@@ -1,27 +1,23 @@
-import { StrictMode } from 'react'
-import ReactDOM from 'react-dom/client'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
+import { StrictMode } from "react";
+import ReactDOM from "react-dom/client";
+import { setupAxiosDefaults } from "@/config/axios";
+import { AppkitProvider } from "@/components/providers/AppkitProvider";
+import QueryProvider from "./components/providers/QueryClientProvider";
+import AppRouterProvider from "./components/providers/AppRouterProvider";
+import "./index.css";
 
-// Import the generated route tree
-import { routeTree } from './routeTree.gen'
+setupAxiosDefaults();
 
-// Create a new router instance
-const router = createRouter({ routeTree })
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-  interface Register {
-    router: typeof router
-  }
-}
-
-// Render the app
-const rootElement = document.getElementById('root')!
+const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
-  const root = ReactDOM.createRoot(rootElement)
+  const root = ReactDOM.createRoot(rootElement);
   root.render(
     <StrictMode>
-      <RouterProvider router={router} />
+      <QueryProvider>
+        <AppkitProvider>
+          <AppRouterProvider />
+        </AppkitProvider>
+      </QueryProvider>
     </StrictMode>,
-  )
+  );
 }
