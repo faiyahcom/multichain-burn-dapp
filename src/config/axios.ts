@@ -47,9 +47,6 @@ const addInterceptors = (axiosInstance: AxiosInstance) => {
 const createAxiosInstance = (baseUrl: string) => {
   const instance = axios.create({
     baseURL: baseUrl,
-    // Tắt withCredentials vì server chưa config CORS với credentials
-    // Nếu server đã config đúng Access-Control-Allow-Credentials: true,
-    // thì có thể bật lại withCredentials: true
     withCredentials: false,
   });
 
@@ -58,7 +55,7 @@ const createAxiosInstance = (baseUrl: string) => {
   return instance;
 };
 
-// Type helper để TypeScript hiểu interceptor đã return response.data
+// Type helper to help TypeScript understand that the interceptor returns response.data
 type ApiClient = Omit<AxiosInstance, 'get' | 'post' | 'put' | 'delete' | 'patch'> & {
   get<T = any>(url: string, config?: any): Promise<T>;
   post<T = any>(url: string, data?: any, config?: any): Promise<T>;
