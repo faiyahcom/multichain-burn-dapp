@@ -4,6 +4,7 @@ import { setupAxiosDefaults } from "@/config/axios";
 import { AppkitProvider } from "@/components/providers/AppkitProvider";
 import QueryProvider from "@/components/providers/QueryClientProvider";
 import AppRouterProvider from "@/components/providers/AppRouterProvider";
+import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
 
 setupAxiosDefaults();
@@ -15,7 +16,9 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryProvider>
         <AppkitProvider>
-          <AppRouterProvider />
+          <ThemeProvider defaultTheme="system" storageKey="xfaiyah-ui-theme">
+            <AppRouterProvider />
+          </ThemeProvider>
         </AppkitProvider>
       </QueryProvider>
     </StrictMode>,
