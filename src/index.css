@@ -1,70 +1,241 @@
 @import "tailwindcss";
 
+/* Optional: import Poppins from Google Fonts (or include your own @font-face) */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+/* Dark mode variant using a .dark class on a parent element (e.g. <html class="dark">) */
+@custom-variant dark (&:where(.dark &));
+
+/* Map design tokens -> Tailwind theme tokens */
+@theme inline {
+  /* Radii */
+  --radius: 0.75rem;
+  /* 12px */
+  --radius-sm: calc(var(--radius) - 4px);
+  /* 8px */
+  --radius-md: var(--radius);
+  /* 12px */
+  --radius-lg: calc(var(--radius) + 4px);
+  /* 16px */
+  --radius-xl: calc(var(--radius) + 8px);
+  /* 20px */
+
+  /* Font */
+  --font-poppins:
+    "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-sans: var(--font-poppins);
+
+  /* Text sizes (Tailwind text-*) */
+  --text-tiny: 0.625rem;
+  /* 10px */
+  --text-xs: 0.75rem;
+  /* 12px */
+  --text-sm: 0.875rem;
+  /* 14px */
+  --text-base: 1rem;
+  /* 16px */
+  --text-md: 1.0625rem;
+  /* 17px */
+  --text-lg: 1.125rem;
+  /* 18px */
+  --text-xl: 1.25rem;
+  /* 20px */
+  --text-2xl: 1.5rem;
+  /* 24px */
+  --text-3xl: 2rem;
+  /* 32px */
+
+  /* Core semantic colors */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-sub-bg: var(--sub-bg);
+  --color-sub-text: var(--sub-text);
+  --color-secondary-text: var(--secondary-text);
+
+  /* State / accents */
+  --color-active: var(--active);
+  --color-inactive: var(--inactive);
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-greyed: var(--greyed);
+
+  /* Status colors */
+  --color-status-close: var(--status-close);
+  --color-status-end: var(--status-end);
+  --color-status-cancel: var(--status-cancel);
+  --color-status-ongoing: var(--status-ongoing);
+
+  /* Progress */
+  --color-progress: var(--progress);
+  --color-progress-bg: var(--progress-bg);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+}
+
+/* Light mode design tokens (default) */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+  /* Your base palette */
+  --background: #e7f1f6;
+  --foreground: #000000;
+  --sub-bg: #ffffff;
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  --active: #6e37ff;
+  --inactive: #dee4f6;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  --sub-text: #4e4e4e;
+  --secondary-text: #7989ba;
+
+  --success: #7af4cb;
+  --error: #ff8e97;
+  --greyed: #696969;
+
+  --status-close: #8eeaff;
+  --status-end: #a5b7ff;
+  --status-cancel: #f698ff;
+  --status-ongoing: #7af4cb;
+
+  --progress: #ffbb37;
+  --progress-bg: #dde1fa;
+
+  /* Shadcn-compatible tokens mapped to your colors */
+  --radius: 0.75rem;
+  --card: var(--sub-bg);
+  --card-foreground: var(--foreground);
+  --popover: var(--sub-bg);
+  --popover-foreground: var(--foreground);
+
+  --primary: var(--active);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--inactive);
+  --secondary-foreground: var(--sub-text);
+
+  --muted: var(--inactive);
+  --muted-foreground: var(--secondary-text);
+
+  --accent: var(--background);
+  --accent-foreground: var(--foreground);
+
+  --destructive: var(--error);
+
+  --border: var(--progress-bg);
+  --input: var(--sub-bg);
+  --ring: var(--active);
+
+  /* Charts and sidebar derive from your palette */
+  --chart-1: var(--active);
+  --chart-2: var(--success);
+  --chart-3: var(--status-close);
+  --chart-4: var(--status-end);
+  --chart-5: var(--progress);
+
+  --sidebar: var(--sub-bg);
+  --sidebar-foreground: var(--sub-text);
+  --sidebar-primary: var(--active);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--background);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--progress-bg);
+  --sidebar-ring: var(--active);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+/* Dark mode design tokens (tweak these later as you like) */
+.dark {
+  --background: oklch(0.145 0 0);
+  /* near-slate-950 */
+  --foreground: oklch(0.985 0 0);
+  /* near-slate-50 */
+  --sub-bg: #020617;
+
+  --active: #8b5cff;
+  /* slightly softer active */
+  --inactive: #1e293b;
+
+  --sub-text: #cbd5f5;
+  --secondary-text: #94a3b8;
+
+  --success: #34d399;
+  --error: #fb7185;
+  --greyed: #696969;
+
+  --status-close: #38bdf8;
+  --status-end: #6366f1;
+  --status-cancel: #f472b6;
+  --status-ongoing: #22c55e;
+
+  --progress: #facc15;
+  --progress-bg: #1f2937;
+  --card: oklch(0.205 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.205 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.922 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.704 0.191 22.216);
+  --border: oklch(1 0 0 / 10%);
+  --input: oklch(1 0 0 / 15%);
+  --ring: oklch(0.556 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.556 0 0);
 }
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-poppins);
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
+
+  * {
+    @apply border-border outline-ring/50;
   }
 }
