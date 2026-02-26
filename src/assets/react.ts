@@ -1,0 +1,1 @@
+export { default as IconUpload } from './icons/upload.svg?react'

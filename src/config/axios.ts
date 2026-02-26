@@ -3,7 +3,7 @@ import axios, {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from "axios";
-import { useAuthStore } from "@/store/authStore";
+import { useAuthStore } from "@/stores/authStore";
 import { API_BASE_URL } from '@/config/constant'
 
 const addInterceptors = (axiosInstance: AxiosInstance) => { 

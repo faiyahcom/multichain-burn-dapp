@@ -3,7 +3,7 @@ import { useSignMessage } from 'wagmi'
 import { useAppKitAccount } from '@reown/appkit/react'
 import bs58 from 'bs58'
 import { authService } from '@/services/authService'
-import { useAuthStore } from '@/store/authStore'
+import { useAuthStore } from '@/stores/authStore'
 
 type WalletType = 'evm' | 'solana'
 

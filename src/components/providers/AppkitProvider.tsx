@@ -1,5 +1,5 @@
 import { AppKitProvider } from '@reown/appkit/react'
-import type { PropsWithChildren } from 'react'
+import { type PropsWithChildren } from 'react'
 import { WagmiProvider } from 'wagmi'
 import { appKitConfig, wagmiAdapter } from '@/config/appkit'
 
