@@ -10,6 +10,7 @@ import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     TOKEN_PROGRAM_ID,
+    getMint,
 } from "@solana/spl-token";
 import {
     getMultichainBurnProgram,
@@ -23,6 +24,7 @@ import {
     getFactoryPDA,
     detectAssetType,
 } from "@/web3/helpers";
+import { toBaseUnits } from "@/utils/helpers/numbers";
 
 export type CreatePoolParams = {
     rewardMint: PublicKey;
@@ -92,6 +94,10 @@ export const useCreateSwapPoolSolanaFn = () => {
                     params.depositMint,
                 );
 
+                const rewardMintInfo = await getMint(connection, params.rewardMint);
+                const rewardDecimals = rewardMintInfo.decimals;
+                console.log("rewardDecimals", rewardDecimals);
+
                 // =============================
                 // 4️⃣ Pool Config
                 // =============================
@@ -101,11 +107,17 @@ export const useCreateSwapPoolSolanaFn = () => {
                 );
 
                 const timeStart = Math.floor(Date.now() / 1000);
-                const timeEnd = timeStart + 2 * 60 * 60;
+                // This pool start like forever
+                const timeEnd = 9999999999; // timestamp max
 
                 // =============================
                 // 5️⃣ Build createPool TX (Anchor)
                 // =============================
+                const rewardAmountInSmallestUnits = toBaseUnits(
+                    params.rewardAmount.toString(),
+                    rewardDecimals,
+                );
+
                 const tx = await program.methods
                     .createPool({
                         projectOwner: walletPublicKey,
@@ -117,7 +129,7 @@ export const useCreateSwapPoolSolanaFn = () => {
                         ratioDenominator: new BN(ratioDenominator),
                         assetType: depositAssetType,
                         assetRewardType: rewardAssetType,
-                        rewardAmount: new BN(params.rewardAmount),
+                        rewardAmount: rewardAmountInSmallestUnits,
                     })
                     .accounts({
                         factory: factoryPDA,
