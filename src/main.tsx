@@ -6,6 +6,7 @@ import QueryProvider from "@/components/providers/QueryClientProvider";
 import AppRouterProvider from "@/components/providers/AppRouterProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
+import "./polyfills";
 setupAxiosDefaults();
 
 const rootElement = document.getElementById("root")!;
