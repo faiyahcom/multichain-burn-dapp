@@ -10,33 +10,182 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SwapIndexRouteImport } from './routes/swap/index'
+import { Route as SwapHistoryIndexRouteImport } from './routes/swap-history/index'
+import { Route as SupportIndexRouteImport } from './routes/support/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as PersonalInfoSettingsIndexRouteImport } from './routes/personal-info-settings/index'
+import { Route as PairListIndexRouteImport } from './routes/pair-list/index'
+import { Route as MyParticipatedPoolsIndexRouteImport } from './routes/my-participated-pools/index'
+import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/index'
+import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
+import { Route as BurnPoolIndexRouteImport } from './routes/burn-pool/index'
+import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SwapIndexRoute = SwapIndexRouteImport.update({
+  id: '/swap/',
+  path: '/swap/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SwapHistoryIndexRoute = SwapHistoryIndexRouteImport.update({
+  id: '/swap-history/',
+  path: '/swap-history/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportIndexRoute = SupportIndexRouteImport.update({
+  id: '/support/',
+  path: '/support/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PersonalInfoSettingsIndexRoute =
+  PersonalInfoSettingsIndexRouteImport.update({
+    id: '/personal-info-settings/',
+    path: '/personal-info-settings/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PairListIndexRoute = PairListIndexRouteImport.update({
+  id: '/pair-list/',
+  path: '/pair-list/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyParticipatedPoolsIndexRoute =
+  MyParticipatedPoolsIndexRouteImport.update({
+    id: '/my-participated-pools/',
+    path: '/my-participated-pools/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const MyDashboardIndexRoute = MyDashboardIndexRouteImport.update({
+  id: '/my-dashboard/',
+  path: '/my-dashboard/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyCreatePoolsIndexRoute = MyCreatePoolsIndexRouteImport.update({
+  id: '/my-create-pools/',
+  path: '/my-create-pools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BurnPoolIndexRoute = BurnPoolIndexRouteImport.update({
+  id: '/burn-pool/',
+  path: '/burn-pool/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
+  id: '/activity-history/',
+  path: '/activity-history/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/activity-history': typeof ActivityHistoryIndexRoute
+  '/burn-pool': typeof BurnPoolIndexRoute
+  '/my-create-pools': typeof MyCreatePoolsIndexRoute
+  '/my-dashboard': typeof MyDashboardIndexRoute
+  '/my-participated-pools': typeof MyParticipatedPoolsIndexRoute
+  '/pair-list': typeof PairListIndexRoute
+  '/personal-info-settings': typeof PersonalInfoSettingsIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/support': typeof SupportIndexRoute
+  '/swap-history': typeof SwapHistoryIndexRoute
+  '/swap': typeof SwapIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/activity-history': typeof ActivityHistoryIndexRoute
+  '/burn-pool': typeof BurnPoolIndexRoute
+  '/my-create-pools': typeof MyCreatePoolsIndexRoute
+  '/my-dashboard': typeof MyDashboardIndexRoute
+  '/my-participated-pools': typeof MyParticipatedPoolsIndexRoute
+  '/pair-list': typeof PairListIndexRoute
+  '/personal-info-settings': typeof PersonalInfoSettingsIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/support': typeof SupportIndexRoute
+  '/swap-history': typeof SwapHistoryIndexRoute
+  '/swap': typeof SwapIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/activity-history/': typeof ActivityHistoryIndexRoute
+  '/burn-pool/': typeof BurnPoolIndexRoute
+  '/my-create-pools/': typeof MyCreatePoolsIndexRoute
+  '/my-dashboard/': typeof MyDashboardIndexRoute
+  '/my-participated-pools/': typeof MyParticipatedPoolsIndexRoute
+  '/pair-list/': typeof PairListIndexRoute
+  '/personal-info-settings/': typeof PersonalInfoSettingsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/support/': typeof SupportIndexRoute
+  '/swap-history/': typeof SwapHistoryIndexRoute
+  '/swap/': typeof SwapIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/activity-history'
+    | '/burn-pool'
+    | '/my-create-pools'
+    | '/my-dashboard'
+    | '/my-participated-pools'
+    | '/pair-list'
+    | '/personal-info-settings'
+    | '/settings'
+    | '/support'
+    | '/swap-history'
+    | '/swap'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/activity-history'
+    | '/burn-pool'
+    | '/my-create-pools'
+    | '/my-dashboard'
+    | '/my-participated-pools'
+    | '/pair-list'
+    | '/personal-info-settings'
+    | '/settings'
+    | '/support'
+    | '/swap-history'
+    | '/swap'
+  id:
+    | '__root__'
+    | '/'
+    | '/activity-history/'
+    | '/burn-pool/'
+    | '/my-create-pools/'
+    | '/my-dashboard/'
+    | '/my-participated-pools/'
+    | '/pair-list/'
+    | '/personal-info-settings/'
+    | '/settings/'
+    | '/support/'
+    | '/swap-history/'
+    | '/swap/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ActivityHistoryIndexRoute: typeof ActivityHistoryIndexRoute
+  BurnPoolIndexRoute: typeof BurnPoolIndexRoute
+  MyCreatePoolsIndexRoute: typeof MyCreatePoolsIndexRoute
+  MyDashboardIndexRoute: typeof MyDashboardIndexRoute
+  MyParticipatedPoolsIndexRoute: typeof MyParticipatedPoolsIndexRoute
+  PairListIndexRoute: typeof PairListIndexRoute
+  PersonalInfoSettingsIndexRoute: typeof PersonalInfoSettingsIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+  SupportIndexRoute: typeof SupportIndexRoute
+  SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
+  SwapIndexRoute: typeof SwapIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +197,99 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/swap/': {
+      id: '/swap/'
+      path: '/swap'
+      fullPath: '/swap'
+      preLoaderRoute: typeof SwapIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/swap-history/': {
+      id: '/swap-history/'
+      path: '/swap-history'
+      fullPath: '/swap-history'
+      preLoaderRoute: typeof SwapHistoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support/': {
+      id: '/support/'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/personal-info-settings/': {
+      id: '/personal-info-settings/'
+      path: '/personal-info-settings'
+      fullPath: '/personal-info-settings'
+      preLoaderRoute: typeof PersonalInfoSettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/pair-list/': {
+      id: '/pair-list/'
+      path: '/pair-list'
+      fullPath: '/pair-list'
+      preLoaderRoute: typeof PairListIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-participated-pools/': {
+      id: '/my-participated-pools/'
+      path: '/my-participated-pools'
+      fullPath: '/my-participated-pools'
+      preLoaderRoute: typeof MyParticipatedPoolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-dashboard/': {
+      id: '/my-dashboard/'
+      path: '/my-dashboard'
+      fullPath: '/my-dashboard'
+      preLoaderRoute: typeof MyDashboardIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-create-pools/': {
+      id: '/my-create-pools/'
+      path: '/my-create-pools'
+      fullPath: '/my-create-pools'
+      preLoaderRoute: typeof MyCreatePoolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/burn-pool/': {
+      id: '/burn-pool/'
+      path: '/burn-pool'
+      fullPath: '/burn-pool'
+      preLoaderRoute: typeof BurnPoolIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/activity-history/': {
+      id: '/activity-history/'
+      path: '/activity-history'
+      fullPath: '/activity-history'
+      preLoaderRoute: typeof ActivityHistoryIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ActivityHistoryIndexRoute: ActivityHistoryIndexRoute,
+  BurnPoolIndexRoute: BurnPoolIndexRoute,
+  MyCreatePoolsIndexRoute: MyCreatePoolsIndexRoute,
+  MyDashboardIndexRoute: MyDashboardIndexRoute,
+  MyParticipatedPoolsIndexRoute: MyParticipatedPoolsIndexRoute,
+  PairListIndexRoute: PairListIndexRoute,
+  PersonalInfoSettingsIndexRoute: PersonalInfoSettingsIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+  SupportIndexRoute: SupportIndexRoute,
+  SwapHistoryIndexRoute: SwapHistoryIndexRoute,
+  SwapIndexRoute: SwapIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

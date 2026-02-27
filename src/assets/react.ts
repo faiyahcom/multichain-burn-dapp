@@ -1,3 +1,15 @@
-export { default as IconUpload } from './icons/upload.svg?react'
+export { default as IconUpload } from "./icons/upload.svg?react";
 
-export { default as IconS } from './icons/s.svg?react'
+export { default as IconS } from "./icons/s.svg?react";
+
+export { default as IconActivityHistory } from "./icons/activity-history.svg?react";
+export { default as IconBurnPool } from "./icons/burn-pool.svg?react";
+export { default as IconMyCreatedPools } from "./icons/my-created-pools.svg?react";
+export { default as IconMyDashboard } from "./icons/my-dashboard.svg?react";
+export { default as IconMyParticipatedPools } from "./icons/my-participated-pools.svg?react";
+export { default as IconPairList } from "./icons/pair-list.svg?react";
+export { default as IconPersonalInfoSettings } from "./icons/personal-info-settings.svg?react";
+export { default as IconSettings } from "./icons/settings.svg?react";
+export { default as IconSupport } from "./icons/support.svg?react";
+export { default as IconSwapHistory } from "./icons/swap-history.svg?react";
+export { default as IconSwap } from "./icons/swap.svg?react";
