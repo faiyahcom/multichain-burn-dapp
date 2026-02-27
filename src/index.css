@@ -17,6 +17,8 @@
   /* 8px */
   --radius-md: var(--radius);
   /* 12px */
+  --radius-md-plus: calc(var(--radius) + 3px);
+  /* 15px */
   --radius-lg: calc(var(--radius) + 4px);
   /* 16px */
   --radius-xl: calc(var(--radius) + 8px);

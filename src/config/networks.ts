@@ -2,7 +2,7 @@
 
 import {
     sepolia,
-    solanaTestnet,
+    solanaDevnet,
     type AppKitNetwork,
 } from "@reown/appkit/networks";
 
@@ -10,7 +10,7 @@ export type NetworkId =
     | "ethereumTestnet"
     | "binanceTestnet"
     | "xphereTestnet"
-    | "solanaTestnet";
+    | "solanaDevnet";
 
 export type NetworkConfig = {
     id: NetworkId;
@@ -89,9 +89,9 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
         appKitNetwork: xphereTestnet,
     },
     {
-        id: "solanaTestnet",
-        label: "Solana Testnet",
+        id: "solanaDevnet",
+        label: "Solana Devnet",
         iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
-        appKitNetwork: solanaTestnet,
+        appKitNetwork: solanaDevnet,
     },
 ];
