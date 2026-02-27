@@ -1,5 +1,6 @@
 import { PublicKey, Connection } from "@solana/web3.js";
 import { BN } from "bn.js";
+import { Buffer } from "buffer";
 
 export const getFactoryPDA = (programId: PublicKey): PublicKey => {
     const [pda] = PublicKey.findProgramAddressSync(

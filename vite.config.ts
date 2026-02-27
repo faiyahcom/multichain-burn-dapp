@@ -7,6 +7,9 @@ import svgr from 'vite-plugin-svgr'
 
 // https://vite.dev/config/
 export default defineConfig({
+  define: {
+    global: 'globalThis',
+  },
   plugins: [
     tanstackRouter({
       target: 'react',
@@ -19,6 +22,10 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
+      buffer: 'buffer',
     },
+  },
+  optimizeDeps: {
+    include: ['buffer'],
   },
 })
