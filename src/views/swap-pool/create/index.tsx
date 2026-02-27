@@ -1,11 +1,12 @@
-import React from 'react'
+import CreateSwapPoolForm from './form'
 
 type Props = {}
 
-const CreateSwapPool = (props: Props) => {
+const CreateSwapPool = ({}: Props) => {
     return (
-        <div className="p-6 flex w-full justify-center">
-            <h1 className='text-3xl font-semibold'>CREATE SWAP POOL</h1>
+        <div className="p-6 flex flex-col w-full items-center">
+            <h1 className='text-3xl font-semibold pt-4 pb-8'>CREATE SWAP POOL</h1>
+            <CreateSwapPoolForm />
         </div>
     )
 }

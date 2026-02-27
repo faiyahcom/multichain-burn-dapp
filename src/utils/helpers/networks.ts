@@ -10,7 +10,7 @@ export function mapChainToSystemNetwork(
         }
 
         if (namespace === "solana") {
-            return net.id === "solanaTestnet";
+            return net.id === "solanaDevnet";
         }
 
         return false;
