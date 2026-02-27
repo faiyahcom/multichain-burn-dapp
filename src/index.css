@@ -1,7 +1,7 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tailwindcss";
 
 /* Optional: import Poppins from Google Fonts (or include your own @font-face) */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
