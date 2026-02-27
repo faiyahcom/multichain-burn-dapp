@@ -6,10 +6,7 @@ import QueryProvider from "@/components/providers/QueryClientProvider";
 import AppRouterProvider from "@/components/providers/AppRouterProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
-import Buffer from "buffer";
-
 setupAxiosDefaults();
-window.Buffer = Buffer as any;
 
 const rootElement = document.getElementById("root")!;
 if (!rootElement.innerHTML) {
