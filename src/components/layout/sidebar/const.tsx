@@ -1,0 +1,105 @@
+import {
+  IconActivityHistory,
+  IconBurnPool,
+  IconMyCreatedPools,
+  IconMyDashboard,
+  IconMyParticipatedPools,
+  IconPairList,
+  IconPersonalInfoSettings,
+  IconSettings,
+  IconSupport,
+  IconSwap,
+  IconSwapHistory,
+} from "@/assets/react";
+
+export const navSection = {
+  overview: "overview",
+  profile_menu: "profile_menu",
+  tools: "tools",
+} as const;
+
+type NavSection = (typeof navSection)[keyof typeof navSection];
+
+export const NavSectionLabel: Record<NavSection, string> = {
+  [navSection.overview]: "Overview",
+  [navSection.profile_menu]: "Profile Menu",
+  [navSection.tools]: "Tools",
+};
+
+type NavItem = {
+  label: string;
+  to?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  section: NavSection;
+};
+
+export const navItems: NavItem[] = [
+  {
+    label: "Pair List",
+    icon: IconPairList,
+    section: navSection.overview,
+    to: "/pair-list",
+  },
+  {
+    label: "Burn Pool",
+    icon: IconBurnPool,
+    section: navSection.overview,
+    to: "/burn-pool",
+  },
+  {
+    label: "Swap",
+    icon: IconSwap,
+    section: navSection.overview,
+    to: "/swap",
+  },
+  // My Dashboard, Personal Info Settings, My Create Pools, My Participated Pools, Swap History, Activity History
+  {
+    label: "My Dashboard",
+    icon: IconMyDashboard,
+    section: navSection.profile_menu,
+    to: "/my-dashboard",
+  },
+  {
+    label: "Personal Info Settings",
+    icon: IconPersonalInfoSettings,
+    section: navSection.profile_menu,
+    to: "/personal-info-settings",
+  },
+  {
+    label: "My Create Pools",
+    icon: IconMyCreatedPools,
+    section: navSection.profile_menu,
+    to: "/my-create-pools",
+  },
+
+  {
+    label: "My Participated Pools",
+    icon: IconMyParticipatedPools,
+    section: navSection.profile_menu,
+    to: "/my-participated-pools",
+  },
+  {
+    label: "Swap History",
+    icon: IconSwapHistory,
+    section: navSection.profile_menu,
+    to: "/swap-history",
+  },
+  {
+    label: "Activity History",
+    icon: IconActivityHistory,
+    section: navSection.profile_menu,
+    to: "/activity-history",
+  },
+  {
+    label: "Support",
+    icon: IconSupport,
+    section: navSection.tools,
+    to: "/support",
+  },
+  {
+    label: "Settings",
+    icon: IconSettings,
+    section: navSection.tools,
+    to: "/settings",
+  },
+];
