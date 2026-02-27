@@ -1145,8 +1145,9 @@
                 ]
               },
               {
-                "kind": "arg",
-                "path": "args.pool_id"
+                "kind": "account",
+                "path": "factory.pool_count",
+                "account": "FactoryAccount"
               }
             ]
           }
@@ -2407,6 +2408,69 @@
       "args": []
     },
     {
+      "name": "reject_pool",
+      "discriminator": [
+        101,
+        162,
+        80,
+        96,
+        2,
+        225,
+        0,
+        0
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "factory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "request_open_pool",
       "discriminator": [
         248,
@@ -3251,6 +3315,19 @@
       ]
     },
     {
+      "name": "MerkleRootSet",
+      "discriminator": [
+        71,
+        89,
+        215,
+        23,
+        123,
+        11,
+        135,
+        16
+      ]
+    },
+    {
       "name": "PoolApproved",
       "discriminator": [
         91,
@@ -3261,6 +3338,19 @@
         121,
         51,
         52
+      ]
+    },
+    {
+      "name": "PoolCancelled",
+      "discriminator": [
+        204,
+        15,
+        86,
+        4,
+        124,
+        97,
+        170,
+        173
       ]
     },
     {
@@ -3300,6 +3390,32 @@
         211,
         159,
         236
+      ]
+    },
+    {
+      "name": "PoolRejected",
+      "discriminator": [
+        134,
+        227,
+        210,
+        39,
+        81,
+        245,
+        66,
+        176
+      ]
+    },
+    {
+      "name": "PoolRequested",
+      "discriminator": [
+        134,
+        110,
+        176,
+        106,
+        84,
+        134,
+        201,
+        194
       ]
     },
     {
@@ -3378,6 +3494,32 @@
         160,
         82,
         46
+      ]
+    },
+    {
+      "name": "WhitelistTokenUpdated",
+      "discriminator": [
+        59,
+        148,
+        229,
+        22,
+        1,
+        104,
+        54,
+        169
+      ]
+    },
+    {
+      "name": "WhitelistUserUpdated",
+      "discriminator": [
+        225,
+        69,
+        124,
+        253,
+        137,
+        115,
+        178,
+        224
       ]
     }
   ],
@@ -3583,10 +3725,6 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "pool_id",
-            "type": "u64"
-          },
-          {
             "name": "project_owner",
             "type": "pubkey"
           },
@@ -3699,6 +3837,31 @@
             "name": "whitelist_user",
             "type": {
               "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "MerkleRootSet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "merkle_root",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
             }
           }
         ]
@@ -3830,6 +3993,26 @@
       }
     },
     {
+      "name": "PoolCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "project_owner",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "PoolClosed",
       "type": {
         "kind": "struct",
@@ -3946,6 +4129,46 @@
       }
     },
     {
+      "name": "PoolRejected",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "admin",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolRequested",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "project_owner",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "PoolStatus",
       "repr": {
         "kind": "rust"
@@ -3976,6 +4199,9 @@
           },
           {
             "name": "Canceled"
+          },
+          {
+            "name": "Rejected"
           }
         ]
       }
@@ -4192,6 +4418,34 @@
           {
             "name": "bump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistTokenUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "whitelist_token",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "WhitelistUserUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "whitelist_user",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }

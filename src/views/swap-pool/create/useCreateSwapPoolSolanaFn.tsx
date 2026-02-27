@@ -57,8 +57,6 @@ export const useCreateSwapPoolSolanaFn = () => {
 
                 const program = getMultichainBurnProgram(connection, anchorWallet);
 
-                const poolId = Math.floor(Math.random() * 1_000_000_000_000_000);
-
                 // =============================
                 // 1️⃣ Derive ATA
                 // =============================
@@ -76,7 +74,7 @@ export const useCreateSwapPoolSolanaFn = () => {
                 // @ts-ignore
                 const factory = await program.account.factoryAccount.fetch(factoryPDA);
                 const treasuryPubkey = factory.treasury;
-                const poolPDA = getPoolPDA(poolId, program.programId);
+                const poolPDA = getPoolPDA(factory.poolCount, program.programId);
                 const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
                 const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
 
@@ -108,7 +106,6 @@ export const useCreateSwapPoolSolanaFn = () => {
                 // =============================
                 const tx = await program.methods
                     .createPool({
-                        poolId: new BN(poolId),
                         projectOwner: walletPublicKey,
                         timeStart: new BN(timeStart),
                         timeEnd: new BN(timeEnd),
