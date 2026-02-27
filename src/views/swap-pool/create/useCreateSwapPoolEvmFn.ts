@@ -3,8 +3,9 @@ import { toast } from "sonner";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import MULTICHAIN_BURN_ABI from "@/web3/contracts/multichain_burn_abi_evm.json";
+import { MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS } from "@/web3";
 
-const CONTRACT_ADDRESS = "0x13BE6f130b53D7cd54Ab7A6351f4A5c940D18eBE";
+const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS;
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const AssetType = {
@@ -22,20 +23,21 @@ export const useCreateSwapPoolEvmFn = () => {
     const { isConnected } = useAppKitAccount();
     const { walletProvider } = useAppKitProvider("eip155");
 
-
     const createPool = useCallback(
         async ({
             poolName,
             tokenReward,
             tokenIn,
             rewardAmount,
-            ratio,
+            ratioNumerator,
+            ratioDenominator,
         }: {
             poolName: string;
             tokenReward: string;
             tokenIn: string;
             rewardAmount: number;
-            ratio: "1:1" | "fixed";
+            ratioNumerator: number;
+            ratioDenominator: number;
         }) => {
             try {
                 if (!isConnected || !walletProvider) {
@@ -85,11 +87,12 @@ export const useCreateSwapPoolEvmFn = () => {
                     await tokenContract.approve(CONTRACT_ADDRESS, parsedAmount);
                 }
 
-                const poolNameBytes32 = ethers.encodeBytes32String(poolName.slice(0, 31));
+                const poolNameBytes32 = ethers.encodeBytes32String(
+                    poolName.slice(0, 31),
+                );
 
-                const rewardNumerator = ratio === "1:1" ? BigInt(1) : BigInt(0);
-
-                const rewardDenominator = BigInt(1);
+                const rewardNumerator = BigInt(ratioNumerator);
+                const rewardDenominator = BigInt(ratioDenominator);
 
                 const payload = {
                     poolName: poolNameBytes32,

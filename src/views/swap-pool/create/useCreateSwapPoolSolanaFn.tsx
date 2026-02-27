@@ -29,7 +29,8 @@ export type CreatePoolParams = {
     depositMint: PublicKey;
     rewardAmount: number;
     name: string;
-    ratio: "1:1" | "fixed";
+    ratioNumerator: number;
+    ratioDenominator: number;
 };
 
 export const useCreateSwapPoolSolanaFn = () => {
@@ -94,9 +95,10 @@ export const useCreateSwapPoolSolanaFn = () => {
                 // =============================
                 // 4️⃣ Pool Config
                 // =============================
-                const ratioBps = params.ratio === "1:1" ? 10000 : 0;
-
                 const ratioDenominator = 10000;
+                const ratioBps = Math.floor(
+                    (params.ratioNumerator / params.ratioDenominator) * ratioDenominator,
+                );
 
                 const timeStart = Math.floor(Date.now() / 1000);
                 const timeEnd = timeStart + 2 * 60 * 60;

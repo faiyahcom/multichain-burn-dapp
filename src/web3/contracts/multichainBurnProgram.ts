@@ -1,9 +1,10 @@
 import { Connection, PublicKey, Transaction } from "@solana/web3.js";
 import { AnchorProvider, type Idl, Program } from "@coral-xyz/anchor";
 import idl from "@/web3/contracts/multichain_burn_sc_sol.json";
+import { MULTICHAIN_BURN_PROGRAM_SOLANA_ADDRESS } from "@/web3";
 
 export const MULTICHAIN_BURN_PROGRAM_ID = new PublicKey(
-  "GtbzyHpYikqrQshmDvxiw6Uam66jd4xRHPtGbBdsAiuw",
+  MULTICHAIN_BURN_PROGRAM_SOLANA_ADDRESS,
 );
 
 export type BrowserWallet = {

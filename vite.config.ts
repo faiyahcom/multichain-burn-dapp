@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { tanstackRouter } from '@tanstack/router-plugin/vite'
 import path from 'node:path'
 import svgr from 'vite-plugin-svgr'
+import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,6 +16,9 @@ export default defineConfig({
     react(),
     svgr(),
     tailwindcss(),
+    nodePolyfills({
+      protocolImports: true,
+    }),
   ],
   resolve: {
     alias: {
