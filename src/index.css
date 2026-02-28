@@ -113,6 +113,7 @@
   --color-mb-gray: var(--mb-gray);
   --color-mb-popover: var(--mb-popover);
   --color-mb-check-blue: var(--mb-check-blue);
+  --color-mb-clear-blue: var(--mb-clear-blue);
 }
 
 /* Light mode design tokens (default) */
@@ -183,7 +184,8 @@
 
   --mb-gray: #fafbfc;
   --mb-popover: #e9f2f7;
-  --mb-check-blue: #1D72F8;
+  --mb-check-blue: #1d72f8;
+  --mb-clear-blue: #4383ef;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -244,7 +246,8 @@
 
   --mb-gray: #fafbfc;
   --mb-popover: #e9f2f7;
-  --mb-check-blue: #1D72F8;
+  --mb-check-blue: #1d72f8;
+  --mb-clear-blue: #4383ef;
 }
 
 @layer base {
@@ -255,6 +258,11 @@
 
   * {
     @apply border-border outline-ring/50;
+  }
+
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
   }
 }
 

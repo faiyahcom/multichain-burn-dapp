@@ -4,13 +4,15 @@ import MultipleSelect, {
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { NETWORK_CONFIGS } from "@/config/networks";
+import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
 
 const PairListSearch = () => {
+  const { filter, setFilter } = usePairListSearchFilterStore();
   const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
     (network) => ({
       label: network.label,
       value: network.id,
-      icon: (className?: string) => (
+      icon: ({ className }: { className?: string }) => (
         <NetworkIcon networkId={network.id} className={className} />
       ),
     }),
@@ -23,8 +25,11 @@ const PairListSearch = () => {
           placeholder: "Search pair...",
         }}
       />
-      <MultipleSelect 
+      <MultipleSelect
         options={networkOptions}
+        placeholder="Network"
+        selected={filter.network}
+        onChange={(value) => setFilter({ network: value })}
       />
     </div>
   );
