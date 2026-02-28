@@ -23,6 +23,8 @@
   /* 16px */
   --radius-xl: calc(var(--radius) + 8px);
   /* 20px */
+  --radius-5px: calc(var(--radius) - 7px);
+  /* 5px */
 
   /* Font */
   --font-poppins:
@@ -49,6 +51,7 @@
   /* 24px */
   --text-3xl: 2rem;
   /* 32px */
+  --text-15px: 0.938rem;
 
   /* Core semantic colors */
   --color-background: var(--background);
@@ -108,6 +111,8 @@
 
   --tracking-2-percent: 0.02em;
   --color-mb-gray: var(--mb-gray);
+  --color-mb-popover: var(--mb-popover);
+  --color-mb-check-blue: var(--mb-check-blue);
 }
 
 /* Light mode design tokens (default) */
@@ -177,6 +182,8 @@
   --sidebar-ring: var(--active);
 
   --mb-gray: #fafbfc;
+  --mb-popover: #e9f2f7;
+  --mb-check-blue: #1D72F8;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -236,6 +243,8 @@
   --sidebar-ring: oklch(0.556 0 0);
 
   --mb-gray: #fafbfc;
+  --mb-popover: #e9f2f7;
+  --mb-check-blue: #1D72F8;
 }
 
 @layer base {
@@ -247,4 +256,8 @@
   * {
     @apply border-border outline-ring/50;
   }
+}
+
+@utility popover-shadow {
+  box-shadow: 0px 4px 4px 0px #00000040;
 }
