@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { PublicKey } from "@solana/web3.js";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useNavigate } from "@tanstack/react-router";
 import { useCreateSwapPoolSolanaFn } from "@/views/swap-pool/create/useCreateSwapPoolSolanaFn";
 import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
 import { IconS } from "@/assets/react";
@@ -31,6 +32,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
     const isSolana = namespace === "solana";
     const isEvm = namespace === "eip155";
 
+    const navigate = useNavigate();
     const { createPool: createPoolSolana } = useCreateSwapPoolSolanaFn();
     const { createPool: createPoolEvm } = useCreateSwapPoolEvmFn();
 
@@ -62,7 +64,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
         }
 
         if (isSolana && !onSubmitForm) {
-            await createPoolSolana({
+            const poolAddress = await createPoolSolana({
                 rewardMint: new PublicKey(values.tokenReward),
                 depositMint: new PublicKey(values.tokenBurn),
                 rewardAmount: Number(values.budget),
@@ -70,11 +72,14 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
                 ratioNumerator,
                 ratioDenominator,
             });
+            if (poolAddress) {
+                navigate({ to: "/swap/detail/$address", params: { address: poolAddress } });
+            }
             return;
         }
 
         if (isEvm && !onSubmitForm) {
-            await createPoolEvm({
+            const poolAddress = await createPoolEvm({
                 poolName: values.poolName,
                 tokenReward: values.tokenReward,
                 tokenIn: values.tokenBurn,
@@ -82,6 +87,9 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
                 ratioNumerator,
                 ratioDenominator,
             });
+            if (poolAddress) {
+                navigate({ to: "/swap/detail/$address", params: { address: poolAddress } });
+            }
             return;
         }
 

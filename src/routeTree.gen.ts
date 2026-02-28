@@ -21,6 +21,7 @@ import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/inde
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as BurnPoolIndexRouteImport } from './routes/burn-pool/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
+import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -84,6 +85,11 @@ const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
   path: '/activity-history/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
+  id: '/swap/detail/$address',
+  path: '/swap/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportIndexRoute
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
+  '/swap/detail/$address': typeof SwapDetailAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/support': typeof SupportIndexRoute
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
+  '/swap/detail/$address': typeof SwapDetailAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -127,6 +135,7 @@ export interface FileRoutesById {
   '/support/': typeof SupportIndexRoute
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
+  '/swap/detail/$address': typeof SwapDetailAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -143,6 +152,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/swap-history'
     | '/swap'
+    | '/swap/detail/$address'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -157,6 +167,7 @@ export interface FileRouteTypes {
     | '/support'
     | '/swap-history'
     | '/swap'
+    | '/swap/detail/$address'
   id:
     | '__root__'
     | '/'
@@ -171,6 +182,7 @@ export interface FileRouteTypes {
     | '/support/'
     | '/swap-history/'
     | '/swap/'
+    | '/swap/detail/$address'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -186,6 +198,7 @@ export interface RootRouteChildren {
   SupportIndexRoute: typeof SupportIndexRoute
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
+  SwapDetailAddressRoute: typeof SwapDetailAddressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -274,6 +287,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivityHistoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/swap/detail/$address': {
+      id: '/swap/detail/$address'
+      path: '/swap/detail/$address'
+      fullPath: '/swap/detail/$address'
+      preLoaderRoute: typeof SwapDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -290,6 +310,7 @@ const rootRouteChildren: RootRouteChildren = {
   SupportIndexRoute: SupportIndexRoute,
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,
+  SwapDetailAddressRoute: SwapDetailAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
