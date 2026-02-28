@@ -11,7 +11,7 @@ export function AppLayout({ children }: AppLayoutProps) {
     <div className="flex h-screen w-screen flex-col bg-background text-foreground">
       <MainHeader />
 
-      <div className="flex min-h-0 flex-1">
+      <div className="flex flex-1">
         <Sidebar />
 
         <main className="min-h-[calc(100dvh-var(--spacing)*24)] flex-1 rounded-tl-xl bg-white pt-6.75 pr-0.75 pl-5.25">
