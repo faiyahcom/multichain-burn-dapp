@@ -35,7 +35,7 @@ const SortSelect: React.FC<Props> = ({
   setSortOrder,
   placeholder = "Sort by",
 }) => {
-  const isActive = sortBy !== "none";
+  const isActive = sortBy !== undefined && sortBy !== "none";
 
   // Cycle through No sort (none) => Sort desc => Sort asc => No sort
   const handleToggleSort = (inputSortBy: SortBy) => {

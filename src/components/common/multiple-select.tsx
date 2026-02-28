@@ -30,9 +30,9 @@ const MultipleSelect: React.FC<Props> = ({
   onChange,
   placeholder = "Select",
 }) => {
-  const isAllSelected = selected?.length === options?.length;
+  const isAllSelected = options && options.length > 0 && selected?.length === options.length;
   const isAnySelected = (selected?.length ?? 0) > 0;
-  const atLeastOneIcon = options?.find((option) => option.icon);
+  const atLeastOneIcon = options?.some((option) => option.icon);
 
   const handleToggleAllCheck = () => {
     if (selected?.length === options?.length) {
@@ -76,6 +76,7 @@ const MultipleSelect: React.FC<Props> = ({
               <span className="truncate">
                 {options
                   ?.filter((option) => selected?.includes(option.value))
+                  ?.map((option) => option.label)
                   ?.join(", ")}
               </span>
             )

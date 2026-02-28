@@ -22,19 +22,21 @@ const LayoutPicker: React.FC<Props> = ({
   classNames,
 }) => {
   if (hasContainer) {
-    <div className={cn("flex items-center gap-2.5", classNames?.container)}>
-      {listLayouts.map((layoutItem) => {
-        const isActive = layoutItem === layout;
-        return (
-          <LayoutPickerButton
-            key={layoutItem}
-            layout={layoutItem}
-            isActive={isActive}
-            onClick={() => setLayout?.(layoutItem)}
-          />
-        );
-      })}
-    </div>;
+    return (
+      <div className={cn("flex items-center gap-2.5", classNames?.container)}>
+        {listLayouts.map((layoutItem) => {
+          const isActive = layoutItem === layout;
+          return (
+            <LayoutPickerButton
+              key={layoutItem}
+              layout={layoutItem}
+              isActive={isActive}
+              onClick={() => setLayout?.(layoutItem)}
+            />
+          );
+        })}
+      </div>
+    );
   }
 
   return (
