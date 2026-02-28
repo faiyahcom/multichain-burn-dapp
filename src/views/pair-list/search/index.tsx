@@ -2,6 +2,7 @@ import MultipleSelect, {
   type MultipleSelectOption,
 } from "@/components/common/multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
+import SortSelect from "@/components/common/sort-select";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
@@ -24,12 +25,21 @@ const PairListSearch = () => {
         inputProps={{
           placeholder: "Search pair...",
         }}
+        value={filter.text}
+        onValueChange={(value) => setFilter({ text: value })}
       />
       <MultipleSelect
         options={networkOptions}
         placeholder="Network"
         selected={filter.network}
         onChange={(value) => setFilter({ network: value })}
+      />
+      <SortSelect 
+        options={["volume", "tvl"]}
+        sortBy={filter.sortBy ?? "none"}
+        sortOrder={filter.sortOrder}
+        setSortBy={(sortBy) => setFilter({ sortBy })}
+        setSortOrder={(sortOrder) => setFilter({ sortOrder })}
       />
     </div>
   );

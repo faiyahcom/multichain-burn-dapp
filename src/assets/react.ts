@@ -17,3 +17,5 @@ export { default as IconSwap } from "./icons/swap.svg?react";
 export { default as IconCheck } from "./icons/check.svg?react";
 export { default as IconSquareCheck } from "./icons/square-check.svg?react";
 export { default as IconSquare } from "./icons/square.svg?react";
+
+export { default as IconArrowDownWithStem } from "./icons/arrow-down-with-stem.svg?react";

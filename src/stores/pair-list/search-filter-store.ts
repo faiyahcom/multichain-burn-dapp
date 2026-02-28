@@ -4,7 +4,7 @@ import { create } from "zustand";
 type PairListSearchFilterType = {
   text: string;
   network: string[];
-  sortBy?: Omit<SortBy, "createdAt">;
+  sortBy?: SortBy;
   sortOrder?: SortOrder;
   listLayout?: ListLayout;
 };

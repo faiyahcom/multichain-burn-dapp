@@ -9,6 +9,12 @@ export const sortBysLabels: Record<SortBy, string> = {
   tvl: "TVL",
   createdAt: "Created At",
 };
+export const sortBysShortLabels: Record<SortBy, string> = {
+  none: "None",
+  volume: "Volume",
+  tvl: "TVL",
+  createdAt: "Created At",
+};
 
 export const listLayouts = ["list", "card"] as const;
 export type ListLayout = (typeof listLayouts)[number];
