@@ -1,9 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import PairListSearch from "../../views/pair-list/search";
 
-export const Route = createFileRoute('/pair-list/')({
+export const Route = createFileRoute("/pair-list/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/pair-list/"!</div>
+  return (
+    <div className="pt-9.25 pl-27.5">
+      <PairListSearch />
+    </div>
+  );
 }

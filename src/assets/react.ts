@@ -13,3 +13,12 @@ export { default as IconSettings } from "./icons/settings.svg?react";
 export { default as IconSupport } from "./icons/support.svg?react";
 export { default as IconSwapHistory } from "./icons/swap-history.svg?react";
 export { default as IconSwap } from "./icons/swap.svg?react";
+
+export { default as IconCheck } from "./icons/check.svg?react";
+export { default as IconSquareCheck } from "./icons/square-check.svg?react";
+export { default as IconSquare } from "./icons/square.svg?react";
+
+export { default as IconArrowDownWithStem } from "./icons/arrow-down-with-stem.svg?react";
+
+export { default as IconGrid } from "./icons/grid.svg?react";
+export { default as IconMenu } from "./icons/menu.svg?react";

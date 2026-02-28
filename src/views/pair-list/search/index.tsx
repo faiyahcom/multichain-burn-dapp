@@ -1,0 +1,55 @@
+import LayoutPicker from "@/components/common/layout-picker";
+import MultipleSelect, {
+  type MultipleSelectOption,
+} from "@/components/common/multiple-select";
+import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
+import SortSelect from "@/components/common/sort-select";
+import NetworkIcon from "@/components/layout/header/network-icon";
+import { NETWORK_CONFIGS } from "@/config/networks";
+import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
+
+const PairListSearch = () => {
+  const { filter, setFilter } = usePairListSearchFilterStore();
+  console.log("filter", filter.text);
+  const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
+    (network) => ({
+      label: network.label,
+      value: network.id,
+      icon: ({ className }: { className?: string }) => (
+        <NetworkIcon networkId={network.id} className={className} />
+      ),
+    }),
+  );
+
+  return (
+    <div className="flex items-center justify-end gap-2.5">
+      <SearchTextDebouncedInput
+        inputProps={{
+          placeholder: "Search pair...",
+        }}
+        value={filter.text}
+        onValueChange={(value) => setFilter({ text: value })}
+        className="sm:max-w-62.5"
+      />
+      <MultipleSelect
+        options={networkOptions}
+        placeholder="Network"
+        selected={filter.network}
+        onChange={(value) => setFilter({ network: value })}
+      />
+      <SortSelect
+        options={["volume", "tvl"]}
+        sortBy={filter.sortBy ?? "none"}
+        sortOrder={filter.sortOrder}
+        setSortBy={(sortBy) => setFilter({ sortBy })}
+        setSortOrder={(sortOrder) => setFilter({ sortOrder })}
+      />
+      <LayoutPicker
+        layout={filter.listLayout}
+        setLayout={(layout) => setFilter({ listLayout: layout })}
+      />
+    </div>
+  );
+};
+
+export default PairListSearch;
