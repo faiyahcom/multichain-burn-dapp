@@ -114,7 +114,7 @@ interface Props {
 
 const PairListListListLayout: React.FC<Props> = ({ data = demoData }) => {
   return (
-    <div className="h-full w-full pt-6 pl-27.5 pb-7">
+    <div className="w-full pt-6 pl-27.5 pb-7">
       <Table>
         <TableHeader>
           <TableRow>

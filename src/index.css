@@ -25,6 +25,10 @@
   /* 20px */
   --radius-5px: calc(var(--radius) - 7px);
   /* 5px */
+  --radius-17px: calc(var(--radius) + 5px);
+  /* 17px */
+  --radius-14px: calc(var(--radius) + 2px);
+  /* 14px */
 
   /* Font */
   --font-poppins:
@@ -52,6 +56,7 @@
   --text-3xl: 2rem;
   /* 32px */
   --text-15px: 0.938rem;
+  /* 15px */
 
   /* Core semantic colors */
   --color-background: var(--background);
@@ -115,6 +120,8 @@
   --color-mb-check-blue: var(--mb-check-blue);
   --color-mb-clear-blue: var(--mb-clear-blue);
   --color-mb-table-text: var(--mb-table-text);
+  --color-mb-card-bg-active: var(--mb-card-bg-active);
+  --color-mb-card-value-blue: var(--mb-card-value-blue);
 }
 
 /* Light mode design tokens (default) */
@@ -188,6 +195,8 @@
   --mb-check-blue: #1d72f8;
   --mb-clear-blue: #4383ef;
   --mb-table-text: #27273b;
+  --mb-card-bg-active: #c1cdf2;
+  --mb-card-value-blue: #627eea;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -251,6 +260,8 @@
   --mb-check-blue: #1d72f8;
   --mb-clear-blue: #4383ef;
   --mb-table-text: #27273b;
+  --mb-card-bg-active: #c1cdf2;
+  --mb-card-value-blue: #627eea;
 }
 
 @layer base {
