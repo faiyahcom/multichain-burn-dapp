@@ -10,6 +10,7 @@ import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-s
 
 const PairListSearch = () => {
   const { filter, setFilter } = usePairListSearchFilterStore();
+  console.log("filter", filter.text);
   const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
     (network) => ({
       label: network.label,

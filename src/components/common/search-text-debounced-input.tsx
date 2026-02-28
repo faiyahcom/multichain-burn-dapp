@@ -44,7 +44,7 @@ const SearchTextDebouncedInput: React.FC<Props> = ({
   }, [value]);
 
   useEffect(() => {
-    if (debouncedValue !== localValue) {
+    if (debouncedValue !== value) {
       onValueChange?.(debouncedValue);
     }
   }, [debouncedValue]);
