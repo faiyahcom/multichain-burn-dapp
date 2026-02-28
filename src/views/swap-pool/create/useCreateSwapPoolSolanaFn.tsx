@@ -187,7 +187,7 @@ export const useCreateSwapPoolSolanaFn = () => {
                     description: `Tx: ${signature}`,
                 });
 
-                return signature;
+                return poolPDA.toBase58();
             } catch (error: any) {
                 toast.error("Failed to create pool", {
                     description: error?.message || String(error),

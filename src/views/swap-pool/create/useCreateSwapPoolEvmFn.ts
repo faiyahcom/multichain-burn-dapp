@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { ethers, type Eip1193Provider } from "ethers";
+import { ethers, type Eip1193Provider, type Log } from "ethers";
 import MULTICHAIN_BURN_ABI from "@/web3/contracts/multichain_burn_abi_evm.json";
 import { MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS } from "@/web3";
 
@@ -117,7 +117,25 @@ export const useCreateSwapPoolEvmFn = () => {
                     description: `Tx: ${receipt.hash}`,
                 });
 
-                return receipt.hash;
+                const poolDeployedLog = receipt?.logs?.find((log: Log) => {
+                    try {
+                        const parsed = contract.interface.parseLog({
+                            topics: log.topics as string[],
+                            data: log.data,
+                        });
+                        return parsed?.name === "PoolSwapDeployed";
+                    } catch {
+                        return false;
+                    }
+                });
+                const poolAddress =
+                    poolDeployedLog &&
+                    contract.interface.parseLog({
+                        topics: poolDeployedLog.topics as string[],
+                        data: poolDeployedLog.data,
+                    })?.args?.pool;
+
+                return poolAddress;
             } catch (error: any) {
                 toast.error("Failed to create pool", {
                     description: error?.message || String(error),
