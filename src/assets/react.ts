@@ -19,3 +19,6 @@ export { default as IconSquareCheck } from "./icons/square-check.svg?react";
 export { default as IconSquare } from "./icons/square.svg?react";
 
 export { default as IconArrowDownWithStem } from "./icons/arrow-down-with-stem.svg?react";
+
+export { default as IconGrid } from "./icons/grid.svg?react";
+export { default as IconMenu } from "./icons/menu.svg?react";

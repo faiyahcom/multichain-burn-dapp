@@ -16,6 +16,7 @@ interface Props {
   onValueChange?: (value: string) => void;
   debounceTime?: number;
   addons?: React.ReactNode;
+  className?: string;
 }
 
 const SearchTextDebouncedInput: React.FC<Props> = ({
@@ -28,6 +29,7 @@ const SearchTextDebouncedInput: React.FC<Props> = ({
       <SearchIcon />
     </InputGroupAddon>
   ),
+  className,
 }) => {
   const [localValue, setLocalValue] = useState(value ?? "");
   const [debouncedValue] = useDebounceValue(localValue, debounceTime);
@@ -48,7 +50,7 @@ const SearchTextDebouncedInput: React.FC<Props> = ({
   }, [debouncedValue]);
 
   return (
-    <InputGroup>
+    <InputGroup className={className}>
       <InputGroupInput
         {...inputProps}
         value={localValue}

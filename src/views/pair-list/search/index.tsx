@@ -1,3 +1,4 @@
+import LayoutPicker from "@/components/common/layout-picker";
 import MultipleSelect, {
   type MultipleSelectOption,
 } from "@/components/common/multiple-select";
@@ -27,6 +28,7 @@ const PairListSearch = () => {
         }}
         value={filter.text}
         onValueChange={(value) => setFilter({ text: value })}
+        className="sm:max-w-62.5"
       />
       <MultipleSelect
         options={networkOptions}
@@ -34,12 +36,16 @@ const PairListSearch = () => {
         selected={filter.network}
         onChange={(value) => setFilter({ network: value })}
       />
-      <SortSelect 
+      <SortSelect
         options={["volume", "tvl"]}
         sortBy={filter.sortBy ?? "none"}
         sortOrder={filter.sortOrder}
         setSortBy={(sortBy) => setFilter({ sortBy })}
         setSortOrder={(sortOrder) => setFilter({ sortOrder })}
+      />
+      <LayoutPicker
+        layout={filter.listLayout}
+        setLayout={(layout) => setFilter({ listLayout: layout })}
       />
     </div>
   );

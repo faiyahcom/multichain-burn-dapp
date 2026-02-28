@@ -1,3 +1,6 @@
+import { IconGrid, IconMenu } from "@/assets/react";
+import type { FunctionComponent, SVGProps } from "react";
+
 export const sortOrders = ["asc", "desc"] as const;
 export type SortOrder = (typeof sortOrders)[number];
 
@@ -16,9 +19,20 @@ export const sortBysShortLabels: Record<SortBy, string> = {
   createdAt: "Created At",
 };
 
-export const listLayouts = ["list", "card"] as const;
+export const listLayouts = ["card", "list"] as const;
 export type ListLayout = (typeof listLayouts)[number];
 export const listLayoutsLabels: Record<ListLayout, string> = {
   list: "List",
   card: "Card",
+};
+export const listLayoutsBtnIcons: Record<
+  ListLayout,
+  FunctionComponent<
+    SVGProps<SVGSVGElement> & {
+      title?: string;
+    }
+  >
+> = {
+  list: IconMenu,
+  card: IconGrid,
 };
