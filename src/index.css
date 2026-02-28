@@ -114,6 +114,7 @@
   --color-mb-popover: var(--mb-popover);
   --color-mb-check-blue: var(--mb-check-blue);
   --color-mb-clear-blue: var(--mb-clear-blue);
+  --color-mb-table-text: var(--mb-table-text);
 }
 
 /* Light mode design tokens (default) */
@@ -186,6 +187,7 @@
   --mb-popover: #e9f2f7;
   --mb-check-blue: #1d72f8;
   --mb-clear-blue: #4383ef;
+  --mb-table-text: #27273b;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -248,6 +250,7 @@
   --mb-popover: #e9f2f7;
   --mb-check-blue: #1d72f8;
   --mb-clear-blue: #4383ef;
+  --mb-table-text: #27273b;
 }
 
 @layer base {

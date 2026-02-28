@@ -10,7 +10,6 @@ import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-s
 
 const PairListSearch = () => {
   const { filter, setFilter } = usePairListSearchFilterStore();
-  console.log("filter", filter.text);
   const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
     (network) => ({
       label: network.label,
@@ -22,7 +21,7 @@ const PairListSearch = () => {
   );
 
   return (
-    <div className="flex items-center justify-end gap-2.5">
+    <div className="flex items-center justify-end gap-2.5 pr-14">
       <SearchTextDebouncedInput
         inputProps={{
           placeholder: "Search pair...",
