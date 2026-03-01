@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import type { PoolDetailResponse } from "@/services/poolService";
+import type { PoolDetailResponse } from "@/types/pool";
+
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -22,7 +23,7 @@ function toCleanRatio(numerator?: string, denominator?: string): string {
     return `${num / divisor}:${den / divisor}`;
 }
 
-export function trimAddress(address?: string, head = 4, tail = 4): string {
+export function trimAddress(address?: string, head = 6, tail = 4): string {
     if (!address) return "—";
     if (address.length <= head + tail) return address;
     return `${address.slice(0, head)}...${address.slice(-tail)}`;
@@ -51,14 +52,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 { label: "Ratio", value: cleanRatio },
                 {
                     label: "Burn Token",
-                    value: trimAddress(poolDetail.pool.burnToken),
+                    value: `${poolDetail.pool.tokenInSymbol}`,
                 },
             ],
             [
                 { label: "Burn Method", value: "Transfer to Maker" },
                 {
                     label: "Reward Token",
-                    value: trimAddress(poolDetail.pool.rewardToken),
+                    value: `${poolDetail.pool.rewardTokenSymbol}`,
                 },
             ],
         ];
