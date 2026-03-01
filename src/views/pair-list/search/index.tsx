@@ -2,9 +2,9 @@ import LayoutPicker from "@/components/common/layout-picker";
 import MultipleSelect, {
   type MultipleSelectOption,
 } from "@/components/common/multiple-select";
+import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SortSelect from "@/components/common/sort-select";
-import NetworkIcon from "@/components/layout/header/network-icon";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
 
@@ -15,7 +15,11 @@ const PairListSearch = () => {
       label: network.label,
       value: network.id,
       icon: ({ className }: { className?: string }) => (
-        <NetworkIcon networkId={network.id} className={className} />
+        <NetworkImgIcon
+          src={network.iconSrc}
+          className={className}
+          alt={network.label}
+        />
       ),
     }),
   );

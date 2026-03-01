@@ -122,6 +122,8 @@
   --color-mb-table-text: var(--mb-table-text);
   --color-mb-card-bg-active: var(--mb-card-bg-active);
   --color-mb-card-value-blue: var(--mb-card-value-blue);
+  --color-mb-danger: var(--mb-danger);
+  --color-mb-green: var(--mb-green);
 }
 
 /* Light mode design tokens (default) */
@@ -197,6 +199,8 @@
   --mb-table-text: #27273b;
   --mb-card-bg-active: #c1cdf2;
   --mb-card-value-blue: #627eea;
+  --mb-danger: #f42d3c;
+  --mb-green: #06c081;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -262,6 +266,8 @@
   --mb-table-text: #27273b;
   --mb-card-bg-active: #c1cdf2;
   --mb-card-value-blue: #627eea;
+  --mb-danger: #f42d3c;
+  --mb-green: #06c081;
 }
 
 @layer base {

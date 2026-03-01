@@ -1,0 +1,29 @@
+import type { TokenStatus } from "@/types/admin/whitelist-token";
+import { create } from "zustand";
+
+type AdminWhitelistTokenSearchFilterType = {
+  status: TokenStatus;
+  network: string[];
+  text: string;
+};
+
+type AdminWhitelistTokenSearchFilterState = {
+  filter: AdminWhitelistTokenSearchFilterType;
+  setFilter: (filter: Partial<AdminWhitelistTokenSearchFilterType>) => void;
+};
+
+export const useAdminWhitelistTokenSearchFilterStore =
+  create<AdminWhitelistTokenSearchFilterState>((set) => ({
+    filter: {
+      status: "all",
+      network: [],
+      text: "",
+    },
+    setFilter: (filter) =>
+      set((state) => ({
+        filter: {
+          ...state.filter,
+          ...filter,
+        },
+      })),
+  }));
