@@ -57,6 +57,7 @@
   /* 32px */
   --text-15px: 0.938rem;
   /* 15px */
+  --text-11px: 0.688rem;
 
   /* Core semantic colors */
   --color-background: var(--background);
@@ -124,6 +125,7 @@
   --color-mb-card-value-blue: var(--mb-card-value-blue);
   --color-mb-danger: var(--mb-danger);
   --color-mb-green: var(--mb-green);
+  --color-mb-copy-gray: var(--mb-copy-gray);
 }
 
 /* Light mode design tokens (default) */
@@ -201,6 +203,7 @@
   --mb-card-value-blue: #627eea;
   --mb-danger: #f42d3c;
   --mb-green: #06c081;
+  --mb-copy-gray: #656988;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -268,6 +271,7 @@
   --mb-card-value-blue: #627eea;
   --mb-danger: #f42d3c;
   --mb-green: #06c081;
+  --mb-copy-gray: #656988;
 }
 
 @layer base {

@@ -22,3 +22,5 @@ export { default as IconArrowDownWithStem } from "./icons/arrow-down-with-stem.s
 
 export { default as IconGrid } from "./icons/grid.svg?react";
 export { default as IconMenu } from "./icons/menu.svg?react";
+
+export { default as IconCopy } from "./icons/copy.svg?react";
