@@ -45,6 +45,7 @@ const AdminWhitelistTokenSearch = () => {
             <p className="text-mb-green">3 active</p>
           </div>
         </div>
+        {/* TODO: add create function */}
         <Button variant={"mb-primary"} size={"mb-square-btn"}>
           Add Token <PlusIcon className="size-3.75" />
         </Button>
