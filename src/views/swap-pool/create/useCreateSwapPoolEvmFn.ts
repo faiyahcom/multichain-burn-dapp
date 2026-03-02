@@ -70,18 +70,31 @@ export const useCreateSwapPoolEvmFn = () => {
                     ? AssetType.NATIVE
                     : AssetType.ERC20;
 
-                const parsedAmount = ethers.parseUnits(rewardAmount.toString(), 18);
+                // Determine token decimals on-chain (for ERC20)
+                let rewardDecimals = 18;
+                let parsedAmount: bigint;
 
-                // -----------------------
-                // ERC20 Approve if needed
-                // -----------------------
-                if (!rewardIsNative) {
+                if (rewardIsNative) {
+                    parsedAmount = ethers.parseUnits(
+                        rewardAmount.toString(),
+                        rewardDecimals,
+                    );
+                } else {
                     const tokenContract = new ethers.Contract(
                         tokenReward,
                         [
+                            "function decimals() view returns (uint8)",
                             "function approve(address spender, uint256 amount) external returns (bool)",
                         ],
                         signer,
+                    );
+
+                    const decimals = await tokenContract.decimals();
+                    rewardDecimals = Number(decimals);
+
+                    parsedAmount = ethers.parseUnits(
+                        rewardAmount.toString(),
+                        rewardDecimals,
                     );
 
                     await tokenContract.approve(CONTRACT_ADDRESS, parsedAmount);
