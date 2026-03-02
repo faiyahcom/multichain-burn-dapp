@@ -1,7 +1,7 @@
 import type { MultipleSelectOption } from "@/components/common/multiple-select";
 import MultipleSelect from "@/components/common/multiple-select";
 import NetworkImgIcon from "@/components/common/network-img-icon";
-import { Button } from "@/components/ui/button";
+import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
 import {
@@ -9,9 +9,8 @@ import {
   tokenStatusLabels,
   type TokenStatus,
 } from "@/types/admin/whitelist-token";
-import { PlusIcon } from "lucide-react";
+import AdminWhitelistTokenDialogCreate from "../dialog/create";
 import AdminWhitelistTokenSearchStatusPicker from "./status-picker";
-import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 
 const AdminWhitelistTokenSearch = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
@@ -45,10 +44,7 @@ const AdminWhitelistTokenSearch = () => {
             <p className="text-mb-green">3 active</p>
           </div>
         </div>
-        {/* TODO: add create function */}
-        <Button variant={"mb-primary"} size={"mb-square-btn"}>
-          Add Token <PlusIcon className="size-3.75" />
-        </Button>
+        <AdminWhitelistTokenDialogCreate />
       </div>
 
       {/* status + network + text */}

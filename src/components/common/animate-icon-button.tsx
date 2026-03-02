@@ -1,25 +1,48 @@
 import { cn } from "@/lib/utils";
 import LetterIcon from "./letter-icon";
 
-interface Props {
+interface BaseProps {
   textVariant?: "text-left" | "text-container-center" | "text-self-center";
   classNames?: {
     btn?: string;
   };
   hasGroupHover?: boolean;
-  iconLetter: string;
   text?: string;
   color?: string;
 }
 
-const AnimateIconButton: React.FC<Props> = ({
-  textVariant,
-  classNames,
-  hasGroupHover,
-  iconLetter,
-  text,
-  color,
-}) => {
+interface LetterIconVariantProps extends BaseProps {
+  variant: "letter-icon";
+  iconLetter: string;
+}
+
+interface ExternalIconVariantProps extends BaseProps {
+  variant: "external-icon";
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+type Props = LetterIconVariantProps | ExternalIconVariantProps;
+
+const AnimateIconButton: React.FC<Props> = (props) => {
+  const { textVariant, classNames, hasGroupHover, text, color } = props;
+
+  const resolveIcon = () => {
+    switch (props.variant ?? "letter-icon") {
+      case "letter-icon":
+        return (
+          <LetterIcon
+            letter={(props as LetterIconVariantProps).iconLetter}
+            className="size-5.5 bg-(--btn-bg)"
+          />
+        );
+      case "external-icon":
+        const Icon = (props as ExternalIconVariantProps).icon;
+        return <Icon className="size-5.5" />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <button
       style={
@@ -43,10 +66,7 @@ const AnimateIconButton: React.FC<Props> = ({
         classNames?.btn,
       )}
     >
-      <LetterIcon
-        letter={iconLetter}
-        className={cn("size-5.5 bg-(--btn-bg)")}
-      />
+      {resolveIcon()}
       <span
         className={cn(
           "text-base font-normal",
