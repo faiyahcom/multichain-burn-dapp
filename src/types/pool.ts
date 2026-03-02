@@ -1,8 +1,13 @@
 export type PoolStatus = "on_going" | "canceled" | "closed";
 
 export interface PoolDetailResponse {
-    totalDeposited: string;
-    totalRewardAmount: string;
+    userDepositedAmount: {
+        address: string;
+        amount: string;
+    };
+    depositedAmount: string;
+    claimedRewardAmount: string;
+    rewardAmount: string;
     pool: {
         address: string;
         name: string;
@@ -12,6 +17,7 @@ export interface PoolDetailResponse {
         chainId: string;
         timestamp: string;
         status: PoolStatus;
+        currentRewardAmount: string;
         rewardTokenSymbol: string;
         rewardTokenDecimals: number;
         tokenInSymbol: string;

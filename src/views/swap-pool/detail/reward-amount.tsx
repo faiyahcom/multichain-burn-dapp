@@ -13,7 +13,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
     }, [poolDetail]);
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.totalRewardAmount,
+            poolDetail.rewardAmount,
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";
