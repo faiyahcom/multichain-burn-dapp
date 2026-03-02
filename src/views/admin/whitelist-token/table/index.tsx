@@ -8,6 +8,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import BlueSwitch from "@/components/common/blue-switch";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
+import CustomPagination from "@/components/common/pagination";
 import {
   Table,
   TableBody,
@@ -16,6 +17,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
 import {
   tokenStatusColors,
   tokenStatusLabels,
@@ -99,6 +101,8 @@ interface Props {
 }
 
 const AdminWhitelistTokenTable: React.FC<Props> = ({ data = demoData }) => {
+  const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
+
   return (
     <div className="pb-10 pl-3.75">
       <Table className="table-auto">
@@ -205,6 +209,13 @@ const AdminWhitelistTokenTable: React.FC<Props> = ({ data = demoData }) => {
           })}
         </TableBody>
       </Table>
+
+      <CustomPagination
+        currentPage={filter.page}
+        totalCount={10000} // TODO: replace with real data
+        pageSize={10} // TODO: replace with real data
+        onPageChange={(page) => setFilter({ page })}
+      />
     </div>
   );
 };
