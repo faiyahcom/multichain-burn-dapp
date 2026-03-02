@@ -38,7 +38,7 @@ const SwapPoolDetail = ({ address }: Props) => {
                         color={POOL_STATUS[safeStatus].color}
                         hasGroupHover
                         classNames={{
-                            btn: "min-w-27 cursor-default",
+                            btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
                             text: "text-2xl font-medium",
                             icon: "size-9 text-3xl",
                         }}
