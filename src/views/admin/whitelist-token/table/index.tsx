@@ -1,4 +1,13 @@
+import {
+  IconEye,
+  IconFileDoc,
+  IconSquareArrowTopRightOut,
+  IconTrashCan,
+} from "@/assets/react";
+import AnimateIconButton from "@/components/common/animate-icon-button";
+import BlueSwitch from "@/components/common/blue-switch";
 import CopyableText from "@/components/common/copyable-text";
+import NetworkDisplay from "@/components/common/network-display";
 import {
   Table,
   TableBody,
@@ -7,7 +16,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import type { TokenStatus } from "@/types/admin/whitelist-token";
+import {
+  tokenStatusColors,
+  tokenStatusLabels,
+  tokenStatusLetters,
+  type TokenStatus,
+} from "@/types/admin/whitelist-token";
 import { truncateString } from "@/utils/helpers/string";
 
 // TODO: might need to change the type
@@ -105,7 +119,7 @@ const AdminWhitelistTokenTable: React.FC<Props> = ({ data = demoData }) => {
             return (
               <TableRow key={index}>
                 <TableCell>
-                  <div className="flex items-center gap-1.75 pl-3.25">
+                  <div className="flex items-center gap-1.75 pl-[15%]">
                     <img
                       src={item.imgSrc}
                       alt={item.name}
@@ -126,6 +140,65 @@ const AdminWhitelistTokenTable: React.FC<Props> = ({ data = demoData }) => {
                       str: item.address,
                     })}
                   />
+                </TableCell>
+                <TableCell>
+                  <NetworkDisplay networkId={item.networkId} />
+                </TableCell>
+                <TableCell>
+                  <p
+                    className="mx-auto max-w-55.25 truncate"
+                    title={item.description}
+                  >
+                    {item.description}
+                  </p>
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-6">
+                    <a
+                      href={item.homepage}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <IconSquareArrowTopRightOut className="[&>path]:group-hover:stroke-[1.5px]" />
+                    </a>
+                    <a
+                      href={item.doc}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      <IconFileDoc className="[&>path]:group-hover:stroke-[1.5px]" />
+                    </a>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <AnimateIconButton
+                    iconLetter={tokenStatusLetters[item.status]}
+                    textVariant="text-self-center"
+                    text={tokenStatusLabels[item.status]}
+                    color={tokenStatusColors[item.status]}
+                    hasGroupHover
+                    classNames={{
+                      btn: "min-w-27 mx-auto",
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <BlueSwitch
+                    active={item.status === "enabled"}
+                    classNames={{
+                      btn: "mx-auto",
+                    }}
+                  />
+                </TableCell>
+                <TableCell>
+                  <div className="flex items-center justify-center gap-4.5">
+                    <button>
+                      <IconEye className="[&>path]:group-hover:stroke-[1.5px]" />
+                    </button>
+                    <button>
+                      <IconTrashCan className="[&>path]:group-hover:stroke-[1.5px]" />
+                    </button>
+                  </div>
                 </TableCell>
               </TableRow>
             );

@@ -24,3 +24,9 @@ export { default as IconGrid } from "./icons/grid.svg?react";
 export { default as IconMenu } from "./icons/menu.svg?react";
 
 export { default as IconCopy } from "./icons/copy.svg?react";
+
+export { default as IconFileDoc } from "./icons/file-doc.svg?react";
+export { default as IconSquareArrowTopRightOut } from "./icons/square-arrow-top-right-out.svg?react";
+
+export { default as IconEye } from "./icons/eye.svg?react";
+export { default as IconTrashCan } from "./icons/trash-can.svg?react";

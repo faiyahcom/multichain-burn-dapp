@@ -126,6 +126,8 @@
   --color-mb-danger: var(--mb-danger);
   --color-mb-green: var(--mb-green);
   --color-mb-copy-gray: var(--mb-copy-gray);
+  --color-mb-switch-inactive: var(--mb-switch-inactive);
+  --color-mb-switch-blue: var(--mb-switch-blue);
 }
 
 /* Light mode design tokens (default) */
@@ -204,6 +206,8 @@
   --mb-danger: #f42d3c;
   --mb-green: #06c081;
   --mb-copy-gray: #656988;
+  --mb-switch-inactive: #363a6c;
+  --mb-switch-blue: #5285ef;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -272,6 +276,8 @@
   --mb-danger: #f42d3c;
   --mb-green: #06c081;
   --mb-copy-gray: #656988;
+  --mb-switch-inactive: #363a6c;
+  --mb-switch-blue: #5285ef;
 }
 
 @layer base {
