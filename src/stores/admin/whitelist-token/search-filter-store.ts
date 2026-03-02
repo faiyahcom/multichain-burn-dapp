@@ -5,6 +5,7 @@ type AdminWhitelistTokenSearchFilterType = {
   status: TokenStatus;
   network: string[];
   text: string;
+  page: number;
 };
 
 type AdminWhitelistTokenSearchFilterState = {
@@ -18,6 +19,7 @@ export const useAdminWhitelistTokenSearchFilterStore =
       status: "all",
       network: [],
       text: "",
+      page: 1,
     },
     setFilter: (filter) =>
       set((state) => ({

@@ -5,3 +5,13 @@ export const tokenStatusLabels: Record<TokenStatus, string> = {
   enabled: "Active",
   disabled: "Disabled",
 };
+export const tokenStatusLetters: Record<TokenStatus, string> = {
+  all: "",
+  enabled: "A",
+  disabled: "D",
+};
+export const tokenStatusColors: Record<TokenStatus, string> = {
+  all: "",
+  enabled: "#7af4cb",
+  disabled: "#ff8e97",
+};

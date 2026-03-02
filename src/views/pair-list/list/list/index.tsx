@@ -1,5 +1,6 @@
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import InfoTooltip from "@/components/common/info-tooltip";
+import NetworkDisplay from "@/components/common/network-display";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import {
   Table,
@@ -114,7 +115,7 @@ interface Props {
 
 const PairListListListLayout: React.FC<Props> = ({ data = demoData }) => {
   return (
-    <div className="w-full pt-6 pl-27.5 pb-7">
+    <div className="w-full pt-6 pb-7 pl-27.5">
       <Table>
         <TableHeader>
           <TableRow>
@@ -133,10 +134,6 @@ const PairListListListLayout: React.FC<Props> = ({ data = demoData }) => {
         </TableHeader>
         <TableBody>
           {data?.map((item, index) => {
-            const networkConfig = NETWORK_CONFIGS.find(
-              (n) => n.id === item.networkId,
-            );
-
             return (
               <TableRow key={index}>
                 <TableCell>
@@ -155,16 +152,7 @@ const PairListListListLayout: React.FC<Props> = ({ data = demoData }) => {
                 <TableCell>${item.volume.toLocaleString("de-DE")}</TableCell>
                 <TableCell>${item.tvl.toLocaleString("de-DE")}</TableCell>
                 <TableCell>
-                  {networkConfig && (
-                    <>
-                      <NetworkImgIcon
-                        src={networkConfig.iconSrc}
-                        alt={networkConfig.label}
-                        className="size-4.75 inline mr-1.5"
-                      />
-                      <span>{networkConfig.label}</span>
-                    </>
-                  )}
+                  <NetworkDisplay networkId={item.networkId} />
                 </TableCell>
                 <TableCell>
                   <ArrowIcon direction="right" />
