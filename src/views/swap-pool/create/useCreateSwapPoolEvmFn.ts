@@ -97,7 +97,10 @@ export const useCreateSwapPoolEvmFn = () => {
                         rewardDecimals,
                     );
 
-                    await tokenContract.approve(CONTRACT_ADDRESS, parsedAmount);
+                    const approveTx = await tokenContract.approve(CONTRACT_ADDRESS, parsedAmount);
+
+                    const approveTxReceipt = await approveTx.wait();
+                    console.log("approveTxReceipt", approveTxReceipt);
                 }
 
                 const poolNameBytes32 = ethers.encodeBytes32String(
