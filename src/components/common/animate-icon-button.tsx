@@ -5,6 +5,8 @@ interface Props {
   textVariant?: "text-left" | "text-container-center" | "text-self-center";
   classNames?: {
     btn?: string;
+    text?: string;
+    icon?: string;
   };
   hasGroupHover?: boolean;
   iconLetter: string;
@@ -25,15 +27,14 @@ const AnimateIconButton: React.FC<Props> = ({
       style={
         {
           "--btn-bg": color,
-          "--btn-text": text ? `'${text.replace(/'/g, "\\'")}'` : "''",
         } as React.CSSProperties
       }
       type="button"
       className={cn(
-        "flex items-center gap-1.75 rounded-sm border border-inactive px-1.25 py-2 text-foreground transition-all duration-300 **:transition-all **:duration-300",
-        "relative overflow-hidden after:absolute after:top-0 after:left-full after:flex after:h-full after:w-full after:items-center after:justify-center after:rounded-sm",
-        "after:bg-(--btn-bg) after:text-base after:font-medium after:text-foreground after:content-(--btn-text)",
-        "after:transition-all after:duration-300",
+        "group flex items-center gap-1.75 rounded-sm border border-inactive px-1.25 py-2 text-foreground transition-all duration-400 **:transition-all **:duration-400",
+        "relative overflow-hidden after:absolute after:top-0 after:left-full after:h-full after:w-full after:rounded-sm",
+        "after:bg-(--btn-bg) after:content-['']",
+        "after:transition-all after:duration-400",
         "hover:border-transparent hover:after:left-0",
         { "justify-center": textVariant === "text-container-center" },
         {
@@ -45,11 +46,12 @@ const AnimateIconButton: React.FC<Props> = ({
     >
       <LetterIcon
         letter={iconLetter}
-        className={cn("size-5.5 bg-(--btn-bg)")}
+        className={cn("relative z-10 bg-(--btn-bg) group-hover:text-(--btn-bg)", classNames?.icon)}
       />
       <span
         className={cn(
-          "text-base font-normal",
+          "relative z-10 text-base font-normal",
+          classNames?.text,
           {
             "text-center":
               textVariant === "text-container-center" ||

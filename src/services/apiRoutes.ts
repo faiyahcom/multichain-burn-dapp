@@ -11,4 +11,7 @@ export const API_ROUTES = {
     GET_POOL_DETAIL: (address: string) => `/pools/${address}`,
     GET_POOL_TXNS: (address: string) => `/pools/${address}/txns`,
   },
+  WHITELIST: {
+    GET_LIST_TOKENS: "/whitelist-tokens",
+  },
 } as const;

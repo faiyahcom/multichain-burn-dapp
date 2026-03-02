@@ -73,28 +73,28 @@ export const xphereTestnet: AppKitNetwork = {
 export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
   {
     id: "ethereumTestnet",
-    label: "Ethereum Testnet",
+    label: "Ethereum",
     iconBg: "bg-[#627EEA]",
     appKitNetwork: sepolia,
     iconSrc: "/network/ethereum.png",
   },
   {
     id: "binanceTestnet",
-    label: "Binance Testnet",
+    label: "Binance",
     iconBg: "bg-[#F3BA2F]",
     appKitNetwork: bscTestnet,
     iconSrc: "/network/binance.png",
   },
   {
     id: "xphereTestnet",
-    label: "Xphere Testnet",
+    label: "Xphere",
     iconBg: "bg-[#E53935]",
     appKitNetwork: xphereTestnet,
     iconSrc: "/network/xphere.png",
   },
   {
     id: "solanaDevnet",
-    label: "Solana Devnet",
+    label: "Solana",
     iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
     appKitNetwork: solanaDevnet,
     iconSrc: "/network/solana.png",

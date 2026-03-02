@@ -6,6 +6,10 @@ import RewardAmount from "./reward-amount";
 import { trimAddress } from "./pool-overview";
 import AmountAndActivity from "./amount-activity";
 import TransactionHistoryTable from "./pool-history/transaction-history";
+import { IconGoTo } from "@/assets/react";
+import { POOL_STATUS } from "@/types/admin/whitelist-token";
+import AnimateIconButton from "@/components/common/animate-icon-button";
+import type { PoolStatus } from "@/types/pool";
 
 type Props = {
     address: string;
@@ -17,20 +21,32 @@ const SwapPoolDetail = ({ address }: Props) => {
         queryFn: () => poolService.getPoolDetail(address),
     });
 
-    const status = poolDetail?.pool.status ?? "";
-    const formattedStatus = status.charAt(0).toUpperCase() + status.slice(1).split("_").join("");
+    const status = poolDetail?.pool.status;
+    const safeStatus: PoolStatus = status ?? "on_going";
+    const formattedStatus =
+        safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1).split("_").join("");
 
     return (
         <div className="pt-9.5 pl-14">
-            <div>
+            <div className="space-y-2">
                 <div className="flex items-center gap-6">
                     <h2 className="text-3xl font-semibold">{poolDetail?.pool.name}</h2>
-                    <span className="text-2xl font-medium">
-                        {formattedStatus}
-                    </span>
+                    <AnimateIconButton
+                        iconLetter={POOL_STATUS[safeStatus].letter}
+                        textVariant="text-container-center"
+                        text={formattedStatus}
+                        color={POOL_STATUS[safeStatus].color}
+                        hasGroupHover
+                        classNames={{
+                            btn: "min-w-27 cursor-default",
+                            text: "text-2xl font-medium",
+                            icon: "size-9 text-3xl",
+                        }}
+                    />
+                    {/* <span className="text-2xl font-medium">{formattedStatus}</span> */}
                 </div>
-                <span className="text-base text-greyed">
-                    {trimAddress(poolDetail?.pool.address)}
+                <span className="flex items-baseline gap-3.5 text-base text-greyed">
+                    {trimAddress(poolDetail?.pool.address)} <IconGoTo />
                 </span>
             </div>
             <div className="grid grid-cols-3 gap-x-6">
