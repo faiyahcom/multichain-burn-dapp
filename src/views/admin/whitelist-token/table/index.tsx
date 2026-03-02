@@ -104,7 +104,7 @@ const AdminWhitelistTokenTable: React.FC<Props> = ({ data = demoData }) => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
 
   return (
-    <div className="pb-10 pl-3.75">
+    <div className="pb-10 pl-3.75 space-y-10">
       <Table className="table-auto">
         <TableHeader>
           <TableRow>

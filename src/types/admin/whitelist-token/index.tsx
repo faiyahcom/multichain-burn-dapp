@@ -6,7 +6,7 @@ export const tokenStatusLabels: Record<TokenStatus, string> = {
   disabled: "Disabled",
 };
 export const tokenStatusLetters: Record<TokenStatus, string> = {
-  all: "A",
+  all: "",
   enabled: "A",
   disabled: "D",
 };

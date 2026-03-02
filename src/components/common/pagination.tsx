@@ -16,7 +16,6 @@ interface Props {
   siblingCount?: number; // pagination button sibling count
   currentPage: number;
   pageSize: number;
-  className?: string;
   hideIfLessThanTwoPages?: boolean;
 }
 
@@ -35,7 +34,7 @@ const CustomPagination: React.FC<Props> = ({
     pageSize,
   });
 
-  const maxPage = Math.ceil(totalCount / pageSize);
+  const maxPage = pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0;
 
   if (
     (currentPage === 0 || (paginationRange && paginationRange?.length < 2)) &&

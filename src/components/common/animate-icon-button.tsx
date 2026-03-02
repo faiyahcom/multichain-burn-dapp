@@ -25,7 +25,7 @@ const AnimateIconButton: React.FC<Props> = ({
       style={
         {
           "--btn-bg": color,
-          "--btn-text": `'${text}'`,
+          "--btn-text": text ? `'${text.replace(/'/g, "\\'")}'` : "''",
         } as React.CSSProperties
       }
       type="button"

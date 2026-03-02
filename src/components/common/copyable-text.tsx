@@ -8,9 +8,13 @@ interface Props {
 
 const CopyableText: React.FC<Props> = ({ content, displayText }) => {
   const handleCopy = () => {
-    navigator.clipboard.writeText(content).then(() => {
-      toast.success("Copied to clipboard");
-    });
+    navigator.clipboard.writeText(content)
+      .then(() => {
+        toast.success("Copied to clipboard");
+      })
+      .catch(() => {
+        toast.error("Failed to copy to clipboard");
+      });
   };
 
   return (
