@@ -13,5 +13,6 @@ export const API_ROUTES = {
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",
+    CREATE_WHITELIST_TOKEN: "/whitelist-tokens",
   },
 } as const;

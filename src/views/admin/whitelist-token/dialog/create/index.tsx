@@ -24,6 +24,13 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import ImageUpload from "./image-upload";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useCreateWhitelistTokenSolanaFn } from "./useCreateWhitelistTokenSolanaFn";
+import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
+import { useMutation } from "@tanstack/react-query";
+import { whitelistService } from "@/services/whitelistService";
+import { getErrorMessage } from "@/utils/helpers/error-message";
+import { toast } from "sonner";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -54,6 +61,18 @@ type WhitelistTokenFormValues = z.infer<typeof whitelistTokenSchema>;
 
 const AdminWhitelistTokenDialogCreate = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
+
+  const { caipAddress } = useAppKitAccount();
+  const namespace = caipAddress?.split(":")[0];
+  const isSolana = namespace === "solana";
+  const isEvm = namespace === "eip155";
+
+  const { createWhitelistToken: createWhitelistTokenSolana } =
+    useCreateWhitelistTokenSolanaFn();
+  const { createWhitelistToken: createWhitelistTokenEvm } =
+    useCreateWhitelistTokenEvmFn();
+
   const { control, handleSubmit, resetField, reset } =
     useForm<WhitelistTokenFormValues>({
       defaultValues: {
@@ -76,10 +95,67 @@ const AdminWhitelistTokenDialogCreate = () => {
     setOpen(open);
   };
 
-  const onSubmit = (data: WhitelistTokenFormValues) => {
-    console.log(data);
-    handleOpenChange(false);
+  const {
+    mutate: createWhitelistTokenMutation,
+    isPending: isCreateWhitelistTokenPending,
+  } = useMutation({
+    mutationFn: async (data: WhitelistTokenFormValues) => {
+      const formData = new FormData();
+      formData.append("address", data.address.trim());
+      formData.append("name", data.name);
+      formData.append("symbol", data.symbol);
+      const networkConfig = NETWORK_CONFIGS.find(
+        (n) => n.id === data.networkId,
+      );
+      if (networkConfig) {
+        if (networkConfig.id === "solanaDevnet") {
+          formData.append("chainId", "-1");
+        } else {
+          formData.append("chainId", networkConfig.appKitNetwork.id.toString());
+        }
+      }
+      if (data.image) {
+        formData.append("img", data.image);
+      }
+      formData.append("description", data.description);
+      formData.append("homepage", data.homepageLink);
+      formData.append("whitepaper", data.docLink);
+
+      const result = await whitelistService.createWhitelistToken(formData);
+      return result;
+    },
+    onSuccess: () => {
+      toast.success("Token whitelisted successfully!");
+      handleOpenChange(false);
+    },
+    onError: (error) => {
+      const message = getErrorMessage({ error });
+      toast.error(message);
+    },
+  });
+
+  const onSubmit = async (data: WhitelistTokenFormValues) => {
+    setIsCallingSc(true);
+    if (isSolana) {
+      const result = await createWhitelistTokenSolana({
+        tokenAddress: data.address,
+      });
+      if (result) {
+        createWhitelistTokenMutation(data);
+      }
+    }
+    if (isEvm) {
+      const result = await createWhitelistTokenEvm({
+        tokenAddress: data.address,
+      });
+      if (result) {
+        createWhitelistTokenMutation(data);
+      }
+    }
+    setIsCallingSc(false);
   };
+
+  const isLoading = isCreateWhitelistTokenPending || isCallingSc;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -88,7 +164,13 @@ const AdminWhitelistTokenDialogCreate = () => {
           Add Token <PlusIcon className="size-3.75" />
         </Button>
       </DialogTrigger>
-      <DialogContent showCloseButton={false} className="sm:max-w-185.75">
+      <DialogContent
+        showCloseButton={false}
+        className="sm:max-w-185.75"
+        onEscapeKeyDown={(e) => e.preventDefault()}
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>ADD TOKEN TO WHITELIST</DialogTitle>
           <DialogDescription>
@@ -299,12 +381,13 @@ const AdminWhitelistTokenDialogCreate = () => {
               btnProps={{
                 type: "reset",
                 onClick: () => handleOpenChange(false),
+                disabled: isLoading,
               }}
             />
             <AnimateIconButton
               variant="letter-icon"
               iconLetter="A"
-              text="Add to Whitelist"
+              text={isLoading ? "Adding..." : "Add to Whitelist"}
               color="#9072f9"
               textVariant="text-self-center"
               classNames={{
@@ -312,6 +395,7 @@ const AdminWhitelistTokenDialogCreate = () => {
               }}
               btnProps={{
                 type: "submit",
+                disabled: isLoading,
               }}
             />
           </div>
