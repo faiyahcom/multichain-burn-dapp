@@ -69,13 +69,13 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           lastValidBlockHeight,
         });
 
-        toast.success("Pool created successfully!", {
+        toast.success("Token whitelisted successfully!", {
           description: `Tx: ${signature}`,
         });
 
         return true;
       } catch (error: any) {
-        toast.error("Failed to create pool", {
+        toast.error("Failed to create whitelist token", {
           description: error?.message || String(error),
         });
         return false;
