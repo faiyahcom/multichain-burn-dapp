@@ -5,6 +5,8 @@ interface BaseProps {
   textVariant?: "text-left" | "text-container-center" | "text-self-center";
   classNames?: {
     btn?: string;
+    text?: string;
+    icon?: string;
   };
   hasGroupHover?: boolean;
   text?: string;
@@ -42,12 +44,12 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         return (
           <LetterIcon
             letter={(props as LetterIconVariantProps).iconLetter}
-            className="size-5.5 bg-(--btn-bg)"
+            className={cn("size-5.5 bg-(--btn-bg)", classNames?.icon)}
           />
         );
       case "external-icon":
         const Icon = (props as ExternalIconVariantProps).icon;
-        return <Icon className="size-5.5" />;
+        return <Icon className={cn("size-5.5", classNames?.icon)} />;
       default:
         return null;
     }
@@ -82,11 +84,15 @@ const AnimateIconButton: React.FC<Props> = (props) => {
     >
       {resolveIcon()}
       <span
-        className={cn("text-base font-normal", {
-          "flex-1 text-center":
-            textVariant === "text-container-center" ||
-            textVariant === "text-self-center",
-        })}
+        className={cn(
+          "text-base font-normal",
+          {
+            "flex-1 text-center":
+              textVariant === "text-container-center" ||
+              textVariant === "text-self-center",
+          },
+          classNames?.text,
+        )}
       >
         {text}
       </span>

@@ -6,31 +6,37 @@ import { useEffect } from "react";
 import { useWalletAuth } from "./useWalletAuth";
 
 const useWalletConnectionHandler = () => {
-    const { user } = useAuthStore();
+    const { user, logout } = useAuthStore();
     const { isConnected, caipAddress } = useAppKitAccount();
     const { setSelectedNetworkId } = useSystemStore();
     const { authenticateEvm, authenticateSolana } = useWalletAuth();
 
     useEffect(() => {
-        if (!isConnected || !caipAddress || user) return;
+        if (!isConnected || !caipAddress) return;
 
         const [namespace, chainRef, address] = caipAddress.split(":");
 
         const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
-
         if (systemNetwork) {
             setSelectedNetworkId(systemNetwork);
         }
 
-        const login = async () => {
-            if (namespace === "eip155") {
-                await authenticateEvm(address);
-            } else if (namespace === "solana") {
-                await authenticateSolana(address);
-            }
-        };
+        const walletChanged = user?.address && user.address !== address;
 
-        login();
+        if (walletChanged) {
+            logout();
+        }
+
+        if (!user || walletChanged) {
+            const login = async () => {
+                if (namespace === "eip155") {
+                    await authenticateEvm(address);
+                } else if (namespace === "solana") {
+                    await authenticateSolana(address);
+                }
+            };
+            login();
+        }
     }, [isConnected, caipAddress, user]);
 }
 

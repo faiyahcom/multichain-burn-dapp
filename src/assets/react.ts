@@ -30,5 +30,5 @@ export { default as IconSquareArrowTopRightOut } from "./icons/square-arrow-top-
 
 export { default as IconEye } from "./icons/eye.svg?react";
 export { default as IconTrashCan } from "./icons/trash-can.svg?react";
-
+export { default as IconGoTo } from "./icons/go-to.svg?react";
 export { default as IconUpload2 } from "./icons/upload-2.svg?react";
