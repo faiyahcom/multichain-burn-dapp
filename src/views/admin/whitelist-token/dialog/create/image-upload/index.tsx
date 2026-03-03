@@ -24,8 +24,12 @@ const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder }) => {
 
   useEffect(() => {
     if (img) {
-      const objectUrl = URL.createObjectURL(img);
-      setUrl(objectUrl);
+      const newObjectUrl = URL.createObjectURL(img);
+      if (url) {
+        // revoke the old object url
+        URL.revokeObjectURL(url);
+      }
+      setUrl(newObjectUrl);
     } else {
       if (url) {
         URL.revokeObjectURL(url);
