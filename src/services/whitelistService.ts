@@ -39,6 +39,7 @@ export const whitelistService = {
     return response;
   },
 
+  // This will overwrite the existing token if the address is already whitelisted
   createWhitelistToken: async (data: FormData) => {
     const response = await apiClient.post<CreateWhitelistTokenResponse>(
       `${WHITELIST_API_ROUTES.CREATE_WHITELIST_TOKEN}`,

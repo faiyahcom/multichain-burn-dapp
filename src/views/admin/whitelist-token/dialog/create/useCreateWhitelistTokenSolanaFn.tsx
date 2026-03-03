@@ -38,8 +38,10 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         const program = getMultichainBurnProgram(connection, anchorWallet);
         const factoryPDA = getFactoryPDA(program.programId);
 
+        const tokenPubkey = new PublicKey(tokenAddress);
+
         const tx = await program.methods
-          .updateWhitelistToken(tokenAddress)
+          .updateWhitelistToken(tokenPubkey, true) // false to delete it
           .accounts({
             admin: walletPublicKey,
             factory: factoryPDA,

@@ -2346,68 +2346,6 @@
       ]
     },
     {
-      "name": "pause",
-      "discriminator": [
-        211,
-        22,
-        221,
-        251,
-        74,
-        121,
-        193,
-        47
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "factory",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  99,
-                  116,
-                  111,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "pool",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool.pool_id",
-                "account": "PoolAccount"
-              }
-            ]
-          }
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "reject_pool",
       "discriminator": [
         101,
@@ -2942,16 +2880,16 @@
       ]
     },
     {
-      "name": "unpause",
+      "name": "update_admin",
       "discriminator": [
-        169,
-        144,
-        4,
-        38,
-        10,
-        141,
-        188,
-        255
+        161,
+        176,
+        40,
+        213,
+        60,
+        184,
+        179,
+        228
       ],
       "accounts": [
         {
@@ -2961,6 +2899,7 @@
         },
         {
           "name": "factory",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -2979,26 +2918,9 @@
           }
         },
         {
-          "name": "pool",
+          "name": "new_admin",
           "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool.pool_id",
-                "account": "PoolAccount"
-              }
-            ]
-          }
+          "signer": true
         }
       ],
       "args": []
@@ -3186,10 +3108,12 @@
       ],
       "args": [
         {
-          "name": "new_whitelist",
-          "type": {
-            "vec": "pubkey"
-          }
+          "name": "mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "is_whitelisted",
+          "type": "bool"
         }
       ]
     },
@@ -3238,10 +3162,12 @@
       ],
       "args": [
         {
-          "name": "new_whitelist",
-          "type": {
-            "vec": "pubkey"
-          }
+          "name": "account",
+          "type": "pubkey"
+        },
+        {
+          "name": "is_whitelisted",
+          "type": "bool"
         }
       ]
     }
@@ -3288,6 +3214,19 @@
     }
   ],
   "events": [
+    {
+      "name": "AdminUpdated",
+      "discriminator": [
+        69,
+        82,
+        49,
+        171,
+        43,
+        3,
+        80,
+        161
+      ]
+    },
     {
       "name": "Collected",
       "discriminator": [
@@ -3341,16 +3280,16 @@
       ]
     },
     {
-      "name": "PoolCancelled",
+      "name": "PoolCanceled",
       "discriminator": [
-        204,
-        15,
-        86,
-        4,
-        124,
-        97,
-        170,
-        173
+        199,
+        197,
+        139,
+        231,
+        147,
+        234,
+        108,
+        73
       ]
     },
     {
@@ -3688,9 +3627,38 @@
       "code": 6032,
       "name": "InvalidInput",
       "msg": "Invalid input"
+    },
+    {
+      "code": 6033,
+      "name": "RewardTooSmall",
+      "msg": "Reward amount too small (rounds to zero)"
     }
   ],
   "types": [
+    {
+      "name": "AdminUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
     {
       "name": "Collected",
       "type": {
@@ -3705,7 +3673,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -3715,6 +3683,10 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -3781,12 +3753,24 @@
             "type": "u64"
           },
           {
-            "name": "user",
+            "name": "executor",
             "type": "pubkey"
           },
           {
-            "name": "amount",
+            "name": "amount_in",
             "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "reward",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -3863,6 +3847,14 @@
                 32
               ]
             }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
@@ -3986,14 +3978,18 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
     },
     {
-      "name": "PoolCancelled",
+      "name": "PoolCanceled",
       "type": {
         "kind": "struct",
         "fields": [
@@ -4006,8 +4002,12 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4026,8 +4026,12 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4046,7 +4050,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4122,8 +4126,12 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4142,8 +4150,12 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4162,8 +4174,12 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4199,9 +4215,6 @@
           },
           {
             "name": "Canceled"
-          },
-          {
-            "name": "Rejected"
           }
         ]
       }
@@ -4220,8 +4233,12 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4250,6 +4267,14 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
@@ -4268,7 +4293,7 @@
             "type": "u64"
           },
           {
-            "name": "user",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4278,6 +4303,10 @@
           {
             "name": "fee",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4296,12 +4325,20 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4320,23 +4357,23 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
-            "name": "reward_amount",
+            "name": "amount",
             "type": "u64"
           },
           {
-            "name": "reward_mint",
+            "name": "token_mint",
             "type": "pubkey"
           },
           {
-            "name": "deposit_amount",
-            "type": "u64"
+            "name": "timestamp",
+            "type": "i64"
           },
           {
-            "name": "deposit_mint",
+            "name": "recipient",
             "type": "pubkey"
           }
         ]
@@ -4356,7 +4393,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4366,6 +4403,10 @@
           {
             "name": "new_fee",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4428,10 +4469,16 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "whitelist_token",
-            "type": {
-              "vec": "pubkey"
-            }
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_whitelisted",
+            "type": "bool"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
@@ -4442,10 +4489,16 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "whitelist_user",
-            "type": {
-              "vec": "pubkey"
-            }
+            "name": "account",
+            "type": "pubkey"
+          },
+          {
+            "name": "is_whitelisted",
+            "type": "bool"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
