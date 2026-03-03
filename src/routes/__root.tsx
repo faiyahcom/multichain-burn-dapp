@@ -16,7 +16,7 @@ function RootComponent() {
       <TooltipProvider>
         <Outlet />
       </TooltipProvider>
-      <Toaster />
+      <Toaster richColors />
     </AppLayout>
   );
 }

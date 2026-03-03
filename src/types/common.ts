@@ -36,3 +36,9 @@ export const listLayoutsBtnIcons: Record<
   list: IconMenu,
   card: IconGrid,
 };
+
+export type ErrorResponseData = {
+  statusCode: number;
+  error: string;
+  message: string;
+};
