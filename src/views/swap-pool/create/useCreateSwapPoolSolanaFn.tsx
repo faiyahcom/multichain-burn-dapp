@@ -15,7 +15,7 @@ import {
 import {
     getMultichainBurnProgram,
     type BrowserWallet,
-} from "@/web3/contracts/multichainBurnProgram";
+} from "@/web3/contracts/multichainBurnProgramSol";
 import BN from "bn.js";
 import {
     getPoolPDA,

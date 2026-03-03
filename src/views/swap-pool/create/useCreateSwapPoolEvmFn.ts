@@ -2,8 +2,11 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider, type Log } from "ethers";
-import MULTICHAIN_BURN_ABI from "@/web3/contracts/multichain_burn_abi_evm.json";
 import { MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS } from "@/web3";
+import {
+    getERC20Contract,
+    getMultichainBurnContract,
+} from "@/web3/contracts/multichainBurnContractEVM";
 
 const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS;
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
@@ -53,11 +56,7 @@ export const useCreateSwapPoolEvmFn = () => {
                 const signer = await provider.getSigner();
                 const userAddress = await signer.getAddress();
 
-                const contract = new ethers.Contract(
-                    CONTRACT_ADDRESS,
-                    MULTICHAIN_BURN_ABI,
-                    signer,
-                );
+                const contract = getMultichainBurnContract(signer);
 
                 const rewardIsNative = isNativeToken(tokenReward);
                 const depositIsNative = isNativeToken(tokenIn);
@@ -80,14 +79,7 @@ export const useCreateSwapPoolEvmFn = () => {
                         rewardDecimals,
                     );
                 } else {
-                    const tokenContract = new ethers.Contract(
-                        tokenReward,
-                        [
-                            "function decimals() view returns (uint8)",
-                            "function approve(address spender, uint256 amount) external returns (bool)",
-                        ],
-                        signer,
-                    );
+                    const tokenContract = getERC20Contract(tokenReward, signer);
 
                     const decimals = await tokenContract.decimals();
                     rewardDecimals = Number(decimals);
@@ -97,7 +89,10 @@ export const useCreateSwapPoolEvmFn = () => {
                         rewardDecimals,
                     );
 
-                    const approveTx = await tokenContract.approve(CONTRACT_ADDRESS, parsedAmount);
+                    const approveTx = await tokenContract.approve(
+                        CONTRACT_ADDRESS,
+                        parsedAmount,
+                    );
 
                     const approveTxReceipt = await approveTx.wait();
                     console.log("approveTxReceipt", approveTxReceipt);

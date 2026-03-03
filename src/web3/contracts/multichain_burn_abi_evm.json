@@ -3,12 +3,59 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "factory_",
+                "name": "target",
                 "type": "address"
             }
         ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
+        "name": "AddressEmptyCode",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "AddressNotWhitelisted",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "implementation",
+                "type": "address"
+            }
+        ],
+        "name": "ERC1967InvalidImplementation",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ERC1967NonPayable",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "FailedCall",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "FailedDeployment",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "balance",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "needed",
+                "type": "uint256"
+            }
+        ],
+        "name": "InsufficientBalance",
+        "type": "error"
     },
     {
         "inputs": [],
@@ -16,12 +63,159 @@
         "type": "error"
     },
     {
+        "inputs": [],
+        "name": "InvalidAmount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidAssetType",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidDecimals",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidInitialization",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidRatio",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidSettlementFee",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidValue",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "MultisigWalletRequired",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotAuthorized",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotInitializing",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotPool",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableInvalidOwner",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "OwnableUnauthorizedAccount",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PoolMasterContractNotSet",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TokenNotWhitelisted",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "UUPSUnauthorizedCallContext",
+        "type": "error"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "bytes32",
+                "name": "slot",
+                "type": "bytes32"
+            }
+        ],
+        "name": "UUPSUnsupportedProxiableUUID",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint64",
+                "name": "version",
+                "type": "uint64"
+            }
+        ],
+        "name": "Initialized",
+        "type": "event"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
                 "indexed": true,
                 "internalType": "address",
-                "name": "user",
+                "name": "previousOwner",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "pool",
+                "type": "address"
+            },
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "by",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "rewardToken",
                 "type": "address"
             },
             {
@@ -37,12 +231,18 @@
                 "type": "uint256"
             }
         ],
-        "name": "DepositedToPool",
+        "name": "PoolCanceled",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "pool",
+                "type": "address"
+            },
             {
                 "indexed": true,
                 "internalType": "address",
@@ -87,26 +287,7 @@
                 "type": "bytes"
             }
         ],
-        "name": "PoolFixedDeployed",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "by",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "timestamp",
-                "type": "uint256"
-            }
-        ],
-        "name": "PoolPaused",
+        "name": "PoolSwapDeployed",
         "type": "event"
     },
     {
@@ -118,106 +299,6 @@
                 "name": "pool",
                 "type": "address"
             },
-            {
-                "indexed": true,
-                "internalType": "bytes32",
-                "name": "poolName",
-                "type": "bytes32"
-            },
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "projectOwner",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "bytes",
-                "name": "extraData",
-                "type": "bytes"
-            }
-        ],
-        "name": "PoolSwapDeployed",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "by",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "timestamp",
-                "type": "uint256"
-            }
-        ],
-        "name": "PoolUnpaused",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "user",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "reward",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "fee",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "timestamp",
-                "type": "uint256"
-            }
-        ],
-        "name": "RewardClaimed",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "from",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "amount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "timestamp",
-                "type": "uint256"
-            }
-        ],
-        "name": "RewardDeposited",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
             {
                 "indexed": true,
                 "internalType": "address",
@@ -253,6 +334,101 @@
         "type": "event"
     },
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "implementation",
+                "type": "address"
+            }
+        ],
+        "name": "Upgraded",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "whitelisted",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "WhitelistedAddressUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": true,
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "whitelisted",
+                "type": "bool"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+            }
+        ],
+        "name": "WhitelistedTokenUpdated",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "PoolToId",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "UPGRADE_INTERFACE_VERSION",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "",
+                "type": "string"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -270,7 +446,7 @@
                 "type": "uint256[]"
             }
         ],
-        "name": "adminWithdrawBatchPool",
+        "name": "adminWithdrawBatchSwapPool",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -293,7 +469,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "adminWithdrawPool",
+        "name": "adminWithdrawSwapPool",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -306,80 +482,9 @@
                 "type": "address"
             }
         ],
-        "name": "cancelPool",
+        "name": "cancelSwapPool",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "bytes32",
-                        "name": "poolName",
-                        "type": "bytes32"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "projectOwner",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "tokenReward",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "assetTypeReward",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "tokenIn",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint8",
-                        "name": "assetTypeIn",
-                        "type": "uint8"
-                    },
-                    {
-                        "internalType": "address",
-                        "name": "targetAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "timeStart",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "timeEnd",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "poolCap",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct CreateFixedPoolParam",
-                "name": "payload",
-                "type": "tuple"
-            }
-        ],
-        "name": "createFixedPool",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "pool",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "payable",
         "type": "function"
     },
     {
@@ -446,7 +551,7 @@
         "outputs": [
             {
                 "internalType": "address",
-                "name": "pool",
+                "name": "clone",
                 "type": "address"
             }
         ],
@@ -459,39 +564,68 @@
                 "internalType": "address",
                 "name": "pool",
                 "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "amountIn",
-                "type": "uint256"
             }
         ],
-        "name": "deposit",
-        "outputs": [],
-        "stateMutability": "payable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "pool",
-                "type": "address"
-            }
-        ],
-        "name": "emergencyClosePool",
+        "name": "emergencyCloseSwapPool",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [],
-        "name": "factory",
+        "name": "idPoolCounter",
         "outputs": [
             {
-                "internalType": "contract Factory",
+                "internalType": "uint256",
                 "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_poolCreationFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_settlementFee",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_treasury",
                 "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_admin",
+                "type": "address"
+            }
+        ],
+        "name": "initialize",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "isAddressWhitelisted",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
         ],
         "stateMutability": "view",
@@ -501,24 +635,120 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "pool",
+                "name": "_addr",
                 "type": "address"
             }
         ],
-        "name": "pausePool",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "name": "isERC20",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
         "inputs": [
             {
                 "internalType": "address",
-                "name": "pool",
+                "name": "",
                 "type": "address"
             }
         ],
-        "name": "remainingReward",
+        "name": "isPool",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "isRouter",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "isTokenWhitelisted",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "nativeDecimals",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "operator",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "owner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "poolCreationFee",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -533,13 +763,307 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "pool",
+                "name": "",
                 "type": "address"
             }
         ],
-        "name": "unpausePool",
+        "name": "poolToOwner",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "pools",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "proxiableUUID",
+        "outputs": [
+            {
+                "internalType": "bytes32",
+                "name": "",
+                "type": "bytes32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "removeWhitelistAddress",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "removeWhitelistToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint8",
+                "name": "decimals",
+                "type": "uint8"
+            }
+        ],
+        "name": "setNativeDecimals",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_operator",
+                "type": "address"
+            }
+        ],
+        "name": "setOperator",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "pool_master_address",
+                "type": "address"
+            }
+        ],
+        "name": "setSwapPoolMasterContract",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "settlementFee",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token_adress",
+                "type": "address"
+            },
+            {
+                "internalType": "bytes4",
+                "name": "iid",
+                "type": "bytes4"
+            }
+        ],
+        "name": "supportsInterface",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "swapPoolMasterContract",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newOwner",
+                "type": "address"
+            }
+        ],
+        "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "treasury",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "newImplementation",
+                "type": "address"
+            },
+            {
+                "internalType": "bytes",
+                "name": "data",
+                "type": "bytes"
+            }
+        ],
+        "name": "upgradeToAndCall",
+        "outputs": [],
+        "stateMutability": "payable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "account",
+                "type": "address"
+            }
+        ],
+        "name": "whitelistAddress",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "accounts",
+                "type": "address[]"
+            }
+        ],
+        "name": "whitelistAddresses",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
+        "name": "whitelistToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "tokens",
+                "type": "address[]"
+            }
+        ],
+        "name": "whitelistTokens",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "whitelistedAddresses",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "name": "whitelistedTokens",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -560,7 +1084,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "withdrawRemainingReward",
+        "name": "withdrawRemainingRewardSwapPool",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
