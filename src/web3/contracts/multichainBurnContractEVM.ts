@@ -1,11 +1,20 @@
 import { ethers, type Signer } from "ethers";
 import MULTICHAIN_BURN_ABI from "./multichain_burn_abi_evm.json";
-import { MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS } from "@/web3";
+import MULTICHAIN_BURN_ABI_ROUTER from "./multichain_burn_abi_evm_router.json";
+import { MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS, MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_ADDRESS } from "@/web3";
 
 export const getMultichainBurnContract = (signer: Signer) => {
     return new ethers.Contract(
         MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS,
         MULTICHAIN_BURN_ABI,
+        signer
+    );
+};
+
+export const getMultichainBurnRouterContract = (signer: Signer) => {
+    return new ethers.Contract(
+        MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_ADDRESS,
+        MULTICHAIN_BURN_ABI_ROUTER,
         signer
     );
 };

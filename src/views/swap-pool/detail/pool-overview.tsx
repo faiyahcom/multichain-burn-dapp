@@ -39,15 +39,17 @@ const PoolOverview = ({ poolDetail }: Props) => {
         (token) => token.address === poolDetail?.pool.rewardToken,
     );
     const network =
-        NETWORK_CONFIGS.find(
-            (n) => n.appKitNetwork.id.toString() === poolDetail?.pool.chainId,
-        ) || undefined;
+        poolDetail?.pool.chainId === "-1"
+            ? NETWORK_CONFIGS.find((n) => n.label === "Solana")
+            : NETWORK_CONFIGS.find(
+                (n) => n.appKitNetwork.id.toString() === poolDetail?.pool.chainId,
+            ) || undefined;
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
         const cleanRatio = toCleanRatio(
-            poolDetail.pool.rewardNumerator,
             poolDetail.pool.rewardDenominator,
+            poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
         );
 
         return [

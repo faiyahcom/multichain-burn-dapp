@@ -10,6 +10,8 @@ import { IconGoTo } from "@/assets/react";
 import { POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { PoolStatus } from "@/types/pool";
+import ActivitiesHistory from "./pool-history/activities-history";
+import PoolHistory from "./pool-history";
 
 type Props = {
     address: string;
@@ -43,7 +45,6 @@ const SwapPoolDetail = ({ address }: Props) => {
                             icon: "size-9 text-3xl",
                         }}
                     />
-                    {/* <span className="text-2xl font-medium">{formattedStatus}</span> */}
                 </div>
                 <span className="flex items-baseline gap-3.5 text-base text-greyed">
                     {trimAddress(poolDetail?.pool.address)} <IconGoTo />
@@ -53,13 +54,7 @@ const SwapPoolDetail = ({ address }: Props) => {
                 <div className="col-span-2">
                     <PoolOverview poolDetail={poolDetail} />
                     <RewardAmount poolDetail={poolDetail} />
-                    <div className="mt-3 w-full py-4">
-                        <div className="flex items-center gap-2 pb-6">
-                            <div className="h-1.5 w-1.5 bg-black" />
-                            <span className="text-xl font-medium">Pool History</span>
-                        </div>
-                        <TransactionHistoryTable poolDetail={poolDetail} />
-                    </div>
+                    <PoolHistory poolDetail={poolDetail} />
                 </div>
                 <div className="col-span-1">
                     <AmountAndActivity poolDetail={poolDetail} />

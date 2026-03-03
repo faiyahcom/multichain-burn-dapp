@@ -10,6 +10,7 @@ export const API_ROUTES = {
     LIST: "/pools",
     GET_POOL_DETAIL: (address: string) => `/pools/${address}`,
     GET_POOL_TXNS: (address: string) => `/pools/${address}/txns`,
+    GET_POOL_ACTIVITIES: (address: string) => `/pools/${address}/actitvites`,
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",

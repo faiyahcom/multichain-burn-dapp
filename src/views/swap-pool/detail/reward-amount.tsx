@@ -34,7 +34,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
         const rewardHuman = rewardRaw / 10 ** rewardDecimals;
 
         // maxBurn in human readable
-        const maxBurnHuman = rewardHuman * (num / den);
+        const maxBurnHuman = rewardHuman * (den / num); // It's reward num and dem, not ratio on onchain
 
         return maxBurnHuman;
     }, [poolDetail]);

@@ -3114,6 +3114,12 @@
         {
           "name": "is_whitelisted",
           "type": "bool"
+          "name": "mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "is_whitelisted",
+          "type": "bool"
         }
       ]
     },
@@ -3162,6 +3168,12 @@
       ],
       "args": [
         {
+          "name": "account",
+          "type": "pubkey"
+        },
+        {
+          "name": "is_whitelisted",
+          "type": "bool"
           "name": "account",
           "type": "pubkey"
         },
@@ -3281,7 +3293,16 @@
     },
     {
       "name": "PoolCanceled",
+      "name": "PoolCanceled",
       "discriminator": [
+        199,
+        197,
+        139,
+        231,
+        147,
+        234,
+        108,
+        73
         199,
         197,
         139,
@@ -3632,6 +3653,11 @@
       "code": 6033,
       "name": "RewardTooSmall",
       "msg": "Reward amount too small (rounds to zero)"
+    },
+    {
+      "code": 6033,
+      "name": "RewardTooSmall",
+      "msg": "Reward amount too small (rounds to zero)"
     }
   ],
   "types": [
@@ -3683,6 +3709,10 @@
           {
             "name": "amount",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -3758,7 +3788,20 @@
           },
           {
             "name": "amount_in",
+            "name": "amount_in",
             "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "reward",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "fee",
@@ -3984,11 +4027,16 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
     },
     {
+      "name": "PoolCanceled",
       "name": "PoolCanceled",
       "type": {
         "kind": "struct",
@@ -4004,6 +4052,10 @@
           {
             "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4028,6 +4080,10 @@
           {
             "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4132,6 +4188,10 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4156,6 +4216,10 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4176,6 +4240,10 @@
           {
             "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4235,6 +4303,10 @@
           {
             "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4307,6 +4379,10 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4375,6 +4451,10 @@
           {
             "name": "recipient",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           }
         ]
       }
@@ -4403,6 +4483,10 @@
           {
             "name": "new_fee",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
           },
           {
             "name": "timestamp",

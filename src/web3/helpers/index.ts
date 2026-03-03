@@ -40,6 +40,14 @@ export const getDepositVaultPDA = (
     return pda;
 };
 
+export const getUserDepositPDA = (poolPDA: PublicKey, user: PublicKey, programId: PublicKey): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("user-deposit"), poolPDA.toBuffer(), user.toBuffer()],
+        programId
+    );
+    return pda;
+};
+
 import {
     NATIVE_MINT,
     TOKEN_PROGRAM_ID,

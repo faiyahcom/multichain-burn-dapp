@@ -1,4 +1,9 @@
 export type PoolStatus = "on_going" | "canceled" | "closed";
+export type PoolKind = "burn_pool" | "swap_pool";
+export const POOL_KIND: Record<number, PoolKind> = {
+    0: "burn_pool",
+    1: "swap_pool",
+};
 
 export interface PoolDetailResponse {
     userAmount: {
@@ -41,11 +46,12 @@ export interface PoolDetailResponse {
 
 export interface PoolTxnsResponse {
     page: number;
+    total: number;
     txns: {
         id: string;
         hash: string;
         log_ix: number;
-        kind: number;
+        kind: typeof txnKind[keyof typeof txnKind];
         timestamp: string;
         tokenIn: string;
         tokenInSymbol: string;
@@ -56,6 +62,44 @@ export interface PoolTxnsResponse {
         tokenOutDecimals: number;
         amountOut: string;
         chainId: string;
+        poolAddress: string;
+    }[];
+}
+
+export const txnKind = {
+    1: "Deposit",
+    2: "Withdraw for Admin",
+    3: "Deposit Reward",
+} as const;
+
+export const activityKind = {
+    // Pool lifecycle
+    0: "Pool Created",
+    1: "Pool Requested",
+    2: "Pool Approved",
+    3: "Pool Rejected",
+    4: "Pool Canceled",
+    5: "Pool Closed",
+    8: "Pool Updated",
+
+    // Reward
+    10: "Reward Deposited",
+    11: "Reward Refund",
+
+    // User actions
+    20: "Deposited"
+} as const
+
+export interface PoolActivitiesResponse {
+    page: number;
+    total: number;
+    activities: {
+        id: string;
+        hash: string;
+        log_ix: number;
+        timestamp: string;
+        actor: string;
+        kind: typeof activityKind[keyof typeof activityKind];
         poolAddress: string;
     }[];
 }

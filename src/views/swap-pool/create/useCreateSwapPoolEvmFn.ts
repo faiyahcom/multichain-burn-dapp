@@ -113,8 +113,8 @@ export const useCreateSwapPoolEvmFn = () => {
                     tokenIn: depositIsNative ? ZERO_ADDRESS : tokenIn,
                     assetTypeIn: depositAssetType,
                     targetAddress: userAddress,
-                    rewardNumerator,
-                    rewardDenominator,
+                    rewardNumerator: rewardDenominator, // It's reward num and dem, not ratio on onchain
+                    rewardDenominator: rewardNumerator,
                     rewardAmount: parsedAmount,
                 };
 
