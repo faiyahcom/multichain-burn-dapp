@@ -18,6 +18,7 @@ export type NetworkConfig = {
   iconBg: string;
   appKitNetwork: AppKitNetwork;
   iconSrc: string;
+  color: string;
 };
 
 /**
@@ -77,6 +78,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconBg: "bg-[#627EEA]",
     appKitNetwork: sepolia,
     iconSrc: "/network/ethereum.png",
+    color: "#5779FE",
   },
   {
     id: "binanceTestnet",
@@ -84,6 +86,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconBg: "bg-[#F3BA2F]",
     appKitNetwork: bscTestnet,
     iconSrc: "/network/binance.png",
+    color: "#f9b845",
   },
   {
     id: "xphereTestnet",
@@ -91,6 +94,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconBg: "bg-[#E53935]",
     appKitNetwork: xphereTestnet,
     iconSrc: "/network/xphere.png",
+    color: "#ba0023",
   },
   {
     id: "solanaDevnet",
@@ -98,5 +102,6 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
     appKitNetwork: solanaDevnet,
     iconSrc: "/network/solana.png",
+    color: "#b07be0",
   },
 ];

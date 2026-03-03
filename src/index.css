@@ -129,6 +129,8 @@
   --color-mb-switch-inactive: var(--mb-switch-inactive);
   --color-mb-switch-blue: var(--mb-switch-blue);
   --color-md-required-red: var(--md-required-red);
+  --color-mb-cancel-gray: var(--mb-cancel-gray);
+  --color-mb-submit-border: var(--mb-submit-border);
 }
 
 /* Light mode design tokens (default) */
@@ -209,7 +211,9 @@
   --mb-copy-gray: #656988;
   --mb-switch-inactive: #363a6c;
   --mb-switch-blue: #5285ef;
-  --md-required-red: #FF0000;
+  --md-required-red: #ff0000;
+  --mb-cancel-gray: #f2f5f9;
+  --mb-submit-border: #7452ff;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -280,7 +284,9 @@
   --mb-copy-gray: #656988;
   --mb-switch-inactive: #363a6c;
   --mb-switch-blue: #5285ef;
-  --md-required-red: #FF0000;
+  --md-required-red: #ff0000;
+  --mb-cancel-gray: #f2f5f9;
+  --mb-submit-border: #7452ff;
 }
 
 @layer base {

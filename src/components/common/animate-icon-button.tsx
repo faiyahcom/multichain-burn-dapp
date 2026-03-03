@@ -9,22 +9,32 @@ interface BaseProps {
   hasGroupHover?: boolean;
   text?: string;
   color?: string;
+  isActive?: boolean;
+  btnProps?: Omit<React.ComponentProps<"button">, "className" | "style">;
 }
 
 interface LetterIconVariantProps extends BaseProps {
-  variant: "letter-icon";
+  variant?: "letter-icon";
   iconLetter: string;
 }
 
 interface ExternalIconVariantProps extends BaseProps {
-  variant: "external-icon";
+  variant?: "external-icon";
   icon: React.ComponentType<{ className?: string }>;
 }
 
 type Props = LetterIconVariantProps | ExternalIconVariantProps;
 
 const AnimateIconButton: React.FC<Props> = (props) => {
-  const { textVariant, classNames, hasGroupHover, text, color } = props;
+  const {
+    textVariant,
+    classNames,
+    hasGroupHover,
+    text,
+    color,
+    isActive,
+    btnProps,
+  } = props;
 
   const resolveIcon = () => {
     switch (props.variant ?? "letter-icon") {
@@ -63,20 +73,20 @@ const AnimateIconButton: React.FC<Props> = (props) => {
           "group-hover:border-transparent group-hover:after:left-0":
             hasGroupHover,
         },
+        {
+          "border-transparent after:left-0": isActive,
+        },
         classNames?.btn,
       )}
+      {...btnProps}
     >
       {resolveIcon()}
       <span
-        className={cn(
-          "text-base font-normal",
-          {
-            "text-center":
-              textVariant === "text-container-center" ||
-              textVariant === "text-self-center",
-          },
-          { "flex-1": textVariant === "text-self-center" },
-        )}
+        className={cn("text-base font-normal", {
+          "flex-1 text-center":
+            textVariant === "text-container-center" ||
+            textVariant === "text-self-center",
+        })}
       >
         {text}
       </span>
