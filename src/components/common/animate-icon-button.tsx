@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import LetterIcon from "./letter-icon";
 
-interface Props {
+interface BaseProps {
   textVariant?: "text-left" | "text-container-center" | "text-self-center";
   classNames?: {
     btn?: string;
@@ -9,19 +9,52 @@ interface Props {
     icon?: string;
   };
   hasGroupHover?: boolean;
-  iconLetter: string;
   text?: string;
   color?: string;
+  isActive?: boolean;
+  btnProps?: Omit<React.ComponentProps<"button">, "className" | "style">;
 }
 
-const AnimateIconButton: React.FC<Props> = ({
-  textVariant,
-  classNames,
-  hasGroupHover,
-  iconLetter,
-  text,
-  color,
-}) => {
+interface LetterIconVariantProps extends BaseProps {
+  variant?: "letter-icon";
+  iconLetter: string;
+}
+
+interface ExternalIconVariantProps extends BaseProps {
+  variant?: "external-icon";
+  icon: React.ComponentType<{ className?: string }>;
+}
+
+type Props = LetterIconVariantProps | ExternalIconVariantProps;
+
+const AnimateIconButton: React.FC<Props> = (props) => {
+  const {
+    textVariant,
+    classNames,
+    hasGroupHover,
+    text,
+    color,
+    isActive,
+    btnProps,
+  } = props;
+
+  const resolveIcon = () => {
+    switch (props.variant ?? "letter-icon") {
+      case "letter-icon":
+        return (
+          <LetterIcon
+            letter={(props as LetterIconVariantProps).iconLetter}
+            className={cn("size-5.5 bg-(--btn-bg)", classNames?.icon)}
+          />
+        );
+      case "external-icon":
+        const Icon = (props as ExternalIconVariantProps).icon;
+        return <Icon className={cn("size-5.5", classNames?.icon)} />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <button
       style={
@@ -42,22 +75,22 @@ const AnimateIconButton: React.FC<Props> = ({
           "group-hover:border-transparent group-hover:after:left-0":
             hasGroupHover,
         },
+        {
+          "border-transparent after:left-0": isActive,
+        },
         classNames?.btn,
       )}
+      {...btnProps}
     >
-      <LetterIcon
-        letter={iconLetter}
-        className={cn("size-5.5 bg-(--btn-bg)", classNames?.icon)}
-      />
+      {resolveIcon()}
       <span
         className={cn(
           "text-base font-normal",
           {
-            "text-center":
+            "flex-1 text-center":
               textVariant === "text-container-center" ||
               textVariant === "text-self-center",
           },
-          { "flex-1": textVariant === "text-self-center" },
           classNames?.text,
         )}
       >
