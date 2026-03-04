@@ -5,7 +5,6 @@ import {
   IconTrashCan,
 } from "@/assets/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import BlueSwitch from "@/components/common/blue-switch";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
@@ -30,6 +29,7 @@ import {
 } from "@/types/admin/whitelist-token";
 import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
+import StatusSwitch from "./status-switch";
 
 const AdminWhitelistTokenTable = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
@@ -164,11 +164,15 @@ const AdminWhitelistTokenTable = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  <BlueSwitch
-                    active={item.enable}
-                    classNames={{
-                      btn: "mx-auto",
+                  <StatusSwitch
+                    switchProps={{
+                      active: item.enable,
+                      classNames: {
+                        btn: "mx-auto",
+                      },
                     }}
+                    chainId={item.chainId}
+                    address={item.address}
                   />
                 </TableCell>
                 <TableCell>

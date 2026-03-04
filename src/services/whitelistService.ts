@@ -43,6 +43,11 @@ export interface WhitelistTokenSummaryResponse {
 export interface ForceUpdateWhitelistTokenStatusRequest {
   chainId: string;
   address: string;
+  active: boolean;
+}
+
+export interface ForceUpdateWhitelistTokenStatusResponse {
+  newStatus: boolean;
 }
 
 export interface DeleteWhitelistTokenRequest {
@@ -88,15 +93,21 @@ export const whitelistService = {
     return response;
   },
 
-  forceUpdateWhitelistTokenStatus: async (
+  // The token status is already updated with the SC event
+  // This is in the case of the update is too slow
+  updateStatusWhitelistTokenStatus: async (
     request: ForceUpdateWhitelistTokenStatusRequest,
   ) => {
-    const response = await apiClient.patch<void>(
-      `${WHITELIST_API_ROUTES.FORCE_UPDATE_WHITELIST_TOKEN_STATUS(
-        request.chainId,
-        request.address,
-      )}`,
-    );
+    const response =
+      await apiClient.post<ForceUpdateWhitelistTokenStatusResponse>(
+        `${WHITELIST_API_ROUTES.UPDATE_STATUS_WHITELIST_TOKEN_STATUS(
+          request.chainId,
+          request.address,
+        )}`,
+        {
+          active: request.active,
+        },
+      );
 
     return response;
   },
