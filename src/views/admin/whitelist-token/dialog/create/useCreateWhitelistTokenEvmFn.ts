@@ -8,7 +8,7 @@ export const useCreateWhitelistTokenEvmFn = () => {
   const { isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
 
-  // Calling this function also enable the token if it is already whitelisted
+  // Calling this function also enables the token if it is already whitelisted
   const createWhitelistToken = useCallback(
     async ({ tokenAddress }: { tokenAddress: string }) => {
       try {
