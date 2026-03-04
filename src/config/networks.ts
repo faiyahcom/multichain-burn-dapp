@@ -19,6 +19,7 @@ export type NetworkConfig = {
   appKitNetwork: AppKitNetwork;
   iconSrc: string;
   color: string;
+  shortLabel: string;
 };
 
 /**
@@ -79,6 +80,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     appKitNetwork: sepolia,
     iconSrc: "/network/ethereum.png",
     color: "#5779FE",
+    shortLabel: "ETH",
   },
   {
     id: "binanceTestnet",
@@ -87,6 +89,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     appKitNetwork: bscTestnet,
     iconSrc: "/network/binance.png",
     color: "#f9b845",
+    shortLabel: "BNB",
   },
   {
     id: "xphereTestnet",
@@ -95,6 +98,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     appKitNetwork: xphereTestnet,
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
+    shortLabel: "XPH",
   },
   {
     id: "solanaDevnet",
@@ -103,6 +107,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     appKitNetwork: solanaDevnet,
     iconSrc: "/network/solana.png",
     color: "#b07be0",
+    shortLabel: "SOL",
   },
 ];
 
@@ -114,6 +119,17 @@ export const networkIdToChainId = (networkId: string): string | undefined => {
       (config) => config.id === networkId,
     )?.appKitNetwork.id.toString();
   }
+};
+
+export const chainIdToNetworkConfig = (
+  chainId: string,
+): NetworkConfig | undefined => {
+  if (chainId === "-1") {
+    return NETWORK_CONFIGS.find((config) => config.id === "solanaDevnet");
+  }
+  return NETWORK_CONFIGS.find(
+    (config) => config.appKitNetwork.id.toString() === chainId,
+  );
 };
 
 export const evmAppkitNetworks = [sepolia, bscTestnet, xphereTestnet];

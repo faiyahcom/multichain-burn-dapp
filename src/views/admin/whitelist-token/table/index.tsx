@@ -19,7 +19,10 @@ import {
 } from "@/components/ui/table";
 import { networkIdToChainId } from "@/config/networks";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
-import { whitelistService } from "@/services/whitelistService";
+import {
+  whitelistService,
+  type WhitelistToken,
+} from "@/services/whitelistService";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
 import {
   booleanToTokenStatus,
@@ -31,9 +34,13 @@ import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
 import StatusSwitch from "./status-switch";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
+import { useState } from "react";
 
 const AdminWhitelistTokenTable = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
+  const [detailToken, setDetailToken] = useState<WhitelistToken | undefined>(
+    undefined,
+  );
   const limit = 20;
 
   const { data: listTokensData, isPending: isListTokensPending } = useQuery({
@@ -100,7 +107,7 @@ const AdminWhitelistTokenTable = () => {
                           className="size-8 shrink-0 rounded-full"
                         />
                       ) : (
-                        <div className="h-8 w-8 rounded-full border border-active bg-inactive shrink-0" />
+                        <div className="h-8 w-8 shrink-0 rounded-full border border-active bg-inactive" />
                       )}
                       <div className="text-left">
                         <p className="text-base">
@@ -179,7 +186,7 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
-                      <button>
+                      <button onClick={() => setDetailToken(item)}>
                         <IconEye className="[&>path]:group-hover:stroke-[1.5px]" />
                       </button>
                       <button>
@@ -201,7 +208,10 @@ const AdminWhitelistTokenTable = () => {
         />
       </div>
 
-      <AdminWhitelistTokenDialogDetail />
+      <AdminWhitelistTokenDialogDetail
+        data={detailToken}
+        setData={setDetailToken}
+      />
     </>
   );
 };
