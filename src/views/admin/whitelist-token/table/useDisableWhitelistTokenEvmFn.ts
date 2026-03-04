@@ -4,12 +4,11 @@ import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-export const useCreateWhitelistTokenEvmFn = () => {
+export const useDisableWhitelistTokenEvmFn = () => {
   const { isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
 
-  // Calling this function also enables the token if it is already whitelisted
-  const createWhitelistToken = useCallback(
+  const disableWhitelistToken = useCallback(
     async ({ tokenAddress }: { tokenAddress: string }) => {
       try {
         if (!isConnected || !walletProvider) {
@@ -27,17 +26,17 @@ export const useCreateWhitelistTokenEvmFn = () => {
 
         const contract = getMultichainBurnContract(signer);
 
-        const tx = await contract.whitelistToken(tokenAddress);
+        const tx = await contract.removeWhitelistToken(tokenAddress);
 
         const receipt = await tx.wait();
 
-        toast.success("Token whitelisted successfully!", {
+        toast.success("Token whitelist disabled successfully!", {
           description: `Tx: ${receipt.hash}`,
         });
 
         return true;
       } catch (error: any) {
-        toast.error("Failed to create whitelist token", {
+        toast.error("Failed to disable whitelist token", {
           description: error?.message || String(error),
         });
         console.log("error", error);
@@ -47,5 +46,5 @@ export const useCreateWhitelistTokenEvmFn = () => {
     [isConnected, walletProvider],
   );
 
-  return { createWhitelistToken };
+  return { disableWhitelistToken };
 };

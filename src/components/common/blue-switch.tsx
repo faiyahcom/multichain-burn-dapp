@@ -1,14 +1,23 @@
 import { cn } from "@/lib/utils";
+import { Spinner } from "../ui/spinner";
 
 interface Props {
   active?: boolean;
-  onChange?: () => void;
+  onClick?: () => void;
   classNames?: {
     btn?: string;
   };
+  isLoading?: boolean;
+  disabled?: boolean;
 }
 
-const BlueSwitch: React.FC<Props> = ({ active, onChange, classNames }) => {
+const BlueSwitch: React.FC<Props> = ({
+  active,
+  onClick,
+  classNames,
+  isLoading,
+  disabled,
+}) => {
   return (
     <button
       className={cn(
@@ -18,7 +27,8 @@ const BlueSwitch: React.FC<Props> = ({ active, onChange, classNames }) => {
         { "justify-end": active },
         classNames?.btn,
       )}
-      onClick={() => onChange?.()}
+      onClick={() => onClick?.()}
+      disabled={disabled || isLoading}
     >
       <div
         className={cn(
@@ -26,9 +36,13 @@ const BlueSwitch: React.FC<Props> = ({ active, onChange, classNames }) => {
           { "bg-primary-foreground": !active },
         )}
       >
-        <div className="flex size-4 shrink-0 items-center justify-center rounded-full bg-mb-switch-blue">
-          <div className="size-2 shrink-0 rounded-full bg-primary-foreground" />
-        </div>
+        {isLoading ? (
+          <Spinner />
+        ) : (
+          <div className="flex size-4 shrink-0 items-center justify-center rounded-full bg-mb-switch-blue">
+            <div className="size-2 shrink-0 rounded-full bg-primary-foreground" />
+          </div>
+        )}
       </div>
     </button>
   );

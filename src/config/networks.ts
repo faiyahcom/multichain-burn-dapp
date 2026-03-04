@@ -115,3 +115,5 @@ export const networkIdToChainId = (networkId: string): string | undefined => {
     )?.appKitNetwork.id.toString();
   }
 };
+
+export const evmAppkitNetworks = [sepolia, bscTestnet, xphereTestnet];

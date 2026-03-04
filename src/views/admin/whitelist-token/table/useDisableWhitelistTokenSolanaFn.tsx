@@ -12,12 +12,12 @@ import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-export const useCreateWhitelistTokenSolanaFn = () => {
+export const useDisableWhitelistTokenSolanaFn = () => {
   const { isConnected, address } = useAppKitAccount();
   const { connection } = useAppKitConnection();
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
-  const createWhitelistToken = useCallback(
+  const disableWhitelistToken = useCallback(
     async ({ tokenAddress }: { tokenAddress: string }) => {
       try {
         if (!isConnected || !address) {
@@ -41,7 +41,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         const tokenPubkey = new PublicKey(tokenAddress);
 
         const tx = await program.methods
-          .updateWhitelistToken(tokenPubkey, true) // false to disable token
+          .updateWhitelistToken(tokenPubkey, false) // false to disable token
           .accounts({
             admin: walletPublicKey,
             factory: factoryPDA,
@@ -69,13 +69,13 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           lastValidBlockHeight,
         });
 
-        toast.success("Token whitelisted successfully!", {
+        toast.success("Token whitelist disabled successfully!", {
           description: `Tx: ${signature}`,
         });
 
         return true;
       } catch (error: any) {
-        toast.error("Failed to create whitelist token", {
+        toast.error("Failed to disable whitelist token", {
           description: error?.message || String(error),
         });
         return false;
@@ -84,5 +84,5 @@ export const useCreateWhitelistTokenSolanaFn = () => {
     [isConnected, address, connection, provider],
   );
 
-  return { createWhitelistToken };
+  return { disableWhitelistToken };
 };
