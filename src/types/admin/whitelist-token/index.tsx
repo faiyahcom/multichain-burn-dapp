@@ -1,22 +1,27 @@
 import type { PoolStatus } from "@/types/pool";
 
-export const tokenStatus = ["all", "enabled", "disabled"] as const;
+export const tokenStatus = ["all", "enable", "disable"] as const;
 export type TokenStatus = (typeof tokenStatus)[number];
 export const tokenStatusLabels: Record<TokenStatus, string> = {
   all: "All",
-  enabled: "Active",
-  disabled: "Disabled",
+  enable: "Active",
+  disable: "Disabled",
 };
 export const tokenStatusLetters: Record<TokenStatus, string> = {
   all: "",
-  enabled: "A",
-  disabled: "D",
+  enable: "A",
+  disable: "D",
 };
 export const tokenStatusColors: Record<TokenStatus, string> = {
   all: "",
-  enabled: "#7af4cb",
-  disabled: "#ff8e97",
+  enable: "#7af4cb",
+  disable: "#ff8e97",
 };
+export const booleanToTokenStatus = (value: boolean): TokenStatus =>
+  value ? "enable" : "disable";
+export const tokenStatusToBoolean = (value: TokenStatus): boolean =>
+  value === "enable";
+
 export const POOL_STATUS: Record<PoolStatus, any> = {
   // "on_going" | "canceled" | "closed"
   on_going: {

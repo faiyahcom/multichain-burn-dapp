@@ -16,6 +16,7 @@ export const navSection = {
   overview: "overview",
   profile_menu: "profile_menu",
   tools: "tools",
+  admin: "admin",
 } as const;
 
 type NavSection = (typeof navSection)[keyof typeof navSection];
@@ -24,6 +25,7 @@ export const NavSectionLabel: Record<NavSection, string> = {
   [navSection.overview]: "Overview",
   [navSection.profile_menu]: "Profile Menu",
   [navSection.tools]: "Tools",
+  [navSection.admin]: "Admin",
 };
 
 type NavItem = {
@@ -101,5 +103,15 @@ export const navItems: NavItem[] = [
     icon: IconSettings,
     section: navSection.tools,
     to: "/settings",
+  },
+  {
+    label: "Whitelist Token",
+    section: navSection.admin,
+    to: "/admin/whitelist-token",
+  },
+  {
+    label: "Whitelist User",
+    section: navSection.admin,
+    to: "/admin/whitelist-user",
   },
 ];

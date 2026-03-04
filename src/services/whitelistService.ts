@@ -1,5 +1,6 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
+import type { BooleanString, PaginationResponse } from "@/types/common";
 const WHITELIST_API_ROUTES = API_ROUTES.WHITELIST;
 
 export interface WhitelistToken {
@@ -17,7 +18,16 @@ export interface WhitelistToken {
   whitepaper: string;
 }
 
-export interface ListTokensResponse {
+export interface ListTokensRequest {
+  page?: number;
+  limit?: number;
+  active?: BooleanString;
+  isDropped?: BooleanString; // soft delete
+  chainIds?: string; // comma separated
+  search?: string;
+}
+
+export interface ListTokensResponse extends PaginationResponse {
   whitelistTokens: WhitelistToken[];
 }
 
@@ -26,13 +36,14 @@ export interface CreateWhitelistTokenResponse {
 }
 
 export const whitelistService = {
-  getListTokens: async () => {
+  getListTokens: async (request?: ListTokensRequest) => {
     const response = await apiClient.get<ListTokensResponse>(
       `${WHITELIST_API_ROUTES.GET_LIST_TOKENS}`,
       {
         params: {
-          page: 1,
-          limit: 100,
+          ...request,
+          page: request?.page || 1,
+          limit: request?.limit || 100,
         },
       },
     );

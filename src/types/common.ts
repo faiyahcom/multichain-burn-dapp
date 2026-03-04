@@ -42,3 +42,18 @@ export type ErrorResponseData = {
   error: string;
   message: string;
 };
+
+export const booleanString = [
+  "true",
+  "false",
+  "1",
+  "0",
+  "enable",
+  "disable",
+] as const;
+export type BooleanString = (typeof booleanString)[number];
+
+export type PaginationResponse = {
+  page: number;
+  total: number;
+};
