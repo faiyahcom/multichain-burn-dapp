@@ -17,7 +17,7 @@ import {
   tokenStatusLabels,
 } from "@/types/admin/whitelist-token";
 import { toast } from "sonner";
-import { format, parseISO } from "date-fns";
+import { format, isValid, parseISO } from "date-fns";
 
 interface Props {
   data?: WhitelistToken;
@@ -133,7 +133,7 @@ const AdminWhitelistTokenDialogDetail: React.FC<Props> = ({
           </div>
 
           {/* timestamp */}
-          {data?.createdAt && (
+          {data?.createdAt && isValid(parseISO(data.createdAt)) && (
             <div className="font-normal text-secondary-text">
               <p className="text-xs">Added to Whitelist</p>
               <p className="text-15px">
