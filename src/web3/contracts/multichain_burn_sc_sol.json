@@ -2880,52 +2880,6 @@
       ]
     },
     {
-      "name": "update_admin",
-      "discriminator": [
-        161,
-        176,
-        40,
-        213,
-        60,
-        184,
-        179,
-        228
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "factory",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  99,
-                  116,
-                  111,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "new_admin",
-          "writable": true,
-          "signer": true
-        }
-      ],
-      "args": []
-    },
-    {
       "name": "update_pool",
       "discriminator": [
         239,
@@ -3114,12 +3068,6 @@
         {
           "name": "is_whitelisted",
           "type": "bool"
-          "name": "mint",
-          "type": "pubkey"
-        },
-        {
-          "name": "is_whitelisted",
-          "type": "bool"
         }
       ]
     },
@@ -3174,12 +3122,6 @@
         {
           "name": "is_whitelisted",
           "type": "bool"
-          "name": "account",
-          "type": "pubkey"
-        },
-        {
-          "name": "is_whitelisted",
-          "type": "bool"
         }
       ]
     }
@@ -3226,19 +3168,6 @@
     }
   ],
   "events": [
-    {
-      "name": "AdminUpdated",
-      "discriminator": [
-        69,
-        82,
-        49,
-        171,
-        43,
-        3,
-        80,
-        161
-      ]
-    },
     {
       "name": "Collected",
       "discriminator": [
@@ -3293,16 +3222,7 @@
     },
     {
       "name": "PoolCanceled",
-      "name": "PoolCanceled",
       "discriminator": [
-        199,
-        197,
-        139,
-        231,
-        147,
-        234,
-        108,
-        73
         199,
         197,
         139,
@@ -3653,38 +3573,9 @@
       "code": 6033,
       "name": "RewardTooSmall",
       "msg": "Reward amount too small (rounds to zero)"
-    },
-    {
-      "code": 6033,
-      "name": "RewardTooSmall",
-      "msg": "Reward amount too small (rounds to zero)"
     }
   ],
   "types": [
-    {
-      "name": "AdminUpdated",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "admin",
-            "type": "pubkey"
-          },
-          {
-            "name": "new_admin",
-            "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
-          },
-          {
-            "name": "executor",
-            "type": "pubkey"
-          }
-        ]
-      }
-    },
     {
       "name": "Collected",
       "type": {
@@ -3699,7 +3590,7 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "project_owner",
             "type": "pubkey"
           },
           {
@@ -3709,10 +3600,6 @@
           {
             "name": "amount",
             "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -3783,25 +3670,12 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "user",
             "type": "pubkey"
           },
           {
             "name": "amount_in",
-            "name": "amount_in",
             "type": "u64"
-          },
-          {
-            "name": "fee",
-            "type": "u64"
-          },
-          {
-            "name": "reward",
-            "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "fee",
@@ -3894,10 +3768,6 @@
           {
             "name": "timestamp",
             "type": "i64"
-          },
-          {
-            "name": "executor",
-            "type": "pubkey"
           }
         ]
       }
@@ -4021,12 +3891,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "admin",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4036,7 +3902,6 @@
       }
     },
     {
-      "name": "PoolCanceled",
       "name": "PoolCanceled",
       "type": {
         "kind": "struct",
@@ -4050,12 +3915,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "project_owner",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4078,12 +3939,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "admin",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4106,7 +3963,7 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "project_owner",
             "type": "pubkey"
           },
           {
@@ -4182,12 +4039,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "admin",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4210,12 +4063,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "admin",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4238,12 +4087,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "project_owner",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4283,6 +4128,9 @@
           },
           {
             "name": "Canceled"
+          },
+          {
+            "name": "Rejected"
           }
         ]
       }
@@ -4301,12 +4149,8 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "admin",
             "type": "pubkey"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4343,10 +4187,6 @@
           {
             "name": "timestamp",
             "type": "i64"
-          },
-          {
-            "name": "executor",
-            "type": "pubkey"
           }
         ]
       }
@@ -4365,7 +4205,7 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "user",
             "type": "pubkey"
           },
           {
@@ -4375,10 +4215,6 @@
           {
             "name": "fee",
             "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4401,15 +4237,11 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "project_owner",
             "type": "pubkey"
           },
           {
             "name": "amount",
-            "type": "u64"
-          },
-          {
-            "name": "current_amount",
             "type": "u64"
           },
           {
@@ -4433,23 +4265,23 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "admin",
             "type": "pubkey"
           },
           {
-            "name": "amount",
+            "name": "reward_amount",
             "type": "u64"
           },
           {
-            "name": "token_mint",
+            "name": "reward_mint",
             "type": "pubkey"
           },
           {
-            "name": "timestamp",
-            "type": "i64"
+            "name": "deposit_amount",
+            "type": "u64"
           },
           {
-            "name": "recipient",
+            "name": "deposit_mint",
             "type": "pubkey"
           },
           {
@@ -4473,7 +4305,7 @@
             "type": "u64"
           },
           {
-            "name": "executor",
+            "name": "project_owner",
             "type": "pubkey"
           },
           {
@@ -4483,10 +4315,6 @@
           {
             "name": "new_fee",
             "type": "u64"
-          },
-          {
-            "name": "timestamp",
-            "type": "i64"
           },
           {
             "name": "timestamp",
@@ -4559,10 +4387,6 @@
           {
             "name": "is_whitelisted",
             "type": "bool"
-          },
-          {
-            "name": "executor",
-            "type": "pubkey"
           }
         ]
       }
@@ -4579,10 +4403,6 @@
           {
             "name": "is_whitelisted",
             "type": "bool"
-          },
-          {
-            "name": "executor",
-            "type": "pubkey"
           }
         ]
       }
