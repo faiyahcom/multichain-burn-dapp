@@ -3,7 +3,7 @@ import MultipleSelect from "@/components/common/multiple-select";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import { useGetWhitelistUsers } from "@/services/queries/queries";
+import { useGetWhitelistTokens, useGetWhitelistUsers } from "@/services/queries/queries";
 import { useAdminWhitelistUserSearchFilterStore } from "@/stores/admin/whitelist-user/search-filter-store";
 import {
     userStatus,
@@ -12,20 +12,13 @@ import {
 } from "@/types/admin/whitelist-user";
 import AdminWhitelistUserDialogCreate from "../dialog/create";
 import AdminWhitelistUserSearchStatusPicker from "./status-picker";
+import { useMemo } from "react";
 
-// TODO: replace with real token options from API
-const tokenOptions: MultipleSelectOption[] = [
-    { label: "USDC", value: "usdc" },
-    { label: "USDT", value: "usdt" },
-    { label: "DAI", value: "dai" },
-    { label: "WBTC", value: "wbtc" },
-    { label: "ETH", value: "eth" },
-];
 
 const AdminWhitelistUserSearch = () => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
 
-    // Fetch without search text so counts don't change while the user is typing
+    // Stable counts (no text filter)
     const { data: countData } = useGetWhitelistUsers();
     const total = (countData?.countEnable ?? 0) + (countData?.countDisable ?? 0);
     const statusCounts = [total, countData?.countEnable ?? 0, countData?.countDisable ?? 0];
@@ -48,6 +41,35 @@ const AdminWhitelistUserSearch = () => {
             ),
         }),
     );
+
+    // Build a chainId → networkId lookup from NETWORK_CONFIGS
+    const chainIdToNetworkId = useMemo(() => {
+        const map = new Map<string, string>();
+        NETWORK_CONFIGS.forEach((n) => {
+            if ("id" in n.appKitNetwork) {
+                map.set(String(n.appKitNetwork.id), n.id);
+            }
+        });
+        return map;
+    }, []);
+
+    // Fetch all whitelisted tokens
+    const { data: tokensData } = useGetWhitelistTokens();
+
+    // Filter tokens by selected networks (if any selected); de-dupe by address
+    const tokenOptions: MultipleSelectOption[] = useMemo(() => {
+        const tokens = tokensData?.whitelistTokens ?? [];
+        const filtered =
+            filter.network.length === 0
+                ? tokens
+                : tokens.filter((t) =>
+                    filter.network.includes(chainIdToNetworkId.get(t.chainId) ?? ""),
+                );
+        return filtered.map((t) => ({
+            label: t.customSymbol || t.symbol || t.name,
+            value: t.address,
+        }));
+    }, [tokensData, filter.network, chainIdToNetworkId]);
 
     return (
         <div className="space-y-4 pt-12.75 pr-13.5 pl-21">
@@ -84,7 +106,25 @@ const AdminWhitelistUserSearch = () => {
                         options={networkOptions}
                         placeholder="Network"
                         selected={filter.network}
-                        onChange={(value) => setFilter({ network: value })}
+                        onChange={(value) => {
+                            setFilter({ network: value });
+                            // Clear token selections that no longer belong to the new network set
+                            if (filter.tokens.length > 0) {
+                                const tokens = tokensData?.whitelistTokens ?? [];
+                                const valid = new Set(
+                                    value.length === 0
+                                        ? tokens.map((t) => t.address)
+                                        : tokens
+                                            .filter((t) =>
+                                                value.includes(chainIdToNetworkId.get(t.chainId) ?? ""),
+                                            )
+                                            .map((t) => t.address),
+                                );
+                                setFilter({
+                                    tokens: filter.tokens.filter((addr) => valid.has(addr)),
+                                });
+                            }
+                        }}
                     />
                     <SearchTextDebouncedInput
                         inputProps={{

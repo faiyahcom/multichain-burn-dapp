@@ -25,4 +25,23 @@ export const whitelistUserService = {
         );
         return response;
     },
+
+    updateUserInfo: async (data: {
+        walletAddress: string;
+        name?: string;
+        email?: string;
+    }) => {
+        const formData = new FormData();
+        if (data.name !== undefined) formData.append("name", data.name ?? "");
+        if (data.email !== undefined) formData.append("email", data.email ?? "");
+
+        const response = await apiClient.post(
+            WHITELIST_USERS_API_ROUTES.UPDATE_USER_INFO(data.walletAddress),
+            formData,
+            {
+                headers: { "Content-Type": "multipart/form-data" },
+            },
+        );
+        return response;
+    },
 };

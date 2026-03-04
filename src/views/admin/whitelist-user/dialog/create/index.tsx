@@ -18,29 +18,58 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import { useState } from "react";
+import { useState, useMemo } from "react";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useCreateWhitelistUserSolanaFn } from "./useCreateWhitelistUserSolanaFn";
+import { whitelistUserService } from "@/services/whitelistUserService";
+import { getErrorMessage } from "@/utils/helpers/error-message";
+import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
 import { toast } from "sonner";
 
-const whitelistUserSchema = z.object({
-    name: z.string().min(1, { error: "Name is required" }),
-    email: z.string().email({ error: "Invalid email address" }),
-    walletAddress: z.string().min(1, { error: "Wallet address is required" }),
-    description: z.string().optional(),
-});
+const baseSchema = {
+    name: z.string().optional(),
+    email: z.string().email({ error: "Invalid email address" }).optional().or(z.literal("")),
+};
 
-type WhitelistUserFormValues = z.infer<typeof whitelistUserSchema>;
+type WhitelistUserFormValues = z.infer<ReturnType<typeof buildSchema>>;
+
+const buildSchema = (isSolana: boolean) =>
+    z.object({
+        ...baseSchema,
+        walletAddress: z
+            .string()
+            .min(1, { error: "Wallet address is required" })
+            .refine(
+                (val) => (isSolana ? isSolanaAddress(val) : isEvmAddress(val)),
+                {
+                    error: isSolana
+                        ? "Must be a valid Solana address"
+                        : "Must be a valid EVM address (0x...)",
+                },
+            ),
+    });
+
 
 const AdminWhitelistUserDialogCreate = () => {
     const [open, setOpen] = useState<boolean>(false);
+    const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
+
+    const { caipAddress } = useAppKitAccount();
+    const namespace = caipAddress?.split(":")[0];
+    const isSolana = namespace === "solana";
+
+    const { createWhitelistUser: createWhitelistUserSolana } =
+        useCreateWhitelistUserSolanaFn();
+
+    const schema = useMemo(() => buildSchema(isSolana), [isSolana]);
 
     const { control, handleSubmit, reset } = useForm<WhitelistUserFormValues>({
         defaultValues: {
             name: "",
             email: "",
             walletAddress: "",
-            description: "",
         },
-        resolver: zodResolver(whitelistUserSchema),
+        resolver: zodResolver(schema),
     });
 
     const handleOpenChange = (open: boolean) => {
@@ -50,11 +79,35 @@ const AdminWhitelistUserDialogCreate = () => {
         setOpen(open);
     };
 
-    const onSubmit = async (_data: WhitelistUserFormValues) => {
-        // TODO: wire up to actual API
-        toast.success("User whitelisted successfully!");
+    const onSubmit = async (data: WhitelistUserFormValues) => {
+        if (isSolana) {
+            setIsCallingSc(true);
+            const result = await createWhitelistUserSolana({
+                userAddress: data.walletAddress,
+            });
+            setIsCallingSc(false);
+            if (!result) return;
+        }
+
+        // If at least one of name/email is filled, persist to backend
+        const hasInfo = !!data.name?.trim() || !!data.email?.trim();
+        if (hasInfo) {
+            try {
+                await whitelistUserService.updateUserInfo({
+                    walletAddress: data.walletAddress.trim(),
+                    name: data.name?.trim() || undefined,
+                    email: data.email?.trim() || undefined,
+                });
+            } catch (error) {
+                toast.error(getErrorMessage({ error }));
+                return;
+            }
+        }
+
         handleOpenChange(false);
     };
+
+    const isLoading = isCallingSc;
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -85,7 +138,7 @@ const AdminWhitelistUserDialogCreate = () => {
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
-                                        Name<span className="text-md-required-red">*</span>
+                                        Name
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -106,7 +159,7 @@ const AdminWhitelistUserDialogCreate = () => {
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
                                     <FieldLabel htmlFor={field.name}>
-                                        Email<span className="text-md-required-red">*</span>
+                                        Email
                                     </FieldLabel>
                                     <Input
                                         {...field}
@@ -133,7 +186,11 @@ const AdminWhitelistUserDialogCreate = () => {
                                         {...field}
                                         id={field.name}
                                         aria-invalid={fieldState.invalid}
-                                        placeholder="0x0000000000000000000000000000000000000000"
+                                        placeholder={
+                                            isSolana
+                                                ? "e.g. 9noXzpXnLLrrTn…"
+                                                : "0x0000000000000000000000000000000000000000"
+                                        }
                                         className="px-5 placeholder:text-15px placeholder:text-secondary-text"
                                     />
                                     {fieldState.invalid && (
@@ -157,12 +214,13 @@ const AdminWhitelistUserDialogCreate = () => {
                             btnProps={{
                                 type: "reset",
                                 onClick: () => handleOpenChange(false),
+                                disabled: isLoading,
                             }}
                         />
                         <AnimateIconButton
                             variant="letter-icon"
                             iconLetter="A"
-                            text="Add to Whitelist"
+                            text={isLoading ? "Adding..." : "Add to Whitelist"}
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
@@ -170,6 +228,7 @@ const AdminWhitelistUserDialogCreate = () => {
                             }}
                             btnProps={{
                                 type: "submit",
+                                disabled: isLoading,
                             }}
                         />
                     </div>

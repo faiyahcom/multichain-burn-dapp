@@ -1,5 +1,4 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import BlueSwitch from "@/components/common/blue-switch";
 import CopyableText from "@/components/common/copyable-text";
 import CustomPagination from "@/components/common/pagination";
 import {
@@ -22,6 +21,8 @@ import { cn } from "@/lib/utils";
 import { PencilIcon } from "lucide-react";
 import { useGetWhitelistUsers } from "@/services/queries/queries";
 import type { WhitelistUser } from "@/services/whitelistUserService";
+import { useState } from "react";
+import AdminWhitelistUserDialogEdit from "../dialog/edit";
 
 interface Props {
     data?: WhitelistUser[];
@@ -35,6 +36,8 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
 
     const users = data ?? apiData?.users ?? [];
 
+    const [editingUser, setEditingUser] = useState<WhitelistUser | null>(null);
+
     return (
         <div className="pb-10 pl-3.75 space-y-10">
             <Table className="table-auto">
@@ -44,12 +47,13 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                         <TableHead>Status</TableHead>
                         <TableHead>Address</TableHead>
                         <TableHead>Added</TableHead>
+                        <TableHead>Action</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={4} className="py-10 text-center text-secondary-text">
+                            <TableCell colSpan={5} className="py-10 text-center text-secondary-text">
                                 Loading...
                             </TableCell>
                         </TableRow>
@@ -57,7 +61,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
 
                     {!isLoading && users.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={4} className="py-10 text-center text-secondary-text">
+                            <TableCell colSpan={5} className="py-10 text-center text-secondary-text">
                                 No users found.
                             </TableCell>
                         </TableRow>
@@ -66,7 +70,6 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     {!isLoading &&
                         users.map((user, index) => {
                             const isFirst = index === 0;
-                            // API doesn't return enable/disable status yet — default to enabled
                             const status: UserStatus = "enabled";
 
                             return (
@@ -125,16 +128,15 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         </p>
                                     </TableCell>
 
-                                    {/* Action = edit + toggle */}
+                                    {/* Action = pencil only */}
                                     <TableCell>
-                                        <div className="flex items-center justify-center gap-4.5">
-                                            <button className="text-secondary-text hover:text-foreground transition-colors">
+                                        <div className="flex items-center justify-center">
+                                            <button
+                                                className="text-secondary-text hover:text-foreground transition-colors"
+                                                onClick={() => setEditingUser(user)}
+                                            >
                                                 <PencilIcon className="size-4" />
                                             </button>
-                                            <BlueSwitch
-                                                active={status === "enabled"}
-                                                classNames={{ btn: "" }}
-                                            />
                                         </div>
                                     </TableCell>
                                 </TableRow>
@@ -155,6 +157,17 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     totalCount={apiData?.total ?? 0}
                     pageSize={50}
                     onPageChange={(page) => setFilter({ page })}
+                />
+            )}
+
+            {/* Edit dialog — rendered outside the table rows */}
+            {editingUser && (
+                <AdminWhitelistUserDialogEdit
+                    user={editingUser}
+                    open={!!editingUser}
+                    onOpenChange={(open) => {
+                        if (!open) setEditingUser(null);
+                    }}
                 />
             )}
         </div>

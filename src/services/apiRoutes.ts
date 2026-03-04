@@ -23,5 +23,6 @@ export const API_ROUTES = {
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
+    UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
   },
 } as const;
