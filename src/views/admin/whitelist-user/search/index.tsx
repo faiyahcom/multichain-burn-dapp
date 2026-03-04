@@ -13,7 +13,13 @@ import {
 import AdminWhitelistUserDialogCreate from "../dialog/create";
 import AdminWhitelistUserSearchStatusPicker from "./status-picker";
 import { useMemo } from "react";
-
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 const AdminWhitelistUserSearch = () => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
@@ -28,27 +34,12 @@ const AdminWhitelistUserSearch = () => {
         value: status,
     }));
 
-    const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
-        (network) => ({
-            label: network.label,
-            value: network.id,
-            icon: ({ className }: { className?: string }) => (
-                <NetworkImgIcon
-                    src={network.iconSrc}
-                    className={className}
-                    alt={network.label}
-                />
-            ),
-        }),
-    );
-
-    // Build a chainId → networkId lookup from NETWORK_CONFIGS
+    // Build chainId → networkId lookup
     const chainIdToNetworkId = useMemo(() => {
         const map = new Map<string, string>();
         NETWORK_CONFIGS.forEach((n) => {
-            if ("id" in n.appKitNetwork) {
-                map.set(String(n.appKitNetwork.id), n.id);
-            }
+            const id = n.appKitNetwork?.id;
+            map.set(typeof id === "number" ? String(id) : "-1", n.id);
         });
         return map;
     }, []);
@@ -56,15 +47,14 @@ const AdminWhitelistUserSearch = () => {
     // Fetch all whitelisted tokens
     const { data: tokensData, isLoading: isTokensLoading } = useGetWhitelistTokens();
 
-    // Filter tokens by selected networks (if any selected); de-dupe by address
+    // Filter tokens by the selected network (single value)
     const tokenOptions: MultipleSelectOption[] = useMemo(() => {
         const tokens = tokensData?.whitelistTokens ?? [];
-        const filtered =
-            filter.network.length === 0
-                ? tokens
-                : tokens.filter((t) =>
-                    filter.network.includes(chainIdToNetworkId.get(t.chainId) ?? ""),
-                );
+        const filtered = filter.network
+            ? tokens.filter((t) =>
+                chainIdToNetworkId.get(t.chainId) === filter.network,
+            )
+            : tokens;
         return filtered.map((t) => ({
             label: t.customSymbol || t.symbol || t.name,
             value: t.address,
@@ -102,7 +92,7 @@ const AdminWhitelistUserSearch = () => {
                             isTokensLoading
                                 ? "Loading tokens..."
                                 : tokenOptions.length === 0
-                                    ? filter.network.length > 0
+                                    ? filter.network
                                         ? "No tokens for selected network"
                                         : "No tokens available"
                                     : "All Tokens"
@@ -110,30 +100,35 @@ const AdminWhitelistUserSearch = () => {
                         selected={filter.tokens}
                         onChange={(value) => setFilter({ tokens: value })}
                     />
-                    <MultipleSelect
-                        options={networkOptions}
-                        placeholder="Network"
-                        selected={filter.network}
-                        onChange={(value) => {
-                            setFilter({ network: value });
-                            // Clear token selections that no longer belong to the new network set
-                            if (filter.tokens.length > 0) {
-                                const tokens = tokensData?.whitelistTokens ?? [];
-                                const valid = new Set(
-                                    value.length === 0
-                                        ? tokens.map((t) => t.address)
-                                        : tokens
-                                            .filter((t) =>
-                                                value.includes(chainIdToNetworkId.get(t.chainId) ?? ""),
-                                            )
-                                            .map((t) => t.address),
-                                );
-                                setFilter({
-                                    tokens: filter.tokens.filter((addr) => valid.has(addr)),
-                                });
-                            }
+
+                    {/* Single-select network */}
+                    <Select
+                        value={filter.network || "__all__"}
+                        onValueChange={(value) => {
+                            const network = value === "__all__" ? "" : value;
+                            setFilter({ network, tokens: [] }); // clear token selection on network change
                         }}
-                    />
+                    >
+                        <SelectTrigger className="h-9 min-w-32 border-border">
+                            <SelectValue placeholder="Network" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="__all__">All Networks</SelectItem>
+                            {NETWORK_CONFIGS.map((n) => (
+                                <SelectItem key={n.id} value={n.id}>
+                                    <span className="flex items-center gap-2">
+                                        <NetworkImgIcon
+                                            src={n.iconSrc}
+                                            alt={n.label}
+                                            className="size-4"
+                                        />
+                                        {n.label}
+                                    </span>
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
                     <SearchTextDebouncedInput
                         inputProps={{
                             placeholder: "Search by name, email, or wallet address",

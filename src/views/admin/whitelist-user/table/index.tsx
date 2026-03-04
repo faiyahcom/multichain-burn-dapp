@@ -1,6 +1,7 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import CustomPagination from "@/components/common/pagination";
+import NetworkImgIcon from "@/components/common/network-img-icon";
 import {
     Table,
     TableBody,
@@ -21,23 +22,43 @@ import { cn } from "@/lib/utils";
 import { PencilIcon, EyeIcon } from "lucide-react";
 import { useGetWhitelistUsers } from "@/services/queries/queries";
 import type { TokenAllocation, WhitelistUser } from "@/services/whitelistUserService";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import AdminWhitelistUserDialogEdit from "../dialog/edit";
 import { NETWORK_CONFIGS } from "@/config/networks";
 
 const MAX_VISIBLE_TOKENS = 3;
 
-/** Formats a raw BigInt amount string using token decimals into a display value */
+/** Maps a chainId string back to the NetworkConfig */
+const getNetworkByChainId = (chainId: string) => {
+    return NETWORK_CONFIGS.find((n) => {
+        const id = n.appKitNetwork?.id;
+        return typeof id === "number" ? String(id) === chainId : chainId === "-1";
+    });
+};
+
+/** Formats a raw BigInt amount string using token decimals into a human-readable value */
 const formatTokenAmount = (amount: string, decimals: number): string => {
     try {
         const raw = BigInt(amount);
+        if (decimals === 0) return raw.toLocaleString();
+
         const divisor = BigInt(10 ** decimals);
         const whole = raw / divisor;
         const frac = raw % divisor;
+
         if (frac === 0n) return whole.toLocaleString();
-        // Show up to 2 decimal places
-        const fracStr = frac.toString().padStart(decimals, "0").slice(0, 2).replace(/0+$/, "");
-        return fracStr ? `${whole.toLocaleString()}.${fracStr}` : whole.toLocaleString();
+
+        // Pad frac to full decimal width (e.g. "1000" → "000001000" for 9 decimals)
+        const fracStr = frac.toString().padStart(decimals, "0");
+
+        // Find the first non-zero digit and show up to 6 significant digits from there
+        const firstNonZero = fracStr.search(/[1-9]/);
+        if (firstNonZero === -1) return whole.toLocaleString();
+
+        const end = Math.min(firstNonZero + 6, decimals);
+        const sigDigits = fracStr.slice(0, end).replace(/0+$/, "");
+
+        return sigDigits ? `${whole.toLocaleString()}.${sigDigits}` : whole.toLocaleString();
     } catch {
         return amount;
     }
@@ -52,9 +73,9 @@ const TokenAllocationChips: React.FC<{ allocations: TokenAllocation[] }> = ({ al
 
     return (
         <div className="flex flex-wrap items-center gap-1.5">
-            {visible.map((a) => (
+            {visible.map((a, i) => (
                 <span
-                    key={a.tokenAddress}
+                    key={`${a.tokenAddress}-${i}`}
                     className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
                 >
                     <span>{formatTokenAmount(a.amount, a.tokenDecimals)}</span>
@@ -74,6 +95,35 @@ const TokenAllocationChips: React.FC<{ allocations: TokenAllocation[] }> = ({ al
     );
 };
 
+/** Shows distinct network icons from the user's token allocations */
+const UserNetworkIcons: React.FC<{ allocations: TokenAllocation[] }> = ({ allocations }) => {
+    const networks = useMemo(() => {
+        const seen = new Set<string>();
+        return allocations
+            .map((a) => getNetworkByChainId(a.chainId))
+            .filter((n): n is typeof NETWORK_CONFIGS[number] => {
+                if (!n || seen.has(n.id)) return false;
+                seen.add(n.id);
+                return true;
+            });
+    }, [allocations]);
+
+    if (networks.length === 0) return <span className="text-secondary-text text-xs">—</span>;
+
+    return (
+        <div className="flex items-center gap-1.5">
+            {networks.map((n) => (
+                <NetworkImgIcon
+                    key={n.id}
+                    src={n.iconSrc}
+                    alt={n.label}
+                    className="size-5"
+                />
+            ))}
+        </div>
+    );
+};
+
 interface Props {
     data?: WhitelistUser[];
 }
@@ -81,14 +131,13 @@ interface Props {
 const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
 
-    // Map NetworkId strings → numeric chainIds for the API (-1 = Solana)
-    const chainIds = filter.network.length > 0
-        ? filter.network.map((networkId) => {
-            const cfg = NETWORK_CONFIGS.find((n) => n.id === networkId);
-            const id = cfg?.appKitNetwork?.id;
-            return typeof id === "number" ? id : -1; // -1 for Solana
-        })
-        : undefined;
+    // Map single NetworkId → numeric chainId for the API (-1 for Solana)
+    const chainIds = useMemo(() => {
+        if (!filter.network) return undefined;
+        const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
+        const id = cfg?.appKitNetwork?.id;
+        return [typeof id === "number" ? id : -1];
+    }, [filter.network]);
 
     const tokenAddresses = filter.tokens.length > 0 ? filter.tokens : undefined;
 
@@ -109,6 +158,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                         <TableHead>User</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Address</TableHead>
+                        <TableHead>Network</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead>Added</TableHead>
                         <TableHead>Action</TableHead>
@@ -117,7 +167,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={6} className="py-10 text-center text-secondary-text">
+                            <TableCell colSpan={7} className="py-10 text-center text-secondary-text">
                                 Loading...
                             </TableCell>
                         </TableRow>
@@ -125,7 +175,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
 
                     {!isLoading && users.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={6} className="py-10 text-center text-secondary-text">
+                            <TableCell colSpan={7} className="py-10 text-center text-secondary-text">
                                 No users found.
                             </TableCell>
                         </TableRow>
@@ -146,11 +196,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                     {/* User name + email */}
                                     <TableCell>
                                         <div className="flex flex-col text-left pl-2">
-                                            <p
-                                                className={cn("text-base font-semibold", {
-                                                    "text-primary": isFirst,
-                                                })}
-                                            >
+                                            <p className={cn("text-base font-semibold", { "text-primary": isFirst })}>
                                                 {user.name}
                                             </p>
                                             <p className="text-11px font-normal text-secondary-text">
@@ -167,9 +213,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                             text={userStatusLabels[status]}
                                             color={userStatusColors[status]}
                                             hasGroupHover
-                                            classNames={{
-                                                btn: "min-w-27 mx-auto",
-                                            }}
+                                            classNames={{ btn: "min-w-27 mx-auto" }}
                                         />
                                     </TableCell>
 
@@ -179,6 +223,11 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                             content={user.address}
                                             displayText={truncateString({ str: user.address })}
                                         />
+                                    </TableCell>
+
+                                    {/* Network icons derived from allocations */}
+                                    <TableCell>
+                                        <UserNetworkIcons allocations={user.tokenAllocations} />
                                     </TableCell>
 
                                     {/* Description — token allocations */}
@@ -197,7 +246,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         </p>
                                     </TableCell>
 
-                                    {/* Action = pencil only */}
+                                    {/* Action */}
                                     <TableCell>
                                         <div className="flex items-center justify-center">
                                             <button

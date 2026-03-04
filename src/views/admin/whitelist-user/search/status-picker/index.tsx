@@ -17,7 +17,7 @@ const AdminWhitelistUserSearchStatusPicker: React.FC<Props> = ({
 
     return (
         <div className="flex items-center gap-2">
-            {options?.map((option, index) => {
+            {/* {options?.map((option, index) => {
                 const isActive = option?.value === selected;
                 return (
                     <button
@@ -45,7 +45,7 @@ const AdminWhitelistUserSearchStatusPicker: React.FC<Props> = ({
                         )}
                     </button>
                 );
-            })}
+            })} */}
         </div>
     );
 };

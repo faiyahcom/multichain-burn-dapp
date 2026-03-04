@@ -7,31 +7,30 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, CheckCircle2Icon, ArrowRightLeftIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-    Field,
-    FieldError,
-    FieldLabel,
-} from "@/components/ui/field";
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import { useState, useMemo } from "react";
-import { useAppKitAccount } from "@reown/appkit/react";
+import NetworkImgIcon from "@/components/common/network-img-icon";
+import { useState, useMemo, useCallback } from "react";
+import { useAppKitNetwork } from "@reown/appkit/react";
 import { useCreateWhitelistUserSolanaFn } from "./useCreateWhitelistUserSolanaFn";
+import { useCreateWhitelistUserEvmFn } from "./useCreateWhitelistUserEvmFn";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
 import { toast } from "sonner";
+import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { cn } from "@/lib/utils";
 
+// ─── address schema ───────────────────────────────────────────────────────────
 const baseSchema = {
     name: z.string().optional(),
     email: z.string().email({ error: "Invalid email address" }).optional().or(z.literal("")),
 };
-
-type WhitelistUserFormValues = z.infer<ReturnType<typeof buildSchema>>;
 
 const buildSchema = (isSolana: boolean) =>
     z.object({
@@ -49,47 +48,94 @@ const buildSchema = (isSolana: boolean) =>
             ),
     });
 
+type WhitelistUserFormValues = z.infer<ReturnType<typeof buildSchema>>;
 
+// ─── helpers ──────────────────────────────────────────────────────────────────
+const SOLANA_NETWORK_ID: NetworkId = "solanaDevnet";
+const EVM_NETWORK_IDS = NETWORK_CONFIGS.filter((n) => n.id !== SOLANA_NETWORK_ID).map((n) => n.id);
+
+// ─── component ────────────────────────────────────────────────────────────────
 const AdminWhitelistUserDialogCreate = () => {
-    const [open, setOpen] = useState<boolean>(false);
-    const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
+    const [open, setOpen] = useState(false);
+    const [isCallingSc, setIsCallingSc] = useState(false);
 
-    const { caipAddress } = useAppKitAccount();
-    const namespace = caipAddress?.split(":")[0];
-    const isSolana = namespace === "solana";
+    // Which networks the admin wants to whitelist this user on
+    const [selectedNetworks, setSelectedNetworks] = useState<NetworkId[]>([]);
 
-    const { createWhitelistUser: createWhitelistUserSolana } =
-        useCreateWhitelistUserSolanaFn();
+    const { caipNetwork, switchNetwork } = useAppKitNetwork();
 
-    const schema = useMemo(() => buildSchema(isSolana), [isSolana]);
+    const { createWhitelistUser: createSolana } = useCreateWhitelistUserSolanaFn();
+    const { createWhitelistUser: createEvm } = useCreateWhitelistUserEvmFn();
+
+    // ── derive whether selection is Solana or EVM type ────────────────────────
+    const hasSolana = selectedNetworks.includes(SOLANA_NETWORK_ID);
+    const hasEvm = selectedNetworks.some((id) => EVM_NETWORK_IDS.includes(id));
+    const networkTypeConflict = hasSolana && hasEvm;
+
+    // ── connected network matching ─────────────────────────────────────────────
+    const connectedNetworkCfg = useMemo(() => {
+        if (!caipNetwork) return undefined;
+        return NETWORK_CONFIGS.find((n) => n.appKitNetwork.id === caipNetwork.id);
+    }, [caipNetwork]);
+
+    // ── address validation depends on selection type ───────────────────────────
+    const schema = useMemo(() => buildSchema(hasSolana && !hasEvm), [hasSolana, hasEvm]);
 
     const { control, handleSubmit, reset } = useForm<WhitelistUserFormValues>({
-        defaultValues: {
-            name: "",
-            email: "",
-            walletAddress: "",
-        },
+        defaultValues: { name: "", email: "", walletAddress: "" },
         resolver: zodResolver(schema),
     });
 
-    const handleOpenChange = (open: boolean) => {
-        if (!open) {
-            reset();
-        }
-        setOpen(open);
+    const handleOpenChange = useCallback(
+        (next: boolean) => {
+            if (!next) {
+                reset();
+                setSelectedNetworks([]);
+            }
+            setOpen(next);
+        },
+        [reset],
+    );
+
+    // ── network pill toggle (mutually exclusive: solana vs evm) ───────────────
+    const toggleNetwork = (id: NetworkId) => {
+        setSelectedNetworks((prev) => {
+            if (prev.includes(id)) return prev.filter((n) => n !== id);
+            // If toggling Solana → clear EVM; if toggling EVM → clear Solana
+            const isSolId = id === SOLANA_NETWORK_ID;
+            const filtered = isSolId
+                ? prev.filter((n) => n === SOLANA_NETWORK_ID) // keep only solana (clear evm)
+                : prev.filter((n) => n !== SOLANA_NETWORK_ID); // clear solana
+            return [...filtered, id];
+        });
     };
 
+    // ── submit: only handles the currently connected network ──────────────────
     const onSubmit = async (data: WhitelistUserFormValues) => {
-        if (isSolana) {
-            setIsCallingSc(true);
-            const result = await createWhitelistUserSolana({
-                userAddress: data.walletAddress,
-            });
-            setIsCallingSc(false);
-            if (!result) return;
+        if (selectedNetworks.length === 0) {
+            toast.error("Select at least one network");
+            return;
+        }
+        if (networkTypeConflict) {
+            toast.error("Cannot mix Solana and EVM networks");
+            return;
+        }
+        if (!connectedNetworkCfg || !selectedNetworks.includes(connectedNetworkCfg.id)) {
+            toast.error("Switch to one of the selected networks to proceed");
+            return;
         }
 
-        // If at least one of name/email is filled, persist to backend
+        setIsCallingSc(true);
+        let scResult = false;
+        if (connectedNetworkCfg.id === SOLANA_NETWORK_ID) {
+            scResult = await createSolana({ userAddress: data.walletAddress });
+        } else {
+            scResult = await createEvm({ userAddress: data.walletAddress });
+        }
+        setIsCallingSc(false);
+        if (!scResult) return;
+
+        // Persist name/email metadata (optional)
         const hasInfo = !!data.name?.trim() || !!data.email?.trim();
         if (hasInfo) {
             try {
@@ -104,10 +150,20 @@ const AdminWhitelistUserDialogCreate = () => {
             }
         }
 
-        handleOpenChange(false);
+        // Remove this network from the selection — if more remain, keep dialog open
+        const remaining = selectedNetworks.filter((n) => n !== connectedNetworkCfg.id);
+        if (remaining.length === 0) {
+            handleOpenChange(false);
+        } else {
+            setSelectedNetworks(remaining);
+            toast.info(`Done for ${connectedNetworkCfg.label}. Switch network to continue.`);
+        }
     };
 
     const isLoading = isCallingSc;
+    const addressPlaceholder = hasSolana
+        ? "e.g. 9noXzpXnLLrrTn…"
+        : "0x0000000000000000000000000000000000000000";
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -125,21 +181,94 @@ const AdminWhitelistUserDialogCreate = () => {
             >
                 <DialogHeader>
                     <DialogTitle>ADD USER TO WHITELIST</DialogTitle>
-                    <DialogDescription>
-                        Add a new user to the transfer whitelist
-                    </DialogDescription>
+                    <DialogDescription>Add a new user to the transfer whitelist</DialogDescription>
                 </DialogHeader>
 
-                <form className="space-y-12.25" onSubmit={handleSubmit(onSubmit)}>
+                <form className="space-y-8" onSubmit={handleSubmit(onSubmit)}>
+                    {/* ── Network selection ── */}
+                    <div className="space-y-2">
+                        <p className="text-sm font-medium">
+                            Networks<span className="text-md-required-red">*</span>
+                        </p>
+                        <div className="flex flex-wrap gap-2">
+                            {NETWORK_CONFIGS.map((n) => {
+                                const isSelected = selectedNetworks.includes(n.id);
+                                const isConnected = connectedNetworkCfg?.id === n.id;
+                                return (
+                                    <button
+                                        key={n.id}
+                                        type="button"
+                                        onClick={() => toggleNetwork(n.id)}
+                                        className={cn(
+                                            "flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-sm transition-all",
+                                            isSelected
+                                                ? "border-primary bg-primary/10 text-primary"
+                                                : "border-border text-secondary-text hover:border-primary/50",
+                                        )}
+                                    >
+                                        <NetworkImgIcon src={n.iconSrc} alt={n.label} className="size-4" />
+                                        {n.label}
+                                        {isConnected && isSelected && (
+                                            <CheckCircle2Icon className="size-3.5 text-green-500" />
+                                        )}
+                                    </button>
+                                );
+                            })}
+                        </div>
+                        {networkTypeConflict && (
+                            <p className="text-xs text-destructive">
+                                Cannot mix Solana and EVM networks — they use different address formats.
+                            </p>
+                        )}
+                    </div>
+
+                    {/* ── Per-network status + switch buttons ── */}
+                    {selectedNetworks.length > 0 && !networkTypeConflict && (
+                        <div className="flex flex-wrap gap-2">
+                            {selectedNetworks.map((id) => {
+                                const cfg = NETWORK_CONFIGS.find((n) => n.id === id)!;
+                                const isConnected = connectedNetworkCfg?.id === id;
+                                return (
+                                    <div
+                                        key={id}
+                                        className={cn(
+                                            "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs",
+                                            isConnected
+                                                ? "border-green-500/30 bg-green-500/10 text-green-400"
+                                                : "border-border text-secondary-text",
+                                        )}
+                                    >
+                                        <NetworkImgIcon src={cfg.iconSrc} alt={cfg.label} className="size-3.5" />
+                                        <span>{cfg.label}</span>
+                                        {isConnected ? (
+                                            <span className="flex items-center gap-1">
+                                                <CheckCircle2Icon className="size-3" />
+                                                Connected
+                                            </span>
+                                        ) : (
+                                            <button
+                                                type="button"
+                                                onClick={() => switchNetwork(cfg.appKitNetwork)}
+                                                className="flex items-center gap-1 text-primary hover:underline"
+                                            >
+                                                <ArrowRightLeftIcon className="size-3" />
+                                                Switch
+                                            </button>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    )}
+
+                    {/* ── Form fields ── */}
                     <div className="space-y-3.75">
                         <Controller
                             control={control}
                             name="name"
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor={field.name}>
-                                        Name
-                                    </FieldLabel>
+                                    <FieldLabel htmlFor={field.name}>Name</FieldLabel>
                                     <Input
                                         {...field}
                                         id={field.name}
@@ -147,9 +276,7 @@ const AdminWhitelistUserDialogCreate = () => {
                                         placeholder="Alice Johnson"
                                         className="px-5 placeholder:text-15px placeholder:text-secondary-text"
                                     />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
                         />
@@ -158,9 +285,7 @@ const AdminWhitelistUserDialogCreate = () => {
                             name="email"
                             render={({ field, fieldState }) => (
                                 <Field data-invalid={fieldState.invalid}>
-                                    <FieldLabel htmlFor={field.name}>
-                                        Email
-                                    </FieldLabel>
+                                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
                                     <Input
                                         {...field}
                                         id={field.name}
@@ -168,9 +293,7 @@ const AdminWhitelistUserDialogCreate = () => {
                                         placeholder="alice@example.com"
                                         className="px-5 placeholder:text-15px placeholder:text-secondary-text"
                                     />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
                         />
@@ -186,21 +309,16 @@ const AdminWhitelistUserDialogCreate = () => {
                                         {...field}
                                         id={field.name}
                                         aria-invalid={fieldState.invalid}
-                                        placeholder={
-                                            isSolana
-                                                ? "e.g. 9noXzpXnLLrrTn…"
-                                                : "0x0000000000000000000000000000000000000000"
-                                        }
+                                        placeholder={addressPlaceholder}
                                         className="px-5 placeholder:text-15px placeholder:text-secondary-text"
                                     />
-                                    {fieldState.invalid && (
-                                        <FieldError errors={[fieldState.error]} />
-                                    )}
+                                    {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
                                 </Field>
                             )}
                         />
                     </div>
 
+                    {/* ── Actions ── */}
                     <div className="flex items-center justify-end">
                         <AnimateIconButton
                             variant="letter-icon"
@@ -220,7 +338,13 @@ const AdminWhitelistUserDialogCreate = () => {
                         <AnimateIconButton
                             variant="letter-icon"
                             iconLetter="A"
-                            text={isLoading ? "Adding..." : "Add to Whitelist"}
+                            text={
+                                isLoading
+                                    ? "Adding..."
+                                    : connectedNetworkCfg && selectedNetworks.includes(connectedNetworkCfg.id)
+                                        ? `Add to ${connectedNetworkCfg.label}`
+                                        : "Add to Whitelist"
+                            }
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
@@ -228,7 +352,7 @@ const AdminWhitelistUserDialogCreate = () => {
                             }}
                             btnProps={{
                                 type: "submit",
-                                disabled: isLoading,
+                                disabled: isLoading || selectedNetworks.length === 0 || networkTypeConflict,
                             }}
                         />
                     </div>

@@ -4,7 +4,7 @@ import { create } from "zustand";
 type AdminWhitelistUserSearchFilterType = {
     status: UserStatus;
     tokens: string[];
-    network: string[];
+    network: string; // single NetworkId or "" for all
     text: string;
     page: number;
 };
@@ -19,7 +19,7 @@ export const useAdminWhitelistUserSearchFilterStore =
         filter: {
             status: "all",
             tokens: [],
-            network: [],
+            network: "ethereumTestnet",
             text: "",
             page: 1,
         },

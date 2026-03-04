@@ -7,6 +7,7 @@ export interface TokenAllocation {
     tokenAddress: string;
     tokenSymbol: string;
     tokenDecimals: number;
+    chainId: string; // stringified BigInt from backend
     amount: string; // raw BigInt string
 }
 
