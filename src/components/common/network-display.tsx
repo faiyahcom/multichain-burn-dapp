@@ -1,14 +1,27 @@
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkConfig } from "@/config/networks";
 import NetworkImgIcon from "./network-img-icon";
 
-interface Props {
-  networkId: string;
-}
+type Props =
+  | { networkId: string; chainId?: never }
+  | { networkId?: never; chainId: string };
 
-const NetworkDisplay: React.FC<Props> = ({ networkId }) => {
-  const networkConfig = NETWORK_CONFIGS.find(
-    (network) => network.id === networkId,
-  );
+const NetworkDisplay: React.FC<Props> = ({ networkId, chainId }) => {
+  let networkConfig: NetworkConfig | undefined = undefined;
+  if (networkId) {
+    networkConfig = NETWORK_CONFIGS.find((network) => network.id === networkId);
+  }
+  if (chainId) {
+    // Solana
+    if (chainId === "-1") {
+      networkConfig = NETWORK_CONFIGS.find(
+        (network) => network.id === "solanaDevnet",
+      );
+    } else {
+      networkConfig = NETWORK_CONFIGS.find(
+        (network) => network.appKitNetwork.id === Number(chainId),
+      );
+    }
+  }
   if (!networkConfig) {
     return null;
   }

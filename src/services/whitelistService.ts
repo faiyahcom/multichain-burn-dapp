@@ -1,5 +1,6 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
+import type { BooleanString, PaginationResponse } from "@/types/common";
 const WHITELIST_API_ROUTES = API_ROUTES.WHITELIST;
 
 export interface WhitelistToken {
@@ -17,7 +18,16 @@ export interface WhitelistToken {
   whitepaper: string;
 }
 
-export interface ListTokensResponse {
+export interface ListTokensRequest {
+  page?: number;
+  limit?: number;
+  active?: BooleanString;
+  isDropped?: BooleanString; // soft delete
+  chainIds?: string; // comma separated
+  search?: string;
+}
+
+export interface ListTokensResponse extends PaginationResponse {
   whitelistTokens: WhitelistToken[];
 }
 
@@ -25,14 +35,30 @@ export interface CreateWhitelistTokenResponse {
   imageUri?: string;
 }
 
+export interface WhitelistTokenSummaryResponse {
+  totalDisable: number;
+  totalEnable: number;
+}
+
+export interface ForceUpdateWhitelistTokenStatusRequest {
+  chainId: string;
+  address: string;
+}
+
+export interface DeleteWhitelistTokenRequest {
+  chainId: string;
+  address: string;
+}
+
 export const whitelistService = {
-  getListTokens: async () => {
+  getListTokens: async (request?: ListTokensRequest) => {
     const response = await apiClient.get<ListTokensResponse>(
       `${WHITELIST_API_ROUTES.GET_LIST_TOKENS}`,
       {
         params: {
-          page: 1,
-          limit: 100,
+          ...request,
+          page: request?.page || 1,
+          limit: request?.limit || 100,
         },
       },
     );
@@ -49,6 +75,39 @@ export const whitelistService = {
           "Content-Type": "multipart/form-data",
         },
       },
+    );
+
+    return response;
+  },
+
+  getWhitelistTokenSummary: async () => {
+    const response = await apiClient.get<WhitelistTokenSummaryResponse>(
+      `${WHITELIST_API_ROUTES.WHITELIST_TOKEN_SUMMARY}`,
+      {},
+    );
+    return response;
+  },
+
+  forceUpdateWhitelistTokenStatus: async (
+    request: ForceUpdateWhitelistTokenStatusRequest,
+  ) => {
+    const response = await apiClient.patch<void>(
+      `${WHITELIST_API_ROUTES.FORCE_UPDATE_WHITELIST_TOKEN_STATUS(
+        request.chainId,
+        request.address,
+      )}`,
+    );
+
+    return response;
+  },
+
+  // soft delete
+  deleteWhitelistToken: async (request: DeleteWhitelistTokenRequest) => {
+    const response = await apiClient.delete<void>(
+      `${WHITELIST_API_ROUTES.DELETE_WHITELIST_TOKEN(
+        request.chainId,
+        request.address,
+      )}`,
     );
 
     return response;

@@ -11,6 +11,9 @@ import {
 } from "@/types/admin/whitelist-token";
 import AdminWhitelistTokenDialogCreate from "../dialog/create";
 import AdminWhitelistTokenSearchStatusPicker from "./status-picker";
+import { useQuery } from "@tanstack/react-query";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { whitelistService } from "@/services/whitelistService";
 
 const AdminWhitelistTokenSearch = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
@@ -32,6 +35,15 @@ const AdminWhitelistTokenSearch = () => {
     }),
   );
 
+  const { data: summaryData } = useQuery({
+    queryKey: whitelistQueryKeys.summary(),
+    queryFn: () => whitelistService.getWhitelistTokenSummary(),
+  });
+
+  const totalEnable = summaryData?.totalEnable ?? 0;
+  const totalDisable = summaryData?.totalDisable ?? 0;
+  const totalTokens = totalEnable + totalDisable;
+
   return (
     <div className="space-y-4 pt-12.75 pr-13.5 pl-21">
       {/* Header + summary + add button  */}
@@ -39,9 +51,8 @@ const AdminWhitelistTokenSearch = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold">Whitelist Token Management</h1>
           <div className="flex items-center gap-2.75 text-base font-semibold">
-            {/* TODO: add actual summary */}
-            <p className="text-mb-danger">5 tokens</p>
-            <p className="text-mb-green">3 active</p>
+            <p className="text-mb-danger">{totalTokens} tokens</p>
+            <p className="text-mb-green">{totalEnable} active</p>
           </div>
         </div>
         <AdminWhitelistTokenDialogCreate />
@@ -51,7 +62,7 @@ const AdminWhitelistTokenSearch = () => {
       <div className="flex items-center justify-between gap-4">
         <AdminWhitelistTokenSearchStatusPicker
           options={statusOptions}
-          counts={[5, 3, 2]} // TODO: add actual counts
+          counts={[totalTokens, totalEnable, totalDisable]} // TODO: add actual counts
           selected={filter.status}
           onChange={(status) => {
             if (status === undefined) return;

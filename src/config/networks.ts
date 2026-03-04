@@ -105,3 +105,13 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     color: "#b07be0",
   },
 ];
+
+export const networkIdToChainId = (networkId: string): string | undefined => {
+  if (networkId === "solanaDevnet") {
+    return "-1";
+  } else {
+    return NETWORK_CONFIGS.find(
+      (config) => config.id === networkId,
+    )?.appKitNetwork.id.toString();
+  }
+};

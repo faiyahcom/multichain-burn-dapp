@@ -27,10 +27,11 @@ import { useState } from "react";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useCreateWhitelistTokenSolanaFn } from "./useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { whitelistService } from "@/services/whitelistService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "sonner";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -72,6 +73,8 @@ const AdminWhitelistTokenDialogCreate = () => {
     useCreateWhitelistTokenSolanaFn();
   const { createWhitelistToken: createWhitelistTokenEvm } =
     useCreateWhitelistTokenEvmFn();
+
+  const queryClient = useQueryClient();
 
   const { control, handleSubmit, resetField, reset } =
     useForm<WhitelistTokenFormValues>({
@@ -126,6 +129,15 @@ const AdminWhitelistTokenDialogCreate = () => {
     },
     onSuccess: () => {
       toast.success("Token whitelisted successfully!");
+
+      queryClient.invalidateQueries({
+        queryKey: [whitelistQueryKeys.summary()],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [whitelistQueryKeys.listTokens()],
+        exact: false,
+      });
+
       handleOpenChange(false);
     },
     onError: (error) => {

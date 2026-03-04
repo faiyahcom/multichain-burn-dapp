@@ -1,3 +1,4 @@
+import { NETWORK_CONFIGS } from "@/config/networks";
 import type { TokenStatus } from "@/types/admin/whitelist-token";
 import { create } from "zustand";
 
@@ -17,7 +18,7 @@ export const useAdminWhitelistTokenSearchFilterStore =
   create<AdminWhitelistTokenSearchFilterState>((set) => ({
     filter: {
       status: "all",
-      network: [],
+      network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
       page: 1,
     },
