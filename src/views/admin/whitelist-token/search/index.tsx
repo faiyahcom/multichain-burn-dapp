@@ -62,7 +62,7 @@ const AdminWhitelistTokenSearch = () => {
       <div className="flex items-center justify-between gap-4">
         <AdminWhitelistTokenSearchStatusPicker
           options={statusOptions}
-          counts={[totalTokens, totalEnable, totalDisable]} // TODO: add actual counts
+          counts={[totalTokens, totalEnable, totalDisable]}
           selected={filter.status}
           onChange={(status) => {
             if (status === undefined) return;

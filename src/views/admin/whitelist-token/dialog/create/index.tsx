@@ -131,10 +131,10 @@ const AdminWhitelistTokenDialogCreate = () => {
       toast.success("Token whitelisted successfully!");
 
       queryClient.invalidateQueries({
-        queryKey: [whitelistQueryKeys.summary()],
+        queryKey: whitelistQueryKeys.summary(),
       });
       queryClient.invalidateQueries({
-        queryKey: [whitelistQueryKeys.listTokens()],
+        queryKey: whitelistQueryKeys.listTokens(),
         exact: false,
       });
 
