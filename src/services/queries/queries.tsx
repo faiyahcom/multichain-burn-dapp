@@ -11,10 +11,10 @@ export const useGetWhitelistTokens = () => {
     });
 };
 
-export const useGetWhitelistUsers = (search?: string) => {
+export const useGetWhitelistUsers = (params?: { search?: string; chainIds?: number[]; tokenAddresses?: string[] }) => {
     return useQuery({
-        queryKey: whitelistUserQueryKeys.listUsers(search),
-        queryFn: () => whitelistUserService.getListUsers({ search }),
+        queryKey: whitelistUserQueryKeys.listUsers(params),
+        queryFn: () => whitelistUserService.getListUsers(params),
         staleTime: 1000 * 60 * 5,
     });
 };

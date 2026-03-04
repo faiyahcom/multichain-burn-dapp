@@ -19,7 +19,7 @@ const AdminWhitelistUserSearch = () => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
 
     // Stable counts (no text filter)
-    const { data: countData } = useGetWhitelistUsers();
+    const { data: countData } = useGetWhitelistUsers({});
     const total = (countData?.countEnable ?? 0) + (countData?.countDisable ?? 0);
     const statusCounts = [total, countData?.countEnable ?? 0, countData?.countDisable ?? 0];
 
@@ -54,7 +54,7 @@ const AdminWhitelistUserSearch = () => {
     }, []);
 
     // Fetch all whitelisted tokens
-    const { data: tokensData } = useGetWhitelistTokens();
+    const { data: tokensData, isLoading: isTokensLoading } = useGetWhitelistTokens();
 
     // Filter tokens by selected networks (if any selected); de-dupe by address
     const tokenOptions: MultipleSelectOption[] = useMemo(() => {
@@ -98,7 +98,15 @@ const AdminWhitelistUserSearch = () => {
                 <div className="flex items-center gap-3">
                     <MultipleSelect
                         options={tokenOptions}
-                        placeholder="All Tokens"
+                        placeholder={
+                            isTokensLoading
+                                ? "Loading tokens..."
+                                : tokenOptions.length === 0
+                                    ? filter.network.length > 0
+                                        ? "No tokens for selected network"
+                                        : "No tokens available"
+                                    : "All Tokens"
+                        }
                         selected={filter.tokens}
                         onChange={(value) => setFilter({ tokens: value })}
                     />

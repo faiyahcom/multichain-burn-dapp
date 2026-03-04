@@ -3,11 +3,19 @@ import { API_ROUTES } from "@/services/apiRoutes";
 
 const WHITELIST_USERS_API_ROUTES = API_ROUTES.WHITELIST_USERS;
 
+export interface TokenAllocation {
+    tokenAddress: string;
+    tokenSymbol: string;
+    tokenDecimals: number;
+    amount: string; // raw BigInt string
+}
+
 export interface WhitelistUser {
     address: string;
     name: string;
     email: string;
     createdAt: string;
+    tokenAllocations: TokenAllocation[];
 }
 
 export interface ListUsersResponse {
@@ -18,10 +26,18 @@ export interface ListUsersResponse {
 }
 
 export const whitelistUserService = {
-    getListUsers: async (params?: { search?: string }) => {
+    getListUsers: async (params?: { search?: string; chainIds?: number[]; tokenAddresses?: string[] }) => {
         const response = await apiClient.get<ListUsersResponse>(
             WHITELIST_USERS_API_ROUTES.GET_LIST_USERS,
-            { params },
+            {
+                params: {
+                    search: params?.search,
+                    chainId: params?.chainIds,
+                    tokenAddress: params?.tokenAddresses,
+                },
+                // axios serializes arrays as repeated params: chainId=97&chainId=11155111
+                paramsSerializer: { indexes: null },
+            },
         );
         return response;
     },

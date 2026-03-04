@@ -18,11 +18,61 @@ import {
 } from "@/types/admin/whitelist-user";
 import { truncateString } from "@/utils/helpers/string";
 import { cn } from "@/lib/utils";
-import { PencilIcon } from "lucide-react";
+import { PencilIcon, EyeIcon } from "lucide-react";
 import { useGetWhitelistUsers } from "@/services/queries/queries";
-import type { WhitelistUser } from "@/services/whitelistUserService";
+import type { TokenAllocation, WhitelistUser } from "@/services/whitelistUserService";
 import { useState } from "react";
 import AdminWhitelistUserDialogEdit from "../dialog/edit";
+import { NETWORK_CONFIGS } from "@/config/networks";
+
+const MAX_VISIBLE_TOKENS = 3;
+
+/** Formats a raw BigInt amount string using token decimals into a display value */
+const formatTokenAmount = (amount: string, decimals: number): string => {
+    try {
+        const raw = BigInt(amount);
+        const divisor = BigInt(10 ** decimals);
+        const whole = raw / divisor;
+        const frac = raw % divisor;
+        if (frac === 0n) return whole.toLocaleString();
+        // Show up to 2 decimal places
+        const fracStr = frac.toString().padStart(decimals, "0").slice(0, 2).replace(/0+$/, "");
+        return fracStr ? `${whole.toLocaleString()}.${fracStr}` : whole.toLocaleString();
+    } catch {
+        return amount;
+    }
+};
+
+const TokenAllocationChips: React.FC<{ allocations: TokenAllocation[] }> = ({ allocations }) => {
+    const [showAll, setShowAll] = useState(false);
+    if (allocations.length === 0) return <span className="text-secondary-text text-xs">—</span>;
+
+    const visible = showAll ? allocations : allocations.slice(0, MAX_VISIBLE_TOKENS);
+    const hidden = allocations.length - MAX_VISIBLE_TOKENS;
+
+    return (
+        <div className="flex flex-wrap items-center gap-1.5">
+            {visible.map((a) => (
+                <span
+                    key={a.tokenAddress}
+                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
+                >
+                    <span>{formatTokenAmount(a.amount, a.tokenDecimals)}</span>
+                    <span className="text-primary/70">{a.tokenSymbol}</span>
+                </span>
+            ))}
+            {!showAll && hidden > 0 && (
+                <button
+                    className="inline-flex items-center gap-0.5 text-xs text-secondary-text hover:text-foreground transition-colors"
+                    onClick={() => setShowAll(true)}
+                >
+                    <EyeIcon className="size-3" />
+                    +{hidden}
+                </button>
+            )}
+        </div>
+    );
+};
 
 interface Props {
     data?: WhitelistUser[];
@@ -30,12 +80,25 @@ interface Props {
 
 const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
-    const { data: apiData, isLoading } = useGetWhitelistUsers(
-        filter.text || undefined,
-    );
+
+    // Map NetworkId strings → numeric chainIds for the API (-1 = Solana)
+    const chainIds = filter.network.length > 0
+        ? filter.network.map((networkId) => {
+            const cfg = NETWORK_CONFIGS.find((n) => n.id === networkId);
+            const id = cfg?.appKitNetwork?.id;
+            return typeof id === "number" ? id : -1; // -1 for Solana
+        })
+        : undefined;
+
+    const tokenAddresses = filter.tokens.length > 0 ? filter.tokens : undefined;
+
+    const { data: apiData, isLoading } = useGetWhitelistUsers({
+        search: filter.text || undefined,
+        chainIds,
+        tokenAddresses,
+    });
 
     const users = data ?? apiData?.users ?? [];
-
     const [editingUser, setEditingUser] = useState<WhitelistUser | null>(null);
 
     return (
@@ -46,6 +109,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                         <TableHead>User</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Address</TableHead>
+                        <TableHead>Description</TableHead>
                         <TableHead>Added</TableHead>
                         <TableHead>Action</TableHead>
                     </TableRow>
@@ -53,7 +117,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 <TableBody>
                     {isLoading && (
                         <TableRow>
-                            <TableCell colSpan={5} className="py-10 text-center text-secondary-text">
+                            <TableCell colSpan={6} className="py-10 text-center text-secondary-text">
                                 Loading...
                             </TableCell>
                         </TableRow>
@@ -61,7 +125,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
 
                     {!isLoading && users.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={5} className="py-10 text-center text-secondary-text">
+                            <TableCell colSpan={6} className="py-10 text-center text-secondary-text">
                                 No users found.
                             </TableCell>
                         </TableRow>
@@ -117,6 +181,11 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         />
                                     </TableCell>
 
+                                    {/* Description — token allocations */}
+                                    <TableCell>
+                                        <TokenAllocationChips allocations={user.tokenAllocations} />
+                                    </TableCell>
+
                                     {/* Added date */}
                                     <TableCell>
                                         <p className="text-sm whitespace-nowrap">
@@ -160,7 +229,6 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 />
             )}
 
-            {/* Edit dialog — rendered outside the table rows */}
             {editingUser && (
                 <AdminWhitelistUserDialogEdit
                     user={editingUser}
