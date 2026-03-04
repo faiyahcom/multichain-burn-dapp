@@ -10,5 +10,6 @@ export const whitelistQueryKeys = {
 };
 
 export const whitelistUserQueryKeys = {
-    listUsers: (search?: string) => ["whitelist-users", "listUsers", search] as const,
+    listUsers: (params?: { search?: string; chainIds?: number[]; tokenAddresses?: string[] }) =>
+        ["whitelist-users", "listUsers", params?.search, params?.chainIds, params?.tokenAddresses] as const,
 };
