@@ -16,6 +16,7 @@ export interface WhitelistToken {
   description: string;
   homepage: string;
   whitepaper: string;
+  createdAt: string;
 }
 
 export interface ListTokensRequest {

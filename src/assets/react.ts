@@ -33,3 +33,5 @@ export { default as IconTrashCan } from "./icons/trash-can.svg?react";
 export { default as IconGoTo } from "./icons/go-to.svg?react";
 export { default as IconUpload2 } from "./icons/upload-2.svg?react";
 export { default as IconTick } from "./icons/tick.svg?react";
+
+export { default as IconClipboard } from "./icons/clipboard.svg?react";

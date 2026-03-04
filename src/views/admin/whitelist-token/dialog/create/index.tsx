@@ -40,7 +40,6 @@ const networkIdValues = [
   "solanaDevnet",
 ] as const satisfies [NetworkId, ...NetworkId[]];
 
-// TODO: schema might need to change
 const whitelistTokenSchema = z.object({
   name: z.string().min(1, { error: "Name is required" }),
   symbol: z.string().min(1, { error: "Symbol is required" }),
