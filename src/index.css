@@ -29,6 +29,10 @@
   /* 17px */
   --radius-14px: calc(var(--radius) + 2px);
   /* 14px */
+  --radius-2px: calc(var(--radius) - 10px);
+  /* 2px */
+  --radius-3px: calc(var(--radius) - 9px);
+  /* 3px */
 
   /* Font */
   --font-poppins:
