@@ -37,4 +37,9 @@ export const POOL_STATUS: Record<PoolStatus, any> = {
     color: "#8eeaff",
     letter: "C",
   },
+  draft: {
+    label: "Draft",
+    color: "#ff8e97",
+    letter: "D",
+  },
 };

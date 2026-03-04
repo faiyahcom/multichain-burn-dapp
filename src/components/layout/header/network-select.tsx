@@ -28,27 +28,38 @@ export default function NetworkSelect() {
         >
           <NetworkIcon networkId={selectedNetworkId} />
           <span>{selectedNetwork?.label ?? selectedNetworkId}</span>
-          <ArrowIcon direction="down" className="text-secondary-text" />
+          <ArrowIcon direction="down" className="text-foreground" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="min-w-44 rounded-lg p-1">
-        {NETWORK_CONFIGS.map((network) => {
-          const isSelected = selectedNetworkId === network.id;
-          return (
-            <DropdownMenuItem
-              key={network.id}
-              onClick={() => setSelectedNetworkId(network.id)}
-              className={cn(
-                "flex items-center gap-3 rounded-md px-3 py-2",
-                isSelected &&
-                  "border-l-4 border-active bg-active/10 font-medium text-active",
-              )}
-            >
-              <NetworkIcon networkId={network.id} />
-              <span>{network.label}</span>
-            </DropdownMenuItem>
-          );
-        })}
+      <DropdownMenuContent
+        align="end"
+        alignOffset={8}
+        className="min-w-56 rounded-lg"
+      >
+        <div className="space-y-4 rounded-sm bg-primary-foreground px-1 py-4">
+          {NETWORK_CONFIGS.map((network) => {
+            const isSelected = selectedNetworkId === network.id;
+            return (
+              <DropdownMenuItem
+                key={network.id}
+                onClick={() => setSelectedNetworkId(network.id)}
+                className={cn(
+                  "flex items-center gap-3 px-4 py-2",
+                  isSelected && "bg-inactive font-bold text-active",
+                )}
+                isSelected={isSelected}
+              >
+                <NetworkIcon networkId={network.id} />
+                <div className="flex flex-1 justify-center">
+                  <span className="text-center group-hover:font-bold group-hover:text-active">
+                    {network.label}
+                  </span>
+                </div>
+                <NetworkIcon networkId={network.id} className="opacity-0" />
+              </DropdownMenuItem>
+            );
+          })}
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );

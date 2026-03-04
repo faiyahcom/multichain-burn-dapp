@@ -1,4 +1,4 @@
-export type PoolStatus = "on_going" | "canceled" | "closed";
+export type PoolStatus = "on_going" | "canceled" | "closed" | "draft";
 export type PoolKind = "burn_pool" | "swap_pool";
 export const POOL_KIND: Record<number, PoolKind> = {
     0: "burn_pool",

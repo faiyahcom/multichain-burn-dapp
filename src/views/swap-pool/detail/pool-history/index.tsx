@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import ActivitiesHistory from "./activities-history";
 import TransactionHistoryTable from "./transaction-history";

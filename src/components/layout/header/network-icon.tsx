@@ -11,12 +11,12 @@ function NetworkIcon({
   const net = NETWORK_CONFIGS.find((n) => n.id === networkId);
   if (!net) return null;
   return (
-    <span
+    <img
       className={cn(
         "inline-block h-6 w-6 shrink-0 rounded",
-        net.iconBg,
         className,
       )}
+      src={net.iconSrc}
       aria-hidden
     />
   );

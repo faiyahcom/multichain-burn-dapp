@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
+import NetworkIcon from "@/components/layout/header/network-icon";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -59,11 +60,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     label: "Network",
                     value: (
                         <div className="flex items-center gap-2">
-                            <img
-                                src={network?.iconSrc}
-                                alt={network?.label}
-                                className="h-6 w-6"
-                            />
+                            <NetworkIcon networkId={network?.id || ("" as NetworkId)} />
                             <span>{network?.label}</span>
                         </div>
                     ),

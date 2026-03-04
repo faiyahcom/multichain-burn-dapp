@@ -31,7 +31,7 @@ const ProfileMenu = ({ }: Props) => {
         >
           <UserIcon className="size-4" />
           <span>Profile</span>
-          <ArrowIcon direction="down" className="text-secondary-text" />
+          <ArrowIcon direction="down" className="text-foreground" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-44 rounded-lg p-1">

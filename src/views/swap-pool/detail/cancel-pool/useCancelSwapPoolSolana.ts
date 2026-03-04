@@ -10,38 +10,30 @@ import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     TOKEN_PROGRAM_ID,
-    getMint,
 } from "@solana/spl-token";
 import {
     getMultichainBurnProgram,
     type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
-import BN from "bn.js";
 import {
-    getPoolPDA,
     getRewardVaultPDA,
     getDepositVaultPDA,
     getFactoryPDA,
-    detectAssetType,
 } from "@/web3/helpers";
-import { toBaseUnits } from "@/utils/helpers/numbers";
+import type { PoolDetailResponse } from "@/types/pool";
 
-export type CreatePoolParams = {
-    rewardMint: PublicKey;
-    depositMint: PublicKey;
-    rewardAmount: number;
-    name: string;
-    ratioNumerator: number;
-    ratioDenominator: number;
+export type CancelPoolParams = {
+    poolAddress: string;
+    poolDetail: PoolDetailResponse;
 };
 
-export const useCreateSwapPoolSolanaFn = () => {
+export const useCancelPoolSolanaFn = () => {
     const { isConnected, address } = useAppKitAccount();
     const { connection } = useAppKitConnection();
     const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
-    const createPool = useCallback(
-        async (params: CreatePoolParams) => {
+    const cancelPool = useCallback(
+        async (params: CancelPoolParams) => {
             try {
                 if (!isConnected || !address) {
                     throw new Error("Wallet is not connected");
@@ -61,92 +53,55 @@ export const useCreateSwapPoolSolanaFn = () => {
                 const program = getMultichainBurnProgram(connection, anchorWallet);
 
                 // =============================
-                // 1️⃣ Derive ATA
+                // 1️⃣ Resolve mints from poolDetail
+                // =============================
+                const rewardMint = new PublicKey(params.poolDetail.pool.rewardToken);
+                const depositMint = new PublicKey(params.poolDetail.pool.tokenIn);
+
+                // =============================
+                // 2️⃣ Derive ATA for owner reward
                 // =============================
                 const ownerRewardAta = await getAssociatedTokenAddress(
-                    params.rewardMint,
+                    rewardMint,
                     walletPublicKey,
                 );
 
                 const ataInfo = await connection.getAccountInfo(ownerRewardAta);
 
                 // =============================
-                // 2️⃣ Derive PDAs
+                // 3️⃣ Derive PDAs
                 // =============================
                 const factoryPDA = getFactoryPDA(program.programId);
                 // @ts-ignore
                 const factory = await program.account.factoryAccount.fetch(factoryPDA);
                 const treasuryPubkey = factory.treasury;
-                const poolPDA = getPoolPDA(factory.poolCount, program.programId);
+                const poolPDA = new PublicKey(params.poolAddress);
                 const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
                 const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
 
                 // =============================
-                // 3️⃣ Detect token types
+                // 4️⃣ Build cancelPool TX (Anchor)
                 // =============================
-                const rewardAssetType = await detectAssetType(
-                    connection,
-                    params.rewardMint,
-                );
-
-                const depositAssetType = await detectAssetType(
-                    connection,
-                    params.depositMint,
-                );
-
-                const rewardMintInfo = await getMint(connection, params.rewardMint);
-                const rewardDecimals = rewardMintInfo.decimals;
-                console.log("rewardDecimals", rewardDecimals);
-
-                // =============================
-                // 4️⃣ Pool Config
-                // =============================
-                const ratioExtraDecimal = 10000000;
-                const ratioBps = params.ratioDenominator * ratioExtraDecimal;
-                const ratioDenominator = params.ratioNumerator * ratioExtraDecimal;
-
-                const timeStart = Math.floor(Date.now() / 1000);
-                // This pool start like forever
-                const timeEnd = 9999999999; // timestamp max
-
-                // =============================
-                // 5️⃣ Build createPool TX (Anchor)
-                // =============================
-                const rewardAmountInSmallestUnits = toBaseUnits(
-                    params.rewardAmount.toString(),
-                    rewardDecimals,
-                );
-
                 const tx = await program.methods
-                    .createPool({
-                        projectOwner: walletPublicKey,
-                        timeStart: new BN(timeStart),
-                        timeEnd: new BN(timeEnd),
-                        targetAddress: walletPublicKey,
-                        name: params.name,
-                        ratioBps: new BN(ratioBps),
-                        ratioDenominator: new BN(ratioDenominator),
-                        assetType: depositAssetType,
-                        assetRewardType: rewardAssetType,
-                        rewardAmount: rewardAmountInSmallestUnits,
-                    })
+                    .canclePool()
                     .accounts({
+                        admin: walletPublicKey,
                         factory: factoryPDA,
-                        projectOwner: walletPublicKey,
                         pool: poolPDA,
+                        projectOwner: walletPublicKey,
                         treasury: treasuryPubkey,
-                        rewardMint: params.rewardMint,
-                        depositMint: params.depositMint,
+                        rewardMint: rewardMint,
+                        depositMint: depositMint,
                         rewardVault: rewardVaultPDA,
                         depositVault: depositVaultPDA,
-                        systemProgram: SystemProgram.programId,
+                        ownerRewardAta: ownerRewardAta,
                         tokenProgram: TOKEN_PROGRAM_ID,
-                        ownerRewardAta,
+                        systemProgram: SystemProgram.programId,
                     })
                     .transaction();
 
                 // =============================
-                // 6️⃣ If ATA doesn't exist → prepend instruction
+                // 5️⃣ If ATA doesn't exist → prepend instruction
                 // =============================
                 if (!ataInfo) {
                     tx.instructions.unshift(
@@ -154,13 +109,13 @@ export const useCreateSwapPoolSolanaFn = () => {
                             walletPublicKey,
                             ownerRewardAta,
                             walletPublicKey,
-                            params.rewardMint,
+                            rewardMint,
                         ),
                     );
                 }
 
                 // =============================
-                // 7️⃣ Finalize transaction
+                // 6️⃣ Finalize transaction
                 // =============================
                 const { blockhash, lastValidBlockHeight } =
                     await connection.getLatestBlockhash();
@@ -168,10 +123,8 @@ export const useCreateSwapPoolSolanaFn = () => {
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPublicKey;
 
-                // Sign
                 const signedTx = await provider.signTransaction(tx);
 
-                // Send
                 const signature = await connection.sendRawTransaction(
                     signedTx.serialize(),
                 );
@@ -182,13 +135,13 @@ export const useCreateSwapPoolSolanaFn = () => {
                     lastValidBlockHeight,
                 });
 
-                toast.success("Pool created successfully!", {
+                toast.success("Pool cancelled successfully!", {
                     description: `Tx: ${signature}`,
                 });
 
                 return poolPDA.toBase58();
             } catch (error: any) {
-                toast.error("Failed to create pool", {
+                toast.error("Failed to cancel pool", {
                     description: error?.message || String(error),
                 });
                 throw error;
@@ -197,5 +150,5 @@ export const useCreateSwapPoolSolanaFn = () => {
         [isConnected, address, connection, provider],
     );
 
-    return { createPool };
+    return { cancelPool };
 };
