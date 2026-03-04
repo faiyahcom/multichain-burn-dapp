@@ -4,6 +4,7 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import SwapDialog from "../swap-action/swap-dialog";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { poolQueryKeys } from "@/services/queries/queryKey";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -32,7 +33,16 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     };
     const handleSuccessSwap = () => {
         queryClient.invalidateQueries({
-            queryKey: ["poolDetail", poolDetail?.pool.address],
+            queryKey: [poolQueryKeys.txns(poolDetail?.pool.address || "")],
+            exact: false,
+        });
+        queryClient.invalidateQueries({
+            queryKey: [poolQueryKeys.activities(poolDetail?.pool.address || "")],
+            exact: false,
+        });
+        queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.detail(poolDetail?.pool.address || ""),
+            exact: false,
         });
     };
     return (

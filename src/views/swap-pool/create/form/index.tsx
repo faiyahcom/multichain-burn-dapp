@@ -40,6 +40,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
         register,
         control,
         handleSubmit,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm<CreateSwapPoolFormValues>({
         defaultValues: {
@@ -73,6 +74,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
                 ratioDenominator,
             });
             if (poolAddress) {
+                reset();
                 navigate({ to: "/swap/detail/$address", params: { address: poolAddress } });
             }
             return;
@@ -88,6 +90,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
                 ratioDenominator,
             });
             if (poolAddress) {
+                reset();
                 navigate({ to: "/swap/detail/$address", params: { address: poolAddress } });
             }
             return;
@@ -95,6 +98,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
 
         if (onSubmitForm) {
             onSubmitForm(values);
+            reset();
             return;
         }
 

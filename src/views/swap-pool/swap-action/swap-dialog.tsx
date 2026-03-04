@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
+import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { PoolDetailResponse } from "@/types/pool";
@@ -56,11 +57,13 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
 
     const { depositSwapPool: depositSwapPoolSOL } = useSwapPoolSOL();
 
+    const queryClient = useQueryClient();
     const {
         register,
         handleSubmit,
         watch,
         setValue,
+        reset,
         formState: { errors, isSubmitting },
     } = useForm<SwapFormValues>({
         defaultValues: {
@@ -112,6 +115,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                 });
             }
 
+            reset();
             onOpenChange(false);
             onSuccess();
         } catch (error: any) {
