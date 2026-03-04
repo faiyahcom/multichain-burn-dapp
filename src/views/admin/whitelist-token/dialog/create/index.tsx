@@ -379,7 +379,7 @@ const AdminWhitelistTokenDialogCreate = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end">
+          <div className="flex items-center justify-end gap-4.5">
             <AnimateIconButton
               variant="letter-icon"
               iconLetter="C"

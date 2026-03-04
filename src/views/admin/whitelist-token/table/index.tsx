@@ -21,6 +21,7 @@ import { networkIdToChainId } from "@/config/networks";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import {
   whitelistService,
+  type DeleteWhitelistTokenRequest,
   type WhitelistToken,
 } from "@/services/whitelistService";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
@@ -31,16 +32,41 @@ import {
   tokenStatusLetters,
 } from "@/types/admin/whitelist-token";
 import { truncateString } from "@/utils/helpers/string";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import StatusSwitch from "./status-switch";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
 import { useState } from "react";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/utils/helpers/error-message";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
+import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
+import ConfirmDialog from "@/components/common/confirm-dialog";
+
+type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
+  enabled: boolean;
+};
 
 const AdminWhitelistTokenTable = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
   const [detailToken, setDetailToken] = useState<WhitelistToken | undefined>(
     undefined,
   );
+  const [isScDeleting, setIsScDeleting] = useState<boolean>(false);
+  const [deleteRequest, setDeleteRequest] = useState<
+    DeleteWhitelistTokenRequestWithStatus | undefined
+  >(undefined);
+  const { caipAddress } = useAppKitAccount();
+  const namespace = caipAddress?.split(":")[0];
+  const isSolana = namespace === "solana";
+  const isEvm = namespace === "eip155";
+
+  const { disableWhitelistToken: disableWhitelistTokenSolana } =
+    useDisableWhitelistTokenSolanaFn();
+  const { disableWhitelistToken: disableWhitelistTokenEvm } =
+    useDisableWhitelistTokenEvmFn();
+
+  const queryClient = useQueryClient();
   const limit = 20;
 
   const { data: listTokensData, isPending: isListTokensPending } = useQuery({
@@ -61,6 +87,58 @@ const AdminWhitelistTokenTable = () => {
       }),
   });
 
+  const { mutate: deleteTokenMutation, isPending: isDeleteTokenPending } =
+    useMutation({
+      mutationFn: async (request: DeleteWhitelistTokenRequest) => {
+        return await whitelistService.deleteWhitelistToken(request);
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries({
+          queryKey: whitelistQueryKeys.summary(),
+        });
+        queryClient.invalidateQueries({
+          queryKey: whitelistQueryKeys.listTokens(),
+          exact: false,
+        });
+        toast.success("Token deleted successfully!");
+      },
+      onError: (error) => {
+        const message = getErrorMessage({ error });
+        toast.error(message);
+      },
+      onSettled: () => {
+        setDeleteRequest(undefined);
+      },
+    });
+
+  const handleDeleteToken = (
+    request: DeleteWhitelistTokenRequestWithStatus,
+  ) => {
+    setDeleteRequest(request);
+  };
+
+  const handleDeleteTokenConfirm = async (
+    request: DeleteWhitelistTokenRequestWithStatus,
+  ) => {
+    // Disable before deleting
+    if (request.enabled) {
+      setIsScDeleting(true);
+      if (isSolana) {
+        await disableWhitelistTokenSolana({
+          tokenAddress: request.address,
+        });
+      }
+      if (isEvm) {
+        await disableWhitelistTokenEvm({
+          tokenAddress: request.address,
+        });
+      }
+      setIsScDeleting(false);
+    }
+
+    deleteTokenMutation(request);
+  };
+
   const columns = [
     "Token",
     "Address",
@@ -71,6 +149,8 @@ const AdminWhitelistTokenTable = () => {
     "Toggle",
     "Action",
   ];
+
+  const isTokenDeleting = isScDeleting || isDeleteTokenPending;
 
   return (
     <>
@@ -189,7 +269,15 @@ const AdminWhitelistTokenTable = () => {
                       <button onClick={() => setDetailToken(item)}>
                         <IconEye className="[&>path]:group-hover:stroke-[1.5px]" />
                       </button>
-                      <button>
+                      <button
+                        onClick={() =>
+                          handleDeleteToken({
+                            chainId: item.chainId,
+                            address: item.address,
+                            enabled: item.enable,
+                          })
+                        }
+                      >
                         <IconTrashCan className="[&>path]:group-hover:stroke-[1.5px]" />
                       </button>
                     </div>
@@ -211,6 +299,20 @@ const AdminWhitelistTokenTable = () => {
       <AdminWhitelistTokenDialogDetail
         data={detailToken}
         setData={setDetailToken}
+      />
+
+      <ConfirmDialog
+        open={!!deleteRequest}
+        onOpenChange={(open) => {
+          if (!open) {
+            setDeleteRequest(undefined);
+          }
+        }}
+        title="Delete Whitelist Token"
+        description="Are you sure you want to delete this token?"
+        onCancel={() => setDeleteRequest(undefined)}
+        onConfirm={() => handleDeleteTokenConfirm(deleteRequest!)}
+        isLoading={isTokenDeleting}
       />
     </>
   );
