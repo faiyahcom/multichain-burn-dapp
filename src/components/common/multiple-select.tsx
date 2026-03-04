@@ -1,4 +1,3 @@
-
 import { IconCheck, IconSquare, IconSquareCheck } from "@/assets/react";
 import { Button } from "../ui/button";
 import {
@@ -22,6 +21,7 @@ interface Props {
   selected?: string[];
   onChange?: (value: string[]) => void;
   placeholder?: string;
+  placeholderMultiple?: string;
 }
 
 const MultipleSelect: React.FC<Props> = ({
@@ -29,8 +29,10 @@ const MultipleSelect: React.FC<Props> = ({
   selected,
   onChange,
   placeholder = "Select",
+  placeholderMultiple = "",
 }) => {
-  const isAllSelected = options && options.length > 0 && selected?.length === options.length;
+  const isAllSelected =
+    options && options.length > 0 && selected?.length === options.length;
   const isAnySelected = (selected?.length ?? 0) > 0;
   const atLeastOneIcon = options?.some((option) => option.icon);
 
@@ -66,12 +68,22 @@ const MultipleSelect: React.FC<Props> = ({
           <div className="size-2.5" />
           {isAnySelected ? (
             atLeastOneIcon ? (
-              <SelectedIcons
-                icons={options
-                  ?.filter((option) => selected?.includes(option.value))
-                  ?.map((option) => option.icon)
-                  ?.filter((icon) => icon !== undefined)}
-              />
+              <div className="flex items-center gap-1.75">
+                <SelectedIcons
+                  icons={options
+                    ?.filter((option) => selected?.includes(option.value))
+                    ?.map((option) => option.icon)
+                    ?.filter((icon) => icon !== undefined)}
+                />
+                {isAllSelected && (
+                  <span>
+                    All{" "}
+                    {placeholderMultiple
+                      ? placeholderMultiple
+                      : `${placeholder}s`}
+                  </span>
+                )}
+              </div>
             ) : (
               <span className="truncate">
                 {options
@@ -152,9 +164,9 @@ const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
     >
       <div className="flex items-center gap-2.5">
         {checked ? (
-            <IconSquareCheck className="text-mb-check-blue size-4.5" />
+          <IconSquareCheck className="size-4.5 text-mb-check-blue" />
         ) : (
-            <IconSquare className="text-mb-check-blue size-4.5" />
+          <IconSquare className="size-4.5 text-mb-check-blue" />
         )}
         {Icon ? (
           <Icon className="size-7.75 rounded-full" />
@@ -164,7 +176,7 @@ const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
         <span className="text-15px font-medium select-none">{label}</span>
       </div>
       {checked ? (
-        <IconCheck className="text-mb-check-blue w-3.75 h-2.5 " />
+        <IconCheck className="h-2.5 w-3.75 text-mb-check-blue" />
       ) : (
         <div className="size-4" />
       )}

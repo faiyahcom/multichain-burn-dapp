@@ -19,8 +19,6 @@ export const tokenStatusColors: Record<TokenStatus, string> = {
 };
 export const booleanToTokenStatus = (value: boolean): TokenStatus =>
   value ? "enable" : "disable";
-export const tokenStatusToBoolean = (value: TokenStatus): boolean =>
-  value === "enable";
 
 export const POOL_STATUS: Record<PoolStatus, any> = {
   // "on_going" | "canceled" | "closed"

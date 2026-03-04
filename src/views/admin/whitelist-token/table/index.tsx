@@ -18,7 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { NETWORK_CONFIGS, networkIdToChainId } from "@/config/networks";
+import { networkIdToChainId } from "@/config/networks";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { whitelistService } from "@/services/whitelistService";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
@@ -27,81 +27,9 @@ import {
   tokenStatusColors,
   tokenStatusLabels,
   tokenStatusLetters,
-  tokenStatusToBoolean,
-  type TokenStatus,
 } from "@/types/admin/whitelist-token";
 import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
-
-// TODO: might need to change the type
-type AdminWhitelistTokenTableItem = {
-  id: string;
-  name: string;
-  symbol: string;
-  imgSrc: string;
-  address: string;
-  networkId: string;
-  description: string;
-  homepage: string;
-  doc: string;
-  status: TokenStatus;
-};
-
-// TODO: replace with real data
-const demoData: AdminWhitelistTokenTableItem[] = [
-  {
-    id: "1",
-    name: "Ethereum",
-    symbol: "ETH",
-    imgSrc: "/network/ethereum.png",
-    address: "0x0000000000000000000000000000000000000000",
-    networkId: "ethereumTestnet",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sollicitudin tempus convallis. Mauris ultricies sagittis interdum. Etiam ante lorem, auctor non sollicitudin id, molestie quis est.",
-    homepage: "https://example.org/",
-    doc: "https://example.org/",
-    status: "enable",
-  },
-  {
-    id: "2",
-    name: "Binance",
-    symbol: "BNB",
-    imgSrc: "/network/binance.png",
-    address: "0x0000000000000000000000000000000000000000",
-    networkId: "binanceTestnet",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sollicitudin tempus convallis. Mauris ultricies sagittis interdum. Etiam ante lorem, auctor non sollicitudin id, molestie quis est.",
-    homepage: "https://example.org/",
-    doc: "https://example.org/",
-    status: "enable",
-  },
-  {
-    id: "3",
-    name: "Xphere",
-    symbol: "XPH",
-    imgSrc: "/network/xphere.png",
-    address: "0x0000000000000000000000000000000000000000",
-    networkId: "xphereTestnet",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sollicitudin tempus convallis. Mauris ultricies sagittis interdum. Etiam ante lorem, auctor non sollicitudin id, molestie quis est.",
-    homepage: "https://example.org/",
-    doc: "https://example.org/",
-    status: "disable",
-  },
-  {
-    id: "4",
-    name: "Solana",
-    symbol: "SOL",
-    imgSrc: "/network/solana.png",
-    address: "0x0000000000000000000000000000000000000000",
-    networkId: "solanaDevnet",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur sollicitudin tempus convallis. Mauris ultricies sagittis interdum. Etiam ante lorem, auctor non sollicitudin id, molestie quis est.",
-    homepage: "https://example.org/",
-    doc: "https://example.org/",
-    status: "enable",
-  },
-];
 
 const AdminWhitelistTokenTable = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
@@ -121,6 +49,7 @@ const AdminWhitelistTokenTable = () => {
                 .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
+        search: filter.text ? filter.text : undefined,
       }),
   });
 

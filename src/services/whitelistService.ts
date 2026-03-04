@@ -35,6 +35,21 @@ export interface CreateWhitelistTokenResponse {
   imageUri?: string;
 }
 
+export interface WhitelistTokenSummaryResponse {
+  totalDisable: number;
+  totalEnable: number;
+}
+
+export interface ForceUpdateWhitelistTokenStatusRequest {
+  chainId: string;
+  address: string;
+}
+
+export interface DeleteWhitelistTokenRequest {
+  chainId: string;
+  address: string;
+}
+
 export const whitelistService = {
   getListTokens: async (request?: ListTokensRequest) => {
     const response = await apiClient.get<ListTokensResponse>(
@@ -60,6 +75,39 @@ export const whitelistService = {
           "Content-Type": "multipart/form-data",
         },
       },
+    );
+
+    return response;
+  },
+
+  getWhitelistTokenSummary: async () => {
+    const response = await apiClient.get<WhitelistTokenSummaryResponse>(
+      `${WHITELIST_API_ROUTES.WHITELIST_TOKEN_SUMMARY}`,
+      {},
+    );
+    return response;
+  },
+
+  forceUpdateWhitelistTokenStatus: async (
+    request: ForceUpdateWhitelistTokenStatusRequest,
+  ) => {
+    const response = await apiClient.patch<void>(
+      `${WHITELIST_API_ROUTES.FORCE_UPDATE_WHITELIST_TOKEN_STATUS(
+        request.chainId,
+        request.address,
+      )}`,
+    );
+
+    return response;
+  },
+
+  // soft delete
+  deleteWhitelistToken: async (request: DeleteWhitelistTokenRequest) => {
+    const response = await apiClient.delete<void>(
+      `${WHITELIST_API_ROUTES.DELETE_WHITELIST_TOKEN(
+        request.chainId,
+        request.address,
+      )}`,
     );
 
     return response;

@@ -8,7 +8,8 @@ interface Props {
 
 const CopyableText: React.FC<Props> = ({ content, displayText }) => {
   const handleCopy = () => {
-    navigator.clipboard.writeText(content)
+    navigator.clipboard
+      .writeText(content)
       .then(() => {
         toast.success("Copied to clipboard");
       })
@@ -19,7 +20,9 @@ const CopyableText: React.FC<Props> = ({ content, displayText }) => {
 
   return (
     <div className="flex items-center justify-center gap-1.75">
-      <span className="text-sm">{displayText ?? content}</span>
+      <span className="text-sm" title={content}>
+        {displayText ?? content}
+      </span>
       <button onClick={handleCopy}>
         <IconCopy className="text-mb-copy-gray" />
       </button>
