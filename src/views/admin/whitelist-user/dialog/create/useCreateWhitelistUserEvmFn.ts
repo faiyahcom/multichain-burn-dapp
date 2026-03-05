@@ -1,4 +1,4 @@
-import { getMultichainBurnContract } from "@/web3/contracts/multichainBurnContractEVM";
+import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
@@ -16,7 +16,7 @@ export const useCreateWhitelistUserEvmFn = () => {
                 }
                 const provider = new ethers.BrowserProvider(walletProvider as Eip1193Provider);
                 const signer = await provider.getSigner();
-                const contract = getMultichainBurnContract(signer);
+                const contract = getContractSwapFactory(signer);
                 const tx = await contract.whitelistAddress(userAddress);
                 const receipt = await tx.wait();
                 toast.success("User whitelisted on EVM!", {
