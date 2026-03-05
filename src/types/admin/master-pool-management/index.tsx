@@ -22,9 +22,9 @@ export const poolTypeOptions = poolTypeOptionValues.map((value) => {
 
 export const swapPoolStatuses = [
   "on_going",
-  "ended",
   "canceled",
   "closed",
+  "ended",
 ] as const;
 export type SwapPoolStatus = (typeof swapPoolStatuses)[number];
 export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
@@ -33,12 +33,18 @@ export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
   canceled: "Cancel",
   closed: "Close",
 };
+export const swapPoolStatusColors: Record<SwapPoolStatus, string> = {
+  on_going: "#7AF4CB",
+  ended: "#A6B7FF",
+  canceled: "#FF8E8E",
+  closed: "#8EEAFF",
+};
 
 export const burnPoolStatuses = [
-  ...swapPoolStatuses,
   "pending",
   "holding",
   "upcoming",
+  ...swapPoolStatuses,
 ] as const;
 export type BurnPoolStatus = (typeof burnPoolStatuses)[number];
 export const burnPoolStatusLabels: Record<BurnPoolStatus, string> = {
@@ -46,4 +52,10 @@ export const burnPoolStatusLabels: Record<BurnPoolStatus, string> = {
   pending: "Pending",
   holding: "Holding",
   upcoming: "Upcoming",
+};
+export const burnPoolStatusColors: Record<BurnPoolStatus, string> = {
+  ...swapPoolStatusColors,
+  pending: "#FF8E97",
+  holding: "#FFB08E",
+  upcoming: "#FFE798",
 };

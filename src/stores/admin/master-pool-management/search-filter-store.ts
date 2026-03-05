@@ -1,3 +1,4 @@
+import { NETWORK_CONFIGS } from "@/config/networks";
 import {
   burnPoolStatuses,
   type BurnPoolStatus,
@@ -23,7 +24,7 @@ export const useMasterPoolManagementSearchFilterStore =
     filter: {
       type: "all",
       status: [...burnPoolStatuses],
-      network: [],
+      network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
     },
     setFilter: (filter) =>
