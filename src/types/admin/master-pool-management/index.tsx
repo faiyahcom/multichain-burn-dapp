@@ -14,10 +14,13 @@ export const swapPoolStatuses = [
   "closed",
 ] as const;
 export type SwapPoolStatus = (typeof swapPoolStatuses)[number];
+export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
+  on_going: "Ongoing",
+  ended: "End",
+  canceled: "Cancel",
+  closed: "Close",
+};
 
-/*
-pending, holding, upcoming, on_going, canceled, closed, ended
-*/
 export const burnPoolStatuses = [
   ...swapPoolStatuses,
   "pending",
@@ -25,3 +28,9 @@ export const burnPoolStatuses = [
   "upcoming",
 ] as const;
 export type BurnPoolStatus = (typeof burnPoolStatuses)[number];
+export const burnPoolStatusLabels: Record<BurnPoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  pending: "Pending",
+  holding: "Holding",
+  upcoming: "Upcoming",
+};
