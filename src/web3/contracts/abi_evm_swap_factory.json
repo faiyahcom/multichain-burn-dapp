@@ -69,6 +69,11 @@
     },
     {
         "inputs": [],
+        "name": "InvalidAssetPair",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidAssetType",
         "type": "error"
     },
@@ -99,7 +104,7 @@
     },
     {
         "inputs": [],
-        "name": "MultisigWalletRequired",
+        "name": "NoStateChange",
         "type": "error"
     },
     {

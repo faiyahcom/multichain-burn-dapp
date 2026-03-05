@@ -62,12 +62,14 @@ function DropdownMenuItem({
   className,
   inset,
   variant = "default",
+  leftSelectedPanelClassName,
   isSelected,
   ...props
 }: React.ComponentProps<typeof DropdownMenuPrimitive.Item> & {
   inset?: boolean
   variant?: "default" | "destructive"
   isSelected?: boolean
+  leftSelectedPanelClassName?: string
 }) {
   return (
     <DropdownMenuPrimitive.Item
@@ -80,7 +82,7 @@ function DropdownMenuItem({
       )}
       {...props}
     >
-      <div className={cn("absolute top-1/2 left-0 h-9.5 w-1.75 -translate-y-1/2 rounded-full bg-transparent group-hover:bg-active", isSelected && "bg-active")} />
+      <div className={cn("absolute top-1/2 left-0 h-9.5 w-1.75 -translate-y-1/2 rounded-full bg-transparent group-hover:bg-active", isSelected && "bg-active", leftSelectedPanelClassName)} />
       {props.children}
     </DropdownMenuPrimitive.Item>
   )

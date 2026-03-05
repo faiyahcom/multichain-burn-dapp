@@ -19,7 +19,7 @@ import { Route as PairListIndexRouteImport } from './routes/pair-list/index'
 import { Route as MyParticipatedPoolsIndexRouteImport } from './routes/my-participated-pools/index'
 import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/index'
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
-import { Route as BurnPoolIndexRouteImport } from './routes/burn-pool/index'
+import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
@@ -76,9 +76,9 @@ const MyCreatePoolsIndexRoute = MyCreatePoolsIndexRouteImport.update({
   path: '/my-create-pools/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BurnPoolIndexRoute = BurnPoolIndexRouteImport.update({
-  id: '/burn-pool/',
-  path: '/burn-pool/',
+const BurnIndexRoute = BurnIndexRouteImport.update({
+  id: '/burn/',
+  path: '/burn/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
@@ -101,7 +101,7 @@ const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
-  '/burn-pool': typeof BurnPoolIndexRoute
+  '/burn': typeof BurnIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
   '/my-participated-pools': typeof MyParticipatedPoolsIndexRoute
@@ -117,7 +117,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
-  '/burn-pool': typeof BurnPoolIndexRoute
+  '/burn': typeof BurnIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
   '/my-participated-pools': typeof MyParticipatedPoolsIndexRoute
@@ -134,7 +134,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/activity-history/': typeof ActivityHistoryIndexRoute
-  '/burn-pool/': typeof BurnPoolIndexRoute
+  '/burn/': typeof BurnIndexRoute
   '/my-create-pools/': typeof MyCreatePoolsIndexRoute
   '/my-dashboard/': typeof MyDashboardIndexRoute
   '/my-participated-pools/': typeof MyParticipatedPoolsIndexRoute
@@ -152,7 +152,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/activity-history'
-    | '/burn-pool'
+    | '/burn'
     | '/my-create-pools'
     | '/my-dashboard'
     | '/my-participated-pools'
@@ -168,7 +168,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/activity-history'
-    | '/burn-pool'
+    | '/burn'
     | '/my-create-pools'
     | '/my-dashboard'
     | '/my-participated-pools'
@@ -184,7 +184,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/activity-history/'
-    | '/burn-pool/'
+    | '/burn/'
     | '/my-create-pools/'
     | '/my-dashboard/'
     | '/my-participated-pools/'
@@ -201,7 +201,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivityHistoryIndexRoute: typeof ActivityHistoryIndexRoute
-  BurnPoolIndexRoute: typeof BurnPoolIndexRoute
+  BurnIndexRoute: typeof BurnIndexRoute
   MyCreatePoolsIndexRoute: typeof MyCreatePoolsIndexRoute
   MyDashboardIndexRoute: typeof MyDashboardIndexRoute
   MyParticipatedPoolsIndexRoute: typeof MyParticipatedPoolsIndexRoute
@@ -287,11 +287,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyCreatePoolsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/burn-pool/': {
-      id: '/burn-pool/'
-      path: '/burn-pool'
-      fullPath: '/burn-pool'
-      preLoaderRoute: typeof BurnPoolIndexRouteImport
+    '/burn/': {
+      id: '/burn/'
+      path: '/burn'
+      fullPath: '/burn'
+      preLoaderRoute: typeof BurnIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/activity-history/': {
@@ -321,7 +321,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityHistoryIndexRoute: ActivityHistoryIndexRoute,
-  BurnPoolIndexRoute: BurnPoolIndexRoute,
+  BurnIndexRoute: BurnIndexRoute,
   MyCreatePoolsIndexRoute: MyCreatePoolsIndexRoute,
   MyDashboardIndexRoute: MyDashboardIndexRoute,
   MyParticipatedPoolsIndexRoute: MyParticipatedPoolsIndexRoute,

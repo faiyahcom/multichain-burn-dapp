@@ -46,7 +46,7 @@ export const navItems: NavItem[] = [
     label: "Burn Pool",
     icon: IconBurnPool,
     section: navSection.overview,
-    to: "/burn-pool",
+    to: "/burn",
   },
   {
     label: "Swap",
