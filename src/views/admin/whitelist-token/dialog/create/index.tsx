@@ -32,6 +32,7 @@ import { whitelistService } from "@/services/whitelistService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "sonner";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { booleanString } from "@/types/common";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -122,6 +123,9 @@ const AdminWhitelistTokenDialogCreate = () => {
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
+      // default to enable and not dropped
+      formData.append("enable", booleanString[4]);
+      formData.append("isDropped", booleanString[5]);
 
       const result = await whitelistService.createWhitelistToken(formData);
       return result;

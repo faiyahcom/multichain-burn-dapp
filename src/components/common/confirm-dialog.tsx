@@ -67,7 +67,7 @@ const ConfirmDialog: React.FC<Props> = ({
           <DialogTitle>{title}</DialogTitle>
           <DialogDescription>{description}</DialogDescription>
         </DialogHeader>
-        <DialogFooter className="sm:justify-center">
+        <DialogFooter className="gap-4.75 sm:justify-center">
           <AnimateIconButton
             variant="letter-icon"
             iconLetter={buttonCancelTextFirstLetter}

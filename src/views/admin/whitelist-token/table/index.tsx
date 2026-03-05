@@ -84,6 +84,7 @@ const AdminWhitelistTokenTable = () => {
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,
+        isDropped: "false", // only show tokens that are not soft-deleted
       }),
   });
 
@@ -121,22 +122,28 @@ const AdminWhitelistTokenTable = () => {
     request: DeleteWhitelistTokenRequestWithStatus,
   ) => {
     // Disable before deleting
+    let isDisabled = false;
     if (request.enabled) {
       setIsScDeleting(true);
       if (isSolana) {
-        await disableWhitelistTokenSolana({
+        isDisabled = await disableWhitelistTokenSolana({
           tokenAddress: request.address,
         });
       }
       if (isEvm) {
-        await disableWhitelistTokenEvm({
+        isDisabled = await disableWhitelistTokenEvm({
           tokenAddress: request.address,
         });
       }
       setIsScDeleting(false);
+    } else {
+      isDisabled = true; // already disabled then return true
     }
 
-    deleteTokenMutation(request);
+    // Only delete if it is disabled
+    if (isDisabled) {
+      deleteTokenMutation(request);
+    }
   };
 
   const columns = [
