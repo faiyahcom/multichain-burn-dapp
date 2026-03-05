@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from "../ui/popover";
 import { ArrowIcon } from "./arrow-icon";
+import { cn } from "@/lib/utils";
 
 export interface MultipleSelectOption {
   label: string;
@@ -22,6 +23,11 @@ interface Props {
   onChange?: (value: string[]) => void;
   placeholder?: string;
   placeholderMultiple?: string;
+  showIconsInTriggerIfAny?: boolean;
+  classNames?: {
+    btn?: string;
+    content?: string;
+  };
 }
 
 const MultipleSelect: React.FC<Props> = ({
@@ -30,11 +36,17 @@ const MultipleSelect: React.FC<Props> = ({
   onChange,
   placeholder = "Select",
   placeholderMultiple = "",
+  showIconsInTriggerIfAny = true,
+  classNames,
 }) => {
   const isAllSelected =
     options && options.length > 0 && selected?.length === options.length;
   const isAnySelected = (selected?.length ?? 0) > 0;
-  const atLeastOneIcon = options?.some((option) => option.icon);
+  const atLeastOneIcon =
+    showIconsInTriggerIfAny && options?.some((option) => option.icon);
+  const selectedLabels = selected?.map(
+    (value) => options?.find((option) => option.value === value)?.label,
+  ).filter(Boolean);
 
   const handleToggleAllCheck = () => {
     if (selected?.length === options?.length) {
@@ -64,6 +76,12 @@ const MultipleSelect: React.FC<Props> = ({
         <Button
           variant={isAnySelected ? "mb-active" : "mb-inactive"}
           size={"mb-btn"}
+          className={classNames?.btn}
+          title={
+            isAnySelected
+              ? `Selected: ${selectedLabels?.join(", ")}`
+              : placeholder
+          }
         >
           <div className="size-2.5" />
           {isAnySelected ? (
@@ -86,10 +104,12 @@ const MultipleSelect: React.FC<Props> = ({
               </div>
             ) : (
               <span className="truncate">
-                {options
-                  ?.filter((option) => selected?.includes(option.value))
-                  ?.map((option) => option.label)
-                  ?.join(", ")}
+                {isAllSelected
+                  ? `All ${placeholderMultiple ? placeholderMultiple : `${placeholder}s`}`
+                  : options
+                      ?.filter((option) => selected?.includes(option.value))
+                      ?.map((option) => option.label)
+                      ?.join(", ")}
               </span>
             )
           ) : (
@@ -99,7 +119,7 @@ const MultipleSelect: React.FC<Props> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="space-y-6 pb-6.75"
+        className={cn("space-y-6 pb-6.75", classNames?.content)}
         // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
         style={{
           maxHeight: "var(--radix-popover-content-available-height)",

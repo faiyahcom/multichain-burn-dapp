@@ -8,7 +8,7 @@ export function Sidebar() {
   });
   return (
     <div
-      className="flex h-full max-h-full w-60 flex-col justify-between gap-6 overflow-y-auto pt-8.25 pr-2 pb-9.75 pl-4.75"
+      className="flex h-full max-h-full w-62 flex-col justify-between gap-6 overflow-y-auto pt-8.25 pr-2 pb-9.75 pl-4.75"
       style={{
         scrollbarWidth: "thin",
       }}
