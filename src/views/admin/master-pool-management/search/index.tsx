@@ -63,28 +63,27 @@ const AdminMasterPoolManagementSearch = () => {
   );
 
   const handleSelectType = (value: PoolTypeOptionValue) => {
-    setFilter({ type: value });
-    /*
-      swap pool has less status than burn pool
-      so we need to filter out the status that does not exist in the pool type
-    */
+    // swap pool has fewer statuses than burn pool
+    // filter out statuses that don't exist in the selected pool type
     if (value === poolTypes[1].toString()) {
       const newStatuses =
         filter.status?.filter((status) =>
           swapPoolStatuses.includes(status as SwapPoolStatus),
         ) ?? [];
-      setFilter({ status: newStatuses });
+      setFilter({ type: value, status: newStatuses });
+      return;
     }
 
-    /*
-      if switching from swap pool to burn pool or all types
-      if it is curently all selected, then set to all burn pool statuses
-    */
+    // if switching from swap pool to burn pool or all types
+    // and all swap statuses were selected, expand to all burn pool statuses
     if (value === poolTypes[0].toString() || value === "all") {
       if (filter.status?.length === swapPoolStatuses.length) {
-        setFilter({ status: [...burnPoolStatuses] });
+        setFilter({ type: value, status: [...burnPoolStatuses] });
+        return;
       }
     }
+
+    setFilter({ type: value });
   };
 
   return (
