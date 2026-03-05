@@ -5,9 +5,7 @@ import {
     DialogPortal,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
-import { useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { PoolDetailResponse } from "@/types/pool";
@@ -57,7 +55,6 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
 
     const { depositSwapPool: depositSwapPoolSOL } = useSwapPoolSOL();
 
-    const queryClient = useQueryClient();
     const {
         register,
         handleSubmit,
@@ -240,7 +237,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 </div>
                             )}
                             {/* separator */}
-                            <div className="mt-3 h-[2px] w-full bg-[linear-gradient(90deg,#FFFFFF_0%,#EAF3F7_19.71%,#EAF3F7_80.77%,#FFFFFF_100%)]" />
+                            <div className="mt-3 h-0.5 w-full bg-[linear-gradient(90deg,#FFFFFF_0%,#EAF3F7_19.71%,#EAF3F7_80.77%,#FFFFFF_100%)]" />
                             <div className="mt-1 flex w-full justify-end text-xl">
                                 {isLoadingBurnBalance
                                     ? "Checking balance..."
@@ -280,7 +277,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 </div>
                             </div>
                             {/* separator */}
-                            <div className="mt-3 h-[2px] w-full bg-[linear-gradient(90deg,#FFFFFF_0%,#EAF3F7_19.71%,#EAF3F7_80.77%,#FFFFFF_100%)]" />
+                            <div className="mt-3 h-0.5 w-full bg-[linear-gradient(90deg,#FFFFFF_0%,#EAF3F7_19.71%,#EAF3F7_80.77%,#FFFFFF_100%)]" />
                             <div className="mt-1 flex w-full justify-end text-xl">
                                 {isLoadingRewardBalance
                                     ? "Checking balance..."

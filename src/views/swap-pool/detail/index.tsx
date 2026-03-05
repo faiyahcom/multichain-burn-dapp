@@ -5,12 +5,10 @@ import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
 import { trimAddress } from "./pool-overview";
 import AmountAndActivity from "./amount-activity";
-import TransactionHistoryTable from "./pool-history/transaction-history";
 import { IconGoTo } from "@/assets/react";
 import { POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { PoolStatus } from "@/types/pool";
-import ActivitiesHistory from "./pool-history/activities-history";
 import PoolHistory from "./pool-history";
 
 type Props = {
@@ -26,7 +24,8 @@ const SwapPoolDetail = ({ address }: Props) => {
     const status = poolDetail?.pool.status;
     const safeStatus: PoolStatus = status ?? "on_going";
     const formattedStatus =
-        safeStatus.charAt(0).toUpperCase() + safeStatus.slice(1).split("_").join("");
+        safeStatus.charAt(0).toUpperCase() +
+        safeStatus.slice(1).split("_").join("");
 
     return (
         <div className="pt-9.5 pl-14">

@@ -2,13 +2,13 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider, type Log } from "ethers";
-import { MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS } from "@/web3";
+import { MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS } from "@/web3";
 import {
     getERC20Contract,
-    getMultichainBurnContract,
+    getContractSwapFactory
 } from "@/web3/contracts/multichainBurnContractEVM";
 
-const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_ADDRESS;
+const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS;
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const AssetType = {
@@ -56,7 +56,7 @@ export const useCreateSwapPoolEvmFn = () => {
                 const signer = await provider.getSigner();
                 const userAddress = await signer.getAddress();
 
-                const contract = getMultichainBurnContract(signer);
+                const contract = getContractSwapFactory(signer);
 
                 const rewardIsNative = isNativeToken(tokenReward);
                 const depositIsNative = isNativeToken(tokenIn);

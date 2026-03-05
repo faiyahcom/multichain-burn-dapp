@@ -67,9 +67,10 @@ export interface PoolTxnsResponse {
 }
 
 export const txnKind = {
-    1: "Deposit",
-    2: "Withdraw for Admin",
-    3: "Deposit Reward",
+    1: "Taker Deposit",
+    2: "Refund to Whitelist User",
+    3: "Maker Deposit Reward",
+    4: "Taker Claim Reward"
 } as const;
 
 export const activityKind = {
@@ -84,10 +85,13 @@ export const activityKind = {
 
     // Reward
     10: "Reward Deposited",
-    11: "Reward Refund",
+
+    // Admin action
+    20: "Admin Refund",
 
     // User actions
-    20: "Deposited"
+    30: "Taker Deposit", //taker deposit to pool
+    31: "Taker Claim" //taker claim reward from burn pool
 } as const
 
 export interface PoolActivitiesResponse {

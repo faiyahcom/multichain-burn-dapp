@@ -1,3 +1,5 @@
+import type { ListTokensRequest } from "../whitelistService";
+
 export const poolQueryKeys = {
     all: ["pools"] as const,
     detail: (address: string) => ["pools", "detail", address] as const,
@@ -6,6 +8,6 @@ export const poolQueryKeys = {
 };
 
 export const whitelistQueryKeys = {
-  listTokens: () => ["whitelist", "listTokens"] as const,
+  listTokens: (params?: ListTokensRequest) => ["whitelist", "listTokens", params] as const,
   summary: () => ["whitelist", "summary"] as const,
 };

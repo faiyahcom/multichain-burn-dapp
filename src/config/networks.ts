@@ -104,7 +104,10 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     id: "solanaDevnet",
     label: "Solana",
     iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
-    appKitNetwork: solanaDevnet,
+    appKitNetwork: {
+      ...solanaDevnet,
+      id: -1, // Use -1 to represent Solana in our app since it doesn't have a chainId like EVM chains
+    },
     iconSrc: "/network/solana.png",
     color: "#b07be0",
     shortLabel: "SOL",

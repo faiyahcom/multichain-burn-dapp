@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import {
+    getContractSwapRouter,
     getERC20Contract,
-    getMultichainBurnRouterContract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 
 type DepositSwapPoolParams = {
@@ -34,7 +34,7 @@ export const useSwapPoolETH = () => {
             );
 
             const signer = await provider.getSigner();
-            const routerContract = getMultichainBurnRouterContract(signer);
+            const routerContract = getContractSwapRouter(signer);
 
             const parsedAmount = ethers.parseUnits(amountIn, decimals);
 
