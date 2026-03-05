@@ -24,7 +24,6 @@ export type NetworkConfig = {
   iconSrc: string;
   color: string;
   shortLabel: string;
-  customNetworkId?: string;
 };
 
 /**
@@ -85,7 +84,6 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/ethereum.png",
     color: "#5779FE",
     shortLabel: "ETH",
-    customNetworkId: sepolia.id.toString(),
   },
   {
     id: "binanceTestnet",
@@ -96,7 +94,6 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/binance.png",
     color: "#f9b845",
     shortLabel: "BNB",
-    customNetworkId: bscTestnet.id.toString(),
   },
   {
     id: "xphereTestnet",
@@ -107,21 +104,16 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
     shortLabel: "XPH",
-    customNetworkId: xphereTestnet.id.toString(),
   },
   {
     id: "solanaDevnet",
     label: "Solana",
     iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
     appKitNetwork: solanaDevnet,
-<<<<<<< Updated upstream
     backendChainId: SOLANA_BACKEND_CHAIN_ID,
-=======
->>>>>>> Stashed changes
     iconSrc: "/network/solana.png",
     color: "#b07be0",
     shortLabel: "SOL",
-    customNetworkId: "-1",
   },
 ];
 

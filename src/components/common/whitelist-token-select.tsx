@@ -28,21 +28,13 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
     const { data: whitelistTokens, isLoading } = useGetWhitelistTokens({
-<<<<<<< Updated upstream
         chainIds: networkConfig?.backendChainId,
-=======
-        chainIds: networkConfig?.customNetworkId,
->>>>>>> Stashed changes
     });
 
     // Native token entry shown at top of list
     const nativeToken = nativeCurrency
         ? {
-<<<<<<< Updated upstream
-            address: ZERO_ADDRESS,
-=======
             address: nativeAddress,
->>>>>>> Stashed changes
             name: nativeCurrency.name,
             symbol: nativeCurrency.symbol,
             imageUri: networkConfig?.iconSrc ?? "",

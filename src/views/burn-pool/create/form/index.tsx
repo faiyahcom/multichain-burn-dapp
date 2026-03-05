@@ -71,7 +71,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             if (poolAddress) {
                 reset();
                 navigate({
-                    to: "/swap/detail/$address",
+                    to: "/burn/detail/$address",
                     params: { address: poolAddress },
                 });
             }

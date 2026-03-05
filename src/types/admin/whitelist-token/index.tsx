@@ -1,4 +1,4 @@
-import type { PoolStatus } from "@/types/pool";
+import type { BurnPoolStatus, SwapPoolStatus } from "@/types/pool";
 
 export const tokenStatus = ["all", "enable", "disable"] as const;
 export type TokenStatus = (typeof tokenStatus)[number];
@@ -20,7 +20,7 @@ export const tokenStatusColors: Record<TokenStatus, string> = {
 export const booleanToTokenStatus = (value: boolean): TokenStatus =>
   value ? "enable" : "disable";
 
-export const POOL_STATUS: Record<PoolStatus, any> = {
+export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
   // "on_going" | "canceled" | "closed"
   on_going: {
     label: "Ongoing",
@@ -39,7 +39,32 @@ export const POOL_STATUS: Record<PoolStatus, any> = {
   },
   draft: {
     label: "Draft",
-    color: "#ff8e97",
+    color: "#C2C2C2",
     letter: "D",
+  },
+};
+
+export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
+  // "on_going" | "canceled" | "closed" | "draft" | "pending" | "upcoming" | "holding" | "end"
+  ...SWAP_POOL_STATUS,
+  pending: {
+    label: "Pending",
+    color: "#FF8E97",
+    letter: "P",
+  },
+  upcoming: {
+    label: "Upcoming",
+    color: "#FFC198",
+    letter: "U",
+  },
+  holding: {
+    label: "Holding",
+    color: "#FFB08E",
+    letter: "H",
+  },
+  end: {
+    label: "End",
+    color: "#A6B7FF",
+    letter: "E",
   },
 };
