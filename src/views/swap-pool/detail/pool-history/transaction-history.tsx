@@ -22,7 +22,13 @@ import { useState } from "react";
 // };
 
 function getExplorerTxUrl(chainId: string, hash: string): string {
+<<<<<<< Updated upstream
     const network = chainIdToNetworkConfig(chainId);
+=======
+    const network = NETWORK_CONFIGS.find(
+        (n) => n.customNetworkId === chainId,
+    );
+>>>>>>> Stashed changes
     const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
     if (!baseUrl) return "#";
     // Solana explorer uses different path format

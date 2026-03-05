@@ -39,9 +39,18 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const rewardToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === poolDetail?.pool.rewardToken,
     );
+<<<<<<< Updated upstream
     const network = poolDetail?.pool.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
+=======
+    const network =
+        poolDetail?.pool.chainId === "-1"
+            ? NETWORK_CONFIGS.find((n) => n.label === "Solana")
+            : NETWORK_CONFIGS.find(
+                (n) => n.customNetworkId === poolDetail?.pool.chainId,
+            ) || undefined;
+>>>>>>> Stashed changes
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
