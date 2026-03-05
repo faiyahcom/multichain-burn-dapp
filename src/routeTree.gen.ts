@@ -22,6 +22,7 @@ import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
+import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
@@ -92,6 +93,12 @@ const AdminWhitelistTokenIndexRoute =
     path: '/admin/whitelist-token/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminMasterPoolManagementIndexRoute =
+  AdminMasterPoolManagementIndexRouteImport.update({
+    id: '/admin/master-pool-management/',
+    path: '/admin/master-pool-management/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
   id: '/swap/detail/$address',
   path: '/swap/detail/$address',
@@ -112,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
+  '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
 }
 export interface FileRoutesByTo {
@@ -128,6 +136,7 @@ export interface FileRoutesByTo {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
+  '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
 }
 export interface FileRoutesById {
@@ -145,6 +154,7 @@ export interface FileRoutesById {
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
+  '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
 }
 export interface FileRouteTypes {
@@ -163,6 +173,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/swap/detail/$address'
+    | '/admin/master-pool-management'
     | '/admin/whitelist-token'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -179,6 +190,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/swap/detail/$address'
+    | '/admin/master-pool-management'
     | '/admin/whitelist-token'
   id:
     | '__root__'
@@ -195,6 +207,7 @@ export interface FileRouteTypes {
     | '/swap-history/'
     | '/swap/'
     | '/swap/detail/$address'
+    | '/admin/master-pool-management/'
     | '/admin/whitelist-token/'
   fileRoutesById: FileRoutesById
 }
@@ -212,6 +225,7 @@ export interface RootRouteChildren {
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
+  AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
 }
 
@@ -308,6 +322,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWhitelistTokenIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/master-pool-management/': {
+      id: '/admin/master-pool-management/'
+      path: '/admin/master-pool-management'
+      fullPath: '/admin/master-pool-management'
+      preLoaderRoute: typeof AdminMasterPoolManagementIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/swap/detail/$address': {
       id: '/swap/detail/$address'
       path: '/swap/detail/$address'
@@ -332,6 +353,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
+  AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -114,4 +114,9 @@ export const navItems: NavItem[] = [
     section: navSection.admin,
     to: "/admin/whitelist-user",
   },
+  {
+    label: "Master Pool Management",
+    section: navSection.admin,
+    to: "/admin/master-pool-management",
+  },
 ];
