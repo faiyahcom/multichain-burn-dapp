@@ -42,6 +42,8 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import ConfirmDialog from "@/components/common/confirm-dialog";
+import { evmAppkitNetworks } from "@/config/networks";
+import { WRONG_NETWORK_ERROR_MESSAGE } from "@/config/constant";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
@@ -78,9 +80,9 @@ const AdminWhitelistTokenTable = () => {
         chainIds:
           filter.network.length > 0
             ? filter.network
-                .map((network) => networkIdToChainId(network))
-                .filter((chainId) => chainId)
-                .join(",")
+              .map((network) => networkIdToChainId(network))
+              .filter((chainId) => chainId)
+              .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,
@@ -125,16 +127,32 @@ const AdminWhitelistTokenTable = () => {
     let isDisabled = false;
     if (request.enabled) {
       setIsScDeleting(true);
+
       if (isSolana) {
-        isDisabled = await disableWhitelistTokenSolana({
-          tokenAddress: request.address,
-        });
+        // Check that the token belongs to Solana network
+        if (String(request.chainId) !== "-1") {
+          toast.error(WRONG_NETWORK_ERROR_MESSAGE);
+        } else {
+          isDisabled = await disableWhitelistTokenSolana({
+            tokenAddress: request.address,
+          });
+        }
       }
+
       if (isEvm) {
-        isDisabled = await disableWhitelistTokenEvm({
-          tokenAddress: request.address,
-        });
+        // Check that the token belongs to an EVM network
+        const evmCheck = evmAppkitNetworks.some(
+          (network) => network.id.toString() === String(request.chainId),
+        );
+        if (!evmCheck) {
+          toast.error(WRONG_NETWORK_ERROR_MESSAGE);
+        } else {
+          isDisabled = await disableWhitelistTokenEvm({
+            tokenAddress: request.address,
+          });
+        }
       }
+
       setIsScDeleting(false);
     } else {
       isDisabled = true; // already disabled then return true

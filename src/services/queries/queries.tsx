@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
-import { whitelistService } from "../whitelistService";
+import { whitelistService, type ListTokensRequest } from "../whitelistService";
 import { whitelistUserService } from "../whitelistUserService";
 import { whitelistQueryKeys, whitelistUserQueryKeys } from "./queryKey";
 
-export const useGetWhitelistTokens = () => {
+export const useGetWhitelistTokens = (params?: ListTokensRequest) => {
     return useQuery({
-        queryKey: whitelistQueryKeys.listTokens(),
-        queryFn: () => whitelistService.getListTokens(),
+        queryKey: whitelistQueryKeys.listTokens(params as Record<string, unknown>),
+        queryFn: () => whitelistService.getListTokens(params),
         staleTime: 1000 * 60 * 60 * 1,
     });
 };

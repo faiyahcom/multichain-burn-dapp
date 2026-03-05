@@ -153,8 +153,7 @@ const AdminWhitelistUserSearch = () => {
     const chainIdToNetworkId = useMemo(() => {
         const map = new Map<string, string>();
         NETWORK_CONFIGS.forEach((n) => {
-            const id = n.appKitNetwork?.id;
-            map.set(typeof id === "number" ? String(id) : "-1", n.id);
+            map.set(n.backendChainId, n.id);
         });
         return map;
     }, []);

@@ -51,7 +51,7 @@ export interface PoolTxnsResponse {
         id: string;
         hash: string;
         log_ix: number;
-        kind: typeof txnKind[keyof typeof txnKind];
+        kind: keyof typeof txnKind;
         timestamp: string;
         tokenIn: string;
         tokenInSymbol: string;

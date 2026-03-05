@@ -6,7 +6,8 @@ export const poolQueryKeys = {
 };
 
 export const whitelistQueryKeys = {
-    listTokens: () => ["whitelist", "listTokens"] as const,
+    listTokens: (params?: Record<string, unknown>) => ["whitelist", "listTokens", params] as const,
+    summary: () => ["whitelist", "summary"] as const,
 };
 
 export const whitelistUserQueryKeys = {

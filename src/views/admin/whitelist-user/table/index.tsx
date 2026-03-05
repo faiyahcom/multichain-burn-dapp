@@ -31,7 +31,7 @@ import { useGetWhitelistUsers } from "@/services/queries/queries";
 import type { TokenAllocation, WhitelistUser } from "@/services/whitelistUserService";
 import { useState, useMemo, useCallback } from "react";
 import AdminWhitelistUserDialogEdit from "../dialog/edit";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, chainIdToNetworkConfig } from "@/config/networks";
 import { useDisableWhitelistUserEvmFn } from "./useDisableWhitelistUserEvmFn";
 import { useDisableWhitelistUserSolanaFn } from "./useDisableWhitelistUserSolanaFn";
 import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
@@ -43,10 +43,7 @@ const MAX_VISIBLE_TOKENS = 3;
 
 /** Maps a chainId string back to the NetworkConfig */
 const getNetworkByChainId = (chainId: string) => {
-    return NETWORK_CONFIGS.find((n) => {
-        const id = n.appKitNetwork?.id;
-        return typeof id === "number" ? String(id) === chainId : chainId === "-1";
-    });
+    return chainIdToNetworkConfig(chainId);
 };
 
 /** Formats a raw BigInt amount string using token decimals into a human-readable value */
@@ -228,8 +225,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 chainIds: filter.network
                     ? (() => {
                         const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
-                        const id = cfg?.appKitNetwork?.id;
-                        return [typeof id === "number" ? id : -1];
+                        return cfg ? [Number(cfg.backendChainId)] : undefined;
                     })()
                     : undefined,
                 tokenAddresses: filter.tokens.length > 0 ? filter.tokens : undefined,
@@ -265,8 +261,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const chainIds = useMemo(() => {
         if (!filter.network) return undefined;
         const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
-        const id = cfg?.appKitNetwork?.id;
-        return [typeof id === "number" ? id : -1];
+        return cfg ? [Number(cfg.backendChainId)] : undefined;
     }, [filter.network]);
 
     const tokenAddresses = filter.tokens.length > 0 ? filter.tokens : undefined;
