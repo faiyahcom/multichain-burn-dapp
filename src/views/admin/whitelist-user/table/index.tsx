@@ -1,4 +1,5 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import BlueSwitch from "@/components/common/blue-switch";
 import CopyableText from "@/components/common/copyable-text";
 import CustomPagination from "@/components/common/pagination";
 import NetworkImgIcon from "@/components/common/network-img-icon";
@@ -10,6 +11,12 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogTitle,
+} from "@/components/ui/dialog";
 import { useAdminWhitelistUserSearchFilterStore } from "@/stores/admin/whitelist-user/search-filter-store";
 import {
     userStatusColors,
@@ -22,9 +29,15 @@ import { cn } from "@/lib/utils";
 import { PencilIcon, EyeIcon } from "lucide-react";
 import { useGetWhitelistUsers } from "@/services/queries/queries";
 import type { TokenAllocation, WhitelistUser } from "@/services/whitelistUserService";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import AdminWhitelistUserDialogEdit from "../dialog/edit";
 import { NETWORK_CONFIGS } from "@/config/networks";
+import { useDisableWhitelistUserEvmFn } from "./useDisableWhitelistUserEvmFn";
+import { useDisableWhitelistUserSolanaFn } from "./useDisableWhitelistUserSolanaFn";
+import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
+import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
+import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 
 const MAX_VISIBLE_TOKENS = 3;
 
@@ -64,34 +77,105 @@ const formatTokenAmount = (amount: string, decimals: number): string => {
     }
 };
 
-const TokenAllocationChips: React.FC<{ allocations: TokenAllocation[] }> = ({ allocations }) => {
-    const [showAll, setShowAll] = useState(false);
+const TokenAllocationChips: React.FC<{
+    allocations: TokenAllocation[];
+    userName?: string;
+}> = ({ allocations, userName }) => {
+    const [dialogOpen, setDialogOpen] = useState(false);
+
     if (allocations.length === 0) return <span className="text-secondary-text text-xs">—</span>;
 
-    const visible = showAll ? allocations : allocations.slice(0, MAX_VISIBLE_TOKENS);
+    const visible = allocations.slice(0, MAX_VISIBLE_TOKENS);
     const hidden = allocations.length - MAX_VISIBLE_TOKENS;
 
+    // Derive distinct networks for the dialog header
+    const networks = (() => {
+        const seen = new Set<string>();
+        return allocations
+            .map((a) => getNetworkByChainId(a.chainId))
+            .filter((n): n is (typeof NETWORK_CONFIGS)[number] => {
+                if (!n || seen.has(n.id)) return false;
+                seen.add(n.id);
+                return true;
+            });
+    })();
+
     return (
-        <div className="flex flex-wrap items-center gap-1.5">
-            {visible.map((a, i) => (
-                <span
-                    key={`${a.tokenAddress}-${i}`}
-                    className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
-                >
-                    <span>{formatTokenAmount(a.amount, a.tokenDecimals)}</span>
-                    <span className="text-primary/70">{a.tokenSymbol}</span>
-                </span>
-            ))}
-            {!showAll && hidden > 0 && (
-                <button
-                    className="inline-flex items-center gap-0.5 text-xs text-secondary-text hover:text-foreground transition-colors"
-                    onClick={() => setShowAll(true)}
-                >
-                    <EyeIcon className="size-3" />
-                    +{hidden}
-                </button>
-            )}
-        </div>
+        <>
+            <div
+                className="flex flex-wrap items-center gap-1.5 cursor-pointer"
+                onClick={() => setDialogOpen(true)}
+            >
+                {visible.map((a, i) => (
+                    <span
+                        key={`${a.tokenAddress}-${i}`}
+                        className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
+                    >
+                        <span>{formatTokenAmount(a.amount, a.tokenDecimals)}</span>
+                        <span className="text-primary/70">{a.tokenSymbol}</span>
+                    </span>
+                ))}
+                {hidden > 0 && (
+                    <span className="inline-flex items-center gap-1 text-xs text-secondary-text">
+                        <EyeIcon className="size-3.5" />
+                        <span>+{hidden}</span>
+                    </span>
+                )}
+            </div>
+
+            {/* Full token list dialog */}
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+                <DialogContent className="sm:max-w-150 p-0 overflow-hidden">
+                    {/* Header section */}
+                    <div className="px-8 pt-8 pb-4 text-center">
+                        <DialogTitle className="text-2xl font-bold text-foreground">
+                            Token transfered{userName ? ` \u2013 ${userName}` : ""}
+                        </DialogTitle>
+                        <DialogDescription className="mt-1 text-sm text-secondary-text">
+                            Detailed breakdown of all token transfered for this user
+                        </DialogDescription>
+                    </div>
+
+                    {/* Network badge */}
+                    {networks.length > 0 && (
+                        <div className="px-6 pb-2 flex items-center gap-1.5 text-sm text-secondary-text">
+                            <span>All token balances on</span>
+                            {networks.map((n) => (
+                                <span key={n.id} className="flex items-center gap-1 font-semibold text-foreground">
+                                    <NetworkImgIcon src={n.iconSrc} alt={n.label} className="size-4" />
+                                    {n.label}
+                                </span>
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Table with margin and white row separators */}
+                    <div className="mx-4 mb-6 border overflow-hidden">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="rounded-sm bg-muted/50 hover:bg-muted/50">
+                                    <TableHead className="text-center font-semibold text-foreground py-3">Token</TableHead>
+                                    <TableHead className="text-center font-semibold text-foreground py-3">Amount</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {allocations.map((a, i) => (
+                                    <TableRow
+                                        key={`${a.tokenAddress}-${i}`}
+                                        className="bg-muted/20 hover:bg-muted/30 rounded-sm p-10"
+                                    >
+                                        <TableCell className="text-center py-3">{a.tokenSymbol}</TableCell>
+                                        <TableCell className="text-center py-3">
+                                            {formatTokenAmount(a.amount, a.tokenDecimals)}
+                                        </TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </>
     );
 };
 
@@ -130,6 +214,52 @@ interface Props {
 
 const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
+
+    const queryClient = useQueryClient();
+    const { disableWhitelistUser: disableEvm } = useDisableWhitelistUserEvmFn();
+    const { disableWhitelistUser: disableSolana } = useDisableWhitelistUserSolanaFn();
+    const [disablingAddress, setDisablingAddress] = useState<string | null>(null);
+
+    const refetchUsers = useCallback(async () => {
+        await new Promise((res) => setTimeout(res, 500));
+        queryClient.invalidateQueries({
+            queryKey: whitelistUserQueryKeys.listUsers({
+                search: filter.text || undefined,
+                chainIds: filter.network
+                    ? (() => {
+                        const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
+                        const id = cfg?.appKitNetwork?.id;
+                        return [typeof id === "number" ? id : -1];
+                    })()
+                    : undefined,
+                tokenAddresses: filter.tokens.length > 0 ? filter.tokens : undefined,
+            }),
+        });
+    }, [queryClient, filter]);
+
+    const handleToggleUser = useCallback(
+        async (user: WhitelistUser) => {
+            const addr = user.address.trim();
+            const whitelist = !user.enabled; // toggle: if currently enabled → disable, else → enable
+
+            if (isEvmAddress(addr)) {
+                setDisablingAddress(user.address);
+                const ok = await disableEvm({ userAddress: addr, whitelist });
+                setDisablingAddress(null);
+                if (ok) refetchUsers();
+            } else if (isSolanaAddress(addr)) {
+                setDisablingAddress(user.address);
+                const ok = await disableSolana({ userAddress: addr, whitelist });
+                setDisablingAddress(null);
+                if (ok) refetchUsers();
+            } else {
+                toast.error("Unknown address format", {
+                    description: `Cannot determine network for: ${addr.slice(0, 20)}…`,
+                });
+            }
+        },
+        [disableEvm, disableSolana, refetchUsers],
+    );
 
     // Map single NetworkId → numeric chainId for the API (-1 for Solana)
     const chainIds = useMemo(() => {
@@ -184,7 +314,8 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     {!isLoading &&
                         users.map((user, index) => {
                             const isFirst = index === 0;
-                            const status: UserStatus = "enabled";
+                            const status: UserStatus = user.enabled ? "enabled" : "disabled";
+                            const isDisabling = disablingAddress === user.address;
 
                             return (
                                 <TableRow
@@ -232,7 +363,10 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
 
                                     {/* Description — token allocations */}
                                     <TableCell>
-                                        <TokenAllocationChips allocations={user.tokenAllocations} />
+                                        <TokenAllocationChips
+                                            allocations={user.tokenAllocations}
+                                            userName={user.name}
+                                        />
                                     </TableCell>
 
                                     {/* Added date */}
@@ -246,15 +380,21 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         </p>
                                     </TableCell>
 
-                                    {/* Action */}
+                                    {/* Action: pencil edit + disable toggle */}
                                     <TableCell>
-                                        <div className="flex items-center justify-center">
+                                        <div className="flex items-center justify-center gap-4.5">
                                             <button
                                                 className="text-secondary-text hover:text-foreground transition-colors"
                                                 onClick={() => setEditingUser(user)}
                                             >
                                                 <PencilIcon className="size-4" />
                                             </button>
+                                            <BlueSwitch
+                                                active={user.enabled}
+                                                isLoading={isDisabling}
+                                                disabled={isDisabling}
+                                                onClick={() => handleToggleUser(user)}
+                                            />
                                         </div>
                                     </TableCell>
                                 </TableRow>

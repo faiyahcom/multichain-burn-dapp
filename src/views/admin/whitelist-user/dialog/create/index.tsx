@@ -341,14 +341,12 @@ const AdminWhitelistUserDialogCreate = () => {
                             text={
                                 isLoading
                                     ? "Adding..."
-                                    : connectedNetworkCfg && selectedNetworks.includes(connectedNetworkCfg.id)
-                                        ? `Add to ${connectedNetworkCfg.label}`
-                                        : "Add to Whitelist"
+                                    : "Add to Whitelist"
                             }
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
-                                btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
+                                btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
                             }}
                             btnProps={{
                                 type: "submit",

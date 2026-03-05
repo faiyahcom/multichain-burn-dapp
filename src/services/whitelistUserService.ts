@@ -15,6 +15,7 @@ export interface WhitelistUser {
     address: string;
     name: string;
     email: string;
+    enabled: boolean;
     createdAt: string;
     tokenAllocations: TokenAllocation[];
 }

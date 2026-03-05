@@ -2,6 +2,7 @@ import type { MultipleSelectOption } from "@/components/common/multiple-select";
 import MultipleSelect from "@/components/common/multiple-select";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
+import { ArrowIcon } from "@/components/common/arrow-icon";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { useGetWhitelistTokens, useGetWhitelistUsers } from "@/services/queries/queries";
 import { useAdminWhitelistUserSearchFilterStore } from "@/stores/admin/whitelist-user/search-filter-store";
@@ -12,15 +13,129 @@ import {
 } from "@/types/admin/whitelist-user";
 import AdminWhitelistUserDialogCreate from "../dialog/create";
 import AdminWhitelistUserSearchStatusPicker from "./status-picker";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/components/ui/select";
+    Popover,
+    PopoverContent,
+    PopoverDescription,
+    PopoverHeader,
+    PopoverTitle,
+    PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
+// ─── Network single-select (styled like MultipleSelect) ─────────────────────
+interface NetworkSelectProps {
+    value: string;
+    onChange: (networkId: string) => void;
+}
+
+const NetworkSelect: React.FC<NetworkSelectProps> = ({ value, onChange }) => {
+    const [open, setOpen] = useState(false);
+
+    const selectedCfg = NETWORK_CONFIGS.find((n) => n.id === value);
+
+    const handleSelect = (networkId: string) => {
+        onChange(networkId);
+        setOpen(false);
+    };
+
+    return (
+        <Popover open={open} onOpenChange={setOpen}>
+            <PopoverTrigger asChild>
+                <Button
+                    variant={selectedCfg ? "mb-active" : "mb-inactive"}
+                    size="mb-btn"
+                >
+                    <div className="size-2.5" />
+                    {selectedCfg ? (
+                        <span className="flex items-center gap-1.75">
+                            <NetworkImgIcon
+                                src={selectedCfg.iconSrc}
+                                alt={selectedCfg.label}
+                                className="size-5"
+                            />
+                            <span>{selectedCfg.label}</span>
+                        </span>
+                    ) : (
+                        <span>Network</span>
+                    )}
+                    <ArrowIcon direction="down" />
+                </Button>
+            </PopoverTrigger>
+            <PopoverContent
+                className="space-y-1 pb-2.5"
+                align="start"
+                style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
+            >
+                <PopoverHeader className="sr-only">
+                    <PopoverTitle>Select Network</PopoverTitle>
+                    <PopoverDescription>Choose a network to filter by</PopoverDescription>
+                </PopoverHeader>
+
+                {NETWORK_CONFIGS.map((n) => (
+                    <NetworkOption
+                        key={n.id}
+                        label={n.label}
+                        iconSrc={n.iconSrc}
+                        selected={value === n.id}
+                        onClick={() => handleSelect(n.id)}
+                    />
+                ))}
+            </PopoverContent>
+        </Popover>
+    );
+};
+
+interface NetworkOptionProps {
+    label: string;
+    iconSrc?: string;
+    selected: boolean;
+    onClick: () => void;
+}
+
+const NetworkOption: React.FC<NetworkOptionProps> = ({
+    label,
+    iconSrc,
+    selected,
+    onClick,
+}) => (
+    <div
+        className={cn(
+            "flex cursor-pointer items-stretch rounded-5px transition-all overflow-hidden",
+            selected ? "bg-[#DEE4F6]" : "bg-primary-foreground",
+        )}
+        onClick={onClick}
+    >
+        {/* Active bar — flush to left/top/bottom, no padding */}
+        <div
+            className={cn(
+                "w-1.75 shrink-0 rounded-r-full transition-colors",
+                selected ? "bg-active" : "bg-transparent",
+            )}
+        />
+
+        {/* Content with its own padding */}
+        <div className="flex items-center gap-2.5 px-3 py-2">
+            {iconSrc ? (
+                <NetworkImgIcon src={iconSrc} alt={label} className="size-7.75 rounded-full" />
+            ) : (
+                <div className="size-7.75" />
+            )}
+            <span
+                className={cn(
+                    "text-15px font-medium select-none transition-colors",
+                    selected && "text-active font-bold",
+                )}
+            >
+                {label}
+            </span>
+        </div>
+    </div>
+);
+
+// ─── Main search component ───────────────────────────────────────────────────
 const AdminWhitelistUserSearch = () => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
 
@@ -51,9 +166,7 @@ const AdminWhitelistUserSearch = () => {
     const tokenOptions: MultipleSelectOption[] = useMemo(() => {
         const tokens = tokensData?.whitelistTokens ?? [];
         const filtered = filter.network
-            ? tokens.filter((t) =>
-                chainIdToNetworkId.get(t.chainId) === filter.network,
-            )
+            ? tokens.filter((t) => chainIdToNetworkId.get(t.chainId) === filter.network)
             : tokens;
         return filtered.map((t) => ({
             label: t.customSymbol || t.symbol || t.name,
@@ -101,33 +214,10 @@ const AdminWhitelistUserSearch = () => {
                         onChange={(value) => setFilter({ tokens: value })}
                     />
 
-                    {/* Single-select network */}
-                    <Select
-                        value={filter.network || "__all__"}
-                        onValueChange={(value) => {
-                            const network = value === "__all__" ? "" : value;
-                            setFilter({ network, tokens: [] }); // clear token selection on network change
-                        }}
-                    >
-                        <SelectTrigger className="h-9 min-w-32 border-border">
-                            <SelectValue placeholder="Network" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="__all__">All Networks</SelectItem>
-                            {NETWORK_CONFIGS.map((n) => (
-                                <SelectItem key={n.id} value={n.id}>
-                                    <span className="flex items-center gap-2">
-                                        <NetworkImgIcon
-                                            src={n.iconSrc}
-                                            alt={n.label}
-                                            className="size-4"
-                                        />
-                                        {n.label}
-                                    </span>
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
+                    <NetworkSelect
+                        value={filter.network}
+                        onChange={(network) => setFilter({ network, tokens: [] })}
+                    />
 
                     <SearchTextDebouncedInput
                         inputProps={{

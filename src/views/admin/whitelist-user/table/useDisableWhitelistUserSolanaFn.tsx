@@ -12,13 +12,13 @@ import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "sonner";
 
-export const useCreateWhitelistUserSolanaFn = () => {
+export const useDisableWhitelistUserSolanaFn = () => {
     const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
     const { connection } = useAppKitConnection();
     const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
-    const createWhitelistUser = useCallback(
-        async ({ userAddress }: { userAddress: string }) => {
+    const disableWhitelistUser = useCallback(
+        async ({ userAddress, whitelist }: { userAddress: string; whitelist: boolean }) => {
             try {
                 if (!isConnected || !address) {
                     throw new Error("Wallet is not connected");
@@ -37,11 +37,10 @@ export const useCreateWhitelistUserSolanaFn = () => {
 
                 const program = getMultichainBurnProgram(connection, anchorWallet);
                 const factoryPDA = getFactoryPDA(program.programId);
-
                 const userPubkey = new PublicKey(userAddress);
 
                 const tx = await program.methods
-                    .updateWhitelistUser(userPubkey, true) // false to remove
+                    .updateWhitelistUser(userPubkey, whitelist)
                     .accounts({
                         admin: walletPublicKey,
                         factory: factoryPDA,
@@ -55,27 +54,17 @@ export const useCreateWhitelistUserSolanaFn = () => {
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPublicKey;
 
-                // Sign
                 const signedTx = await provider.signTransaction(tx);
+                const signature = await connection.sendRawTransaction(signedTx.serialize());
 
-                // Send
-                const signature = await connection.sendRawTransaction(
-                    signedTx.serialize(),
-                );
+                await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight });
 
-                await connection.confirmTransaction({
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
-
-                toast.success("User whitelisted on-chain successfully!", {
+                toast.success(whitelist ? "User added to whitelist!" : "User removed from whitelist!", {
                     description: `Tx: ${signature}`,
                 });
-
                 return true;
             } catch (error: any) {
-                toast.error("Failed to whitelist user on Solana", {
+                toast.error(whitelist ? "Failed to enable user" : "Failed to remove user from whitelist", {
                     description: error?.message || String(error),
                 });
                 return false;
@@ -84,5 +73,5 @@ export const useCreateWhitelistUserSolanaFn = () => {
         [isConnected, address, connection, provider],
     );
 
-    return { createWhitelistUser };
+    return { disableWhitelistUser };
 };
