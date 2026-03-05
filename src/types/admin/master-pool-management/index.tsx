@@ -7,6 +7,19 @@ export const poolTypeLabels: Record<PoolType, string> = {
   1: "Swap pool",
 };
 
+export const poolTypeOptionValues = [
+  "all",
+  ...poolTypes.map((type) => type.toString()),
+];
+export type PoolTypeOptionValue = (typeof poolTypeOptionValues)[number];
+export const poolTypeOptions = poolTypeOptionValues.map((value) => {
+  if (value === "all") return { label: "All Types", value };
+  return {
+    label: poolTypeLabels[Number(value) as PoolType],
+    value,
+  };
+});
+
 export const swapPoolStatuses = [
   "on_going",
   "ended",
