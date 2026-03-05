@@ -21,6 +21,7 @@ import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/inde
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
+import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
@@ -87,6 +88,11 @@ const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
   path: '/activity-history/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminWhitelistUserIndexRoute = AdminWhitelistUserIndexRouteImport.update({
+  id: '/admin/whitelist-user/',
+  path: '/admin/whitelist-user/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminWhitelistTokenIndexRoute =
   AdminWhitelistTokenIndexRouteImport.update({
     id: '/admin/whitelist-token/',
@@ -121,6 +127,7 @@ export interface FileRoutesByFullPath {
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
+  '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -138,6 +145,7 @@ export interface FileRoutesByTo {
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
+  '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -156,6 +164,7 @@ export interface FileRoutesById {
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
+  '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -175,6 +184,7 @@ export interface FileRouteTypes {
     | '/swap/detail/$address'
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
+    | '/admin/whitelist-user'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -192,6 +202,7 @@ export interface FileRouteTypes {
     | '/swap/detail/$address'
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
+    | '/admin/whitelist-user'
   id:
     | '__root__'
     | '/'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/swap/detail/$address'
     | '/admin/master-pool-management/'
     | '/admin/whitelist-token/'
+    | '/admin/whitelist-user/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -227,6 +239,7 @@ export interface RootRouteChildren {
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
+  AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivityHistoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/whitelist-user/': {
+      id: '/admin/whitelist-user/'
+      path: '/admin/whitelist-user'
+      fullPath: '/admin/whitelist-user'
+      preLoaderRoute: typeof AdminWhitelistUserIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/whitelist-token/': {
       id: '/admin/whitelist-token/'
       path: '/admin/whitelist-token'
@@ -355,6 +375,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapDetailAddressRoute: SwapDetailAddressRoute,
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
+  AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
