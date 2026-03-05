@@ -13,6 +13,10 @@ const AdminMasterPoolManagementSearch = () => {
           options={poolTypeOptions}
           selected={filter.type}
           onChange={(value) => setFilter({ type: value })}
+          classNames={{
+            content: "w-55.5",
+            btn: "min-w-34",
+          }}
         />
       </div>
     </div>

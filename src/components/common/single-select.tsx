@@ -20,6 +20,10 @@ interface Props {
   selected?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
+  classNames?: {
+    btn?: string;
+    content?: string;
+  };
 }
 
 const SingleSelect: React.FC<Props> = ({
@@ -27,8 +31,11 @@ const SingleSelect: React.FC<Props> = ({
   selected,
   onChange,
   placeholder = "Select",
+  classNames,
 }) => {
-    const selectedLabel = options?.find((option) => option.value === selected)?.label;
+  const selectedLabel = options?.find(
+    (option) => option.value === selected,
+  )?.label;
 
   const handleToggleCheck = (value?: string) => {
     if (!value) return;
@@ -41,14 +48,15 @@ const SingleSelect: React.FC<Props> = ({
         <Button
           variant={selected ? "mb-active" : "mb-inactive"}
           size={"mb-btn"}
+          className={classNames?.btn}
         >
-          <div className="size-2.5" />
+          <div className="size-2.5 shrink-0" />
           <span>{selectedLabel ?? placeholder}</span>
           <ArrowIcon direction="down" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="space-y-1 overflow-y-auto"
+        className={cn("space-y-1 overflow-y-auto", classNames?.content)}
         // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
         style={{
           maxHeight: "var(--radix-popover-content-available-height)",
@@ -85,7 +93,7 @@ const OptionItem: React.FC<SingleSelectOption & OptionItemProps> = ({
 }) => {
   return (
     <div
-      className="group flex cursor-pointer items-center justify-between gap-2.5 rounded-5px bg-primary-foreground py-0.5 pr-0.75"
+      className="group cursor-pointer rounded-5px bg-primary-foreground py-0.5 pr-0.75"
       onClick={() => toggleCheck?.(value)}
     >
       <div className="relative pl-1">
@@ -96,7 +104,13 @@ const OptionItem: React.FC<SingleSelectOption & OptionItemProps> = ({
             "group-hover:bg-active",
           )}
         />
-        <div className="flex items-center pl-11.25">
+        <div
+          className={cn(
+            "flex items-center rounded-5px bg-transparent pt-2.5 pb-2.25 pl-11.25 transition-colors",
+            { "bg-inactive": checked },
+            "group-hover:bg-inactive",
+          )}
+        >
           <p className="text-15px font-medium">{label}</p>
         </div>
       </div>
