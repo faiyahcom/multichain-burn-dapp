@@ -111,11 +111,7 @@ const AdminWhitelistTokenDialogCreate = () => {
         (n) => n.id === data.networkId,
       );
       if (networkConfig) {
-        if (networkConfig.id === "solanaDevnet") {
-          formData.append("chainId", "-1");
-        } else {
-          formData.append("chainId", networkConfig.appKitNetwork.id.toString());
-        }
+        formData.append("chainId", networkConfig.backendChainId);
       }
       if (data.image) {
         formData.append("img", data.image);

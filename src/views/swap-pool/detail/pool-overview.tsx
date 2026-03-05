@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import NetworkIcon from "@/components/layout/header/network-icon";
@@ -31,7 +31,7 @@ export function trimAddress(address?: string, head = 6, tail = 4): string {
 }
 
 const PoolOverview = ({ poolDetail }: Props) => {
-    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } =
+    const { data: whitelistTokens } =
         useGetWhitelistTokens();
     const burnToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === poolDetail?.pool.tokenIn,
@@ -39,12 +39,9 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const rewardToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === poolDetail?.pool.rewardToken,
     );
-    const network =
-        poolDetail?.pool.chainId === "-1"
-            ? NETWORK_CONFIGS.find((n) => n.label === "Solana")
-            : NETWORK_CONFIGS.find(
-                (n) => n.appKitNetwork.id.toString() === poolDetail?.pool.chainId,
-            ) || undefined;
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 

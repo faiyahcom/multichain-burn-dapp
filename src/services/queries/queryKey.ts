@@ -1,5 +1,3 @@
-import type { ListTokensRequest } from "../whitelistService";
-
 export const poolQueryKeys = {
     all: ["pools"] as const,
     detail: (address: string) => ["pools", "detail", address] as const,
@@ -8,6 +6,11 @@ export const poolQueryKeys = {
 };
 
 export const whitelistQueryKeys = {
-  listTokens: (params?: ListTokensRequest) => ["whitelist", "listTokens", params] as const,
-  summary: () => ["whitelist", "summary"] as const,
+    listTokens: (params?: Record<string, unknown>) => ["whitelist", "listTokens", params] as const,
+    summary: () => ["whitelist", "summary"] as const,
+};
+
+export const whitelistUserQueryKeys = {
+    listUsers: (params?: { search?: string; chainIds?: number[]; tokenAddresses?: string[] }) =>
+        ["whitelist-users", "listUsers", params?.search, params?.chainIds, params?.tokenAddresses] as const,
 };

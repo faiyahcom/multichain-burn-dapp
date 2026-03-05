@@ -27,25 +27,25 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     const nativeCurrency = networkConfig?.appKitNetwork.nativeCurrency;
 
     const { data: whitelistTokens, isLoading } = useGetWhitelistTokens({
-        chainIds: networkConfig?.appKitNetwork.id.toString(),
+        chainIds: networkConfig?.backendChainId,
     });
 
     // Native token entry shown at top of list (EVM only)
     const nativeToken = nativeCurrency
         ? {
-              address: ZERO_ADDRESS,
-              name: nativeCurrency.name,
-              symbol: nativeCurrency.symbol,
-              imageUri: networkConfig?.iconSrc ?? "",
-          }
+            address: ZERO_ADDRESS,
+            name: nativeCurrency.name,
+            symbol: nativeCurrency.symbol,
+            imageUri: networkConfig?.iconSrc ?? "",
+        }
         : null;
 
     const selectedDetail =
         value === ZERO_ADDRESS
             ? nativeToken
             : whitelistTokens?.whitelistTokens.find(
-                  (token) => token.address === value,
-              );
+                (token) => token.address === value,
+            );
 
     return (
         <DropdownMenu>

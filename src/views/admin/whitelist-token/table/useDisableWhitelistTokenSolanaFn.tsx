@@ -13,7 +13,7 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 
 export const useDisableWhitelistTokenSolanaFn = () => {
-  const { isConnected, address } = useAppKitAccount();
+  const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
   const { connection } = useAppKitConnection();
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 

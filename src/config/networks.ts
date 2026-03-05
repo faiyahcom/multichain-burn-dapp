@@ -12,11 +12,15 @@ export type NetworkId =
   | "xphereTestnet"
   | "solanaDevnet";
 
+export const SOLANA_BACKEND_CHAIN_ID = "-1";
+
 export type NetworkConfig = {
   id: NetworkId;
   label: string;
   iconBg: string;
   appKitNetwork: AppKitNetwork;
+  /** Chain ID used by the backend API (e.g. "11155111" for Sepolia, "-1" for Solana) */
+  backendChainId: string;
   iconSrc: string;
   color: string;
   shortLabel: string;
@@ -30,7 +34,6 @@ export type NetworkConfig = {
 export const bscTestnet: AppKitNetwork = {
   id: 97,
   name: "BSC Testnet",
-  network: "bsc-testnet",
   nativeCurrency: {
     name: "BNB",
     symbol: "tBNB",
@@ -53,7 +56,6 @@ export const bscTestnet: AppKitNetwork = {
 export const xphereTestnet: AppKitNetwork = {
   id: 12345, // 🔥 replace with real chainId
   name: "Xphere Testnet",
-  network: "xphere-testnet",
   nativeCurrency: {
     name: "XPH",
     symbol: "XPH",
@@ -78,6 +80,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     label: "Ethereum",
     iconBg: "bg-[#627EEA]",
     appKitNetwork: sepolia,
+    backendChainId: String(sepolia.id),
     iconSrc: "/network/ethereum.png",
     color: "#5779FE",
     shortLabel: "ETH",
@@ -87,6 +90,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     label: "Binance",
     iconBg: "bg-[#F3BA2F]",
     appKitNetwork: bscTestnet,
+    backendChainId: String(bscTestnet.id),
     iconSrc: "/network/binance.png",
     color: "#f9b845",
     shortLabel: "BNB",
@@ -96,6 +100,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     label: "Xphere",
     iconBg: "bg-[#E53935]",
     appKitNetwork: xphereTestnet,
+    backendChainId: String(xphereTestnet.id),
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
     shortLabel: "XPH",
@@ -104,10 +109,8 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     id: "solanaDevnet",
     label: "Solana",
     iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
-    appKitNetwork: {
-      ...solanaDevnet,
-      id: -1, // Use -1 to represent Solana in our app since it doesn't have a chainId like EVM chains
-    },
+    appKitNetwork: solanaDevnet,
+    backendChainId: SOLANA_BACKEND_CHAIN_ID,
     iconSrc: "/network/solana.png",
     color: "#b07be0",
     shortLabel: "SOL",
@@ -115,23 +118,16 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
 ];
 
 export const networkIdToChainId = (networkId: string): string | undefined => {
-  if (networkId === "solanaDevnet") {
-    return "-1";
-  } else {
-    return NETWORK_CONFIGS.find(
-      (config) => config.id === networkId,
-    )?.appKitNetwork.id.toString();
-  }
+  return NETWORK_CONFIGS.find(
+    (config) => config.id === networkId,
+  )?.backendChainId;
 };
 
 export const chainIdToNetworkConfig = (
   chainId: string,
 ): NetworkConfig | undefined => {
-  if (chainId === "-1") {
-    return NETWORK_CONFIGS.find((config) => config.id === "solanaDevnet");
-  }
   return NETWORK_CONFIGS.find(
-    (config) => config.appKitNetwork.id.toString() === chainId,
+    (config) => config.backendChainId === chainId,
   );
 };
 
