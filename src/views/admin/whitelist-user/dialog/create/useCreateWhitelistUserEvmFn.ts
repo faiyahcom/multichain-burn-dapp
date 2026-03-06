@@ -22,6 +22,8 @@ export const useCreateWhitelistUserEvmFn = () => {
 
   const createWhitelistUser = useCallback(
     async ({ userAddress }: { userAddress: string }) => {
+      console.log("Checkpoint 1");
+
       try {
         if (!isConnected || !walletProvider) {
           throw new Error("Wallet not connected");
@@ -33,13 +35,25 @@ export const useCreateWhitelistUserEvmFn = () => {
         if (!provider) {
           throw new Error("Provider not found");
         }
+        console.log("Checkpoint 1");
 
         const signer = await provider.getSigner();
+        console.log("Checkpoint 1");
+
         const swapFactoryContract = getContractSwapFactory(signer);
+        console.log("Checkpoint 1");
+
         const burnFactoryContract = getContractBurnFactory(signer);
+        console.log("Checkpoint 1");
+
         const account = (await signer.getAddress()) as Address;
+        console.log("Checkpoint 1");
+
         const network = await provider.getNetwork();
+        console.log("Checkpoint 1");
+
         const chainId = Number(network.chainId);
+        console.log("Checkpoint 1");
 
         const whitelistUserSwapData =
           swapFactoryContract.interface.encodeFunctionData("whitelistAddress", [
@@ -50,6 +64,7 @@ export const useCreateWhitelistUserEvmFn = () => {
             userAddress,
             true,
           ]);
+        console.log("Checkpoint 1");
 
         const { id } = await sendCalls(wagmiAdapter.wagmiConfig, {
           account,
@@ -66,11 +81,13 @@ export const useCreateWhitelistUserEvmFn = () => {
             },
           ],
         });
+        console.log("Checkpoint 1");
 
         const callsStatus = await waitForCallsStatus(wagmiAdapter.wagmiConfig, {
           id,
           throwOnFailure: true,
         });
+        console.log("Checkpoint 1");
 
         const [isSwapFactoryWhitelisted, isBurnFactoryWhitelisted] =
           await multicall(wagmiAdapter.wagmiConfig, {

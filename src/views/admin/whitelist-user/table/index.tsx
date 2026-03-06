@@ -177,29 +177,41 @@ const TokenAllocationChips: React.FC<{
 };
 
 /** Shows distinct network icons from the user's token allocations */
-const UserNetworkIcons: React.FC<{ allocations: TokenAllocation[] }> = ({ allocations }) => {
+/** Shows network icons for each chain the user is registered on (whitelistChainId) */
+const UserNetworkIcons: React.FC<{ user: WhitelistUser }> = ({ user }) => {
     const networks = useMemo(() => {
+        // Prefer whitelistChainId (explicit registration chains)
+        const chainIds =
+            user.whitelistChainId?.length > 0
+                ? user.whitelistChainId
+                : user.tokenAllocations.map((a) => a.chainId);
+
         const seen = new Set<string>();
-        return allocations
-            .map((a) => getNetworkByChainId(a.chainId))
+        return chainIds
+            .map((id) => chainIdToNetworkConfig(id))
             .filter((n): n is typeof NETWORK_CONFIGS[number] => {
                 if (!n || seen.has(n.id)) return false;
                 seen.add(n.id);
                 return true;
             });
-    }, [allocations]);
+    }, [user]);
 
     if (networks.length === 0) return <span className="text-secondary-text text-xs">—</span>;
 
     return (
         <div className="flex items-center gap-1.5">
             {networks.map((n) => (
-                <NetworkImgIcon
-                    key={n.id}
-                    src={n.iconSrc}
-                    alt={n.label}
-                    className="size-5"
-                />
+                <div key={n.id} className="group relative">
+                    <NetworkImgIcon
+                        src={n.iconSrc}
+                        alt={n.label}
+                        className="size-5 transition-transform group-hover:scale-110"
+                    />
+                    {/* Tooltip */}
+                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-foreground/90 px-1.5 py-0.5 text-[10px] text-background opacity-0 transition-opacity group-hover:opacity-100">
+                        {n.label}
+                    </span>
+                </div>
             ))}
         </div>
     );
@@ -351,9 +363,9 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         />
                                     </TableCell>
 
-                                    {/* Network icons derived from allocations */}
+                                    {/* Network icons from whitelistChainId */}
                                     <TableCell>
-                                        <UserNetworkIcons allocations={user.tokenAllocations} />
+                                        <UserNetworkIcons user={user} />
                                     </TableCell>
 
                                     {/* Description — token allocations */}

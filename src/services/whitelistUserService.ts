@@ -16,6 +16,8 @@ export interface WhitelistUser {
     name: string;
     email: string;
     enabled: boolean;
+    /** Chain IDs this user is registered on (backend stringified BigInt array) */
+    whitelistChainId: string[];
     createdAt: string;
     tokenAllocations: TokenAllocation[];
 }

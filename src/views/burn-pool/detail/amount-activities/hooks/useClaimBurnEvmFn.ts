@@ -7,6 +7,8 @@ import { getContractBurnRouter } from "@/web3/contracts/multichainBurnContractEV
 export interface ClaimBurnParams {
     poolAddress: string;
     merkleProof?: string[];
+    /** Optional recipient override. If set, tokens are sent to this address instead of the connected wallet. */
+    userAddress?: string;
 }
 
 export const useClaimBurnEvmFn = () => {
@@ -14,7 +16,7 @@ export const useClaimBurnEvmFn = () => {
     const { walletProvider } = useAppKitProvider("eip155");
 
     const claimBurnReward = useCallback(
-        async ({ poolAddress, merkleProof = [] }: ClaimBurnParams) => {
+        async ({ poolAddress, merkleProof = [], userAddress }: ClaimBurnParams) => {
             try {
                 if (!isConnected || !address || !walletProvider) {
                     throw new Error("Wallet not connected");
@@ -26,7 +28,7 @@ export const useClaimBurnEvmFn = () => {
                 const signer = await provider.getSigner();
                 const contract = getContractBurnRouter(signer);
 
-                const tx = await contract.claim(poolAddress, address, merkleProof);
+                const tx = await contract.claim(poolAddress, userAddress ?? address, merkleProof);
                 const receipt = await tx.wait();
 
                 toast.success("Reward claimed successfully!", {
