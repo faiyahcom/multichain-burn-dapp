@@ -211,41 +211,8 @@
                 "path": "project_owner"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "reward_token_program"
               },
               {
                 "kind": "account",
@@ -292,12 +259,10 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         },
         {
-          "name": "token_program_2022",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "deposit_token_program"
         },
         {
           "name": "system_program",
@@ -744,8 +709,7 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         }
       ],
       "args": [
@@ -1074,12 +1038,10 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         },
         {
-          "name": "token_program_2022",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "deposit_token_program"
         },
         {
           "name": "associated_token_program",
@@ -1231,41 +1193,8 @@
                 "path": "project_owner"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "reward_token_program"
               },
               {
                 "kind": "account",
@@ -1312,12 +1241,10 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         },
         {
-          "name": "token_program_2022",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "deposit_token_program"
         },
         {
           "name": "system_program",
@@ -1603,12 +1530,7 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
-        },
-        {
-          "name": "token_program_2022",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         },
         {
           "name": "associated_token_program",
@@ -2173,12 +2095,10 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         },
         {
-          "name": "token_program_2022",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "deposit_token_program"
         },
         {
           "name": "associated_token_program",
@@ -2609,41 +2529,8 @@
                 "path": "receiver_address"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "reward_token_program"
               },
               {
                 "kind": "account",
@@ -2699,41 +2586,8 @@
                 "path": "receiver_address"
               },
               {
-                "kind": "const",
-                "value": [
-                  6,
-                  221,
-                  246,
-                  225,
-                  215,
-                  101,
-                  161,
-                  147,
-                  217,
-                  203,
-                  225,
-                  70,
-                  206,
-                  235,
-                  121,
-                  172,
-                  28,
-                  180,
-                  133,
-                  237,
-                  95,
-                  91,
-                  55,
-                  145,
-                  58,
-                  140,
-                  245,
-                  133,
-                  126,
-                  255,
-                  0,
-                  169
-                ]
+                "kind": "account",
+                "path": "deposit_token_program"
               },
               {
                 "kind": "account",
@@ -2780,12 +2634,10 @@
           }
         },
         {
-          "name": "token_program",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "reward_token_program"
         },
         {
-          "name": "token_program_2022",
-          "address": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"
+          "name": "deposit_token_program"
         },
         {
           "name": "associated_token_program",
@@ -2878,6 +2730,52 @@
           }
         }
       ]
+    },
+    {
+      "name": "update_admin",
+      "discriminator": [
+        161,
+        176,
+        40,
+        213,
+        60,
+        184,
+        179,
+        228
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "factory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "new_admin",
+          "writable": true,
+          "signer": true
+        }
+      ],
+      "args": []
     },
     {
       "name": "update_pool",
@@ -3168,6 +3066,19 @@
     }
   ],
   "events": [
+    {
+      "name": "AdminUpdated",
+      "discriminator": [
+        69,
+        82,
+        49,
+        171,
+        43,
+        3,
+        80,
+        161
+      ]
+    },
     {
       "name": "Collected",
       "discriminator": [
@@ -3577,6 +3488,30 @@
   ],
   "types": [
     {
+      "name": "AdminUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "Collected",
       "type": {
         "kind": "struct",
@@ -3590,7 +3525,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -3670,7 +3605,7 @@
             "type": "u64"
           },
           {
-            "name": "user",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -3688,6 +3623,14 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
           }
         ]
       }
@@ -3768,6 +3711,10 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
@@ -3891,7 +3838,7 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -3915,7 +3862,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -3939,7 +3886,7 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -3963,7 +3910,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4039,7 +3986,7 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4063,7 +4010,7 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4087,7 +4034,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4128,9 +4075,6 @@
           },
           {
             "name": "Canceled"
-          },
-          {
-            "name": "Rejected"
           }
         ]
       }
@@ -4149,7 +4093,7 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4187,6 +4131,10 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
@@ -4205,7 +4153,7 @@
             "type": "u64"
           },
           {
-            "name": "user",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4219,6 +4167,14 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
           }
         ]
       }
@@ -4237,11 +4193,19 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
             "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_amount",
             "type": "u64"
           },
           {
@@ -4265,28 +4229,24 @@
             "type": "u64"
           },
           {
-            "name": "admin",
+            "name": "executor",
             "type": "pubkey"
           },
           {
-            "name": "reward_amount",
+            "name": "amount",
             "type": "u64"
           },
           {
-            "name": "reward_mint",
-            "type": "pubkey"
-          },
-          {
-            "name": "deposit_amount",
-            "type": "u64"
-          },
-          {
-            "name": "deposit_mint",
+            "name": "token_mint",
             "type": "pubkey"
           },
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
           }
         ]
       }
@@ -4305,7 +4265,7 @@
             "type": "u64"
           },
           {
-            "name": "project_owner",
+            "name": "executor",
             "type": "pubkey"
           },
           {
@@ -4387,6 +4347,10 @@
           {
             "name": "is_whitelisted",
             "type": "bool"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }
@@ -4403,6 +4367,10 @@
           {
             "name": "is_whitelisted",
             "type": "bool"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }

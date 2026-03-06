@@ -9,7 +9,6 @@ import {
 import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
     getMint,
 } from "@solana/spl-token";
 import {
@@ -23,6 +22,7 @@ import {
     getDepositVaultPDA,
     getFactoryPDA,
     detectAssetType,
+    getTokenProgramFromAssetType,
 } from "@/web3/helpers";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 
@@ -94,6 +94,12 @@ export const useCreateSwapPoolSolanaFn = () => {
                     params.depositMint,
                 );
 
+                const rewardTokenProgramId =
+                    getTokenProgramFromAssetType(rewardAssetType);
+
+                const depositTokenProgramId =
+                    getTokenProgramFromAssetType(depositAssetType);
+
                 const rewardMintInfo = await getMint(connection, params.rewardMint);
                 const rewardDecimals = rewardMintInfo.decimals;
                 console.log("rewardDecimals", rewardDecimals);
@@ -140,7 +146,8 @@ export const useCreateSwapPoolSolanaFn = () => {
                         rewardVault: rewardVaultPDA,
                         depositVault: depositVaultPDA,
                         systemProgram: SystemProgram.programId,
-                        tokenProgram: TOKEN_PROGRAM_ID,
+                        rewardTokenProgram: rewardTokenProgramId!,
+                        depositTokenProgram: depositTokenProgramId!,
                         ownerRewardAta,
                     })
                     .transaction();

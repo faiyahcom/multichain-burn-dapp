@@ -4,6 +4,7 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
 import { useCreateBurnPoolEvmFn } from "../useCreateBurnPoolEvmFn";
+import { useCreateBurnPoolSolFn } from "../useCreateBurnPoolSolFn";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import AnimateIconButton from "@/components/common/animate-icon-button";
@@ -25,12 +26,15 @@ type Props = {
 };
 
 const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
-    const { caipAddress } = useAppKitAccount();
+    const { caipAddress, address } = useAppKitAccount();
     const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
 
-    const isEvm = caipAddress?.startsWith("eip155:");
+    const namespace = caipAddress?.split(":")[0];
+    const isSolana = namespace === "solana";
+    const isEvm = namespace === "eip155";
 
     const navigate = useNavigate();
+    const { createPool: createPoolSol } = useCreateBurnPoolSolFn();
     const { createPool: createPoolEvm } = useCreateBurnPoolEvmFn();
 
     const {
@@ -44,9 +48,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
         defaultValues: {
             poolName: undefined,
             tokenBurn: undefined,
-            ratio: undefined,
             tokenReward: undefined,
-            budget: undefined,
             startTime: undefined,
             endTime: undefined,
         },
@@ -58,6 +60,24 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
     const endTime = watch("endTime");
 
     const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
+        if (isSolana && !onSubmitForm) {
+            const poolAddress = await createPoolSol({
+                poolName: values.poolName,
+                tokenBurn: values.tokenBurn,
+                tokenReward: values.tokenReward,
+                startTime: values.startTime,
+                endTime: values.endTime,
+            });
+            if (poolAddress) {
+                reset();
+                navigate({
+                    to: "/burn/detail/$address",
+                    params: { address: poolAddress },
+                });
+            }
+            return;
+        }
+
         if (isEvm && !onSubmitForm) {
             const poolAddress = await createPoolEvm({
                 poolName: values.poolName,
@@ -69,7 +89,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             if (poolAddress) {
                 reset();
                 navigate({
-                    to: "/swap/detail/$address",
+                    to: "/burn/detail/$address",
                     params: { address: poolAddress },
                 });
             }

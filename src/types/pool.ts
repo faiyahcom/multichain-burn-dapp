@@ -1,4 +1,5 @@
-export type PoolStatus = "on_going" | "canceled" | "closed" | "draft";
+export type SwapPoolStatus = "on_going" | "canceled" | "closed" | "draft";
+export type BurnPoolStatus = "on_going" | "canceled" | "closed" | "draft" | "pending" | "upcoming" | "holding" | "ended";
 export type PoolKind = "burn_pool" | "swap_pool";
 export const POOL_KIND: Record<number, PoolKind> = {
     0: "burn_pool",
@@ -22,7 +23,7 @@ export interface PoolDetailResponse {
         kind: number;
         chainId: string;
         timestamp: string;
-        status: PoolStatus;
+        status: SwapPoolStatus | BurnPoolStatus;
         currentRewardAmount: string;
         rewardTokenSymbol: string;
         rewardTokenDecimals: number;

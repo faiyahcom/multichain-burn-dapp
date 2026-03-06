@@ -4,28 +4,25 @@ import { useQuery } from "@tanstack/react-query";
 import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
 import { trimAddress } from "./pool-overview";
-import AmountAndActivity from "./amount-activity";
+import AmountAndActivity from "./amount-activities";
 import { IconGoTo } from "@/assets/react";
-import { SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
+import { BURN_POOL_STATUS, SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import type { SwapPoolStatus } from "@/types/pool";
+import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 
 type Props = {
     address: string;
 };
 
-const SwapPoolDetail = ({ address }: Props) => {
+const AdminBurnPoolDetail = ({ address }: Props) => {
     const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
     });
 
     const status = poolDetail?.pool.status;
-    const safeStatus: SwapPoolStatus = (status as SwapPoolStatus) ?? "on_going";
-    const formattedStatus =
-        safeStatus.charAt(0).toUpperCase() +
-        safeStatus.slice(1).split("_").join("");
+    const safeStatus: BurnPoolStatus = status ?? "on_going";
 
     return (
         <div className="pt-9.5 pl-14">
@@ -33,10 +30,10 @@ const SwapPoolDetail = ({ address }: Props) => {
                 <div className="flex items-center gap-6">
                     <h2 className="text-3xl font-semibold">{poolDetail?.pool.name}</h2>
                     <AnimateIconButton
-                        iconLetter={SWAP_POOL_STATUS[safeStatus].letter}
+                        iconLetter={BURN_POOL_STATUS[safeStatus]?.letter}
                         textVariant="text-container-center"
-                        text={formattedStatus}
-                        color={SWAP_POOL_STATUS[safeStatus].color}
+                        text={BURN_POOL_STATUS[safeStatus]?.label}
+                        color={BURN_POOL_STATUS[safeStatus]?.color}
                         hasGroupHover
                         classNames={{
                             btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
@@ -63,4 +60,4 @@ const SwapPoolDetail = ({ address }: Props) => {
     );
 };
 
-export default SwapPoolDetail;
+export default AdminBurnPoolDetail;
