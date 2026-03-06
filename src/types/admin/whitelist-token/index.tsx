@@ -62,7 +62,7 @@ export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
     color: "#FFB08E",
     letter: "H",
   },
-  end: {
+  ended: {
     label: "End",
     color: "#A6B7FF",
     letter: "E",

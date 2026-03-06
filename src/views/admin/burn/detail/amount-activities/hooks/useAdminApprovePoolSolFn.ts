@@ -1,0 +1,68 @@
+import { useCallback } from "react";
+import { toast } from "sonner";
+import { PublicKey } from "@solana/web3.js";
+import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
+import {
+    useAppKitConnection,
+    type Provider,
+} from "@reown/appkit-adapter-solana/react";
+import {
+    getMultichainBurnProgram,
+    type BrowserWallet,
+} from "@/web3/contracts/multichainBurnProgramSol";
+import { getFactoryPDA } from "@/web3/helpers";
+
+export const useAdminApprovePoolSolFn = () => {
+    const { isConnected, address } = useAppKitAccount();
+    const { connection } = useAppKitConnection();
+    const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
+
+    const adminApprovePoolSol = useCallback(
+        async ({ poolAddress }: { poolAddress: string }) => {
+            try {
+                if (!isConnected || !address) {
+                    throw new Error("Wallet not connected");
+                }
+                if (!connection || !provider) {
+                    throw new Error("Solana connection or provider is not available");
+                }
+
+                const walletPublicKey = new PublicKey(address);
+
+                const anchorWallet: BrowserWallet = {
+                    publicKey: walletPublicKey,
+                    signTransaction: provider.signTransaction.bind(provider),
+                    signAllTransactions: provider.signAllTransactions?.bind(provider),
+                };
+
+                const program = getMultichainBurnProgram(connection, anchorWallet);
+
+                const poolPDA = new PublicKey(poolAddress);
+                const factoryPDA = getFactoryPDA(program.programId);
+
+                const tx = await program.methods
+                    .approvePool()
+                    .accounts({
+                        admin: walletPublicKey,
+                        factory: factoryPDA,
+                        pool: poolPDA,
+                    })
+                    .rpc();
+
+                toast.success("Pool approved successfully!", {
+                    description: `Tx: ${tx}`,
+                });
+
+                return tx;
+            } catch (error: any) {
+                toast.error("Failed to approve pool", {
+                    description: error?.message || String(error),
+                });
+                throw error;
+            }
+        },
+        [isConnected, address, connection, provider],
+    );
+
+    return { adminApprovePoolSol };
+};

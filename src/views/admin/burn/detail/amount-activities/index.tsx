@@ -1,5 +1,4 @@
 import type { PoolDetailResponse } from "@/types/pool";
-import { useAuthStore } from "@/stores/authStore";
 import { Container } from "./components";
 import DraftStatus from "./status/DraftStatus";
 import PendingHoldingStatus from "./status/PendingHoldingStatus";
@@ -13,21 +12,17 @@ type Props = {
 };
 
 const AmountAndActivity = ({ poolDetail }: Props) => {
-    const { user } = useAuthStore();
     const status = poolDetail?.pool?.status;
-    const isPoolOwner = user?.address === poolDetail?.pool?.owner;
 
     const renderContent = () => {
         if (!status) return null;
 
         switch (status) {
             case "draft":
-                if (!isPoolOwner) return null;
                 return <DraftStatus poolDetail={poolDetail} />;
 
             case "pending":
             case "holding":
-                if (!isPoolOwner) return null;
                 return <PendingHoldingStatus poolDetail={poolDetail} />;
 
             case "upcoming":

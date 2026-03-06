@@ -25,6 +25,7 @@ import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whit
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
+import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -109,6 +110,11 @@ const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
   path: '/burn/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminBurnDetailAddressRoute = AdminBurnDetailAddressRouteImport.update({
+  id: '/admin/burn/detail/$address',
+  path: '/admin/burn/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -164,6 +172,7 @@ export interface FileRoutesById {
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
+  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -184,6 +193,7 @@ export interface FileRouteTypes {
     | '/swap/detail/$address'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/admin/burn/detail/$address'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -202,6 +212,7 @@ export interface FileRouteTypes {
     | '/swap/detail/$address'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/admin/burn/detail/$address'
   id:
     | '__root__'
     | '/'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/swap/detail/$address'
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
+    | '/admin/burn/detail/$address'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -239,6 +251,7 @@ export interface RootRouteChildren {
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
+  AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -355,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BurnDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/burn/detail/$address': {
+      id: '/admin/burn/detail/$address'
+      path: '/admin/burn/detail/$address'
+      fullPath: '/admin/burn/detail/$address'
+      preLoaderRoute: typeof AdminBurnDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -375,6 +395,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapDetailAddressRoute: SwapDetailAddressRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
+  AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

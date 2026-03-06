@@ -1,5 +1,5 @@
 export type SwapPoolStatus = "on_going" | "canceled" | "closed" | "draft";
-export type BurnPoolStatus = "on_going" | "canceled" | "closed" | "draft" | "pending" | "upcoming" | "holding" | "end";
+export type BurnPoolStatus = "on_going" | "canceled" | "closed" | "draft" | "pending" | "upcoming" | "holding" | "ended";
 export type PoolKind = "burn_pool" | "swap_pool";
 export const POOL_KIND: Record<number, PoolKind> = {
     0: "burn_pool",

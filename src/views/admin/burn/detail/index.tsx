@@ -6,9 +6,7 @@ import RewardAmount from "./reward-amount";
 import { trimAddress } from "./pool-overview";
 import AmountAndActivity from "./amount-activities";
 import { IconGoTo } from "@/assets/react";
-import {
-    BURN_POOL_STATUS,
-} from "@/types/admin/whitelist-token";
+import { BURN_POOL_STATUS, SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
@@ -17,7 +15,7 @@ type Props = {
     address: string;
 };
 
-const BurnPoolDetail = ({ address }: Props) => {
+const AdminBurnPoolDetail = ({ address }: Props) => {
     const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
@@ -32,10 +30,10 @@ const BurnPoolDetail = ({ address }: Props) => {
                 <div className="flex items-center gap-6">
                     <h2 className="text-3xl font-semibold">{poolDetail?.pool.name}</h2>
                     <AnimateIconButton
-                        iconLetter={BURN_POOL_STATUS[safeStatus].letter}
+                        iconLetter={BURN_POOL_STATUS[safeStatus]?.letter}
                         textVariant="text-container-center"
                         text={BURN_POOL_STATUS[safeStatus]?.label}
-                        color={BURN_POOL_STATUS[safeStatus].color}
+                        color={BURN_POOL_STATUS[safeStatus]?.color}
                         hasGroupHover
                         classNames={{
                             btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
@@ -62,4 +60,4 @@ const BurnPoolDetail = ({ address }: Props) => {
     );
 };
 
-export default BurnPoolDetail;
+export default AdminBurnPoolDetail;
