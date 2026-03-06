@@ -37,7 +37,10 @@ export const whitelistUserService = {
                 params: {
                     search: params?.search,
                     chainIds: params?.chainIds,
-                    tokenAddresses: params?.tokenAddresses,
+                    // comma-separated: tokenAddresses=addr1,addr2,addr3
+                    tokenAddresses: params?.tokenAddresses?.length
+                        ? params.tokenAddresses.join(",")
+                        : undefined,
                 },
                 // axios serializes arrays as repeated params: chainIds=97&chainIds=11155111
                 paramsSerializer: { indexes: null },
