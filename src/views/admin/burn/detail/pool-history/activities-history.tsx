@@ -5,7 +5,7 @@ import { activityKind, type PoolDetailResponse } from '@/types/pool';
 import { formatAmount } from '@/utils/helpers/numbers';
 import { useQuery } from '@tanstack/react-query';
 import { formatTimestamp } from './transaction-history';
-import { trimAddress } from '../pool-overview';
+import { truncateString } from '@/utils/helpers/string';
 import CustomPagination from '@/components/common/pagination';
 import { useState } from 'react';
 
@@ -62,7 +62,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
                     {activities.map((activity) => (
                         <TableRow key={activity.id} className="text-base text-greyed">
                             <TableCell className="w-40">{formatTimestamp(activity.timestamp)}</TableCell>
-                            <TableCell className="w-40">{trimAddress(activity.actor, 4) || '—'}</TableCell>
+                            <TableCell className="w-40">{truncateString({ str: activity.actor, left: 4, right: 4 }) || '—'}</TableCell>
                             <TableCell className="text-right pr-20 w-auto">{activityKind[activity.kind]}</TableCell>
                         </TableRow>
                     ))}

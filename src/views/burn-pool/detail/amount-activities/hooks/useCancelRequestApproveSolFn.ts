@@ -1,29 +1,16 @@
 import { useCallback } from "react";
 import { toast } from "sonner";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     useAppKitConnection,
     type Provider,
 } from "@reown/appkit-adapter-solana/react";
 import {
-    createAssociatedTokenAccountInstruction,
-    getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
-    TOKEN_2022_PROGRAM_ID,
-    ASSOCIATED_TOKEN_PROGRAM_ID,
-} from "@solana/spl-token";
-import {
     getMultichainBurnProgram,
     type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
-import {
-    getFactoryPDA,
-    getRewardVaultPDA,
-    getDepositVaultPDA,
-    detectAssetType,
-    AssetTypeEnum,
-} from "@/web3/helpers";
+import { getFactoryPDA } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
 
 export interface CancelRequestApproveSolParams {
@@ -37,7 +24,7 @@ export const useCancelRequestApproveSolFn = () => {
     const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
     const cancelRequestApproveSol = useCallback(
-        async ({ poolAddress, poolDetail }: CancelRequestApproveSolParams) => {
+        async ({ poolAddress, poolDetail: _poolDetail }: CancelRequestApproveSolParams) => {
             try {
                 if (!isConnected || !address) {
                     throw new Error("Wallet not connected");
@@ -56,79 +43,21 @@ export const useCancelRequestApproveSolFn = () => {
 
                 const program = getMultichainBurnProgram(connection, anchorWallet);
 
-                // ── 1. Resolve mints ───────────────────────────────────────
-                const rewardMint = new PublicKey(poolDetail.pool.rewardToken);
-                const depositMint = new PublicKey(poolDetail.pool.tokenIn);
-
-                // ── 2. Detect token programs ───────────────────────────────
-                const rewardAssetType = await detectAssetType(connection, rewardMint);
-                const rewardTokenProgram =
-                    rewardAssetType === AssetTypeEnum.SPL2022
-                        ? TOKEN_2022_PROGRAM_ID
-                        : TOKEN_PROGRAM_ID;
-
-                const depositAssetType = await detectAssetType(connection, depositMint);
-                const depositTokenProgram =
-                    depositAssetType === AssetTypeEnum.SPL2022
-                        ? TOKEN_2022_PROGRAM_ID
-                        : TOKEN_PROGRAM_ID;
-
-                // ── 3. Derive PDAs ─────────────────────────────────────────
-                const factoryPDA = getFactoryPDA(program.programId);
-                // @ts-ignore
-                const factory = await program.account.factoryAccount.fetch(factoryPDA);
-                const treasuryPubkey = factory.treasury;
-
+                // ── 1. Derive PDAs ─────────────────────────────────────────
                 const poolPDA = new PublicKey(poolAddress);
-                const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
-                const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
+                const factoryPDA = getFactoryPDA(program.programId);
 
-                // ── 4. Owner reward ATA ────────────────────────────────────
-                const ownerRewardAta = await getAssociatedTokenAddress(
-                    rewardMint,
-                    walletPublicKey,
-                    false,
-                    rewardTokenProgram,
-                    ASSOCIATED_TOKEN_PROGRAM_ID,
-                );
-
-                const ataInfo = await connection.getAccountInfo(ownerRewardAta);
-
-                // ── 5. Build TX ────────────────────────────────────────────
+                // ── 2. Build TX ────────────────────────────────────────────
                 const tx = await program.methods
-                    .canclePool()
+                    .cancleRequestApprove()
                     .accounts({
-                        admin: walletPublicKey,
-                        factory: factoryPDA,
-                        pool: poolPDA,
                         projectOwner: walletPublicKey,
-                        treasury: treasuryPubkey,
-                        rewardMint: rewardMint,
-                        depositMint: depositMint,
-                        rewardVault: rewardVaultPDA,
-                        depositVault: depositVaultPDA,
-                        ownerRewardAta: ownerRewardAta,
-                        rewardTokenProgram: rewardTokenProgram,
-                        depositTokenProgram: depositTokenProgram,
-                        systemProgram: SystemProgram.programId,
+                        pool: poolPDA,
+                        factory: factoryPDA,
                     })
                     .transaction();
 
-                // ── 6. Prepend ATA creation if needed ─────────────────────
-                if (!ataInfo) {
-                    tx.instructions.unshift(
-                        createAssociatedTokenAccountInstruction(
-                            walletPublicKey,
-                            ownerRewardAta,
-                            walletPublicKey,
-                            rewardMint,
-                            rewardTokenProgram,
-                            ASSOCIATED_TOKEN_PROGRAM_ID,
-                        ),
-                    );
-                }
-
-                // ── 7. Sign & send ─────────────────────────────────────────
+                // ── 3. Sign & send ─────────────────────────────────────────
                 const { blockhash, lastValidBlockHeight } =
                     await connection.getLatestBlockhash();
 

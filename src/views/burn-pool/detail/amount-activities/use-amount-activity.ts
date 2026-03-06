@@ -17,6 +17,8 @@ import { useCancelBurnPoolSolFn } from "./hooks/useCancelBurnPoolSolFn";
 import { useClaimBurnSolFn } from "./hooks/useClaimBurnSolFn";
 import { useCancelRequestApproveEvmFn } from "./hooks/useCancelRequestApproveEvmFn";
 import { useCancelRequestApproveSolFn } from "./hooks/useCancelRequestApproveSolFn";
+import { useDepositRewardSolFn } from "./hooks/useDepositRewardSolFn";
+import { useDepositBurnSolFn } from "./hooks/useDepositBurnSolFn";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -37,9 +39,10 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { claimBurnSol } = useClaimBurnSolFn();
     const { cancelRequestApproveEvm } = useCancelRequestApproveEvmFn();
     const { cancelRequestApproveSol } = useCancelRequestApproveSolFn();
+    const { depositRewardSol } = useDepositRewardSolFn();
+    const { depositBurnSol } = useDepositBurnSolFn();
 
     // ── Amount-input state ─────────────────────────────────────
-    const [depositRewardInput, setDepositRewardInput] = useState("");
     const [depositRewardOpen, setDepositRewardOpen] = useState(false);
     const [depositBurnInput, setDepositBurnInput] = useState("");
     const [depositBurnOpen, setDepositBurnOpen] = useState(false);
@@ -101,6 +104,22 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
 
     const handleRequestApprove = async () => {
         if (!pool?.address) return;
+
+        const hasReward = Number(pool.currentRewardAmount ?? 0) > 0;
+        const isPastStartTime =
+            pool.timeStart && pool.timeStart !== "0"
+                ? Date.now() / 1000 > Number(pool.timeStart)
+                : false;
+
+        if (isPastStartTime) {
+            toast.warning("Pool already past start time. Please edit pool start time.");
+            return;
+        }
+        if (!hasReward) {
+            toast.warning("Pool has no reward. Please deposit reward to pool.");
+            return;
+        }
+
         if (isSolana) {
             await requestApproveSol({ poolAddress: pool.address });
         } else {
@@ -109,27 +128,34 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const handleDepositReward = async () => {
-        if (!pool || !depositRewardInput) return;
-        await depositRewardEvm({
-            poolAddress: pool.address,
-            rewardToken: pool.rewardToken,
-            amountStr: depositRewardInput,
-            decimals: pool.rewardTokenDecimals,
-        });
-        setDepositRewardInput("");
+    const handleDepositReward = async (amountStr: string) => {
+        if (!pool || !amountStr) return;
+        if (isSolana && poolDetail) {
+            await depositRewardSol({ poolAddress: pool.address, poolDetail, amountStr });
+        } else {
+            await depositRewardEvm({
+                poolAddress: pool.address,
+                rewardToken: pool.rewardToken,
+                amountStr,
+                decimals: pool.rewardTokenDecimals,
+            });
+        }
         setDepositRewardOpen(false);
         invalidatePoolQueries(pool.address);
     };
 
     const handleDepositBurn = async () => {
         if (!pool || !depositBurnInput) return;
-        await depositBurnEvm({
-            poolAddress: pool.address,
-            burnToken: pool.tokenIn,
-            amountStr: depositBurnInput,
-            decimals: pool.tokenInDecimals,
-        });
+        if (isSolana && poolDetail) {
+            await depositBurnSol({ poolAddress: pool.address, poolDetail, amountStr: depositBurnInput });
+        } else {
+            await depositBurnEvm({
+                poolAddress: pool.address,
+                burnToken: pool.tokenIn,
+                amountStr: depositBurnInput,
+                decimals: pool.tokenInDecimals,
+            });
+        }
         setDepositBurnInput("");
         setDepositBurnOpen(false);
         invalidatePoolQueries(pool.address);
@@ -169,8 +195,6 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         formattedReturnReward,
         hasClaimed,
         // deposit reward input
-        depositRewardInput,
-        setDepositRewardInput,
         depositRewardOpen,
         setDepositRewardOpen,
         // deposit burn input

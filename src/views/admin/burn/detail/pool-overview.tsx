@@ -24,12 +24,6 @@ function toCleanRatio(numerator?: string, denominator?: string): string {
     return `${num / divisor}:${den / divisor}`;
 }
 
-export function trimAddress(address?: string, head = 6, tail = 4): string {
-    if (!address) return "—";
-    if (address.length <= head + tail) return address;
-    return `${address.slice(0, head)}...${address.slice(-tail)}`;
-}
-
 const PoolOverview = ({ poolDetail }: Props) => {
     const { data: whitelistTokens } =
         useGetWhitelistTokens();

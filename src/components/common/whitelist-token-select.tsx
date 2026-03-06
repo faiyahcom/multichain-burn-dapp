@@ -8,10 +8,11 @@ import {
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
-import { trimAddress } from "@/views/swap-pool/detail/pool-overview";
+
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
+import { truncateString } from "@/utils/helpers/string";
 
 type Props = {
     value?: string;
@@ -113,8 +114,8 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
                                 </div>
                             </DropdownMenuItem>
                         )}
-                        {whitelistTokens?.whitelistTokens.length ? (
-                            whitelistTokens.whitelistTokens.map((token) => {
+                        {whitelistTokens?.whitelistTokens.length
+                            ? whitelistTokens.whitelistTokens.map((token) => {
                                 const isSelected = value === token.address;
                                 const isDisabled = disabledAddress === token.address;
                                 return (
@@ -142,20 +143,18 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
                                                     {token.symbol}
                                                 </span>
                                                 <span className="text-tiny font-light text-secondary-text/80">
-                                                    {trimAddress(token.address)}
+                                                    {truncateString({ str: token.address })}
                                                 </span>
                                             </div>
                                         </div>
                                     </DropdownMenuItem>
                                 );
                             })
-                        ) : (
-                            !nativeToken && (
+                            : !nativeToken && (
                                 <div className="flex items-center justify-center py-4">
                                     No tokens available
                                 </div>
-                            )
-                        )}
+                            )}
                     </div>
                 )}
             </DropdownMenuContent>
