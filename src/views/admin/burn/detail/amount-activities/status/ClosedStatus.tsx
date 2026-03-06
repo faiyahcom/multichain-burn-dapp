@@ -3,6 +3,10 @@ import { ActionBtn, StatRow } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
 import TransferTokensDialog from "../TransferTokensDialog";
 import { formatAmount } from "@/utils/helpers/numbers";
+import { useBatchTransferSolFn } from "../hooks/useBatchTransferSolFn";
+import { useBatchTransferEvmFn } from "../hooks/useBatchTransferEvmFn";
+import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
+import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -13,14 +17,44 @@ const ClosedStatus = ({ poolDetail }: Props) => {
         pool,
         formattedReward,
         formattedBurned,
-        handleClaim,
         transferDialogOpen,
         setTransferDialogOpen,
+        invalidatePoolQueries,
     } = useAmountActivity(poolDetail);
 
-    const formattedAvailable = pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
-        ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
-        : undefined;
+    const { batchTransferSol } = useBatchTransferSolFn();
+    const { batchTransferEvm } = useBatchTransferEvmFn();
+    const isSolana = pool?.chainId === SOLANA_BACKEND_CHAIN_ID;
+
+    const formattedAvailable =
+        pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
+            ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
+            : undefined;
+
+    const formattedDepositAvailable =
+        poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
+            ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
+            : undefined;
+
+    const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
+        if (!pool) return;
+        if (isSolana) {
+            await batchTransferSol({
+                poolAddress: pool.address,
+                poolDetail: poolDetail!,
+                mode,
+                recipients,
+            });
+        } else {
+            await batchTransferEvm({
+                poolAddress: pool.address,
+                poolDetail: poolDetail!,
+                mode,
+                recipients,
+            });
+        }
+        invalidatePoolQueries(pool.address);
+    };
 
     return (
         <>
@@ -44,15 +78,16 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 open={transferDialogOpen}
                 onOpenChange={setTransferDialogOpen}
                 chainId={pool?.chainId ?? ""}
+                poolKind={pool?.kind}
                 poolInfo={{
-                    tokenSymbol: pool?.tokenInSymbol,
+                    tokenInSymbol: pool?.tokenInSymbol,
                     rewardTokenSymbol: pool?.rewardTokenSymbol,
                     currentRewardAmount: formattedAvailable,
+                    currentDepositAmount: formattedDepositAvailable,
                     rewardTokenDecimals: pool?.rewardTokenDecimals,
+                    tokenInDecimals: pool?.tokenInDecimals,
                 }}
-                onTransfer={async (userAddress) => {
-                    await handleClaim(userAddress);
-                }}
+                onTransfer={handleTransfer}
             />
         </>
     );

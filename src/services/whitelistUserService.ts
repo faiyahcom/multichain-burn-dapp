@@ -36,10 +36,10 @@ export const whitelistUserService = {
             {
                 params: {
                     search: params?.search,
-                    chainId: params?.chainIds,
-                    tokenAddress: params?.tokenAddresses,
+                    chainIds: params?.chainIds,
+                    tokenAddresses: params?.tokenAddresses,
                 },
-                // axios serializes arrays as repeated params: chainId=97&chainId=11155111
+                // axios serializes arrays as repeated params: chainIds=97&chainIds=11155111
                 paramsSerializer: { indexes: null },
             },
         );

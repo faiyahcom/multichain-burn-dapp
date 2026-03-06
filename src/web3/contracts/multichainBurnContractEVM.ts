@@ -27,16 +27,11 @@ export const getContractSwapRouter = (signer: Signer) => {
 };
 
 export const getContractBurnFactory = (signer: Signer) => {
-    const rawAddress =
-        MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS;
-
+    const rawAddress = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS;
     const normalized = ethers.getAddress(rawAddress.toLowerCase());
-
-    console.log("Normalized factory:", normalized);
-
     return new ethers.Contract(
         normalized,
-        MULTICHAIN_BURN_ABI_BURN_FACTORY,
+        (MULTICHAIN_BURN_ABI_BURN_FACTORY as any).abi ?? MULTICHAIN_BURN_ABI_BURN_FACTORY,
         signer,
     );
 };

@@ -238,5 +238,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         handleAdminApprove,
         handleAdminReject,
         handleAdminClose,
+        // util
+        invalidatePoolQueries,
     };
 };
