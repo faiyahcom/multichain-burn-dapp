@@ -27,6 +27,7 @@ export const useAdminWhitelistTokenSearchFilterStore =
         filter: {
           ...state.filter,
           ...filter,
+          page: filter.page ?? 1,
         },
       })),
   }));

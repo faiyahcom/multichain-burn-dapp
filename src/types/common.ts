@@ -4,19 +4,19 @@ import type { FunctionComponent, SVGProps } from "react";
 export const sortOrders = ["asc", "desc"] as const;
 export type SortOrder = (typeof sortOrders)[number];
 
-export const sortBys = ["none", "volume", "tvl", "createdAt"] as const;
+export const sortBys = ["none", "volume", "tvl", "timestamp"] as const;
 export type SortBy = (typeof sortBys)[number];
 export const sortBysLabels: Record<SortBy, string> = {
   none: "None",
   volume: "Volume (24h)",
   tvl: "TVL",
-  createdAt: "Created At",
+  timestamp: "Created At",
 };
 export const sortBysShortLabels: Record<SortBy, string> = {
   none: "None",
   volume: "Volume",
   tvl: "TVL",
-  createdAt: "Created At",
+  timestamp: "Created At",
 };
 
 export const listLayouts = ["card", "list"] as const;
@@ -52,6 +52,11 @@ export const booleanString = [
   "disable",
 ] as const;
 export type BooleanString = (typeof booleanString)[number];
+
+export type PaginationRequest = {
+  page: number;
+  limit: number;
+};
 
 export type PaginationResponse = {
   page: number;

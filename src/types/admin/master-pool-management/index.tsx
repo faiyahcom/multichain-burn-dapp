@@ -1,4 +1,12 @@
 // 0 - burn pool
+
+import type {
+  PaginationRequest,
+  PaginationResponse,
+  SortBy,
+  SortOrder,
+} from "@/types/common";
+
 // 1 - swap pool
 export const poolTypes = [0, 1] as const;
 export type PoolType = (typeof poolTypes)[number];
@@ -58,4 +66,53 @@ export const burnPoolStatusColors: Record<BurnPoolStatus, string> = {
   pending: "#FF8E97",
   holding: "#FFB08E",
   upcoming: "#FFE798",
+};
+
+export const getPoolStatusColor = (status: AllPoolStatus) => {
+  return burnPoolStatusColors[status as BurnPoolStatus] ?? "#7989ba";
+};
+export const getPoolStatusLabel = (status: AllPoolStatus) => {
+  if (status === "draft") return "Draft";
+  return burnPoolStatusLabels[status as BurnPoolStatus] ?? "N/A";
+};
+
+export type AllPoolStatus = BurnPoolStatus | SwapPoolStatus | "draft";
+
+export type PoolItemType = {
+  address: string;
+  chainId: string;
+  name: string;
+  status: AllPoolStatus;
+  volume: string; // string number
+  tvl: string; // string number
+  budget: string; // string number
+  tokenIn: string;
+  tokenInSymbol: string;
+  tokenInDecimals: number;
+  tokenOut: string;
+  tokenOutSymbol: string;
+  tokenOutDecimals: number;
+  kind: PoolType;
+  timestamp: string;
+  tokenInSymbolCustom: string | null;
+  tokenOutSymbolCustom: string | null;
+  tokenInImageUri: string | null;
+  tokenOutImageUri: string | null;
+};
+
+export type PoolListRequest = PaginationRequest & {
+  excludeStatuses?: string; // comma separated
+  includeStatuses?: string; // comma separated
+  chainIds?: string; // comma separated
+  kind?: string;
+  search?: string;
+  sortBy?: SortBy; // default to timestamp
+  sortDirection?: SortOrder; // default to desc
+  tokenIn?: string;
+  tokenReward?: string;
+  taker?: string;
+};
+
+export type PoolListResponse = PaginationResponse & {
+  pools: PoolItemType[];
 };

@@ -8,6 +8,7 @@ import {
 import { create } from "zustand";
 
 type MasterPoolManagementSearchFilterType = {
+  page: number;
   type?: PoolTypeOptionValue;
   status?: (SwapPoolStatus | BurnPoolStatus)[];
   network?: string[];
@@ -22,11 +23,14 @@ type MasterPoolManagementSearchFilterState = {
 export const useMasterPoolManagementSearchFilterStore =
   create<MasterPoolManagementSearchFilterState>()((set) => ({
     filter: {
+      page: 1,
       type: "all",
       status: [...burnPoolStatuses],
       network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
     },
     setFilter: (filter) =>
-      set((state) => ({ filter: { ...state.filter, ...filter } })),
+      set((state) => ({
+        filter: { ...state.filter, ...filter, page: filter.page ?? 1 },
+      })),
   }));

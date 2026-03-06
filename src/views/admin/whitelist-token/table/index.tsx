@@ -5,10 +5,11 @@ import {
   IconTrashCan,
 } from "@/assets/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import ConfirmDialog from "@/components/common/confirm-dialog";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
-import { Spinner } from "@/components/ui/spinner";
+import TableSpinner from "@/components/common/table-spinner";
 import {
   Table,
   TableBody,
@@ -17,7 +18,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { networkIdToChainId } from "@/config/networks";
+import { WRONG_NETWORK_ERROR_MESSAGE } from "@/config/constant";
+import { evmAppkitNetworks, networkIdToChainId } from "@/config/networks";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import {
   whitelistService,
@@ -31,19 +33,16 @@ import {
   tokenStatusLabels,
   tokenStatusLetters,
 } from "@/types/admin/whitelist-token";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import StatusSwitch from "./status-switch";
-import AdminWhitelistTokenDialogDetail from "../dialog/detail";
 import { useState } from "react";
 import { toast } from "sonner";
-import { getErrorMessage } from "@/utils/helpers/error-message";
-import { useAppKitAccount } from "@reown/appkit/react";
-import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
+import AdminWhitelistTokenDialogDetail from "../dialog/detail";
+import StatusSwitch from "./status-switch";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
-import ConfirmDialog from "@/components/common/confirm-dialog";
-import { evmAppkitNetworks } from "@/config/networks";
-import { WRONG_NETWORK_ERROR_MESSAGE } from "@/config/constant";
+import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
@@ -80,9 +79,9 @@ const AdminWhitelistTokenTable = () => {
         chainIds:
           filter.network.length > 0
             ? filter.network
-              .map((network) => networkIdToChainId(network))
-              .filter((chainId) => chainId)
-              .join(",")
+                .map((network) => networkIdToChainId(network))
+                .filter((chainId) => chainId)
+                .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,
@@ -189,15 +188,10 @@ const AdminWhitelistTokenTable = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isListTokensPending && (
-              <TableRow>
-                <TableCell colSpan={columns.length}>
-                  <div className="flex items-center justify-center py-6">
-                    <Spinner />
-                  </div>
-                </TableCell>
-              </TableRow>
-            )}
+            <TableSpinner
+              isLoading={isListTokensPending}
+              colSpan={columns.length}
+            />
             {listTokensData?.whitelistTokens?.map((item, index) => {
               const status = booleanToTokenStatus(item.enable);
 

@@ -95,7 +95,7 @@ const AdminMasterPoolManagementSearch = () => {
           selected={filter.type}
           onChange={handleSelectType}
           classNames={{
-            content: "w-55.5",
+            content: "w-55.5 capitalize",
             btn: "min-w-34",
           }}
         />
