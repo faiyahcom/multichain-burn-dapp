@@ -48,6 +48,10 @@ const MultipleSelect: React.FC<Props> = ({
     (value) => options?.find((option) => option.value === value)?.label,
   ).filter(Boolean);
 
+  // "All Tokens" label — use placeholderMultiple if provided, else just placeholder
+  // (avoids "All All Tokens" when placeholder already says "All Tokens")
+  const allLabel = placeholderMultiple ? `All ${placeholderMultiple}` : placeholder;
+
   const handleToggleAllCheck = () => {
     if (selected?.length === options?.length) {
       onChange?.([]);
@@ -94,18 +98,13 @@ const MultipleSelect: React.FC<Props> = ({
                     ?.filter((icon) => icon !== undefined)}
                 />
                 {isAllSelected && (
-                  <span>
-                    All{" "}
-                    {placeholderMultiple
-                      ? placeholderMultiple
-                      : `${placeholder}s`}
-                  </span>
+                  <span>{allLabel}</span>
                 )}
               </div>
             ) : (
               <span className="truncate">
                 {isAllSelected
-                  ? `All ${placeholderMultiple ? placeholderMultiple : `${placeholder}s`}`
+                  ? allLabel
                   : options
                       ?.filter((option) => selected?.includes(option.value))
                       ?.map((option) => option.label)
@@ -135,7 +134,7 @@ const MultipleSelect: React.FC<Props> = ({
         */}
         <div className="max-h-[calc(var(--radix-popover-content-available-height)-var(--spacing)*21)] space-y-1 overflow-y-auto">
           <OptionItem
-            label={`All ${placeholder}`}
+            label={allLabel}
             value=""
             checked={isAllSelected}
             toggleCheck={handleToggleAllCheck}

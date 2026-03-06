@@ -48,9 +48,16 @@ export const useBatchTransferEvmFn = () => {
                 }
 
                 const tos: string[] = validRecipients.map((r) => r.address);
-                const amounts: bigint[] = validRecipients.map((r) =>
-                    ethers.parseUnits(r.amountStr, decimals),
-                );
+                const tokenDecimals = decimals ?? 18;
+                const amounts: bigint[] = validRecipients.map((r) => {
+                    // Truncate input to the token's decimal precision to
+                    // avoid ethers "too many decimals" RangeError.
+                    const [whole, frac = ""] = r.amountStr.split(".");
+                    const truncated = frac.length > tokenDecimals
+                        ? `${whole}.${frac.slice(0, tokenDecimals)}`
+                        : r.amountStr;
+                    return ethers.parseUnits(truncated, tokenDecimals);
+                });
 
                 let receipt: ethers.TransactionReceipt | null;
 
