@@ -4,6 +4,7 @@ import TokenImage from "@/components/common/token-image";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
+import { Link } from "@tanstack/react-router";
 
 interface Props {
   data?: PairItemType[];
@@ -36,6 +37,9 @@ const CardItem: React.FC<PairItemType> = ({
   tokenOutSymbolCustom,
   volume,
   tvl,
+  chainId,
+  tokenIn,
+  tokenOut,
 }) => {
   return (
     <div
@@ -90,21 +94,18 @@ const CardItem: React.FC<PairItemType> = ({
         />
       </div>
 
-      <AnimateIconButton
-        variant="letter-icon"
-        iconLetter="V"
-        color="#6E37FF"
-        text="View Details"
-        textVariant="text-container-center"
-        btnProps={{
-          onClick: () => {
-            // TODO: redirect to pair detail page
-          },
-        }}
-        classNames={{
-          btn: "w-full rounded-t-none bg-primary-foreground after:rounded-t-none hover:border-active rounded-b-sm after:rounded-b-sm after:text-primary-foreground",
-        }}
-      />
+      <Link to={`/pair-detail/${chainId}/${tokenIn}/${tokenOut}`}>
+        <AnimateIconButton
+          variant="letter-icon"
+          iconLetter="V"
+          color="#6E37FF"
+          text="View Details"
+          textVariant="text-container-center"
+          classNames={{
+            btn: "w-full rounded-t-none bg-primary-foreground after:rounded-t-none hover:border-active rounded-b-sm after:rounded-b-sm after:text-primary-foreground",
+          }}
+        />
+      </Link>
     </div>
   );
 };
