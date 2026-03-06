@@ -1,5 +1,18 @@
-export type SwapPoolStatus = "on_going" | "canceled" | "closed" | "draft";
-export type BurnPoolStatus = "on_going" | "canceled" | "closed" | "draft" | "pending" | "upcoming" | "holding" | "ended";
+export type SwapPoolStatus =
+    | "on_going"
+    | "canceled"
+    | "closed"
+    | "draft"
+    | "ended";
+export type BurnPoolStatus =
+    | "on_going"
+    | "canceled"
+    | "closed"
+    | "draft"
+    | "pending"
+    | "upcoming"
+    | "holding"
+    | "ended";
 export type PoolKind = "burn_pool" | "swap_pool";
 export const POOL_KIND: Record<number, PoolKind> = {
     0: "burn_pool",
@@ -71,7 +84,7 @@ export const txnKind = {
     1: "Taker Deposit",
     2: "Refund to Whitelist User",
     3: "Maker Deposit Reward",
-    4: "Taker Claim Reward"
+    4: "Taker Claim Reward",
 } as const;
 
 export const activityKind = {
@@ -92,8 +105,8 @@ export const activityKind = {
 
     // User actions
     30: "Taker Deposit", //taker deposit to pool
-    31: "Taker Claim" //taker claim reward from burn pool
-} as const
+    31: "Taker Claim", //taker claim reward from burn pool
+} as const;
 
 export interface PoolActivitiesResponse {
     page: number;
@@ -104,7 +117,7 @@ export interface PoolActivitiesResponse {
         log_ix: number;
         timestamp: string;
         actor: string;
-        kind: typeof activityKind[keyof typeof activityKind];
+        kind: (typeof activityKind)[keyof typeof activityKind];
         poolAddress: string;
     }[];
 }

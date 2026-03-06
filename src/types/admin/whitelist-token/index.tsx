@@ -42,6 +42,11 @@ export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
     color: "#C2C2C2",
     letter: "D",
   },
+  ended: {
+    label: "End",
+    color: "#A6B7FF",
+    letter: "E",
+  },
 };
 
 export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
@@ -61,10 +66,5 @@ export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
     label: "Holding",
     color: "#FFB08E",
     letter: "H",
-  },
-  ended: {
-    label: "End",
-    color: "#A6B7FF",
-    letter: "E",
   },
 };
