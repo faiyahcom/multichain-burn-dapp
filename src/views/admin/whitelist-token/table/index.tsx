@@ -200,7 +200,7 @@ const AdminWhitelistTokenTable = () => {
                 <TableRow key={index}>
                   <TableCell>
                     <div className="flex items-center gap-1.75 pl-[15%]">
-                      <TokenImage src={item.imageUri} alt={item.name} />
+                      <TokenImage src={item.imageUri} alt={item.customName || item.name || "N/A"} />
                       <div className="text-left">
                         <p className="text-base">
                           {item.customName || item.name || "N/A"}

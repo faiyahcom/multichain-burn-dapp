@@ -81,12 +81,12 @@ const CardItem: React.FC<PairItemType> = ({
         <CardInfoRow
           title="Volume"
           tooltipContent="The total value of burn tokens deposited by taker into Swap Pools and Burn Pools of the pair"
-          value={Number(volume)}
+          value={Number(volume) || 0}
         />
         <CardInfoRow
           title="TVL"
           tooltipContent="The total amount of reward tokens deposited by all makers when creating Swap Pools and Burn Pools within the same pair."
-          value={Number(tvl)}
+          value={Number(tvl) || 0}
         />
       </div>
 
@@ -96,6 +96,11 @@ const CardItem: React.FC<PairItemType> = ({
         color="#6E37FF"
         text="View Details"
         textVariant="text-container-center"
+        btnProps={{
+          onClick: () => {
+            // TODO: redirect to pair detail page
+          },
+        }}
         classNames={{
           btn: "w-full rounded-t-none bg-primary-foreground after:rounded-t-none hover:border-active rounded-b-sm after:rounded-b-sm after:text-primary-foreground",
         }}
