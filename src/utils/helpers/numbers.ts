@@ -12,6 +12,6 @@ export function formatAmount(amount: string, decimals: number): string {
   if (isNaN(amt)) return amount;
   return (amt / Math.pow(10, decimals)).toLocaleString(undefined, {
     minimumFractionDigits: 0,
-    maximumFractionDigits: decimals,
+    maximumFractionDigits: Math.min(decimals, 4),
   });
 }

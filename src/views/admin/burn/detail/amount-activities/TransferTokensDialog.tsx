@@ -1,4 +1,4 @@
-import { useMemo, useState, useCallback } from "react";
+import { useMemo, useState, useCallback, useEffect } from "react";
 import { useGetWhitelistUsers } from "@/services/queries/queries";
 import { chainIdToNetworkConfig, SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import type { WhitelistUser } from "@/services/whitelistUserService";
@@ -119,6 +119,27 @@ const TransferTokensDialog = ({
     const [selectedMap, setSelectedMap] = useState<Map<string, string>>(new Map());
     const [isTransferring, setIsTransferring] = useState(false);
 
+    // ── Optimistic local balances ─────────────────────────────────────────────
+    // Seeded from props; immediately decremented after each successful transfer
+    // so the UI reflects the new balance without waiting for the backend indexer.
+    const [localRewardAmount, setLocalRewardAmount] = useState<string | undefined>(poolInfo.currentRewardAmount);
+    const [localDepositAmount, setLocalDepositAmount] = useState<string | undefined>(poolInfo.currentDepositAmount);
+
+    // Sync from props whenever the server data updates
+    useEffect(() => {
+        setLocalRewardAmount(poolInfo.currentRewardAmount);
+    }, [poolInfo.currentRewardAmount]);
+    useEffect(() => {
+        setLocalDepositAmount(poolInfo.currentDepositAmount);
+    }, [poolInfo.currentDepositAmount]);
+    // Reset local state when dialog closes
+    useEffect(() => {
+        if (!open) {
+            setLocalRewardAmount(poolInfo.currentRewardAmount);
+            setLocalDepositAmount(poolInfo.currentDepositAmount);
+        }
+    }, [open]);
+
     const chainIdNum = Number(chainId);
     const networkConfig = chainIdToNetworkConfig(chainId);
     const isSolana = chainId === SOLANA_BACKEND_CHAIN_ID;
@@ -144,10 +165,10 @@ const TransferTokensDialog = ({
         ? (poolInfo.rewardTokenSymbol ?? "")
         : (poolInfo.tokenInSymbol ?? "");
 
-    // Available amount switches with mode
+    // Available amount switches with mode — use optimistic local state
     const displayAvailableAmount = mode === "reward"
-        ? (poolInfo.currentRewardAmount ?? "—")
-        : (poolInfo.currentDepositAmount ?? "—");
+        ? (localRewardAmount ?? "—")
+        : (localDepositAmount ?? "—");
     const displayAvailableSymbol = mode === "reward"
         ? (poolInfo.rewardTokenSymbol ?? "")
         : (poolInfo.tokenInSymbol ?? "");
@@ -208,10 +229,31 @@ const TransferTokensDialog = ({
             return;
         }
 
+        // Compute total being sent so we can optimistically update the balance
+        const totalSent = selectedEntries.reduce(
+            (sum, [, amt]) => sum + (parseFloat(amt) || 0),
+            0,
+        );
+
         setIsTransferring(true);
         try {
             await onTransfer(recipients, mode);
-            handleClose();
+            // ── Optimistic balance update ──────────────────────────────────
+            // Immediately subtract the sent amount from the displayed balance.
+            // The backend indexer may lag; this keeps the UI accurate right away.
+            const subtractFrom = (current: string | undefined) => {
+                const parsed = parseFloat((current ?? "0").replace(/,/g, ""));
+                if (isNaN(parsed)) return current;
+                const updated = Math.max(0, parsed - totalSent);
+                return updated.toFixed(4);
+            };
+            if (mode === "reward") {
+                setLocalRewardAmount(subtractFrom(localRewardAmount));
+            } else {
+                setLocalDepositAmount(subtractFrom(localDepositAmount));
+            }
+            setSelectedMap(new Map());
+            setSearch("");
         } finally {
             setIsTransferring(false);
         }
