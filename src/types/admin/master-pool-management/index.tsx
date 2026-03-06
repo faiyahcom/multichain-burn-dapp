@@ -98,6 +98,9 @@ export type PoolItemType = {
   tokenOutSymbolCustom: string | null;
   tokenInImageUri: string | null;
   tokenOutImageUri: string | null;
+  owner: string;
+  timeStart: string; // timestamp seconds, if none then it is "0"
+  timeEnd: string; // timestamp seconds, if none then it is "0"
 };
 
 export type PoolListRequest = PaginationRequest & {

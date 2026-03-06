@@ -22,8 +22,12 @@ import {
   type PoolType,
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
-import { truncateString } from "@/utils/helpers/string";
+import {
+  formatTimestampSecondsToDate,
+  truncateString,
+} from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "@tanstack/react-router";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
@@ -47,7 +51,6 @@ const AdminMasterPoolManagementTable = () => {
   });
 
   const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Status"];
-
   return (
     <div className="space-y-10 pb-10 pl-14">
       <Table>
@@ -60,15 +63,25 @@ const AdminMasterPoolManagementTable = () => {
         </TableHeader>
         <TableBody>
           <TableSpinner isLoading={isPendingPools} colSpan={columns.length} />
-
           {pools?.pools?.map((item, index) => {
+            const timeStart = formatTimestampSecondsToDate({
+              timestamp: item.timeStart,
+              notFound: "",
+            });
+            const timeEnd = formatTimestampSecondsToDate({
+              timestamp: item.timeEnd,
+              notFound: "",
+            });
             return (
               <TableRow key={index}>
                 <TableCell className="pl-11.25 text-left">
-                  {/* TODO: add link format /admin/burn/detail/<adddress> */}
-                  <p className="max-w-full truncate" title={item.name}>
+                  <Link
+                    to={`/admin/${item.kind === 0 ? "burn" : "swap"}/detail/${item.address}`}
+                    className="block max-w-full truncate"
+                    title={item.name}
+                  >
                     {item.name}
-                  </p>
+                  </Link>
                   <CopyableText
                     content={item.address}
                     displayText={truncateString({
@@ -82,8 +95,21 @@ const AdminMasterPoolManagementTable = () => {
                 <TableCell>
                   {poolTypeLabels[Number(item.kind) as PoolType]}
                 </TableCell>
-                <TableCell>{/* Creator */}</TableCell>
-                <TableCell>{/* Start Time - End Time */}</TableCell>
+                <TableCell>
+                  <CopyableText
+                    content={item.owner}
+                    displayText={truncateString({
+                      str: item.owner,
+                    })}
+                  />
+                </TableCell>
+                <TableCell>
+                  {timeStart && timeEnd && (
+                    <>
+                      {timeStart} - {timeEnd}
+                    </>
+                  )}
+                </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
                 </TableCell>
