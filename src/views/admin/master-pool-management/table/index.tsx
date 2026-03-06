@@ -64,7 +64,7 @@ const AdminMasterPoolManagementTable = () => {
         </TableHeader>
         <TableBody>
           <TableSpinner isLoading={isPendingPools} colSpan={columns.length} />
-          {pools?.pools?.map((item, index) => {
+          {pools?.pools?.map((item) => {
             const timeStart = formatTimestampSecondsToDate({
               timestamp: item.timeStart,
               notFound: "",
