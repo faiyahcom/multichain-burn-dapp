@@ -27,6 +27,12 @@ export const poolTypeOptions = poolTypeOptionValues.map((value) => {
     value,
   };
 });
+export const poolTypeShortenOptions = poolTypes.map((type) => {
+  return {
+    label: poolTypeLabels[type],
+    value: type.toString(),
+  };
+});
 
 export const swapPoolStatuses = [
   "on_going",

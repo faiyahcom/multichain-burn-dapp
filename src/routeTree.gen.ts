@@ -26,6 +26,7 @@ import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whi
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
+import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
@@ -117,6 +118,12 @@ const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
   path: '/burn/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PairDetailChainIdTokenInTokenOutRoute =
+  PairDetailChainIdTokenInTokenOutRouteImport.update({
+    id: '/pair-detail/$chainId/$tokenIn/$tokenOut',
+    path: '/pair-detail/$chainId/$tokenIn/$tokenOut',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminBurnDetailAddressRoute = AdminBurnDetailAddressRouteImport.update({
   id: '/admin/burn/detail/$address',
   path: '/admin/burn/detail/$address',
@@ -142,6 +149,7 @@ export interface FileRoutesByFullPath {
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
+  '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -162,6 +170,7 @@ export interface FileRoutesByTo {
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
+  '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -183,6 +192,7 @@ export interface FileRoutesById {
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
+  '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -205,6 +215,7 @@ export interface FileRouteTypes {
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
     | '/admin/burn/detail/$address'
+    | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -225,6 +236,7 @@ export interface FileRouteTypes {
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
     | '/admin/burn/detail/$address'
+    | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   id:
     | '__root__'
     | '/'
@@ -245,6 +257,7 @@ export interface FileRouteTypes {
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
     | '/admin/burn/detail/$address'
+    | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -266,6 +279,7 @@ export interface RootRouteChildren {
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
+  PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -389,6 +403,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BurnDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pair-detail/$chainId/$tokenIn/$tokenOut': {
+      id: '/pair-detail/$chainId/$tokenIn/$tokenOut'
+      path: '/pair-detail/$chainId/$tokenIn/$tokenOut'
+      fullPath: '/pair-detail/$chainId/$tokenIn/$tokenOut'
+      preLoaderRoute: typeof PairDetailChainIdTokenInTokenOutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/burn/detail/$address': {
       id: '/admin/burn/detail/$address'
       path: '/admin/burn/detail/$address'
@@ -418,6 +439,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
+  PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

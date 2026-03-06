@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { PairItemType } from "@/types/pair";
+import { Link } from "@tanstack/react-router";
 
 interface Props {
   data?: PairItemType[];
@@ -84,7 +85,12 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                   <NetworkDisplay chainId={item.chainId} />
                 </TableCell>
                 <TableCell>
-                  <ArrowIcon direction="right" />
+                  <Link
+                    to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
+                    className="block h-full w-full"
+                  >
+                    <ArrowIcon direction="right" />
+                  </Link>
                 </TableCell>
               </TableRow>
             );
