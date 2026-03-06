@@ -33,7 +33,7 @@ const InfoTooltip: React.FC<Props> = ({
         sideOffset={sideOffset}
         side={side}
       >
-        <div className="rounded-5px bg-primary-foreground pt-3.25 pr-2.75 pb-5.5 pl-2.25">
+        <div className="rounded-5px bg-primary-foreground py-3.25 pr-2.75 pl-2.25 min-h-20.25">
           <p className="text-15px font-normal text-foreground">{content}</p>
         </div>
       </TooltipContent>

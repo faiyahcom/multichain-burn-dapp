@@ -25,6 +25,7 @@ interface Props {
   setSortBy?: (sortBy: SortBy) => void;
   setSortOrder?: (sortOrder: SortOrder) => void;
   placeholder?: string;
+  defaultSortBy?: SortBy; // if set then it will be selected by default instead of none
 }
 
 const SortSelect: React.FC<Props> = ({
@@ -34,28 +35,23 @@ const SortSelect: React.FC<Props> = ({
   setSortBy,
   setSortOrder,
   placeholder = "Sort by",
+  defaultSortBy,
 }) => {
   const isActive = sortBy !== undefined && sortBy !== "none";
 
-  // Cycle through No sort (none) => Sort desc => Sort asc => No sort
   const handleToggleSort = (inputSortBy: SortBy) => {
     if (inputSortBy === "none") {
       return;
     }
-    if (sortBy === "none") {
+
+    const fallbackSortBy = defaultSortBy ?? "none";
+    if (sortBy !== inputSortBy) {
       setSortBy?.(inputSortBy);
       setSortOrder?.("desc");
-      return;
-    }
-    if (sortBy === inputSortBy) {
-      if (sortOrder === "desc") {
-        setSortOrder?.("asc");
-      } else {
-        setSortBy?.("none");
-        setSortOrder?.("desc");
-      }
+    } else if (sortOrder === "desc") {
+      setSortOrder?.("asc");
     } else {
-      setSortBy?.(inputSortBy);
+      setSortBy?.(fallbackSortBy);
       setSortOrder?.("desc");
     }
   };
