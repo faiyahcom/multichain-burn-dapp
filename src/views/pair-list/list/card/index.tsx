@@ -1,99 +1,25 @@
+import AnimateIconButton from "@/components/common/animate-icon-button";
 import InfoTooltip from "@/components/common/info-tooltip";
-import LetterIcon from "@/components/common/letter-icon";
-import NetworkImgIcon from "@/components/common/network-img-icon";
+import TokenImage from "@/components/common/token-image";
+import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
+import type { PairItemType } from "@/types/pair";
 
-// TODO: might need to change the type
-type PairListListCardLayoutItem = {
-  id: string;
-  pairName: string;
-  volume: number;
-  tvl: number;
-  img: string;
-  pairImgs?: string[];
-};
+interface Props {
+  data?: PairItemType[];
+  isLoading?: boolean;
+}
 
-// TODO: replace with real data
-const demoData: PairListListCardLayoutItem[] = [
-  {
-    id: "1",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/ethereum.png", "/network/usdt.svg"],
-  },
-  {
-    id: "2",
-    pairName: "BTC/USDT",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/binance.png", "/network/usdt.svg"],
-  },
-  {
-    id: "3",
-    pairName: "SOL/USDC",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/solana.png", "/network/usdc.png"],
-  },
-  {
-    id: "4",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/ethereum.png", "/network/usdt.svg"],
-  },
-  {
-    id: "5",
-    pairName: "BTC/USDT",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/binance.png", "/network/usdt.svg"],
-  },
-  {
-    id: "6",
-    pairName: "SOL/USDC",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/solana.png", "/network/usdc.png"],
-  },
-  {
-    id: "7",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/ethereum.png", "/network/usdt.svg"],
-  },
-  {
-    id: "8",
-    pairName: "BTC/USDT",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/binance.png", "/network/usdt.svg"],
-  },
-  {
-    id: "9",
-    pairName: "SOL/USDC",
-    volume: 1000,
-    tvl: 1000,
-    img: "/demo/sample.jpg",
-    pairImgs: ["/network/solana.png", "/network/usdc.png"],
-  },
-];
-
-const PairListListCardLayout = () => {
+const PairListListCardLayout: React.FC<Props> = ({ data, isLoading }) => {
   return (
     <div className="w-full pt-15.75 pr-7.25 pb-7 pl-22.5">
+      {isLoading && (
+        <div className="flex w-full items-center justify-center py-5">
+          <Spinner />
+        </div>
+      )}
       <div className="grid w-full grid-cols-1 gap-x-8.5 gap-y-10.5 md:grid-cols-2 xl:grid-cols-3">
-        {demoData.map((item, index) => (
+        {data?.map((item, index) => (
           <CardItem key={index} {...item} />
         ))}
       </div>
@@ -101,12 +27,15 @@ const PairListListCardLayout = () => {
   );
 };
 
-const CardItem: React.FC<PairListListCardLayoutItem> = ({
-  pairName,
+const CardItem: React.FC<PairItemType> = ({
+  tokenInImageUri,
+  tokenOutImageUri,
+  tokenInSymbol,
+  tokenOutSymbol,
+  tokenInSymbolCustom,
+  tokenOutSymbolCustom,
   volume,
   tvl,
-  img,
-  pairImgs,
 }) => {
   return (
     <div
@@ -117,23 +46,32 @@ const CardItem: React.FC<PairListListCardLayoutItem> = ({
     >
       <div className="relative aspect-315/243 w-full">
         <img
-          src={img}
+          src={"/demo/pair-placeholder-img.png"}
           alt="Pair"
           className="h-full w-full rounded-t-14px object-cover"
         />
         <div className="absolute right-0 bottom-2 left-0">
           <div className="z-10 flex h-full w-full items-center gap-2.75 px-4.25 pt-0.75 pb-1 **:z-10">
             <div className="flex items-center gap-px">
-              {pairImgs?.map((img, index) => (
-                <NetworkImgIcon
-                  key={index}
-                  src={img}
-                  alt="Pair"
-                  className="size-5.75"
-                />
-              ))}
+              <TokenImage
+                src={tokenInImageUri}
+                alt={tokenInSymbol}
+                classNames={{
+                  common: "size-5.75",
+                }}
+              />
+              <TokenImage
+                src={tokenOutImageUri}
+                alt={tokenOutSymbol}
+                classNames={{
+                  common: "size-5.75",
+                }}
+              />
             </div>
-            <p className="text-xl font-semibold">{pairName}</p>
+            <p className="text-xl font-semibold">
+              {tokenInSymbolCustom ?? tokenInSymbol}/
+              {tokenOutSymbolCustom ?? tokenOutSymbol}
+            </p>
           </div>
           <div className="absolute inset-0 z-0 h-full w-full bg-primary-foreground/50 backdrop-blur-[15px]" />
         </div>
@@ -143,26 +81,30 @@ const CardItem: React.FC<PairListListCardLayoutItem> = ({
         <CardInfoRow
           title="Volume"
           tooltipContent="The total value of burn tokens deposited by taker into Swap Pools and Burn Pools of the pair"
-          value={volume}
+          value={Number(volume) || 0}
         />
         <CardInfoRow
           title="TVL"
           tooltipContent="The total amount of reward tokens deposited by all makers when creating Swap Pools and Burn Pools within the same pair."
-          value={tvl}
+          value={Number(tvl) || 0}
         />
       </div>
 
-      <button className="group flex w-full items-center justify-between gap-1 rounded-b-sm border border-inactive bg-primary-foreground px-5 pt-1.5 pb-2.25 transition-colors hover:border-active hover:bg-active">
-        <LetterIcon
-          letter="V"
-          className="bg-active transition-opacity group-hover:opacity-0"
-        />
-        <span className="text-sm font-semibold transition-colors group-hover:text-primary-foreground">
-          View Details
-        </span>
-
-        <div className="size-5.5" />
-      </button>
+      <AnimateIconButton
+        variant="letter-icon"
+        iconLetter="V"
+        color="#6E37FF"
+        text="View Details"
+        textVariant="text-container-center"
+        btnProps={{
+          onClick: () => {
+            // TODO: redirect to pair detail page
+          },
+        }}
+        classNames={{
+          btn: "w-full rounded-t-none bg-primary-foreground after:rounded-t-none hover:border-active rounded-b-sm after:rounded-b-sm after:text-primary-foreground",
+        }}
+      />
     </div>
   );
 };
@@ -180,7 +122,7 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
 }) => {
   return (
     <div className="flex items-center justify-between gap-1">
-      <div className="flex items-center gap-0.75">
+      <div className="flex min-w-22.5 items-center gap-0.75">
         <p className="text-15px font-normal">{title}:</p>
         <InfoTooltip
           content={tooltipContent}
@@ -189,9 +131,12 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
           }}
         />
       </div>
-      <p className="text-xl font-normal text-mb-card-value-blue">
-        ${value.toLocaleString("de-DE")}
-      </p>
+      <div className="flex min-w-0 items-center gap-0.5 text-xl font-normal text-mb-card-value-blue">
+        <p className="min-w-0 truncate" title={value.toLocaleString("de-DE")}>
+          {value.toLocaleString("de-DE")}
+        </p>
+        <p>ETH</p>
+      </div>
     </div>
   );
 };

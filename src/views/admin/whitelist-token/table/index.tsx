@@ -43,6 +43,7 @@ import AdminWhitelistTokenDialogDetail from "../dialog/detail";
 import StatusSwitch from "./status-switch";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
+import TokenImage from "@/components/common/token-image";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
@@ -199,15 +200,7 @@ const AdminWhitelistTokenTable = () => {
                 <TableRow key={index}>
                   <TableCell>
                     <div className="flex items-center gap-1.75 pl-[15%]">
-                      {item.imageUri ? (
-                        <img
-                          src={item.imageUri}
-                          alt={item.name}
-                          className="size-8 shrink-0 rounded-full"
-                        />
-                      ) : (
-                        <div className="h-8 w-8 shrink-0 rounded-full border border-active bg-inactive" />
-                      )}
+                      <TokenImage src={item.imageUri} alt={item.customName || item.name || "N/A"} />
                       <div className="text-left">
                         <p className="text-base">
                           {item.customName || item.name || "N/A"}

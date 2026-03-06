@@ -46,6 +46,7 @@ const PairListSearch = () => {
         sortOrder={filter.sortOrder}
         setSortBy={(sortBy) => setFilter({ sortBy })}
         setSortOrder={(sortOrder) => setFilter({ sortOrder })}
+        defaultSortBy="volume"
       />
       <LayoutPicker
         layout={filter.listLayout}
