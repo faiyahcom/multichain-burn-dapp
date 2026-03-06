@@ -44,7 +44,8 @@ const AdminMasterPoolManagementTable = () => {
         chainIds: convertArrayToStringParam({
           array: filter.network?.map((network) => networkIdToChainId(network)),
         }),
-        kind: !isNaN(Number(filter.type)) ? filter.type : undefined,
+        kind:
+          filter.type && !isNaN(Number(filter.type)) ? filter.type : undefined,
         search: filter.text || undefined,
       });
     },
@@ -73,7 +74,7 @@ const AdminMasterPoolManagementTable = () => {
               notFound: "",
             });
             return (
-              <TableRow key={index}>
+              <TableRow key={item.address}>
                 <TableCell className="pl-11.25 text-left">
                   <Link
                     to={`/admin/${item.kind === 0 ? "burn" : "swap"}/detail/${item.address}`}

@@ -36,8 +36,8 @@ export const poolService = {
       {
         params: {
           ...request,
-          page: request?.page || 1,
-          limit: request?.limit || 100,
+          page: request.page ?? 1,
+          limit: request.limit ?? 100,
         },
       },
     );
