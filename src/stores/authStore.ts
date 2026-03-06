@@ -1,21 +1,21 @@
-import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
 
 export type AuthUser = {
-  id: string
-  address?: string
-}
+  id: string;
+  address?: string;
+};
 
 type AuthState = {
-  user: AuthUser | null
-  accessToken: string | null
-  isLoading: boolean
-  error: string | null
-  login: (params: { user: AuthUser; accessToken: string }) => void
-  logout: () => void
-  setLoading: (value: boolean) => void
-  setError: (message: string | null) => void
-}
+  user: AuthUser | null;
+  accessToken: string | null;
+  isLoading: boolean;
+  error: string | null;
+  login: (params: { user: AuthUser; accessToken: string }) => void;
+  logout: () => void;
+  setLoading: (value: boolean) => void;
+  setError: (message: string | null) => void;
+};
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -48,13 +48,11 @@ export const useAuthStore = create<AuthState>()(
         }),
     }),
     {
-      name: 'auth-storage',
+      name: "auth-storage",
       partialize: (state) => ({
         user: state.user,
         accessToken: state.accessToken,
       }),
     },
   ),
-)
-
-
+);

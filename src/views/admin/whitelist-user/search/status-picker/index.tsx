@@ -1,23 +1,23 @@
 import { cn } from "@/lib/utils";
 
 interface Props {
-    options?: { label: string; value: string }[];
-    counts?: number[];
-    selected?: string;
-    onChange?: (value: string) => void;
+  options?: { label: string; value: string }[];
+  counts?: number[];
+  selected?: string;
+  onChange?: (value: string) => void;
 }
 
 const AdminWhitelistUserSearchStatusPicker: React.FC<Props> = ({
-    options,
-    counts,
-    selected,
-    onChange,
+  options,
+  counts,
+  selected,
+  onChange,
 }) => {
-    const hasCounts = counts && counts.length > 0;
+  const hasCounts = counts && counts.length > 0;
 
-    return (
-        <div className="flex items-center gap-2">
-            {/* {options?.map((option, index) => {
+  return (
+    <div className="flex items-center gap-2">
+      {/* {options?.map((option, index) => {
                 const isActive = option?.value === selected;
                 return (
                     <button
@@ -46,8 +46,8 @@ const AdminWhitelistUserSearchStatusPicker: React.FC<Props> = ({
                     </button>
                 );
             })} */}
-        </div>
-    );
+    </div>
+  );
 };
 
 export default AdminWhitelistUserSearchStatusPicker;

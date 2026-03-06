@@ -52,9 +52,10 @@ export const useDisableWhitelistUserEvmFn = () => {
         const chainId = Number(network.chainId);
 
         const whitelistUserSwapData = whitelist
-          ? swapFactoryContract.interface.encodeFunctionData("whitelistAddress", [
-              userAddress,
-            ])
+          ? swapFactoryContract.interface.encodeFunctionData(
+              "whitelistAddress",
+              [userAddress],
+            )
           : swapFactoryContract.interface.encodeFunctionData(
               "removeWhitelistAddress",
               [userAddress],
@@ -119,7 +120,9 @@ export const useDisableWhitelistUserEvmFn = () => {
         const txHash = callsStatus.receipts?.[0]?.transactionHash;
 
         toast.success(
-          whitelist ? "User added to whitelist!" : "User removed from whitelist!",
+          whitelist
+            ? "User added to whitelist!"
+            : "User removed from whitelist!",
           {
             description: txHash ? `Tx: ${txHash}` : `Batch: ${id}`,
           },
@@ -130,7 +133,9 @@ export const useDisableWhitelistUserEvmFn = () => {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         toast.error(
-          whitelist ? "Failed to enable user" : "Failed to remove user from whitelist",
+          whitelist
+            ? "Failed to enable user"
+            : "Failed to remove user from whitelist",
           {
             description: errorMessage,
           },

@@ -56,10 +56,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
   return (
     <tr
       data-slot="table-row"
-      className={cn(
-        "transition-all group",
-        className,
-      )}
+      className={cn("group transition-all", className)}
       {...props}
     />
   );

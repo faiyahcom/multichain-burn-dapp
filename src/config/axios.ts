@@ -4,9 +4,9 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 import { useAuthStore } from "@/stores/authStore";
-import { API_BASE_URL } from '@/config/constant'
+import { API_BASE_URL } from "@/config/constant";
 
-const addInterceptors = (axiosInstance: AxiosInstance) => { 
+const addInterceptors = (axiosInstance: AxiosInstance) => {
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
       const accessToken = useAuthStore.getState().accessToken;
@@ -14,8 +14,8 @@ const addInterceptors = (axiosInstance: AxiosInstance) => {
       if (config.headers && !config.headers.Authorization && accessToken) {
         config.headers.Authorization = `Bearer ${accessToken}`;
       }
-      
-      (config.headers as Record<string, string>)['Accept'] = '*/*';
+
+      (config.headers as Record<string, string>)["Accept"] = "*/*";
       (config.headers as Record<string, string>)["ngrok-skip-browser-warning"] =
         "true";
 
@@ -56,7 +56,10 @@ const createAxiosInstance = (baseUrl: string) => {
 };
 
 // Type helper to help TypeScript understand that the interceptor returns response.data
-type ApiClient = Omit<AxiosInstance, 'get' | 'post' | 'put' | 'delete' | 'patch'> & {
+type ApiClient = Omit<
+  AxiosInstance,
+  "get" | "post" | "put" | "delete" | "patch"
+> & {
   get<T = any>(url: string, config?: any): Promise<T>;
   post<T = any>(url: string, data?: any, config?: any): Promise<T>;
   put<T = any>(url: string, data?: any, config?: any): Promise<T>;

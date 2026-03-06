@@ -1,14 +1,14 @@
-import CreateBurnPoolForm from './form'
+import CreateBurnPoolForm from "./form";
 
-type Props = {}
+type Props = {};
 
 const CreateBurnPool = ({}: Props) => {
-    return (
-        <div className="p-6 flex flex-col w-full items-center">
-            <h1 className='text-3xl font-semibold pt-4 pb-8'>CREATE BURN POOL</h1>
-            <CreateBurnPoolForm />
-        </div>
-    )
-}
+  return (
+    <div className="flex w-full flex-col items-center p-6">
+      <h1 className="pt-4 pb-8 text-3xl font-semibold">CREATE BURN POOL</h1>
+      <CreateBurnPoolForm />
+    </div>
+  );
+};
 
-export default CreateBurnPool
+export default CreateBurnPool;

@@ -9,18 +9,15 @@ import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 
 type UseTokenBalanceParams = {
   tokenAddress?: string;
-  decimals?: number;   // passed from parent
-  symbol?: string;     // passed from parent
+  decimals?: number; // passed from parent
+  symbol?: string; // passed from parent
 };
 
 const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const isNativeToken = (address?: string) => {
   if (!address) return false;
-  return (
-    address === ZERO_ADDRESS ||
-    address.toLowerCase() === "native"
-  );
+  return address === ZERO_ADDRESS || address.toLowerCase() === "native";
 };
 
 export function useTokenBalance({
@@ -35,12 +32,11 @@ export function useTokenBalance({
      EVM
   ============================== */
 
-  const {
-    address: evmAddress,
-    isConnected: isEvmConnected,
-  } = useAppKitAccount({
-    namespace: "eip155",
-  });
+  const { address: evmAddress, isConnected: isEvmConnected } = useAppKitAccount(
+    {
+      namespace: "eip155",
+    },
+  );
 
   const isEvmNative = !isSolanaNetwork && isNativeToken(tokenAddress);
 
@@ -52,26 +48,19 @@ export function useTokenBalance({
     !isEvmNative;
 
   const enabledEvmNative =
-    !isSolanaNetwork &&
-    isEvmConnected &&
-    !!evmAddress &&
-    isEvmNative;
+    !isSolanaNetwork && isEvmConnected && !!evmAddress && isEvmNative;
 
   // ERC20 balance
-  const { data: evmRawBalance, isLoading: isLoadingEvmErc20 } =
-    useReadContract({
+  const { data: evmRawBalance, isLoading: isLoadingEvmErc20 } = useReadContract(
+    {
       address: tokenAddress as Address | undefined,
       abi: [
         {
           type: "function",
           name: "balanceOf",
           stateMutability: "view",
-          inputs: [
-            { name: "owner", type: "address" },
-          ],
-          outputs: [
-            { name: "", type: "uint256" },
-          ],
+          inputs: [{ name: "owner", type: "address" }],
+          outputs: [{ name: "", type: "uint256" }],
         },
       ] as const,
       functionName: "balanceOf",
@@ -79,25 +68,22 @@ export function useTokenBalance({
       query: {
         enabled: enabledEvmErc20,
       },
-    });
+    },
+  );
 
   // Native balance (ETH, BNB, etc.)
-  const { data: evmNativeBalance, isLoading: isLoadingEvmNative } =
-    useBalance({
-      address: evmAddress as Address | undefined,
-      query: {
-        enabled: enabledEvmNative,
-      },
-    });
+  const { data: evmNativeBalance, isLoading: isLoadingEvmNative } = useBalance({
+    address: evmAddress as Address | undefined,
+    query: {
+      enabled: enabledEvmNative,
+    },
+  });
 
   const evmFormatted = useMemo(() => {
     if (isEvmNative) {
       if (!evmNativeBalance) return "0";
       try {
-        return formatUnits(
-          evmNativeBalance.value,
-          evmNativeBalance.decimals,
-        );
+        return formatUnits(evmNativeBalance.value, evmNativeBalance.decimals);
       } catch {
         return "0";
       }
@@ -116,12 +102,10 @@ export function useTokenBalance({
      SOLANA
   ============================== */
 
-  const {
-    address: solanaAddress,
-    isConnected: isSolanaConnected,
-  } = useAppKitAccount({
-    namespace: "solana",
-  });
+  const { address: solanaAddress, isConnected: isSolanaConnected } =
+    useAppKitAccount({
+      namespace: "solana",
+    });
 
   const { connection } = useAppKitConnection();
 
@@ -153,9 +137,7 @@ export function useTokenBalance({
           const lamports = await connection.getBalance(owner);
           if (cancelled) return;
 
-          setSolanaFormatted(
-            (lamports / LAMPORTS_PER_SOL).toString()
-          );
+          setSolanaFormatted((lamports / LAMPORTS_PER_SOL).toString());
           return;
         }
 
@@ -164,10 +146,12 @@ export function useTokenBalance({
         // SPL token
         const mint = new PublicKey(tokenAddress);
 
-        const tokenAccounts =
-          await connection.getParsedTokenAccountsByOwner(owner, {
+        const tokenAccounts = await connection.getParsedTokenAccountsByOwner(
+          owner,
+          {
             mint,
-          });
+          },
+        );
 
         if (cancelled) return;
 
@@ -225,8 +209,6 @@ export function useTokenBalance({
       : (evmRawBalance as bigint | undefined),
     formatted: evmFormatted,
     symbol,
-    isLoading: isEvmNative
-      ? isLoadingEvmNative
-      : isLoadingEvmErc20,
+    isLoading: isEvmNative ? isLoadingEvmNative : isLoadingEvmErc20,
   };
 }

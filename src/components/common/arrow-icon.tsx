@@ -22,10 +22,14 @@ export function ArrowIcon({
   return (
     <span
       aria-label={`arrow ${direction}`}
-      className={cn("font-medium leading-6 text-base", rotationMap[direction], className)}
+      className={cn(
+        "text-base leading-6 font-medium",
+        rotationMap[direction],
+        className,
+      )}
       {...props}
     >
-      {'>'}
+      {">"}
     </span>
   );
 }

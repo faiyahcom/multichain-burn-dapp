@@ -8,7 +8,7 @@ export const Route = createFileRoute("/pair-list/")({
 
 function RouteComponent() {
   return (
-    <div className="pt-9.25 w-full h-full">
+    <div className="h-full w-full pt-9.25">
       <PairListSearch />
       <PairListList />
     </div>

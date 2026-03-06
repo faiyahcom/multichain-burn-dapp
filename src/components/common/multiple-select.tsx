@@ -44,9 +44,9 @@ const MultipleSelect: React.FC<Props> = ({
   const isAnySelected = (selected?.length ?? 0) > 0;
   const atLeastOneIcon =
     showIconsInTriggerIfAny && options?.some((option) => option.icon);
-  const selectedLabels = selected?.map(
-    (value) => options?.find((option) => option.value === value)?.label,
-  ).filter(Boolean);
+  const selectedLabels = selected
+    ?.map((value) => options?.find((option) => option.value === value)?.label)
+    .filter(Boolean);
 
   const handleToggleAllCheck = () => {
     if (selected?.length === options?.length) {

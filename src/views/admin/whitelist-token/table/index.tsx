@@ -80,9 +80,9 @@ const AdminWhitelistTokenTable = () => {
         chainIds:
           filter.network.length > 0
             ? filter.network
-              .map((network) => networkIdToChainId(network))
-              .filter((chainId) => chainId)
-              .join(",")
+                .map((network) => networkIdToChainId(network))
+                .filter((chainId) => chainId)
+                .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,

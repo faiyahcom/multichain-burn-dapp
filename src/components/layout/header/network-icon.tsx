@@ -12,10 +12,7 @@ function NetworkIcon({
   if (!net) return null;
   return (
     <img
-      className={cn(
-        "inline-block h-6 w-6 shrink-0 rounded",
-        className,
-      )}
+      className={cn("inline-block h-6 w-6 shrink-0 rounded", className)}
       src={net.iconSrc}
       aria-hidden
     />

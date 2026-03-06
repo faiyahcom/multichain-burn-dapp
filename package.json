@@ -9,7 +9,8 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "generate-routes": "tsr generate",
-    "generate-routes-watch": "tsr generate --watch"
+    "generate-routes-watch": "tsr generate --watch",
+    "format": "prettier . --write"
   },
   "dependencies": {
     "@coral-xyz/anchor": "^0.30.1",

@@ -1,11 +1,9 @@
-import CreateSwapPool from "./create"
+import CreateSwapPool from "./create";
 
-type Props = {}
+type Props = {};
 
-const SwapPool = ({ }: Props) => {
-    return (
-        <CreateSwapPool />
-    )
-}
+const SwapPool = ({}: Props) => {
+  return <CreateSwapPool />;
+};
 
-export default SwapPool
+export default SwapPool;

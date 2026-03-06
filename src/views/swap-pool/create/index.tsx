@@ -1,14 +1,14 @@
-import CreateSwapPoolForm from './form'
+import CreateSwapPoolForm from "./form";
 
-type Props = {}
+type Props = {};
 
 const CreateSwapPool = ({}: Props) => {
-    return (
-        <div className="p-6 flex flex-col w-full items-center">
-            <h1 className='text-3xl font-semibold pt-4 pb-8'>CREATE SWAP POOL</h1>
-            <CreateSwapPoolForm />
-        </div>
-    )
-}
+  return (
+    <div className="flex w-full flex-col items-center p-6">
+      <h1 className="pt-4 pb-8 text-3xl font-semibold">CREATE SWAP POOL</h1>
+      <CreateSwapPoolForm />
+    </div>
+  );
+};
 
-export default CreateSwapPool
+export default CreateSwapPool;

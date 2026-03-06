@@ -6,38 +6,38 @@ import { useEffect } from "react";
 import { useWalletAuth } from "./useWalletAuth";
 
 const useWalletConnectionHandler = () => {
-    const { user, logout } = useAuthStore();
-    const { isConnected, caipAddress } = useAppKitAccount();
-    const { setSelectedNetworkId } = useSystemStore();
-    const { authenticateEvm, authenticateSolana } = useWalletAuth();
+  const { user, logout } = useAuthStore();
+  const { isConnected, caipAddress } = useAppKitAccount();
+  const { setSelectedNetworkId } = useSystemStore();
+  const { authenticateEvm, authenticateSolana } = useWalletAuth();
 
-    useEffect(() => {
-        if (!isConnected || !caipAddress) return;
+  useEffect(() => {
+    if (!isConnected || !caipAddress) return;
 
-        const [namespace, chainRef, address] = caipAddress.split(":");
+    const [namespace, chainRef, address] = caipAddress.split(":");
 
-        const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
-        if (systemNetwork) {
-            setSelectedNetworkId(systemNetwork);
+    const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
+    if (systemNetwork) {
+      setSelectedNetworkId(systemNetwork);
+    }
+
+    const walletChanged = user?.address && user.address !== address;
+
+    if (walletChanged) {
+      logout();
+    }
+
+    if (!user || walletChanged) {
+      const login = async () => {
+        if (namespace === "eip155") {
+          await authenticateEvm(address);
+        } else if (namespace === "solana") {
+          await authenticateSolana(address);
         }
+      };
+      login();
+    }
+  }, [isConnected, caipAddress, user]);
+};
 
-        const walletChanged = user?.address && user.address !== address;
-
-        if (walletChanged) {
-            logout();
-        }
-
-        if (!user || walletChanged) {
-            const login = async () => {
-                if (namespace === "eip155") {
-                    await authenticateEvm(address);
-                } else if (namespace === "solana") {
-                    await authenticateSolana(address);
-                }
-            };
-            login();
-        }
-    }, [isConnected, caipAddress, user]);
-}
-
-export default useWalletConnectionHandler
+export default useWalletConnectionHandler;

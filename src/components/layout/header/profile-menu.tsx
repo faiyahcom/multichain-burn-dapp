@@ -12,7 +12,7 @@ import { LogOutIcon, UserIcon } from "lucide-react";
 
 type Props = {};
 
-const ProfileMenu = ({ }: Props) => {
+const ProfileMenu = ({}: Props) => {
   const { logout } = useAuthStore();
   const { disconnect } = useDisconnect();
 

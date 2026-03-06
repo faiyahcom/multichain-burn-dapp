@@ -28,11 +28,17 @@ export const NavSectionLabel: Record<NavSection, string> = {
   [navSection.admin]: "Admin",
 };
 
+type SubNavItem = {
+  label: string;
+  tab: string;
+};
+
 type NavItem = {
   label: string;
   to?: string;
   icon?: React.ComponentType<{ className?: string }>;
   section: NavSection;
+  subItems?: SubNavItem[];
 };
 
 export const navItems: NavItem[] = [
@@ -79,6 +85,11 @@ export const navItems: NavItem[] = [
     icon: IconMyParticipatedPools,
     section: navSection.profile_menu,
     to: "/my-participated-pools",
+    subItems: [
+      { label: "Burn Pool", tab: "burn-pool" },
+      { label: "Swap Pool", tab: "swap-pool" },
+      { label: "Claimable", tab: "claimable" },
+    ],
   },
   {
     label: "Swap History",

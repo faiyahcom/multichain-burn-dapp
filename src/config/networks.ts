@@ -118,17 +118,14 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
 ];
 
 export const networkIdToChainId = (networkId: string): string | undefined => {
-  return NETWORK_CONFIGS.find(
-    (config) => config.id === networkId,
-  )?.backendChainId;
+  return NETWORK_CONFIGS.find((config) => config.id === networkId)
+    ?.backendChainId;
 };
 
 export const chainIdToNetworkConfig = (
   chainId: string,
 ): NetworkConfig | undefined => {
-  return NETWORK_CONFIGS.find(
-    (config) => config.backendChainId === chainId,
-  );
+  return NETWORK_CONFIGS.find((config) => config.backendChainId === chainId);
 };
 
 export const evmAppkitNetworks = [sepolia, bscTestnet, xphereTestnet];

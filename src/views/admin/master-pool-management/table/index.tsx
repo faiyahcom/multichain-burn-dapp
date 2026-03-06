@@ -1,9 +1,5 @@
-
-
 const AdminMasterPoolManagementTable = () => {
-  return (
-    <></>
-  );
+  return <></>;
 };
 
 export default AdminMasterPoolManagementTable;
