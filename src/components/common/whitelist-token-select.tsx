@@ -11,8 +11,7 @@ import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { trimAddress } from "@/views/swap-pool/detail/pool-overview";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
-
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 
 type Props = {
     value?: string;
@@ -25,15 +24,17 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
 
     const networkConfig = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
     const nativeCurrency = networkConfig?.appKitNetwork.nativeCurrency;
+    const isSolana = selectedNetworkId === "solanaDevnet";
+    const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
     const { data: whitelistTokens, isLoading } = useGetWhitelistTokens({
         chainIds: networkConfig?.backendChainId,
     });
 
-    // Native token entry shown at top of list (EVM only)
+    // Native token entry shown at top of list
     const nativeToken = nativeCurrency
         ? {
-            address: ZERO_ADDRESS,
+            address: nativeAddress,
             name: nativeCurrency.name,
             symbol: nativeCurrency.symbol,
             imageUri: networkConfig?.iconSrc ?? "",
@@ -41,7 +42,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
         : null;
 
     const selectedDetail =
-        value === ZERO_ADDRESS
+        value === nativeAddress
             ? nativeToken
             : whitelistTokens?.whitelistTokens.find(
                 (token) => token.address === value,
@@ -83,14 +84,14 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
                     <div className="mt-2 space-y-1">
                         {nativeToken && (
                             <DropdownMenuItem
-                                key={ZERO_ADDRESS}
-                                className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${value === ZERO_ADDRESS ? "bg-inactive font-semibold text-active" : ""} ${disabledAddress === ZERO_ADDRESS ? "cursor-not-allowed opacity-40" : ""}`}
+                                key={nativeAddress}
+                                className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${value === nativeAddress ? "bg-inactive font-semibold text-active" : ""} ${disabledAddress === nativeAddress ? "cursor-not-allowed opacity-40" : ""}`}
                                 leftSelectedPanelClassName="w-1.5"
-                                isSelected={value === ZERO_ADDRESS}
-                                disabled={disabledAddress === ZERO_ADDRESS}
+                                isSelected={value === nativeAddress}
+                                disabled={disabledAddress === nativeAddress}
                                 onClick={() => {
-                                    if (disabledAddress !== ZERO_ADDRESS) {
-                                        onChange(ZERO_ADDRESS);
+                                    if (disabledAddress !== nativeAddress) {
+                                        onChange(nativeAddress);
                                     }
                                 }}
                             >

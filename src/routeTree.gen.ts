@@ -25,6 +25,8 @@ import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whit
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
+import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
+import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -110,6 +112,16 @@ const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
   path: '/swap/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
+  id: '/burn/detail/$address',
+  path: '/burn/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminBurnDetailAddressRoute = AdminBurnDetailAddressRouteImport.update({
+  id: '/admin/burn/detail/$address',
+  path: '/admin/burn/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -124,10 +136,12 @@ export interface FileRoutesByFullPath {
   '/support': typeof SupportIndexRoute
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
+  '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -142,10 +156,12 @@ export interface FileRoutesByTo {
   '/support': typeof SupportIndexRoute
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
+  '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -161,10 +177,12 @@ export interface FileRoutesById {
   '/support/': typeof SupportIndexRoute
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
+  '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
+  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -181,10 +199,12 @@ export interface FileRouteTypes {
     | '/support'
     | '/swap-history'
     | '/swap'
+    | '/burn/detail/$address'
     | '/swap/detail/$address'
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/admin/burn/detail/$address'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -199,10 +219,12 @@ export interface FileRouteTypes {
     | '/support'
     | '/swap-history'
     | '/swap'
+    | '/burn/detail/$address'
     | '/swap/detail/$address'
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/admin/burn/detail/$address'
   id:
     | '__root__'
     | '/'
@@ -217,10 +239,12 @@ export interface FileRouteTypes {
     | '/support/'
     | '/swap-history/'
     | '/swap/'
+    | '/burn/detail/$address'
     | '/swap/detail/$address'
     | '/admin/master-pool-management/'
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
+    | '/admin/burn/detail/$address'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -236,10 +260,12 @@ export interface RootRouteChildren {
   SupportIndexRoute: typeof SupportIndexRoute
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
+  BurnDetailAddressRoute: typeof BurnDetailAddressRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
+  AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -356,6 +382,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SwapDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/burn/detail/$address': {
+      id: '/burn/detail/$address'
+      path: '/burn/detail/$address'
+      fullPath: '/burn/detail/$address'
+      preLoaderRoute: typeof BurnDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/burn/detail/$address': {
+      id: '/admin/burn/detail/$address'
+      path: '/admin/burn/detail/$address'
+      fullPath: '/admin/burn/detail/$address'
+      preLoaderRoute: typeof AdminBurnDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -372,10 +412,12 @@ const rootRouteChildren: RootRouteChildren = {
   SupportIndexRoute: SupportIndexRoute,
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,
+  BurnDetailAddressRoute: BurnDetailAddressRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
+  AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

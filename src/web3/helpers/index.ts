@@ -1,6 +1,16 @@
 import { PublicKey, Connection } from "@solana/web3.js";
 import { BN } from "bn.js";
 import { Buffer } from "buffer";
+import {
+    NATIVE_MINT,
+    TOKEN_PROGRAM_ID,
+    TOKEN_2022_PROGRAM_ID,
+    NATIVE_MINT_2022,
+} from "@solana/spl-token";
+
+// ==============================
+// PDA HELPERS
+// ==============================
 
 export const getFactoryPDA = (programId: PublicKey): PublicKey => {
     const [pda] = PublicKey.findProgramAddressSync(
@@ -40,19 +50,21 @@ export const getDepositVaultPDA = (
     return pda;
 };
 
-export const getUserDepositPDA = (poolPDA: PublicKey, user: PublicKey, programId: PublicKey): PublicKey => {
+export const getUserDepositPDA = (
+    poolPDA: PublicKey,
+    user: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
     const [pda] = PublicKey.findProgramAddressSync(
         [Buffer.from("user-deposit"), poolPDA.toBuffer(), user.toBuffer()],
-        programId
+        programId,
     );
     return pda;
 };
 
-import {
-    NATIVE_MINT,
-    TOKEN_PROGRAM_ID,
-    TOKEN_2022_PROGRAM_ID,
-} from "@solana/spl-token";
+// ==============================
+// ASSET DETECTION
+// ==============================
 
 export type AssetType = 0 | 1 | 2;
 
@@ -66,7 +78,6 @@ export const detectAssetType = async (
     connection: Connection,
     mint: PublicKey,
 ): Promise<AssetType> => {
-    // Native SOL (wrapped SOL mint address)
     if (mint.equals(NATIVE_MINT)) {
         return AssetTypeEnum.NATIVE;
     }
@@ -86,4 +97,23 @@ export const detectAssetType = async (
     }
 
     throw new Error("Unknown token standard");
+};
+
+// ==============================
+// TOKEN PROGRAM RESOLVER
+// ==============================
+
+export const getTokenProgramFromAssetType = (
+    assetType: AssetType,
+): PublicKey | null => {
+    switch (assetType) {
+        case AssetTypeEnum.SPL:
+            return TOKEN_PROGRAM_ID;
+        case AssetTypeEnum.SPL2022:
+            return TOKEN_2022_PROGRAM_ID;
+        case AssetTypeEnum.NATIVE:
+            return NATIVE_MINT; // or NATIVE_MINT_2022
+        default:
+            throw new Error("Invalid asset type");
+    }
 };
