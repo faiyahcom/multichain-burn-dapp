@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -44,7 +45,6 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
 
     // ── Amount-input state ─────────────────────────────────────
     const [depositRewardOpen, setDepositRewardOpen] = useState(false);
-    const [depositBurnInput, setDepositBurnInput] = useState("");
     const [depositBurnOpen, setDepositBurnOpen] = useState(false);
 
     const pool = poolDetail?.pool;
@@ -144,19 +144,18 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const handleDepositBurn = async () => {
-        if (!pool || !depositBurnInput) return;
+    const handleDepositBurn = async (amountStr: string) => {
+        if (!pool || !amountStr) return;
         if (isSolana && poolDetail) {
-            await depositBurnSol({ poolAddress: pool.address, poolDetail, amountStr: depositBurnInput });
+            await depositBurnSol({ poolAddress: pool.address, poolDetail, amountStr });
         } else {
             await depositBurnEvm({
                 poolAddress: pool.address,
                 burnToken: pool.tokenIn,
-                amountStr: depositBurnInput,
+                amountStr,
                 decimals: pool.tokenInDecimals,
             });
         }
-        setDepositBurnInput("");
         setDepositBurnOpen(false);
         invalidatePoolQueries(pool.address);
     };
@@ -181,8 +180,13 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
+    const navigate = useNavigate();
     const handleEdit = () => {
-        toast.info("Edit is not available yet");
+        if (!pool?.address) return;
+        navigate({
+            to: "/burn/edit/$address",
+            params: { address: pool.address },
+        });
     };
 
     return {
@@ -197,9 +201,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         // deposit reward input
         depositRewardOpen,
         setDepositRewardOpen,
-        // deposit burn input
-        depositBurnInput,
-        setDepositBurnInput,
+        // deposit burn dialog
         depositBurnOpen,
         setDepositBurnOpen,
         // action handlers

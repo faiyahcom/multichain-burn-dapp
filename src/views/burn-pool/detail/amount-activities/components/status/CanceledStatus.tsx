@@ -7,14 +7,25 @@ type Props = {
 };
 
 const CanceledStatus = ({ poolDetail }: Props) => {
-    const { pool, formattedReturnReward } = useAmountActivity(poolDetail);
+    const {
+        pool,
+        formattedReward,
+        formattedBurned,
+    } = useAmountActivity(poolDetail);
 
     return (
-        <StatRow
-            label="Your reward token return:"
-            value={`${formattedReturnReward} ${pool?.rewardTokenSymbol ?? ""}`}
-            valueClassName="text-sm font-medium"
-        />
+        <>
+            <StatRow
+                label="Claimed Reward"
+                value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
+                className="font-medium text-active"
+                valueClassName="text-2xl font-bold"
+            />
+            <StatRow
+                label="Your Burned Amount"
+                value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
+            />
+        </>
     );
 };
 

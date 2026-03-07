@@ -25,7 +25,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
 
         return [
             [
-                { label: "Pool Type", value: "Swap Pool" },
+                { label: "Pool Type", value: "Burn Pool" },
                 {
                     label: "Network",
                     value: (

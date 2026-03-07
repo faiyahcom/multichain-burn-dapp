@@ -97,7 +97,7 @@ export const useAdminClosePoolSolFn = () => {
 
                 // ── 5. Build TX ────────────────────────────────────────────
                 const tx = await program.methods
-                    .canclePool()
+                    .emergencyClosePool()
                     .accounts({
                         admin: walletPublicKey,
                         factory: factoryPDA,

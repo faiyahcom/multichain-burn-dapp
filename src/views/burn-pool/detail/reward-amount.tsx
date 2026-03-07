@@ -61,18 +61,18 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 <p className="text-base text-greyed">
                     <span>Total Burned Amount:</span>{" "}
                     <span className="ml-14">
-                        {formattedBurned} / {formattedMaxBurn}{" "}
+                        {formattedBurned}{" "}
                         {poolDetail?.pool.tokenInSymbol}
                     </span>
                 </p>
-                <div>
+                {/* <div>
                     <div className="h-3.25 w-full rounded-[9.5px] bg-progress-bg">
                         <div
                             className="h-full rounded-[9.5px] bg-progress"
                             style={{ width: `${burnProgress * 100}%` }}
                         ></div>
                     </div>
-                </div>
+                </div> */}
             </div>
         </div>
     );

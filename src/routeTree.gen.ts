@@ -25,6 +25,7 @@ import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whit
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
+import { Route as BurnEditAddressRouteImport } from './routes/burn/edit/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
@@ -113,6 +114,11 @@ const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
   path: '/swap/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BurnEditAddressRoute = BurnEditAddressRouteImport.update({
+  id: '/burn/edit/$address',
+  path: '/burn/edit/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
   id: '/burn/detail/$address',
   path: '/burn/detail/$address',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/burn/edit/$address': typeof BurnEditAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/burn/edit/$address': typeof BurnEditAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/burn/edit/$address': typeof BurnEditAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/burn/detail/$address'
+    | '/burn/edit/$address'
     | '/swap/detail/$address'
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/burn/detail/$address'
+    | '/burn/edit/$address'
     | '/swap/detail/$address'
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/swap-history/'
     | '/swap/'
     | '/burn/detail/$address'
+    | '/burn/edit/$address'
     | '/swap/detail/$address'
     | '/admin/master-pool-management/'
     | '/admin/whitelist-token/'
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
   BurnDetailAddressRoute: typeof BurnDetailAddressRoute
+  BurnEditAddressRoute: typeof BurnEditAddressRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
@@ -396,6 +409,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SwapDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/burn/edit/$address': {
+      id: '/burn/edit/$address'
+      path: '/burn/edit/$address'
+      fullPath: '/burn/edit/$address'
+      preLoaderRoute: typeof BurnEditAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/burn/detail/$address': {
       id: '/burn/detail/$address'
       path: '/burn/detail/$address'
@@ -434,6 +454,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,
   BurnDetailAddressRoute: BurnDetailAddressRoute,
+  BurnEditAddressRoute: BurnEditAddressRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,

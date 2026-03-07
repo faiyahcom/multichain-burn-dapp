@@ -153,11 +153,22 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                             onChange={(date) =>
                                 setValue("startTime", date as Date, { shouldValidate: true })
                             }
-                            disabled={(date) => (endTime ? date >= endTime : false)}
+                            disabled={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return date < today || (endTime ? date > endTime : false);
+                            }}
                         />
                         <input
                             type="hidden"
-                            {...register("startTime", { required: "Start time is required" })}
+                            {...register("startTime", {
+                                required: "Start time is required",
+                                validate: (value) => {
+                                    if (value <= new Date()) return "Start time must be in the future";
+                                    if (endTime && value >= endTime) return "Start time must be before end time";
+                                    return true;
+                                },
+                            })}
                         />
                         {errors.startTime && (
                             <p className="text-xs text-destructive">{errors.startTime.message}</p>
@@ -170,11 +181,22 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                             onChange={(date) =>
                                 setValue("endTime", date as Date, { shouldValidate: true })
                             }
-                            disabled={(date) => (startTime ? date <= startTime : false)}
+                            disabled={(date) => {
+                                const today = new Date();
+                                today.setHours(0, 0, 0, 0);
+                                return date < today || (startTime ? date < startTime : false);
+                            }}
                         />
                         <input
                             type="hidden"
-                            {...register("endTime", { required: "End time is required" })}
+                            {...register("endTime", {
+                                required: "End time is required",
+                                validate: (value) => {
+                                    if (value <= new Date()) return "End time must be in the future";
+                                    if (startTime && value <= startTime) return "End time must be after start time";
+                                    return true;
+                                },
+                            })}
                         />
                         {errors.endTime && (
                             <p className="text-xs text-destructive">{errors.endTime.message}</p>

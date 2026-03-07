@@ -11,6 +11,7 @@ import {
     TOKEN_PROGRAM_ID,
     TOKEN_2022_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
+    getMint
 } from "@solana/spl-token";
 import { BN } from "bn.js";
 import {
@@ -62,6 +63,10 @@ export const useDepositRewardSolFn = () => {
 
                 const { rewardTokenDecimals, assetTypeReward, rewardToken } =
                     poolDetail.pool;
+
+                // const rewardTokenInfo = await getMint(connection, new PublicKey(rewardToken), undefined, TOKEN_2022_PROGRAM_ID);
+                // console.log("Onchain reward token decimals:", rewardTokenInfo.decimals);
+                // console.log("Reward token decimals:", amountStr, rewardTokenDecimals, assetTypeReward, rewardToken);
 
                 const amountBN = new BN(
                     toBaseUnits(amountStr, rewardTokenDecimals).toString(),
@@ -115,6 +120,8 @@ export const useDepositRewardSolFn = () => {
                         rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
+
+                    console.log("amountBN", amountBN.toString());
 
                     const tx = await program.methods
                         .depositRewardSpl(amountBN)
