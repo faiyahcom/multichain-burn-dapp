@@ -49,6 +49,22 @@ export const getContractBurnRouter = (signer: Signer) => {
     );
 };
 
+export const getContractBurnFactoryInterface = () => {
+    return new ethers.Interface(MULTICHAIN_BURN_ABI_BURN_FACTORY);
+}
+
+export const getContractBurnRouterInterface = () => {
+    return new ethers.Interface(MULTICHAIN_BURN_ABI_BURN_ROUTER);
+}
+
+export const getContractSwapFactoryInterface = () => {
+    return new ethers.Interface(MULTICHAIN_BURN_ABI_SWAP_FACTORY);
+}
+
+export const getContractSwapRouterInterface = () => {
+    return new ethers.Interface(MULTICHAIN_BURN_ABI_SWAP_ROUTER);
+}
+
 export const getERC20Contract = (token: string, signer: Signer) => {
     return new ethers.Contract(
         token,

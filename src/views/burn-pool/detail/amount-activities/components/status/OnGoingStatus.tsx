@@ -1,8 +1,8 @@
 import type { PoolDetailResponse } from "@/types/pool";
 import { IconTick } from "@/assets/react";
 import { Button } from "@/components/ui/button";
-import { ActionBtn, AmountInput, StatRow } from "../components";
-import { useAmountActivity } from "../use-amount-activity";
+import { ActionBtn, AmountInput, StatRow } from "../../components";
+import { useAmountActivity } from "../../use-amount-activity";
 
 type Props = {
     poolDetail?: PoolDetailResponse;

@@ -1,7 +1,9 @@
+import { NETWORK_CONFIGS } from "@/config/networks";
 import type { ListLayout, SortBy, SortOrder } from "@/types/common";
 import { create } from "zustand";
 
 type PairListSearchFilterType = {
+  page: number;
   text: string;
   network: string[];
   sortBy?: SortBy;
@@ -17,13 +19,16 @@ type PairListSearchFilterState = {
 export const usePairListSearchFilterStore = create<PairListSearchFilterState>(
   (set) => ({
     filter: {
+      page: 1,
       text: "",
-      network: [],
-      sortBy: "none",
+      network: NETWORK_CONFIGS.map((network) => network.id),
+      sortBy: "volume",
       sortOrder: "desc",
       listLayout: "list",
     },
     setFilter: (filter) =>
-      set((state) => ({ filter: { ...state.filter, ...filter } })),
+      set((state) => ({
+        filter: { ...state.filter, ...filter, page: filter.page ?? 1 },
+      })),
   }),
 );

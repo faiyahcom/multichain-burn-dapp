@@ -1,6 +1,6 @@
 import type { PoolDetailResponse } from "@/types/pool";
-import { ActionBtn, StatRow } from "../components";
-import { useAmountActivity } from "../use-amount-activity";
+import { ActionBtn, StatRow } from "../../components";
+import { useAmountActivity } from "../../use-amount-activity";
 
 type Props = {
     poolDetail?: PoolDetailResponse;

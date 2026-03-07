@@ -13,7 +13,7 @@ import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { IconArrowDownWithStem } from "@/assets/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { toast } from "sonner";
-import { useTokenBalance } from "./useTokenBalance";
+import { useTokenBalance } from "../../../hooks/useTokenBalance";
 import { useSystemStore } from "@/stores/systemStore";
 import { useSwapPoolETH } from "./useSwapPoolETH";
 import { useSwapPoolSOL } from "./useSwapPoolSOL";
@@ -26,7 +26,7 @@ import { ArrowIcon } from "@/components/common/arrow-icon";
 const swapFormSchema = z.object({
     burnAmount: z
         .string()
-        .min(1, { message: "Burn amount is required" })
+        .min(0, { message: "Burn amount is required" })
         .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
             message: "Burn amount must be a positive number",
         }),
@@ -309,32 +309,32 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                         </div>
                     </form>
                 </DialogContent>
-                    <div
-                        className={`fixed transition-all duration-300 ${openFeePopUp ? "mt-3 max-h-40 opacity-100" : "max-h-0 opacity-0"
-                            }`}
-                    >
-                        <div className="w-full rounded-2xl bg-mb-gray px-6 py-5">
-                            <div className="flex justify-between text-lg text-greyed">
-                                <div className="flex items-center gap-1">
-                                    Fee:
-                                    <span className="text-sm opacity-60">ⓘ</span>
-                                </div>
-                                <div className="font-medium text-green-500">
-                                    {poolDetail?.pool?.settlementFee
-                                        ? `${Number(poolDetail.pool.settlementFee) / 100}%`
-                                        : "Free"}
-                                </div>
+                <div
+                    className={`fixed transition-all duration-300 ${openFeePopUp ? "mt-3 max-h-40 opacity-100" : "max-h-0 opacity-0"
+                        }`}
+                >
+                    <div className="w-full rounded-2xl bg-mb-gray px-6 py-5">
+                        <div className="flex justify-between text-lg text-greyed">
+                            <div className="flex items-center gap-1">
+                                Fee:
+                                <span className="text-sm opacity-60">ⓘ</span>
                             </div>
-
-                            <div className="mt-4 flex justify-between text-lg text-greyed">
-                                <div className="flex items-center gap-1">
-                                    Network Fee:
-                                    <span className="text-sm opacity-60">ⓘ</span>
-                                </div>
-                                <div>{"<0.01 USD$"}</div>
+                            <div className="font-medium text-green-500">
+                                {poolDetail?.pool?.settlementFee
+                                    ? `${Number(poolDetail.pool.settlementFee) / 100}%`
+                                    : "Free"}
                             </div>
                         </div>
+
+                        <div className="mt-4 flex justify-between text-lg text-greyed">
+                            <div className="flex items-center gap-1">
+                                Network Fee:
+                                <span className="text-sm opacity-60">ⓘ</span>
+                            </div>
+                            <div>{"<0.01 USD$"}</div>
+                        </div>
                     </div>
+                </div>
             </DialogPortal>
         </Dialog>
     );

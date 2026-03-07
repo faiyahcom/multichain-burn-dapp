@@ -1,7 +1,8 @@
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import InfoTooltip from "@/components/common/info-tooltip";
 import NetworkDisplay from "@/components/common/network-display";
-import NetworkImgIcon from "@/components/common/network-img-icon";
+import TableSpinner from "@/components/common/table-spinner";
+import TokenImage from "@/components/common/token-image";
 import {
   Table,
   TableBody,
@@ -10,110 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { NETWORK_CONFIGS } from "@/config/networks";
-
-// TODO: might need to change the type
-type PairListListListLayoutItem = {
-  id: string;
-  pairName: string;
-  volume: number;
-  tvl: number;
-  networkId: string;
-};
-
-// TODO: replace with real data
-const demoData: PairListListListLayoutItem[] = [
-  {
-    id: "1",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "ethereumTestnet",
-  },
-  {
-    id: "2",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "binanceTestnet",
-  },
-  {
-    id: "3",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "xphereTestnet",
-  },
-  {
-    id: "4",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "solanaDevnet",
-  },
-  {
-    id: "5",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "ethereumTestnet",
-  },
-  {
-    id: "6",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "binanceTestnet",
-  },
-  {
-    id: "7",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "xphereTestnet",
-  },
-  {
-    id: "8",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "solanaDevnet",
-  },
-  {
-    id: "9",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "ethereumTestnet",
-  },
-  {
-    id: "10",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "binanceTestnet",
-  },
-  {
-    id: "11",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "xphereTestnet",
-  },
-  {
-    id: "12",
-    pairName: "ETH/USDT",
-    volume: 1000,
-    tvl: 1000,
-    networkId: "solanaDevnet",
-  },
-];
+import type { PairItemType } from "@/types/pair";
+import { Link } from "@tanstack/react-router";
 
 interface Props {
-  data?: PairListListListLayoutItem[];
+  data?: PairItemType[];
+  isLoading?: boolean;
 }
 
-const PairListListListLayout: React.FC<Props> = ({ data = demoData }) => {
+const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
   return (
     <div className="w-full pt-6 pb-7 pl-27.5">
       <Table>
@@ -133,29 +39,58 @@ const PairListListListLayout: React.FC<Props> = ({ data = demoData }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
+          <TableSpinner isLoading={isLoading} colSpan={5} />
           {data?.map((item, index) => {
             return (
               <TableRow key={index}>
                 <TableCell>
-                  <NetworkImgIcon
-                    src="/network/ethereum.png"
-                    alt="Ethereum"
-                    className="mr-px inline size-6.25"
-                  />
-                  <NetworkImgIcon
-                    src="/network/usdt.svg"
-                    alt="USDT"
-                    className="mr-3.25 inline size-6.25"
-                  />
-                  <span>{item.pairName}</span>
+                  <div className="flex items-center gap-3.25 pl-15.75">
+                    <div className="flex items-center gap-px">
+                      <TokenImage
+                        src={item.tokenInImageUri}
+                        alt={item.tokenInSymbol}
+                        classNames={{
+                          common: "size-6.25",
+                        }}
+                      />
+                      <TokenImage
+                        src={item.tokenOutImageUri}
+                        alt={item.tokenOutSymbol}
+                        classNames={{
+                          common: "size-6.25",
+                        }}
+                      />
+                    </div>
+                    <span>
+                      {item.tokenInSymbolCustom ?? item.tokenInSymbol}/
+                      {item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
+                    </span>
+                  </div>
                 </TableCell>
-                <TableCell>${item.volume.toLocaleString("de-DE")}</TableCell>
-                <TableCell>${item.tvl.toLocaleString("de-DE")}</TableCell>
                 <TableCell>
-                  <NetworkDisplay networkId={item.networkId} />
+                  <div className="flex w-full items-center justify-center gap-0.5">
+                    <p
+                      className="min-w-0 truncate"
+                      title={Number(item.volume).toLocaleString("de-DE")}
+                    >
+                      {Number(item.volume).toLocaleString("de-DE")}
+                    </p>
+                    <p className="shrink-0">ETH</p>
+                  </div>
                 </TableCell>
                 <TableCell>
-                  <ArrowIcon direction="right" />
+                  {Number(item.tvl).toLocaleString("de-DE")} ETH
+                </TableCell>
+                <TableCell>
+                  <NetworkDisplay chainId={item.chainId} />
+                </TableCell>
+                <TableCell>
+                  <Link
+                    to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
+                    className="block h-full w-full"
+                  >
+                    <ArrowIcon direction="right" />
+                  </Link>
                 </TableCell>
               </TableRow>
             );

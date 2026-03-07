@@ -26,4 +26,7 @@ export const API_ROUTES = {
     GET_LIST_USERS: "/whitelist-users/users",
     UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
   },
+  PAIRS: {
+    LIST: "/pairs",
+  },
 } as const;

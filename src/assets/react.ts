@@ -35,3 +35,4 @@ export { default as IconUpload2 } from "./icons/upload-2.svg?react";
 export { default as IconTick } from "./icons/tick.svg?react";
 
 export { default as IconClipboard } from "./icons/clipboard.svg?react";
+export { default as IconWallet } from "./icons/wallet.svg?react";

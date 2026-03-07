@@ -34,3 +34,8 @@ export const whitelistUserQueryKeys = {
       params?.tokenAddresses,
     ] as const,
 };
+
+export const pairQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["pairs", "list", params] as const,
+};
