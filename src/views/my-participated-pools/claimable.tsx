@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
-import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
 import TableSpinner from "@/components/common/table-spinner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -18,6 +17,7 @@ import { Link } from "@tanstack/react-router";
 import MyParticipatedMenu from "./menu";
 import type { SortOption } from "./menu";
 import { formatUnits } from "ethers";
+import TokenDisplay from "@/components/common/token-display";
 
 const ALL_NETWORK_IDS = NETWORK_CONFIGS.map((n) => n.id);
 const LIMIT = 20;
@@ -94,14 +94,13 @@ function MyParticipatedClaimable() {
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    <div className="flex flex-col">
-                                        <span>{item.tokenInSymbolCustom ?? item.tokenInSymbol}</span>
-                                        <NetworkDisplay chainId={item.chainId} />
-                                    </div>
+                                    <TokenDisplay symbol={item.tokenInSymbol} customSymbol={item.tokenInSymbolCustom ?? undefined} imageUri={item.tokenInImageUri ?? undefined} />
                                 </TableCell>
-                                <TableCell>{item.tokenOutSymbolCustom ?? item.tokenOutSymbol}</TableCell>
+                                <TableCell>
+                                    <TokenDisplay symbol={item.tokenOutSymbol} customSymbol={item.tokenOutSymbolCustom ?? undefined} imageUri={item.tokenInImageUri ?? undefined} />
+                                </TableCell>
                                 <TableCell>{amountBurned} {item.tokenInSymbolCustom ?? item.tokenInSymbol}</TableCell>
-                                <TableCell>{claimableReward} {item.tokenInSymbolCustom ?? item.tokenOutSymbol}</TableCell>
+                                <TableCell>{claimableReward} {item.tokenOutSymbolCustom ?? item.tokenOutSymbol}</TableCell>
                                 <TableCell>
                                     <Link to="/burn/detail/$address" params={{ address: item.address }}>
                                         <AnimateIconButton
