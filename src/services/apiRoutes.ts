@@ -5,6 +5,7 @@ export const API_ROUTES = {
     SIGN_IN_EVM: "/users/evm/sign-in",
     SIGN_IN_SOLANA: "/users/solana/sign-in",
     GET_CURRENT_USER: "/users/me",
+    GET_PARTICIPATED_POOLS: "/users/pools"
   },
   POOLS: {
     LIST: "/pools",

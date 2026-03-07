@@ -6,17 +6,26 @@ import SortSelect from "@/components/common/sort-select";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import type { SortBy, SortOrder } from "@/types/common";
 
+export type ParticipatedPoolSortBy = "tvl" | "joinedTime" | "claimableReward" | "amountBurned";
+
+export interface SortOption {
+    value: ParticipatedPoolSortBy;
+    label: string;
+    shortLabel: string;
+}
+
 export interface IMyParticipatedMenu {
-    statusOptions: MultipleSelectOption[];
-    selectedStatuses: string[];
-    onStatusChange: (value: string[]) => void;
+    statusOptions?: MultipleSelectOption[];
+    selectedStatuses?: string[];
+    onStatusChange?: (value: string[]) => void;
     selectedNetworks: string[];
     onNetworkChange: (value: string[]) => void;
     searchText: string;
     onSearchChange: (value: string) => void;
-    sortBy: SortBy;
+    sortOptions: SortOption[];
+    sortBy: ParticipatedPoolSortBy | undefined;
     sortOrder: SortOrder;
-    onSortByChange: (sortBy: SortBy) => void;
+    onSortByChange: (sortBy: ParticipatedPoolSortBy | undefined) => void;
     onSortOrderChange: (sortOrder: SortOrder) => void;
 }
 
@@ -28,8 +37,6 @@ const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map((network) => 
     ),
 }));
 
-const SORT_OPTIONS: SortBy[] = ["timestamp", "tvl"];
-
 function MyParticipatedMenu({
     statusOptions,
     selectedStatuses,
@@ -38,25 +45,30 @@ function MyParticipatedMenu({
     onNetworkChange,
     searchText,
     onSearchChange,
+    sortOptions,
     sortBy,
     sortOrder,
     onSortByChange,
     onSortOrderChange,
 }: IMyParticipatedMenu) {
+    const sortLabels = Object.fromEntries(sortOptions.map((o) => [o.value, o.label]));
+    const sortShortLabels = Object.fromEntries(sortOptions.map((o) => [o.value, o.shortLabel]));
     return (
         <div className="space-y-9.5 pt-12.75 pr-12.75 pl-21">
             <h1 className="text-3xl font-semibold">My Participated Pools</h1>
             <div className="flex items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2.5 w-full justify-end">
-                    <MultipleSelect
-                        options={statusOptions}
-                        selected={selectedStatuses}
-                        onChange={onStatusChange}
-                        showIconsInTriggerIfAny={false}
-                        placeholder="Status"
-                        placeholderMultiple="Status"
-                        classNames={{ btn: "max-w-50" }}
-                    />
+                    {statusOptions && selectedStatuses && onStatusChange && (
+                        <MultipleSelect
+                            options={statusOptions}
+                            selected={selectedStatuses}
+                            onChange={onStatusChange}
+                            showIconsInTriggerIfAny={false}
+                            placeholder="Status"
+                            placeholderMultiple="Status"
+                            classNames={{ btn: "max-w-50" }}
+                        />
+                    )}
                     <MultipleSelect
                         options={networkOptions}
                         placeholder="Network"
@@ -64,11 +76,13 @@ function MyParticipatedMenu({
                         onChange={onNetworkChange}
                     />
                     <SortSelect
-                        options={SORT_OPTIONS}
-                        sortBy={sortBy}
+                        options={sortOptions.map((o) => o.value) as unknown as SortBy[]}
+                        sortBy={sortBy as unknown as SortBy}
                         sortOrder={sortOrder}
-                        setSortBy={onSortByChange}
+                        setSortBy={onSortByChange as unknown as (sortBy: SortBy | undefined) => void}
                         setSortOrder={onSortOrderChange}
+                        labels={sortLabels}
+                        shortLabels={sortShortLabels}
                     />
                     <SearchTextDebouncedInput
                         inputProps={{ placeholder: "Search Pools..." }}

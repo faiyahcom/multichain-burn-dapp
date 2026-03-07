@@ -4,21 +4,19 @@ import type { FunctionComponent, SVGProps } from "react";
 export const sortOrders = ["asc", "desc"] as const;
 export type SortOrder = (typeof sortOrders)[number];
 
-export const sortBys = ["none", "volume", "tvl", "timestamp", "ts"] as const;
+export const sortBys = ["none", "volume", "tvl", "timestamp"] as const;
 export type SortBy = (typeof sortBys)[number];
 export const sortBysLabels: Record<SortBy, string> = {
   none: "None",
   volume: "Volume (24h)",
   tvl: "TVL",
   timestamp: "Created At",
-  ts: "New Joined",
 };
 export const sortBysShortLabels: Record<SortBy, string> = {
   none: "None",
   volume: "Volume",
   tvl: "TVL",
   timestamp: "Created At",
-  ts: "New Joined",
 };
 
 export const listLayouts = ["card", "list"] as const;

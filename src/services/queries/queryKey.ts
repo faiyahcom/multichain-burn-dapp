@@ -15,6 +15,11 @@ export const whitelistQueryKeys = {
   summary: () => ["whitelist", "summary"] as const,
 };
 
+export const userQueryKeys = {
+  participatedPools: (params?: unknown) =>
+    ["users", "participatedPools", params] as const,
+};
+
 export const whitelistUserQueryKeys = {
   listUsers: (params?: {
     search?: string;
