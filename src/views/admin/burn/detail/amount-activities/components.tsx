@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 export const Container = ({ children }: { children?: React.ReactNode }) => (
     <div className="mt-3 w-full space-y-3 px-6 py-4">
         <span className="flex items-center gap-2 text-xl font-medium">
-            Amount & Activity
+            Admin Action Panel
         </span>
         {children}
     </div>

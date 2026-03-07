@@ -8,28 +8,6 @@ type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
-function gcd(a: number, b: number): number {
-    return b === 0 ? a : gcd(b, a % b);
-}
-
-function toCleanRatio(numerator?: string, denominator?: string): string {
-    if (!numerator || !denominator) return "—";
-
-    const num = Number(numerator);
-    const den = Number(denominator);
-
-    if (!num || !den) return "—";
-
-    const divisor = gcd(num, den);
-    return `${num / divisor}:${den / divisor}`;
-}
-
-export function trimAddress(address?: string, head = 6, tail = 4): string {
-    if (!address) return "—";
-    if (address.length <= head + tail) return address;
-    return `${address.slice(0, head)}...${address.slice(-tail)}`;
-}
-
 const PoolOverview = ({ poolDetail }: Props) => {
     const { data: whitelistTokens } =
         useGetWhitelistTokens();
@@ -45,11 +23,6 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
-        const cleanRatio = toCleanRatio(
-            poolDetail.pool.rewardDenominator,
-            poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
-        );
-
         return [
             [
                 { label: "Pool Type", value: "Swap Pool" },
@@ -64,7 +37,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
             ],
             [
-                { label: "Ratio", value: cleanRatio },
+                { label: "Ratio", value: "Dynamic" },
                 {
                     label: "Burn Token",
                     // value: `${poolDetail.pool.tokenInSymbol}`,
@@ -81,7 +54,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
             ],
             [
-                { label: "Burn Method", value: "Transfer to Maker" },
+                { label: "Burn Method", value: "Burn" },
                 {
                     label: "Reward Token",
                     value: (

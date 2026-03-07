@@ -135,6 +135,8 @@
   --color-md-required-red: var(--md-required-red);
   --color-mb-cancel-gray: var(--mb-cancel-gray);
   --color-mb-submit-border: var(--mb-submit-border);
+  --color-mb-summary-form: var(--mb-summary-form);
+  --color-mb-summary-token-card: var(--mb-summary-token-card);
 }
 
 /* Light mode design tokens (default) */
@@ -218,6 +220,8 @@
   --md-required-red: #ff0000;
   --mb-cancel-gray: #f2f5f9;
   --mb-submit-border: #7452ff;
+  --mb-summary-form: #EAEAFA;
+  --mb-summary-token-card: #CCD6F6;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */

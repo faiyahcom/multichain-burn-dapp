@@ -1,12 +1,12 @@
 import type { PoolDetailResponse } from "@/types/pool";
 import { useAuthStore } from "@/stores/authStore";
 import { Container } from "./components";
-import DraftStatus from "./status/DraftStatus";
-import PendingHoldingStatus from "./status/PendingHoldingStatus";
-import UpcomingStatus from "./status/UpcomingStatus";
-import CanceledStatus from "./status/CanceledStatus";
-import OnGoingStatus from "./status/OnGoingStatus";
-import EndStatus from "./status/EndStatus";
+import DraftStatus from "./components/status/DraftStatus";
+import PendingHoldingStatus from "./components/status/PendingHoldingStatus";
+import UpcomingStatus from "./components/status/UpcomingStatus";
+import CanceledStatus from "./components/status/CanceledStatus";
+import OnGoingStatus from "./components/status/OnGoingStatus";
+import EndStatus from "./components/status/EndStatus";
 
 type Props = {
     poolDetail?: PoolDetailResponse;

@@ -3,7 +3,7 @@ import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
 import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
-import { trimAddress } from "./pool-overview";
+import { truncateString } from "@/utils/helpers/string";
 import AmountAndActivity from "./amount-activities";
 import { IconGoTo } from "@/assets/react";
 import {
@@ -45,7 +45,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     />
                 </div>
                 <span className="flex items-baseline gap-3.5 text-base text-greyed">
-                    {trimAddress(poolDetail?.pool.address)} <IconGoTo />
+                    {truncateString({ str: poolDetail?.pool.address ?? '' })} <IconGoTo />
                 </span>
             </div>
             <div className="grid grid-cols-3 gap-x-6">
