@@ -51,8 +51,6 @@ function MyParticipatedMenu({
     onSortByChange,
     onSortOrderChange,
 }: IMyParticipatedMenu) {
-    const sortLabels = Object.fromEntries(sortOptions.map((o) => [o.value, o.label]));
-    const sortShortLabels = Object.fromEntries(sortOptions.map((o) => [o.value, o.shortLabel]));
     return (
         <div className="space-y-9.5 pt-12.75 pr-12.75 pl-21">
             <h1 className="text-3xl font-semibold">My Participated Pools</h1>
@@ -81,8 +79,6 @@ function MyParticipatedMenu({
                         sortOrder={sortOrder}
                         setSortBy={onSortByChange as unknown as (sortBy: SortBy | undefined) => void}
                         setSortOrder={onSortOrderChange}
-                        labels={sortLabels}
-                        shortLabels={sortShortLabels}
                     />
                     <SearchTextDebouncedInput
                         inputProps={{ placeholder: "Search Pools..." }}

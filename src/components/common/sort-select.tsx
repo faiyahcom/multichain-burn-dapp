@@ -25,8 +25,6 @@ interface Props {
     setSortBy?: (sortBy: SortBy | undefined) => void;
     setSortOrder?: (sortOrder: SortOrder) => void;
     placeholder?: string;
-    labels?: Record<string, string>;
-    shortLabels?: Record<string, string>;
     defaultSortBy?: SortBy; // if set then it will be selected by default instead of none
 }
 
@@ -37,8 +35,6 @@ const SortSelect: React.FC<Props> = ({
     setSortBy,
     setSortOrder,
     placeholder = "Sort by",
-    labels,
-    shortLabels,
     defaultSortBy,
 }) => {
     const isActive = sortBy !== undefined && sortBy !== "none";
@@ -67,7 +63,7 @@ const SortSelect: React.FC<Props> = ({
                     size={"mb-btn"}
                 >
                     <div className={cn("size-2.5", { "size-4": isActive })} />
-                    {!isActive ? placeholder : (shortLabels?.[sortBy ?? "none"] ?? sortBysShortLabels[sortBy ?? "none"])}{" "}
+                    {!isActive ? placeholder : (sortBysShortLabels[sortBy ?? "none"] ?? sortBy)}{" "}
                     {!isActive ? (
                         <ArrowIcon direction="down" />
                     ) : (
@@ -99,7 +95,7 @@ const SortSelect: React.FC<Props> = ({
                             sortOrder={sortOrder}
                             isActive={isActive}
                             toggleSort={handleToggleSort}
-                            label={labels?.[sortByItem]}
+                            label={sortBysLabels[sortByItem]}
                         />
                     );
                 })}

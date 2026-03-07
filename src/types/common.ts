@@ -6,17 +6,23 @@ export type SortOrder = (typeof sortOrders)[number];
 
 export const sortBys = ["none", "volume", "tvl", "timestamp"] as const;
 export type SortBy = (typeof sortBys)[number];
-export const sortBysLabels: Record<SortBy, string> = {
+export const sortBysLabels: Record<string, string> = {
   none: "None",
   volume: "Volume (24h)",
   tvl: "TVL",
   timestamp: "Created At",
+  joinedTime: "Newest Joined",
+  claimableReward: "Claimable Reward",
+  amountBurned: "Amount Burned",
 };
-export const sortBysShortLabels: Record<SortBy, string> = {
+export const sortBysShortLabels: Record<string, string> = {
   none: "None",
   volume: "Volume",
   tvl: "TVL",
   timestamp: "Created At",
+  joinedTime: "Newest",
+  claimableReward: "Claimable",
+  amountBurned: "Burned",
 };
 
 export const listLayouts = ["card", "list"] as const;
