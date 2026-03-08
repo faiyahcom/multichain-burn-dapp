@@ -6,15 +6,16 @@ import SortSelect from "@/components/common/sort-select";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import type { SortBy, SortOrder } from "@/types/common";
 
-export type ParticipatedPoolSortBy = "tvl" | "joinedTime" | "claimableReward" | "amountBurned";
+export type UserPoolSortBy = "tvl" | "joinedTime" | "claimableReward" | "amountBurned" | "timestamp";
 
 export interface SortOption {
-    value: ParticipatedPoolSortBy;
+    value: UserPoolSortBy;
     label: string;
     shortLabel: string;
 }
 
-export interface IMyParticipatedMenu {
+export interface IUserPoolsMenu {
+    title?: string;
     statusOptions?: MultipleSelectOption[];
     selectedStatuses?: string[];
     onStatusChange?: (value: string[]) => void;
@@ -23,9 +24,9 @@ export interface IMyParticipatedMenu {
     searchText: string;
     onSearchChange: (value: string) => void;
     sortOptions: SortOption[];
-    sortBy: ParticipatedPoolSortBy | undefined;
+    sortBy: UserPoolSortBy | undefined;
     sortOrder: SortOrder;
-    onSortByChange: (sortBy: ParticipatedPoolSortBy | undefined) => void;
+    onSortByChange: (sortBy: UserPoolSortBy | undefined) => void;
     onSortOrderChange: (sortOrder: SortOrder) => void;
 }
 
@@ -37,7 +38,8 @@ const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map((network) => 
     ),
 }));
 
-function MyParticipatedMenu({
+function UserPoolsMenu({
+    title = "My Participated Pools",
     statusOptions,
     selectedStatuses,
     onStatusChange,
@@ -50,10 +52,10 @@ function MyParticipatedMenu({
     sortOrder,
     onSortByChange,
     onSortOrderChange,
-}: IMyParticipatedMenu) {
+}: IUserPoolsMenu) {
     return (
         <div className="space-y-9.5 pt-12.75 pr-12.75 pl-21">
-            <h1 className="text-3xl font-semibold">My Participated Pools</h1>
+            <h1 className="text-3xl font-semibold">{title}</h1>
             <div className="flex items-center justify-between gap-2.5">
                 <div className="flex items-center gap-2.5 w-full justify-end">
                     {statusOptions && selectedStatuses && onStatusChange && (
@@ -92,4 +94,4 @@ function MyParticipatedMenu({
     );
 }
 
-export default MyParticipatedMenu;
+export default UserPoolsMenu;

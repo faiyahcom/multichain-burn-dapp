@@ -18,7 +18,7 @@ export interface GetParticipatedPoolsByUserParams {
   tokenReward?: string;
 }
 
-interface ParticipatedUserPool {
+export interface ParticipatedUserPool {
   address: string
   chainId: string
   name: string
@@ -57,11 +57,13 @@ interface ParticipatedUserPool {
   joinedTime: string
 }
 
+export type ParticipatedPoolsResponse = PaginationResponse & { pools: ParticipatedUserPool[] };
+
 export const userService = {
   getParticipatedPoolsByUser: async (
     params: GetParticipatedPoolsByUserParams,
   ) => {
-    const response = await apiClient.get<PaginationResponse & {pools: ParticipatedUserPool[]}>(
+    const response = await apiClient.get<ParticipatedPoolsResponse>(
       USERS_API_ROUTES.GET_PARTICIPATED_POOLS,
       {params},
     )
