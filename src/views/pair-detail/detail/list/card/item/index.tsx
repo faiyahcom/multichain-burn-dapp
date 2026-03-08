@@ -22,7 +22,7 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
   const isBurnPool = data?.kind === 0;
 
   return (
-    <div className="space-y-2.25 rounded-t-md-plus bg-primary-foreground pt-2">
+    <div className="space-y-2.25 rounded-t-md-plus bg-primary-foreground pt-2 rounded-b-sm">
       {isBurnPool ? <BurnPoolInfo data={data} /> : <SwapPoolInfo data={data} />}
       <div className="space-y-1 pr-2 pl-2.25">
         <ValueLine
