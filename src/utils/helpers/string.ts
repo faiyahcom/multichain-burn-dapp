@@ -5,7 +5,7 @@ export const truncateString = ({
   left = 6,
   right = 4,
 }: {
-  str: string;
+  str?: string;
   left?: number;
   right?: number;
 }) => {
@@ -23,7 +23,7 @@ export const formatTimestampSecondsToDate = ({
   formatStr = "dd/MM/yyyy",
   notFound = "N/A",
 }: {
-  timestamp: string; // timestamp seconds
+  timestamp?: string; // timestamp seconds
   formatStr?: string;
   notFound?: string;
 }) => {

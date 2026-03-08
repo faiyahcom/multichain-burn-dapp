@@ -9,7 +9,6 @@ export const Route = createFileRoute(
 });
 
 function RouteComponent() {
-  const { chainId, tokenIn, tokenOut } = Route.useParams();
   return (
     <div className="flex gap-4.25 pt-9.5 pr-4.25 pb-10 pl-6.75">
       <PairDetailDetail />

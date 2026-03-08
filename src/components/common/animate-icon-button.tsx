@@ -10,6 +10,7 @@ interface BaseProps {
   };
   hasGroupHover?: boolean;
   text?: string;
+  afterText?: string; // Only use if the after text is different from the text
   color?: string;
   isActive?: boolean;
   btnProps?: Omit<React.ComponentProps<"button">, "className" | "style">;
@@ -33,6 +34,7 @@ const AnimateIconButton: React.FC<Props> = (props) => {
     classNames,
     hasGroupHover,
     text,
+    afterText,
     color,
     isActive,
     btnProps,
@@ -61,6 +63,9 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         {
           "--btn-bg": color,
           "--btn-text": text ? `'${text.replace(/'/g, "\\'")}'` : "''",
+          "--btn-after-text": afterText
+            ? `'${afterText.replace(/'/g, "\\'")}'`
+            : "''",
         } as React.CSSProperties
       }
       type="button"
@@ -77,6 +82,9 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         },
         {
           "border-transparent after:left-0": isActive,
+        },
+        {
+          "after:content-(--btn-after-text)": afterText,
         },
         classNames?.btn,
       )}

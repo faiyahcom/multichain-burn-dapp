@@ -137,6 +137,8 @@
   --color-mb-submit-border: var(--mb-submit-border);
   --color-mb-summary-form: var(--mb-summary-form);
   --color-mb-summary-token-card: var(--mb-summary-token-card);
+  --color-mb-gray-b5b7ca: var(--mb-gray-b5b7ca);
+  --color-mb-gray-69: var(--mb-gray-69);
 }
 
 /* Light mode design tokens (default) */
@@ -220,8 +222,10 @@
   --md-required-red: #ff0000;
   --mb-cancel-gray: #f2f5f9;
   --mb-submit-border: #7452ff;
-  --mb-summary-form: #EAEAFA;
-  --mb-summary-token-card: #CCD6F6;
+  --mb-summary-form: #eaeafa;
+  --mb-summary-token-card: #ccd6f6;
+  --mb-gray-b5b7ca: #b5b7ca;
+  --mb-gray-69: #696969;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -295,6 +299,8 @@
   --md-required-red: #ff0000;
   --mb-cancel-gray: #f2f5f9;
   --mb-submit-border: #7452ff;
+  --mb-gray-b5b7ca: #b5b7ca;
+  --mb-gray-69: #696969;
 }
 
 @layer base {

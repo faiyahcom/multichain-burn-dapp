@@ -1,5 +1,6 @@
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import InfoTooltip from "@/components/common/info-tooltip";
+import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import TableSpinner from "@/components/common/table-spinner";
 import TokenImage from "@/components/common/token-image";
@@ -68,18 +69,10 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="flex w-full items-center justify-center gap-0.5">
-                    <p
-                      className="min-w-0 truncate"
-                      title={Number(item.volume).toLocaleString("de-DE")}
-                    >
-                      {Number(item.volume).toLocaleString("de-DE")}
-                    </p>
-                    <p className="shrink-0">ETH</p>
-                  </div>
+                  <MetricNumber number={item.volume} unit="ETH" />
                 </TableCell>
                 <TableCell>
-                  {Number(item.tvl).toLocaleString("de-DE")} ETH
+                  <MetricNumber number={item.tvl} unit="ETH" />
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
