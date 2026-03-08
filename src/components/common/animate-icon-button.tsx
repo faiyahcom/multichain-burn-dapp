@@ -74,14 +74,14 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         "relative overflow-hidden after:absolute after:top-0 after:left-full after:flex after:h-full after:w-full after:items-center after:justify-center after:rounded-sm",
         "after:bg-(--btn-bg) after:text-base after:font-medium after:text-foreground after:content-(--btn-text)",
         "after:transition-all after:duration-300",
-        "hover:border-transparent hover:after:left-0",
+        "hover:border-(--btn-bg) hover:after:left-0",
         { "justify-center": textVariant === "text-container-center" },
         {
-          "group-hover:border-transparent group-hover:after:left-0":
+          "group-hover:border-(--btn-bg) group-hover:after:left-0":
             hasGroupHover,
         },
         {
-          "border-transparent after:left-0": isActive,
+          "border-(--btn-bg) after:left-0": isActive,
         },
         {
           "after:content-(--btn-after-text)": afterText,
