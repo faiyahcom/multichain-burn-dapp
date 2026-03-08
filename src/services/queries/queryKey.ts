@@ -38,4 +38,6 @@ export const whitelistUserQueryKeys = {
 export const pairQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["pairs", "list", params] as const,
+  stats: (params?: Record<string, unknown>) =>
+    ["pairs", "stats", params] as const,
 };

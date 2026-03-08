@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { Spinner } from "../ui/spinner";
 
 interface Props {
   src?: string | undefined | null;
@@ -8,9 +9,22 @@ interface Props {
     img?: string;
     placeholder?: string;
   };
+  isLoading?: boolean;
 }
 
-const TokenImage: React.FC<Props> = ({ src, alt, classNames }) => {
+const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
+  if (isLoading) {
+    <div
+      className={cn(
+        "flex size-8 shrink-0 items-center justify-center rounded-full border border-active bg-inactive",
+        classNames?.common,
+        classNames?.placeholder,
+      )}
+    >
+      <Spinner />
+    </div>;
+  }
+
   if (src) {
     return (
       <img

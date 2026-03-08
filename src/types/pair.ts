@@ -31,3 +31,15 @@ export type PairListRequest = PaginationRequest & {
 export type PairListResponse = PaginationResponse & {
   pairs: PairItemType[];
 };
+
+export type PairDetailStatsRequest = {
+  chainId: string;
+  tokenIn: string;
+  tokenOut: string;
+};
+
+export type PairDetailStatsResponse = {
+  totalPools: number;
+  totalPaticipants: number;
+  pair: PairItemType;
+};
