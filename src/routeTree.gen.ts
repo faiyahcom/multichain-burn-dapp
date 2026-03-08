@@ -21,6 +21,7 @@ import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/inde
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
+import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
 import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
@@ -92,6 +93,11 @@ const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
   path: '/activity-history/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BurnCreateIndexRoute = BurnCreateIndexRouteImport.update({
+  id: '/burn/create/',
+  path: '/burn/create/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminWhitelistUserIndexRoute = AdminWhitelistUserIndexRouteImport.update({
   id: '/admin/whitelist-user/',
   path: '/admin/whitelist-user/',
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/burn/create': typeof BurnCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/burn/create': typeof BurnCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -200,6 +208,7 @@ export interface FileRoutesById {
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
+  '/burn/create/': typeof BurnCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -224,6 +233,7 @@ export interface FileRouteTypes {
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/burn/create'
     | '/admin/burn/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesByTo: FileRoutesByTo
@@ -246,6 +256,7 @@ export interface FileRouteTypes {
     | '/admin/master-pool-management'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/burn/create'
     | '/admin/burn/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   id:
@@ -268,6 +279,7 @@ export interface FileRouteTypes {
     | '/admin/master-pool-management/'
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
+    | '/burn/create/'
     | '/admin/burn/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesById: FileRoutesById
@@ -291,6 +303,7 @@ export interface RootRouteChildren {
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
+  BurnCreateIndexRoute: typeof BurnCreateIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -381,6 +394,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivityHistoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/burn/create/': {
+      id: '/burn/create/'
+      path: '/burn/create'
+      fullPath: '/burn/create'
+      preLoaderRoute: typeof BurnCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/whitelist-user/': {
       id: '/admin/whitelist-user/'
       path: '/admin/whitelist-user'
@@ -459,6 +479,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
+  BurnCreateIndexRoute: BurnCreateIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
 }
