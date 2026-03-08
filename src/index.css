@@ -76,6 +76,7 @@
   --color-success: var(--success);
   --color-error: var(--error);
   --color-greyed: var(--greyed);
+  --color-admin-warning: var(--admin-warning);
 
   /* Status colors */
   --color-status-close: var(--status-close);
@@ -154,9 +155,10 @@
   --sub-text: #4e4e4e;
   --secondary-text: #7989ba;
 
-  --success: #7af4cb;
-  --error: #ff8e97;
+  --success: #00ff2f;
+  --error: #ff5562;
   --greyed: #696969;
+  --admin-warning: #FFE8D0;
 
   --status-close: #8eeaff;
   --status-end: #a5b7ff;
@@ -317,6 +319,7 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
   button:disabled,
   [role="button"]:disabled {
     cursor: not-allowed;

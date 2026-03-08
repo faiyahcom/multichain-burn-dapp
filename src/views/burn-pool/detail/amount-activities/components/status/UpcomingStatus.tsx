@@ -1,6 +1,6 @@
 import type { PoolDetailResponse } from "@/types/pool";
 import { Button } from "@/components/ui/button";
-import { ActionBtn, AmountInput, StatRow } from "../../components";
+import { StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 
 type Props = {
@@ -11,11 +11,6 @@ const UpcomingStatus = ({ poolDetail }: Props) => {
     const {
         pool,
         formattedBurned,
-        depositBurnOpen,
-        setDepositBurnOpen,
-        depositBurnInput,
-        setDepositBurnInput,
-        handleDepositBurn,
     } = useAmountActivity(poolDetail);
 
     return (
@@ -27,21 +22,12 @@ const UpcomingStatus = ({ poolDetail }: Props) => {
                 valueClassName="text-xl font-bold"
             />
             <StatRow label="Estimated Claimable Reward" value="0" />
-            <Button className="w-full" disabled>
+            <Button className="w-full rounded-sm" disabled>
                 Claim
             </Button>
-            <ActionBtn
-                letter="D"
-                text="Deposit"
-                onClick={() => setDepositBurnOpen((o) => !o)}
-            />
-            <AmountInput
-                open={depositBurnOpen}
-                value={depositBurnInput}
-                onChange={setDepositBurnInput}
-                onConfirm={handleDepositBurn}
-                placeholder={`Amount (${pool?.tokenInSymbol ?? ""})`}
-            />
+            <Button className="w-full rounded-sm" disabled>
+                Deposit
+            </Button>
         </>
     );
 };

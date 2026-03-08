@@ -32,7 +32,12 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 onClick={() => setDepositRewardOpen(true)}
             />
             <ActionBtn letter="E" text="Edit" color="#7AF4CB" onClick={handleEdit} />
-            <ActionBtn letter="R" text="Request Approve" color="#A5B7FF" onClick={handleRequestApprove} />
+            <ActionBtn
+                letter="R"
+                text="Request Approve"
+                color="#A5B7FF"
+                onClick={handleRequestApprove}
+            />
             <DepositRewardDialog
                 open={depositRewardOpen}
                 onOpenChange={setDepositRewardOpen}

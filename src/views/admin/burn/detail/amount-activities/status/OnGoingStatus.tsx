@@ -9,7 +9,7 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import { ActionBtn, StatRow } from "../components";
+import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
 
 type Props = {
@@ -20,7 +20,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [reason, setReason] = useState("");
 
-    const { pool, formattedBurned, formattedReturnReward, handleAdminClose } =
+    const { handleAdminClose } =
         useAmountActivity(poolDetail);
 
     const handleConfirmClose = async () => {
@@ -36,16 +36,6 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
 
     return (
         <>
-            <StatRow
-                label="Remaining Reward"
-                value={`${formattedReturnReward} ${pool?.rewardTokenSymbol ?? ""}`}
-                className="font-medium text-active"
-                valueClassName="text-2xl font-bold"
-            />
-            <StatRow
-                label="Burn Amount"
-                value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
-            />
             <ActionBtn
                 letter="C"
                 text="Close Pool"

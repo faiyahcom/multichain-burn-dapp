@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { formatAmount } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 
@@ -17,35 +16,6 @@ const RewardAmount = ({ poolDetail }: Props) => {
         ? formatAmount(poolDetail.depositedAmount, poolDetail.pool.tokenInDecimals)
         : "-";
 
-    const maxBurn = useMemo(() => {
-        if (!poolDetail) return 0;
-
-        const num = Number(poolDetail.pool.rewardNumerator ?? 0); // N
-        const den = Number(poolDetail.pool.rewardDenominator ?? 0); // D;
-
-        if (!num || !den) return 0;
-
-        // Raw amounts (not formatted)
-        const rewardRaw = Number(poolDetail.rewardAmount);
-        const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
-        const burnDecimals = poolDetail.pool.tokenInDecimals;
-
-        // Convert reward to human readable
-        const rewardHuman = rewardRaw / 10 ** rewardDecimals;
-
-        // maxBurn in human readable
-        const maxBurnHuman = rewardHuman * (den / num); // It's reward num and dem, not ratio on onchain
-
-        return maxBurnHuman;
-    }, [poolDetail]);
-    const formattedMaxBurn = maxBurn
-        ? formatAmount(
-            (maxBurn * 10 ** poolDetail!.pool.tokenInDecimals).toString(),
-            poolDetail!.pool.tokenInDecimals,
-        )
-        : "-";
-
-    const burnProgress = Number(formattedBurned) / Number(maxBurn);
     return (
         <div className="mt-3 w-full py-4">
             <div className="flex items-center gap-14 pb-4 text-xl font-medium">
@@ -57,23 +27,17 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     {formattedReward} {poolDetail?.pool.rewardTokenSymbol}
                 </p>
             </div>
-            <div>
-                <p className="text-base text-greyed">
-                    <span>Total Burned Amount:</span>{" "}
-                    <span className="ml-14">
-                        {formattedBurned}{" "}
-                        {poolDetail?.pool.tokenInSymbol}
-                    </span>
-                </p>
-                {/* <div>
-                    <div className="h-3.25 w-full rounded-[9.5px] bg-progress-bg">
-                        <div
-                            className="h-full rounded-[9.5px] bg-progress"
-                            style={{ width: `${burnProgress * 100}%` }}
-                        ></div>
+            {poolDetail?.pool.status &&
+                ["on_going", "ended", "closed"].includes(poolDetail.pool.status) && (
+                    <div>
+                        <p className="text-base text-greyed">
+                            <span>Total Burned Amount:</span>{" "}
+                            <span className="ml-14">
+                                {formattedBurned} {poolDetail?.pool.tokenInSymbol}
+                            </span>
+                        </p>
                     </div>
-                </div> */}
-            </div>
+                )}
         </div>
     );
 };

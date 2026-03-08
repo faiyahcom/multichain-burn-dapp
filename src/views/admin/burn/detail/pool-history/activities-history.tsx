@@ -4,10 +4,10 @@ import { poolQueryKeys } from '@/services/queries/queryKey';
 import { activityKind, type PoolDetailResponse } from '@/types/pool';
 import { formatAmount } from '@/utils/helpers/numbers';
 import { useQuery } from '@tanstack/react-query';
-import { formatTimestamp } from './transaction-history';
 import { truncateString } from '@/utils/helpers/string';
 import CustomPagination from '@/components/common/pagination';
 import { useState } from 'react';
+import { formatTimestamp } from '@/views/burn-pool/detail/pool-history/transaction-history';
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -47,10 +47,10 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
             <Table className="border-spacing-y-0 mb-2 rounded-b-lg border border-progress-bg">
                 <TableHeader>
                     <TableRow>
-                        <TableHead className="w-40 h-auto border-b border-progress-bg py-3 text-base font-medium">
+                        <TableHead className="w-80 h-auto border-b border-progress-bg py-3 text-base font-medium">
                             Time
                         </TableHead>
-                        <TableHead className="w-40 h-auto border-b border-progress-bg py-3 text-base font-medium">
+                        <TableHead className="w-80 h-auto border-b border-progress-bg py-3 text-base font-medium">
                             Actor
                         </TableHead>
                         <TableHead className="text-right pr-20 w-auto h-auto border-b border-progress-bg py-3 text-base font-medium">

@@ -6,7 +6,7 @@ import RewardAmount from "./reward-amount";
 import { truncateString } from "@/utils/helpers/string";
 import AmountAndActivity from "./amount-activities";
 import { IconGoTo } from "@/assets/react";
-import { BURN_POOL_STATUS, SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
+import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
@@ -23,6 +23,58 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
 
     const status = poolDetail?.pool.status;
     const safeStatus: BurnPoolStatus = status ?? "on_going";
+
+    const renderExtraContent = () => {
+        if (!status) return null;
+
+        switch (status) {
+            case "pending":
+                return (
+                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                        This pool is waiting for admin approval.
+                    </p>
+                );
+            case "upcoming":
+                return (
+                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                        This pool is waiting for admin approval.
+                    </p>
+                );
+            case "holding":
+                return (
+                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                        Pool has reached its start time but is awaiting admin action.
+                    </p>
+                );
+            case "on_going":
+                return (
+                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                        This pool is currently active. Users can participate until the end time.
+                    </p>
+                );
+            case "closed":
+                return (
+                    <p className="bg-admin-error ml-auto rounded-md px-6 py-2 text-base">
+                        This pool has been emergency closed by the admin.
+                    </p>
+                );
+            case "ended":
+                return (
+                    <p className="bg-admin-error ml-auto rounded-md px-6 py-2 text-base">
+                        This pool has ended. Participation is no longer possible.
+                    </p>
+                );
+            case "canceled":
+                return (
+                    <p className="bg-admin-error ml-auto rounded-md px-6 py-2 text-base">
+                        This pool has been manually canceled by the Project Owner.
+                    </p>
+                );
+            case "draft":
+            default:
+                return null;
+        }
+    };
 
     return (
         <div className="pt-9.5 pl-14">
@@ -41,21 +93,22 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
                             icon: "size-9 text-3xl",
                         }}
                     />
+                    <div className="flex flex-1">{renderExtraContent()}</div>
                 </div>
                 <span className="flex items-baseline gap-3.5 text-base text-greyed">
-                    {truncateString({ str: poolDetail?.pool.address ?? '' })} <IconGoTo />
+                    {truncateString({ str: poolDetail?.pool.address ?? "" })} <IconGoTo />
                 </span>
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">
                     <PoolOverview poolDetail={poolDetail} />
                     <RewardAmount poolDetail={poolDetail} />
-                    <PoolHistory poolDetail={poolDetail} />
                 </div>
                 <div className="col-span-1">
                     <AmountAndActivity poolDetail={poolDetail} />
                 </div>
             </div>
+            <PoolHistory poolDetail={poolDetail} />
         </div>
     );
 };
