@@ -14,15 +14,17 @@ interface Props {
 
 const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
   if (isLoading) {
-    <div
-      className={cn(
-        "flex size-8 shrink-0 items-center justify-center rounded-full border border-active bg-inactive",
-        classNames?.common,
-        classNames?.placeholder,
-      )}
-    >
-      <Spinner />
-    </div>;
+    return (
+      <div
+        className={cn(
+          "flex size-8 shrink-0 items-center justify-center rounded-full border border-active bg-inactive",
+          classNames?.common,
+          classNames?.placeholder,
+        )}
+      >
+        <Spinner />
+      </div>
+    );
   }
 
   if (src) {
