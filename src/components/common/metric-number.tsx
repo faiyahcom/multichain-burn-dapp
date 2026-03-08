@@ -9,7 +9,12 @@ interface Props {
 }
 
 const MetricNumber: React.FC<Props> = ({ number, unit, classNames }) => {
-  if (isNaN(Number(number))) {
+  if (
+    number === "" ||
+    number === null ||
+    number === undefined ||
+    isNaN(Number(number))
+  ) {
     return null;
   }
 

@@ -14,7 +14,7 @@ const PairDetailDetailList = () => {
   const limit = 18;
 
   const { data: pools, isPending: isPendingPools } = useQuery({
-    queryKey: poolQueryKeys.list({ ...filter }),
+    queryKey: poolQueryKeys.list({ ...filter, chainId, tokenIn, tokenOut }),
     queryFn: async () => {
       return poolService.getPoolList({
         page: filter.page,
