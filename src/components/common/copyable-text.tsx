@@ -3,10 +3,11 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 interface Props {
-  content: string;
+  content?: string;
   displayText?: string;
   classNames?: {
     container?: string;
+    displayText?: string;
   };
 }
 
@@ -16,6 +17,7 @@ const CopyableText: React.FC<Props> = ({
   classNames,
 }) => {
   const handleCopy = () => {
+    if (!content) return;
     navigator.clipboard
       .writeText(content)
       .then(() => {
@@ -33,7 +35,7 @@ const CopyableText: React.FC<Props> = ({
         classNames?.container,
       )}
     >
-      <span className="text-sm" title={content}>
+      <span className={cn("text-sm", classNames?.displayText)} title={content}>
         {displayText ?? content}
       </span>
       <button onClick={handleCopy}>

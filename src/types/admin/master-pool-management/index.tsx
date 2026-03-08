@@ -1,5 +1,3 @@
-// 0 - burn pool
-
 import type {
   PaginationRequest,
   PaginationResponse,
@@ -7,7 +5,7 @@ import type {
   SortOrder,
 } from "@/types/common";
 
-// 1 - swap pool
+// 0 - burn pool | 1 - swap pool
 export const poolTypes = [0, 1] as const;
 export type PoolType = (typeof poolTypes)[number];
 export const poolTypeLabels: Record<PoolType, string> = {
@@ -107,6 +105,8 @@ export type PoolItemType = {
   owner: string;
   timeStart: string; // timestamp seconds, if none then it is "0"
   timeEnd: string; // timestamp seconds, if none then it is "0"
+  rewardNumerator: string;
+  rewardDenominator: string;
 };
 
 export type PoolListRequest = PaginationRequest & {
