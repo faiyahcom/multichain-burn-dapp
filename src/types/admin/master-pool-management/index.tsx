@@ -119,7 +119,7 @@ export type PoolListRequest = PaginationRequest & {
   sortDirection?: SortOrder; // default to desc
   tokenIn?: string;
   tokenReward?: string;
-  taker?: string;
+  owner?: string;
 };
 
 export type PoolListResponse = PaginationResponse & {

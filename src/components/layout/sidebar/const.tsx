@@ -78,6 +78,10 @@ export const navItems: NavItem[] = [
     icon: IconMyCreatedPools,
     section: navSection.profile_menu,
     to: "/my-create-pools",
+    children: [
+      { label: "Burn Pool", tab: "burn-pool" },
+      { label: "Swap Pool", tab: "swap-pool" },
+    ],
   },
 
   {

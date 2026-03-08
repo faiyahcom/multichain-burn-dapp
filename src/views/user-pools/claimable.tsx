@@ -10,11 +10,11 @@ import { userService, type GetParticipatedPoolsByUserParams } from "@/services/u
 import { userQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import type { SortOrder } from "@/types/common";
-import type { ParticipatedPoolSortBy } from "./menu";
+import type { UserPoolSortBy } from "./menu";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { truncateString } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
-import MyParticipatedMenu from "./menu";
+import UserPoolsMenu from "./menu";
 import type { SortOption } from "./menu";
 import { formatUnits } from "ethers";
 import TokenDisplay from "@/components/common/token-display";
@@ -29,11 +29,11 @@ const SORT_OPTIONS: SortOption[] = [
     { value: "joinedTime", label: "Newest Joined", shortLabel: "Newest" },
 ];
 
-function MyParticipatedClaimable() {
+function UserClaimablePool() {
     const user = useAuthStore((s) => s.user);
     const [selectedNetworks, setSelectedNetworks] = useState<string[]>(ALL_NETWORK_IDS);
     const [searchText, setSearchText] = useState("");
-    const [sortBy, setSortBy] = useState<ParticipatedPoolSortBy | undefined>("claimableReward");
+    const [sortBy, setSortBy] = useState<UserPoolSortBy | undefined>("claimableReward");
     const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
     const [page, setPage] = useState(1);
 
@@ -46,7 +46,7 @@ function MyParticipatedClaimable() {
             array: selectedNetworks.map(networkIdToChainId),
         }),
         search: searchText || undefined,
-        sortBy,
+        sortBy: sortBy as GetParticipatedPoolsByUserParams["sortBy"],
         sortDirection: sortOrder,
     };
 
@@ -58,7 +58,7 @@ function MyParticipatedClaimable() {
 
     return (
         <div>
-            <MyParticipatedMenu
+            <UserPoolsMenu
                 selectedNetworks={selectedNetworks}
                 onNetworkChange={(v) => { setSelectedNetworks(v); setPage(1); }}
                 searchText={searchText}
@@ -128,4 +128,4 @@ function MyParticipatedClaimable() {
     );
 }
 
-export default MyParticipatedClaimable;
+export default UserClaimablePool;

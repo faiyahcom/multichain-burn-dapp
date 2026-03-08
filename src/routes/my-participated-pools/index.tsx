@@ -1,6 +1,6 @@
-import MyParticipatedBurnPools from '@/views/my-participated-pools/burn-pool';
-import MyParticipatedClaimable from '@/views/my-participated-pools/claimable';
-import MyParticipatedSwapPools from '@/views/my-participated-pools/swap-pool';
+import UserBurnPools from '@/views/user-pools/burn-pool';
+import UserClaimablePool from '@/views/user-pools/claimable';
+import UserSwapPools from '@/views/user-pools/swap-pool';
 import { createFileRoute } from '@tanstack/react-router'
 
 type Tab = 'burn-pool' | 'swap-pool' | 'claimable';
@@ -16,9 +16,9 @@ function RouteComponent() {
   const { tab } = Route.useSearch()  as {tab:Tab}
 
   if(tab === "claimable")
-    return <MyParticipatedClaimable/>
+    return <UserClaimablePool/>
   if(tab === "swap-pool")
-    return <MyParticipatedSwapPools/>
+    return <UserSwapPools mode="participated"/>
 
-  return <MyParticipatedBurnPools/>
+  return <UserBurnPools mode="participated"/>
 }
