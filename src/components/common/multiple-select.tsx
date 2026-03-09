@@ -28,7 +28,7 @@ interface Props {
     btn?: string;
     content?: string;
   };
-  defaultValuesWhenUncheckAll?: string[];
+  defaultValuesWhenUncheckAll?: string[]; // By default, "clear" like action will result in an empty array. This will override that behavior.
 }
 
 const MultipleSelect: React.FC<Props> = ({
@@ -69,7 +69,11 @@ const MultipleSelect: React.FC<Props> = ({
   };
 
   const handleClearAllCheck = () => {
-    onChange?.([]);
+    if (defaultValuesWhenUncheckAll) {
+      onChange?.(defaultValuesWhenUncheckAll);
+    } else {
+      onChange?.([]);
+    }
   };
 
   const handleToggleCheck = (value?: string) => {
