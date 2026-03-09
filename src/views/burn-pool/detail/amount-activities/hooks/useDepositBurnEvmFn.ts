@@ -7,8 +7,7 @@ import {
     getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_BURN_ADDRESS } from "@/web3";
-
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+import { ZERO_ADDRESS } from "@/config/constant";
 
 export interface DepositBurnParams {
     poolAddress: string;

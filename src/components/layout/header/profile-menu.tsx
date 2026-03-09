@@ -17,7 +17,6 @@ const ProfileMenu = ({ }: Props) => {
   const { disconnect } = useDisconnect();
 
   const handleLogout = async () => {
-    console.log("abc");
     await disconnect();
     logout();
   };

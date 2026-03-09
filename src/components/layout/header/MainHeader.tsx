@@ -6,7 +6,6 @@ import ConnectButton from "./connect-button";
 export function MainHeader() {
   const { isConnected } = useAppKitAccount();
 
-  console.log("isConnected", isConnected);
 
   return (
     <header className="flex items-center justify-between gap-4 bg-background pt-6 pr-14 pb-9 pl-9">
