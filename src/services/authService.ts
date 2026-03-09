@@ -23,6 +23,7 @@ export interface SignInResponse {
 export interface UserResponse {
   id: string
   address: string
+	role: "normal" | "admin"
 }
 
 export const authService = {
