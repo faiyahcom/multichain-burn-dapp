@@ -31,7 +31,7 @@ export const getContractBurnFactory = (signer: Signer) => {
     const normalized = ethers.getAddress(rawAddress.toLowerCase());
     return new ethers.Contract(
         normalized,
-        (MULTICHAIN_BURN_ABI_BURN_FACTORY as any).abi ?? MULTICHAIN_BURN_ABI_BURN_FACTORY,
+        MULTICHAIN_BURN_ABI_BURN_FACTORY,
         signer,
     );
 };
