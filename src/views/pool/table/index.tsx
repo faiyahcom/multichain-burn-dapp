@@ -33,6 +33,7 @@ import {
 } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 
 interface Props {
   poolType: PoolType;
@@ -228,7 +229,10 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                   <NetworkDisplay chainId={pool.chainId} />
                 </TableCell>
                 <TableCell>
-                  <MetricNumber number={pool.tvl} unit="ETH" />
+                  <MetricNumber
+                    number={formatUnits(pool.tvl ?? 0, pool.tokenOutDecimals)}
+                    unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                  />
                 </TableCell>
                 {isBurnPool ? (
                   <>

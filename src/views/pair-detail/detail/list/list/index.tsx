@@ -22,6 +22,7 @@ import {
   truncateString,
 } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 
 interface Props {
   data?: PoolItemType[];
@@ -117,10 +118,16 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
                 )}
               </TableCell>
               <TableCell>
-                <MetricNumber number={pool.volume} unit="ETH" />
+                <MetricNumber
+                  number={formatUnits(pool.volume ?? 0, pool.tokenInDecimals)}
+                  unit={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                />
               </TableCell>
               <TableCell>
-                <MetricNumber number={pool.tvl} unit="ETH" />
+                <MetricNumber
+                  number={formatUnits(pool.tvl ?? 0, pool.tokenOutDecimals)}
+                  unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                />
               </TableCell>
               <TableCell>
                 <AnimateIconButton

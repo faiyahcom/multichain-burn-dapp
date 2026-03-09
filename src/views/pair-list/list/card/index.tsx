@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 
 interface Props {
   data?: PairItemType[];
@@ -48,6 +49,8 @@ const CardItem: React.FC<PairItemType> = ({
   chainId,
   tokenIn,
   tokenOut,
+  tokenInDecimals,
+  tokenOutDecimals,
 }) => {
   return (
     <div
@@ -93,12 +96,14 @@ const CardItem: React.FC<PairItemType> = ({
         <CardInfoRow
           title="Volume"
           tooltipContent="The total value of burn tokens deposited by taker into Swap Pools and Burn Pools of the pair"
-          value={Number(volume) || 0}
+          value={Number(formatUnits(volume ?? 0, tokenInDecimals)) || 0}
+          unit={tokenInSymbolCustom ?? tokenInSymbol}
         />
         <CardInfoRow
           title="TVL"
           tooltipContent="The total amount of reward tokens deposited by all makers when creating Swap Pools and Burn Pools within the same pair."
-          value={Number(tvl) || 0}
+          value={Number(formatUnits(tvl ?? 0, tokenOutDecimals)) || 0}
+          unit={tokenOutSymbolCustom ?? tokenOutSymbol}
         />
       </div>
 
@@ -122,12 +127,14 @@ interface CardInfoRowProps {
   title: string;
   tooltipContent?: string;
   value: number;
+  unit?: string;
 }
 
 const CardInfoRow: React.FC<CardInfoRowProps> = ({
   title,
   tooltipContent,
   value,
+  unit,
 }) => {
   return (
     <div className="flex items-center justify-between gap-1">
@@ -144,7 +151,7 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
         <p className="min-w-0 truncate" title={value.toLocaleString("de-DE")}>
           {value.toLocaleString("de-DE")}
         </p>
-        <p>ETH</p>
+        <p>{unit}</p>
       </div>
     </div>
   );
