@@ -36,9 +36,10 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
                 );
             case "upcoming":
                 return (
-                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
-                        This pool is waiting for admin approval.
-                    </p>
+                    // <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                    //     This pool is waiting for admin approval.
+                    // </p>
+                    <></>
                 );
             case "holding":
                 return (

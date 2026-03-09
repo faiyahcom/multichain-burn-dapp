@@ -9,8 +9,6 @@ import {
 import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
-    TOKEN_2022_PROGRAM_ID,
     ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { BN } from "bn.js";
@@ -19,21 +17,22 @@ import {
     type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
 import {
+    AssetTypeEnum,
+    detectAssetType,
     getFactoryPDA,
     getRewardVaultPDA,
+    getTokenProgramFromAssetType,
     getUserDepositPDA,
-    detectAssetType,
-    AssetTypeEnum,
 } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
 
 export interface ClaimBurnSolParams {
     poolAddress: string;
     poolDetail: PoolDetailResponse;
-    /** Merkle proof bytes — pass empty array / omit if no whitelist */
-    proof?: Uint8Array;
-    /** Merkle leaf index — defaults to 0 */
-    index?: number;
+    /** Merkle proof hex strings from API — each entry is a 32-byte hash */
+    merkleProof?: string[];
+    /** Merkle leaf index from API response (`proofIndex`) — defaults to 0 */
+    proofIndex?: number;
 }
 
 export const useClaimBurnSolFn = () => {
@@ -45,8 +44,8 @@ export const useClaimBurnSolFn = () => {
         async ({
             poolAddress,
             poolDetail,
-            proof = new Uint8Array(),
-            index = 0,
+            merkleProof = [],
+            proofIndex = 0,
         }: ClaimBurnSolParams) => {
             try {
                 if (!isConnected || !address) {
@@ -80,8 +79,15 @@ export const useClaimBurnSolFn = () => {
                 );
 
                 // ── 2. Proof args ──────────────────────────────────────────
-                const proofBuffer = Buffer.from(proof);
-                const indexBN = new BN(index);
+                // API returns hex-encoded ASCII of "0xSOMEHASH"; decode twice to get 32-byte hashes
+                // IDL expects `proof: bytes` — a flat buffer of concatenated 32-byte hashes
+                const proofBuffer = Buffer.concat(
+                    merkleProof.map((h) => {
+                        const hexStr = Buffer.from(h, "hex").toString("ascii").replace(/^0x/, "");
+                        return Buffer.from(hexStr, "hex");
+                    }),
+                );
+                const indexBN = new BN(proofIndex);
 
                 const isNativeReward =
                     poolDetail.pool.assetTypeReward === AssetTypeEnum.NATIVE;
@@ -124,10 +130,7 @@ export const useClaimBurnSolFn = () => {
                         connection,
                         rewardMint,
                     );
-                    const rewardTokenProgram =
-                        rewardAssetType === AssetTypeEnum.SPL2022
-                            ? TOKEN_2022_PROGRAM_ID
-                            : TOKEN_PROGRAM_ID;
+                    const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
 
                     // User reward ATA
                     const userRewardAta = await getAssociatedTokenAddress(

@@ -6,6 +6,7 @@ export const API_ROUTES = {
     SIGN_IN_SOLANA: "/users/solana/sign-in",
     GET_CURRENT_USER: "/users/me",
     GET_PARTICIPATED_POOLS: "/users/pools",
+    GET_POOL_MERKLE_PROOF: (poolAddress: string) => `/users/pools/${poolAddress}/proof`,
   },
   POOLS: {
     LIST: "/pools",
