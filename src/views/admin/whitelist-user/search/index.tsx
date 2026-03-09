@@ -209,6 +209,7 @@ const AdminWhitelistUserSearch = () => {
                                         : "No tokens available"
                                     : "All Tokens"
                         }
+                        placeholderMultiple="All Tokens"
                         selected={filter.tokens}
                         onChange={(value) => setFilter({ tokens: value })}
                     />
