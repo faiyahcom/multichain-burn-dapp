@@ -1,5 +1,5 @@
 import {
-  burnPoolStatuses,
+  userViewBurnPoolStatuses,
   type BurnPoolStatus,
   type PoolType,
   type SwapPoolStatus,
@@ -27,7 +27,7 @@ export const usePairDetailSearchFilterStore =
     filter: {
       page: 1,
       type: 0,
-      status: [...burnPoolStatuses],
+      status: [...userViewBurnPoolStatuses],
       sortBy: "volume",
       sortOrder: "desc",
       text: "",

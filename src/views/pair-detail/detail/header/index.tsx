@@ -7,10 +7,10 @@ import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
 import {
-  burnPoolStatuses,
   poolTypes,
   poolTypeShortenOptions,
-  swapPoolStatuses,
+  userViewBurnPoolStatuses,
+  userViewSwapPoolStatuses,
   type PoolType,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
@@ -43,7 +43,9 @@ const PairDetailDetailHeader = () => {
     if (value === poolTypes[1]) {
       const newStatuses =
         filter.status?.filter((status) =>
-          swapPoolStatuses.includes(status as SwapPoolStatus),
+          (userViewSwapPoolStatuses as ReadonlyArray<SwapPoolStatus>).includes(
+            status as SwapPoolStatus,
+          ),
         ) ?? [];
       setFilter({ type: value, status: newStatuses });
       return;
@@ -52,8 +54,8 @@ const PairDetailDetailHeader = () => {
     // if switching from swap pool to burn pool or all types
     // and all swap statuses were selected, expand to all burn pool statuses
     if (value === poolTypes[0]) {
-      if (filter.status?.length === swapPoolStatuses.length) {
-        setFilter({ type: value, status: [...burnPoolStatuses] });
+      if (filter.status?.length === userViewSwapPoolStatuses.length) {
+        setFilter({ type: value, status: [...userViewBurnPoolStatuses] });
         return;
       }
     }

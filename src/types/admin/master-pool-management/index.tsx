@@ -125,3 +125,33 @@ export type PoolListRequest = PaginationRequest & {
 export type PoolListResponse = PaginationResponse & {
   pools: PoolItemType[];
 };
+
+// user view pool list can only see certain statuses
+export const userViewBurnPoolStatuses = [
+  "pending",
+  "holding",
+  "upcoming",
+  "on_going",
+  "ended",
+] as const;
+export type UserViewBurnPoolStatus = (typeof userViewBurnPoolStatuses)[number];
+export const userHiddenBurnPoolStatuses = [
+  ...burnPoolStatuses.filter(
+    (status) =>
+      !(userViewBurnPoolStatuses as ReadonlyArray<BurnPoolStatus>).includes(
+        status,
+      ),
+  ),
+  "draft",
+] as const;
+
+export const userViewSwapPoolStatuses = ["on_going"] as const;
+export const userHiddenSwapPoolStatuses = [
+  ...swapPoolStatuses.filter(
+    (status) =>
+      !(userViewSwapPoolStatuses as ReadonlyArray<SwapPoolStatus>).includes(
+        status,
+      ),
+  ),
+  "draft",
+] as const;

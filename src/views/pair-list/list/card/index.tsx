@@ -1,5 +1,6 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import InfoTooltip from "@/components/common/info-tooltip";
+import NoData from "@/components/common/no-data";
 import TokenImage from "@/components/common/token-image";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
@@ -20,6 +21,13 @@ const PairListListCardLayout: React.FC<Props> = ({ data, isLoading }) => {
         </div>
       )}
       <div className="grid w-full grid-cols-1 gap-x-8.5 gap-y-10.5 md:grid-cols-2 xl:grid-cols-3">
+        <NoData
+          isLoading={isLoading}
+          data={data}
+          classNames={{
+            container: "col-span-1 md:col-span-2 xl:col-span-3",
+          }}
+        />
         {data?.map((item, index) => (
           <CardItem key={index} {...item} />
         ))}

@@ -1,6 +1,6 @@
 import { NETWORK_CONFIGS } from "@/config/networks";
 import {
-  burnPoolStatuses,
+  userViewBurnPoolStatuses,
   type BurnPoolStatus,
 } from "@/types/admin/master-pool-management";
 import type { SortBy, SortOrder } from "@/types/common";
@@ -26,7 +26,7 @@ export const useBurnPoolListSearchFilterStore =
       page: 1,
       text: "",
       network: NETWORK_CONFIGS.map((network) => network.id),
-      status: [...burnPoolStatuses],
+      status: [...userViewBurnPoolStatuses],
       sortBy: "tvl",
       sortOrder: "desc",
     },

@@ -1,6 +1,7 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import MetricNumber from "@/components/common/metric-number";
+import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
   Table,
@@ -55,6 +56,11 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
       </TableHeader>
       <TableBody>
         <TableSpinner isLoading={isLoading} colSpan={columns.length} />
+        <TableNoData
+          colSpan={columns.length}
+          data={data}
+          isLoading={isLoading}
+        />
         {data?.map((pool) => {
           const timeStart = formatTimestampSecondsToDate({
             timestamp: pool.timeStart,

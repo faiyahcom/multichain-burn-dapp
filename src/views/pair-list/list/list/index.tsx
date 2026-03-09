@@ -2,6 +2,7 @@ import { ArrowIcon } from "@/components/common/arrow-icon";
 import InfoTooltip from "@/components/common/info-tooltip";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
+import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import TokenImage from "@/components/common/token-image";
 import {
@@ -41,6 +42,7 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
         </TableHeader>
         <TableBody>
           <TableSpinner isLoading={isLoading} colSpan={5} />
+          <TableNoData colSpan={5} data={data} isLoading={isLoading} />
           {data?.map((item, index) => {
             return (
               <TableRow key={index}>

@@ -7,12 +7,12 @@ import SortSelect from "@/components/common/sort-select";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
 import {
   burnPoolStatusColors,
-  burnPoolStatuses,
   burnPoolStatusLabels,
   poolTypes,
   swapPoolStatusColors,
-  swapPoolStatuses,
   swapPoolStatusLabels,
+  userViewBurnPoolStatuses,
+  userViewSwapPoolStatuses,
   type BurnPoolStatus,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
@@ -21,7 +21,7 @@ const PairDetailDetailSearch = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
   const statusOptions: MultipleSelectOption[] =
     filter.type === poolTypes[1]
-      ? swapPoolStatuses.map((status) => ({
+      ? userViewSwapPoolStatuses.map((status) => ({
           label: swapPoolStatusLabels[status],
           value: status,
           icon: ({ className }: { className?: string }) => (
@@ -32,7 +32,7 @@ const PairDetailDetailSearch = () => {
             />
           ),
         }))
-      : burnPoolStatuses.map((status) => ({
+      : userViewBurnPoolStatuses.map((status) => ({
           label: burnPoolStatusLabels[status],
           value: status,
           icon: ({ className }: { className?: string }) => (
