@@ -12,6 +12,7 @@ import {
   truncateString,
 } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 import type React from "react";
 
 interface Props {
@@ -21,15 +22,17 @@ interface Props {
 const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
   const isBurnPool = data?.kind === 0;
 
+  if (!data) return null;
+
   return (
-    <div className="space-y-2.25 rounded-t-md-plus bg-primary-foreground pt-2 rounded-b-sm">
+    <div className="space-y-2.25 rounded-t-md-plus rounded-b-sm bg-primary-foreground pt-2">
       {isBurnPool ? <BurnPoolInfo data={data} /> : <SwapPoolInfo data={data} />}
       <div className="space-y-1 pr-2 pl-2.25">
         <ValueLine
           title="Volume"
           value={
             <MetricNumber
-              number={data?.volume}
+              number={formatUnits(data?.volume, data?.tokenInDecimals)}
               unit="ETH"
               classNames={{
                 container: "justify-end",
@@ -41,7 +44,7 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="TVL"
           value={
             <MetricNumber
-              number={data?.tvl}
+              number={formatUnits(data?.tvl, data?.tokenOutDecimals)}
               unit="ETH"
               classNames={{
                 container: "justify-end",

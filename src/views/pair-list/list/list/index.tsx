@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import type { PairItemType } from "@/types/pair";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 
 interface Props {
   data?: PairItemType[];
@@ -71,10 +72,16 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <MetricNumber number={item.volume} unit="ETH" />
+                  <MetricNumber
+                    number={formatUnits(item.volume, item.tokenInDecimals)}
+                    unit="ETH"
+                  />
                 </TableCell>
                 <TableCell>
-                  <MetricNumber number={item.tvl} unit="ETH" />
+                  <MetricNumber
+                    number={formatUnits(item.tvl, item.tokenOutDecimals)}
+                    unit="ETH"
+                  />
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />

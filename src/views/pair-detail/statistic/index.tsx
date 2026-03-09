@@ -4,6 +4,7 @@ import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
+import { formatUnits } from "ethers";
 
 const PairDetailStatistics = () => {
   const { chainId, tokenIn, tokenOut } = Route.useParams();
@@ -33,13 +34,33 @@ const PairDetailStatistics = () => {
         isLoading={isPairDetailStatsPending}
         title="Volume"
         value={
-          <MetricNumber number={pairDetailStats?.pair.volume} unit="ETH" />
+          <MetricNumber
+            number={formatUnits(
+              pairDetailStats?.pair.volume ?? 0,
+              pairDetailStats?.pair.tokenInDecimals,
+            )}
+            unit="ETH"
+            classNames={{
+              container: "justify-start",
+            }}
+          />
         }
       />
       <PairDetailStatisticsCard
         isLoading={isPairDetailStatsPending}
         title="TVL"
-        value={<MetricNumber number={pairDetailStats?.pair.tvl} unit="ETH" />}
+        value={
+          <MetricNumber
+            number={formatUnits(
+              pairDetailStats?.pair.tvl ?? 0,
+              pairDetailStats?.pair.tokenOutDecimals,
+            )}
+            unit="ETH"
+            classNames={{
+              container: "justify-start",
+            }}
+          />
+        }
       />
       <PairDetailStatisticsCard
         isLoading={isPairDetailStatsPending}

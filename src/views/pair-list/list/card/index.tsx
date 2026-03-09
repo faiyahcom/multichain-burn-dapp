@@ -6,6 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 
 interface Props {
   data?: PairItemType[];
@@ -48,6 +49,8 @@ const CardItem: React.FC<PairItemType> = ({
   chainId,
   tokenIn,
   tokenOut,
+  tokenInDecimals,
+  tokenOutDecimals,
 }) => {
   return (
     <div
@@ -93,12 +96,12 @@ const CardItem: React.FC<PairItemType> = ({
         <CardInfoRow
           title="Volume"
           tooltipContent="The total value of burn tokens deposited by taker into Swap Pools and Burn Pools of the pair"
-          value={Number(volume) || 0}
+          value={Number(formatUnits(volume, tokenInDecimals)) || 0}
         />
         <CardInfoRow
           title="TVL"
           tooltipContent="The total amount of reward tokens deposited by all makers when creating Swap Pools and Burn Pools within the same pair."
-          value={Number(tvl) || 0}
+          value={Number(formatUnits(tvl, tokenOutDecimals)) || 0}
         />
       </div>
 
