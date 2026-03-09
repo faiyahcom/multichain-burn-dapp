@@ -12,7 +12,7 @@ type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
-const EndStatus = ({ poolDetail }: Props) => {
+const ClosedStatus = ({ poolDetail }: Props) => {
     const {
         pool,
         formattedReward,
@@ -59,7 +59,7 @@ const EndStatus = ({ poolDetail }: Props) => {
     return (
         <>
             <StatRow
-                label="Claimed Reward"
+                label="Close Reward"
                 value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
                 className="font-medium text-active"
                 valueClassName="text-2xl font-bold"
@@ -93,4 +93,4 @@ const EndStatus = ({ poolDetail }: Props) => {
     );
 };
 
-export default EndStatus;
+export default ClosedStatus;

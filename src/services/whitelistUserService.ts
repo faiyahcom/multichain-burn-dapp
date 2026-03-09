@@ -16,6 +16,8 @@ export interface WhitelistUser {
     name: string;
     email: string;
     enabled: boolean;
+    /** Chain IDs this user is registered on (backend stringified BigInt array) */
+    whitelistChainId: string[];
     createdAt: string;
     tokenAllocations: TokenAllocation[];
 }
@@ -34,10 +36,13 @@ export const whitelistUserService = {
             {
                 params: {
                     search: params?.search,
-                    chainId: params?.chainIds,
-                    tokenAddress: params?.tokenAddresses,
+                    chainIds: params?.chainIds,
+                    // comma-separated: tokenAddresses=addr1,addr2,addr3
+                    tokenAddresses: params?.tokenAddresses?.length
+                        ? params.tokenAddresses.join(",")
+                        : undefined,
                 },
-                // axios serializes arrays as repeated params: chainId=97&chainId=11155111
+                // axios serializes arrays as repeated params: chainIds=97&chainIds=11155111
                 paramsSerializer: { indexes: null },
             },
         );

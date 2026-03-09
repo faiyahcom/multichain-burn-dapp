@@ -56,6 +56,8 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const [depositRewardOpen, setDepositRewardOpen] = useState(false);
     const [depositBurnInput, setDepositBurnInput] = useState("");
     const [depositBurnOpen, setDepositBurnOpen] = useState(false);
+    // ── Transfer dialog state ──────────────────────────────────
+    const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
     const pool = poolDetail?.pool;
     const userAmount = poolDetail?.userAmount;
@@ -148,12 +150,12 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const handleClaim = async () => {
+    const handleClaim = async (userAddress?: string) => {
         if (!pool?.address) return;
         if (isSolana && poolDetail) {
             await claimBurnSol({ poolAddress: pool.address, poolDetail });
         } else {
-            await claimBurnReward({ poolAddress: pool.address });
+            await claimBurnReward({ poolAddress: pool.address, userAddress });
         }
         invalidatePoolQueries(pool.address);
     };
@@ -221,6 +223,9 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         setDepositBurnInput,
         depositBurnOpen,
         setDepositBurnOpen,
+        // transfer dialog
+        transferDialogOpen,
+        setTransferDialogOpen,
         // action handlers
         handleCancelPool,
         handleRequestApprove,
@@ -233,5 +238,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         handleAdminApprove,
         handleAdminReject,
         handleAdminClose,
+        // util
+        invalidatePoolQueries,
     };
 };
