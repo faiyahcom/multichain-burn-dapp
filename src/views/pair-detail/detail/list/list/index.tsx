@@ -119,14 +119,14 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={formatUnits(pool.volume, pool.tokenInDecimals)}
-                  unit="ETH"
+                  number={formatUnits(pool.volume ?? 0, pool.tokenInDecimals)}
+                  unit={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
                 />
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={formatUnits(pool.tvl, pool.tokenOutDecimals)}
-                  unit="ETH"
+                  number={formatUnits(pool.tvl ?? 0, pool.tokenOutDecimals)}
+                  unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
                 />
               </TableCell>
               <TableCell>

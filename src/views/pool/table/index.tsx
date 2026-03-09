@@ -230,8 +230,8 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={formatUnits(pool.tvl, pool.tokenOutDecimals)}
-                    unit="ETH"
+                    number={formatUnits(pool.tvl ?? 0, pool.tokenOutDecimals)}
+                    unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
                   />
                 </TableCell>
                 {isBurnPool ? (

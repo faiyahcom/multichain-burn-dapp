@@ -73,14 +73,14 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={formatUnits(item.volume, item.tokenInDecimals)}
-                    unit="ETH"
+                    number={formatUnits(item.volume ?? 0, item.tokenInDecimals)}
+                    unit={item.tokenInSymbolCustom ?? item.tokenInSymbol}
                   />
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={formatUnits(item.tvl, item.tokenOutDecimals)}
-                    unit="ETH"
+                    number={formatUnits(item.tvl ?? 0, item.tokenOutDecimals)}
+                    unit={item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
                   />
                 </TableCell>
                 <TableCell>

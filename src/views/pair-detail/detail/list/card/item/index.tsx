@@ -32,8 +32,8 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="Volume"
           value={
             <MetricNumber
-              number={formatUnits(data?.volume, data?.tokenInDecimals)}
-              unit="ETH"
+              number={formatUnits(data?.volume ?? 0, data?.tokenInDecimals)}
+              unit={data?.tokenInSymbolCustom ?? data?.tokenInSymbol}
               classNames={{
                 container: "justify-end",
               }}
@@ -44,8 +44,8 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="TVL"
           value={
             <MetricNumber
-              number={formatUnits(data?.tvl, data?.tokenOutDecimals)}
-              unit="ETH"
+              number={formatUnits(data?.tvl ?? 0, data?.tokenOutDecimals)}
+              unit={data?.tokenOutSymbolCustom ?? data?.tokenOutSymbol}
               classNames={{
                 container: "justify-end",
               }}

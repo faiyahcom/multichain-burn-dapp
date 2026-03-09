@@ -39,7 +39,10 @@ const PairDetailStatistics = () => {
               pairDetailStats?.pair.volume ?? 0,
               pairDetailStats?.pair.tokenInDecimals,
             )}
-            unit="ETH"
+            unit={
+              pairDetailStats?.pair.tokenInSymbolCustom ??
+              pairDetailStats?.pair.tokenInSymbol
+            }
             classNames={{
               container: "justify-start",
             }}
@@ -55,7 +58,10 @@ const PairDetailStatistics = () => {
               pairDetailStats?.pair.tvl ?? 0,
               pairDetailStats?.pair.tokenOutDecimals,
             )}
-            unit="ETH"
+            unit={
+              pairDetailStats?.pair.tokenOutSymbolCustom ??
+              pairDetailStats?.pair.tokenOutSymbol
+            }
             classNames={{
               container: "justify-start",
             }}
