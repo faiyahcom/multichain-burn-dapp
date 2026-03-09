@@ -47,7 +47,7 @@ export const useCreateWhitelistTokenEvmFn = () => {
           swapFactoryContract.interface.encodeFunctionData("whitelistToken", [
             tokenAddress,
           ]);
-          
+
         const setBurnTokenWhitelistData =
           burnFactoryContract.interface.encodeFunctionData(
             "setTokenWhitelist",

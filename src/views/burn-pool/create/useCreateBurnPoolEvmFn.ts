@@ -5,8 +5,8 @@ import { ethers, type Eip1193Provider, type Log } from "ethers";
 import {
     getContractBurnFactory,
 } from "@/web3/contracts/multichainBurnContractEVM";
+import { ZERO_ADDRESS } from "@/config/constant";
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 const isNativeToken = (address: string) =>
     !address || address === ZERO_ADDRESS || address.toLowerCase() === "native";
