@@ -67,14 +67,8 @@ const CardItem: React.FC<PairItemType> = ({
         />
         <div className="absolute right-0 bottom-2 left-0">
           <div className="z-10 flex h-full w-full items-center gap-2.75 px-4.25 pt-0.75 pb-1 **:z-10">
+            {/* Client wants the order to be token out / token in, refers to MB-415 */}
             <div className="flex items-center gap-px">
-              <TokenImage
-                src={tokenInImageUri}
-                alt={tokenInSymbol}
-                classNames={{
-                  common: "size-5.75",
-                }}
-              />
               <TokenImage
                 src={tokenOutImageUri}
                 alt={tokenOutSymbol}
@@ -82,10 +76,17 @@ const CardItem: React.FC<PairItemType> = ({
                   common: "size-5.75",
                 }}
               />
+              <TokenImage
+                src={tokenInImageUri}
+                alt={tokenInSymbol}
+                classNames={{
+                  common: "size-5.75",
+                }}
+              />
             </div>
             <p className="text-xl font-semibold">
-              {tokenInSymbolCustom ?? tokenInSymbol}/
-              {tokenOutSymbolCustom ?? tokenOutSymbol}
+              {tokenOutSymbolCustom ?? tokenOutSymbol}/
+              {tokenInSymbolCustom ?? tokenInSymbol}
             </p>
           </div>
           <div className="absolute inset-0 z-0 h-full w-full bg-primary-foreground/50 backdrop-blur-[15px]" />

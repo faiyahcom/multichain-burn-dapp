@@ -181,15 +181,25 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                     )
                   ) : (
                     <>
-                      <span>
-                        {pool.rewardDenominator}{" "}
-                        {pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
-                      </span>
-                      <span>{" = "}</span>
-                      <span>
-                        {pool.rewardNumerator}{" "}
-                        {pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
-                      </span>
+                      <div className="flex max-w-full flex-wrap items-center justify-center gap-0.5">
+                        <MetricNumber
+                          number={pool.rewardDenominator}
+                          unit={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                          classNames={{
+                            container: "max-w-max",
+                          }}
+                        />
+                        <span>{" = "}</span>
+                        <MetricNumber
+                          number={pool.rewardNumerator}
+                          unit={
+                            pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol
+                          }
+                          classNames={{
+                            container: "max-w-max",
+                          }}
+                        />
+                      </div>
                     </>
                   )}
                 </TableCell>
