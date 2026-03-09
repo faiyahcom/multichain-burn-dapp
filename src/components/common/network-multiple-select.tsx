@@ -19,7 +19,7 @@ interface Props {
 const NetworkMultipleSelect: React.FC<Props> = ({
   selected,
   onChange,
-  ...otherProps
+  otherProps,
 }) => {
   const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
     (network) => ({
@@ -41,7 +41,9 @@ const NetworkMultipleSelect: React.FC<Props> = ({
       placeholder="Network"
       selected={selected}
       onChange={onChange}
-      defaultValuesWhenUncheckAll={[NETWORK_CONFIGS[0].id]}
+      defaultValuesWhenUncheckAll={
+        NETWORK_CONFIGS.length > 0 ? [NETWORK_CONFIGS[0].id] : []
+      }
       {...otherProps}
     />
   );
