@@ -11,7 +11,7 @@ type Props = {
 type TabType = "transactions" | "activity";
 
 const PoolHistory = ({ poolDetail }: Props) => {
-    const [activeTab, setActiveTab] = useState<TabType>("activity");
+    const [activeTab, setActiveTab] = useState<TabType>("transactions");
 
     return (
         <div className="mt-3 w-full py-4">

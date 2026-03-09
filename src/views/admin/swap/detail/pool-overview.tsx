@@ -3,30 +3,16 @@ import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import NetworkIcon from "@/components/layout/header/network-icon";
+import { truncateString } from "@/utils/helpers/string";
+import CopyableText from "@/components/common/copyable-text";
+import { toCleanRatio } from "@/views/swap-pool/detail/pool-overview";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
-function gcd(a: number, b: number): number {
-    return b === 0 ? a : gcd(b, a % b);
-}
-
-export function toCleanRatio(numerator?: string, denominator?: string): string {
-    if (!numerator || !denominator) return "—";
-
-    const num = Number(numerator);
-    const den = Number(denominator);
-
-    if (!num || !den) return "—";
-
-    const divisor = gcd(num, den);
-    return `${num / divisor}:${den / divisor}`;
-}
-
 const PoolOverview = ({ poolDetail }: Props) => {
-    const { data: whitelistTokens } =
-        useGetWhitelistTokens();
+    const { data: whitelistTokens } = useGetWhitelistTokens();
     const burnToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === poolDetail?.pool.tokenIn,
     );
@@ -45,6 +31,23 @@ const PoolOverview = ({ poolDetail }: Props) => {
         );
 
         return [
+            [
+                {
+                    label: "Owner address",
+                    value: (
+                        <CopyableText
+                            classNames={{
+                                container: "inline-flex items-center gap-2",
+                                displayText: "text-xl",
+                            }}
+                            content={poolDetail?.pool.owner}
+                            displayText={truncateString({
+                                str: poolDetail?.pool.owner || "",
+                            })}
+                        />
+                    ),
+                },
+            ],
             [
                 { label: "Pool Type", value: "Swap Pool" },
                 {
@@ -95,26 +98,37 @@ const PoolOverview = ({ poolDetail }: Props) => {
 
     return (
         <div className="mt-3 w-full py-4">
-            <div className="flex items-center gap-2 pb-4">
-                <div className="h-1.5 w-1.5 bg-black" />
-                <span className="text-xl font-medium">Pool Overview</span>
+            <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 bg-black" />
+                    <span className="text-xl font-medium">Pool Overview</span>
+                </div>
+                {/* <p className="text-[13px] text-greyed">
+                    {poolDetail?.pool.timeStart && poolDetail?.pool.timeEnd
+                        ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
+                            Number(poolDetail.pool.timeEnd) * 1000,
+                        ).toLocaleDateString()}`
+                        : "No time limit"}
+                </p> */}
             </div>
 
             <div className="space-y-2">
                 {rows.map((row, rowIndex) => (
                     <div className="grid grid-cols-2 space-x-2" key={rowIndex}>
                         <div className="grid grid-cols-2">
-                            <span className="text-xl text-greyed">{row[0].label}:</span>
+                            <span className="text-xl text-greyed">{row[0]?.label}:</span>
                             <span className="text-xl break-all text-black">
-                                {row[0].value}
+                                {row[0]?.value}
                             </span>
                         </div>
-                        <div className="grid grid-cols-2">
-                            <span className="text-xl text-greyed">{row[1].label}:</span>
-                            <span className="text-xl break-all text-black">
-                                {row[1].value}
-                            </span>
-                        </div>
+                        {row[1] && (
+                            <div className="grid grid-cols-2">
+                                <span className="text-xl text-greyed">{row[1]?.label}:</span>
+                                <span className="text-xl break-all text-black">
+                                    {row[1]?.value}
+                                </span>
+                            </div>
+                        )}
                     </div>
                 ))}
             </div>

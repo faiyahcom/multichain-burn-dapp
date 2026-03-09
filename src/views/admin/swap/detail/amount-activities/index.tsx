@@ -1,11 +1,8 @@
 import type { PoolDetailResponse } from "@/types/pool";
 import { Container } from "./components";
-import DraftStatus from "./status/DraftStatus";
-import PendingHoldingStatus from "./status/PendingHoldingStatus";
-import UpcomingStatus from "./status/UpcomingStatus";
 import CanceledStatus from "./status/CanceledStatus";
 import OnGoingStatus from "./status/OnGoingStatus";
-// import EndStatus from "./status/EndStatus";
+import EndStatus from "./status/EndStatus";
 import ClosedStatus from "./status/ClosedStatus";
 
 type Props = {
@@ -19,28 +16,14 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
         if (!status) return null;
 
         switch (status) {
-            case "draft":
-                return <DraftStatus poolDetail={poolDetail} />;
-
-            case "pending":
-            case "holding":
-                return <PendingHoldingStatus poolDetail={poolDetail} />;
-
-            case "upcoming":
-                return <UpcomingStatus poolDetail={poolDetail} />;
-
-            case "canceled":
-                return <CanceledStatus poolDetail={poolDetail} />;
-
             case "on_going":
                 return <OnGoingStatus poolDetail={poolDetail} />;
 
             case "closed":
                 return <ClosedStatus poolDetail={poolDetail} />;
 
-            // case "ended":
-            //     return <EndStatus poolDetail={poolDetail} />;
-
+            case "canceled":
+            case "ended":
             default:
                 return null;
         }

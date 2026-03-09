@@ -15,7 +15,7 @@ type Props = {
     address: string;
 };
 
-const AdminBurnPoolDetail = ({ address }: Props) => {
+const AdminSwapPoolDetail = ({ address }: Props) => {
     const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
@@ -49,25 +49,24 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
             case "on_going":
                 return (
                     <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
-                        This pool is currently active. Users can participate until the end
-                        time.
+                        This pool is currently active. Users can participate until the end time.
                     </p>
                 );
             case "closed":
                 return (
-                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                    <p className="bg-admin-warning ml-auto rounded-md px-6 py-2 text-base">
                         This pool has been emergency closed by the admin.
                     </p>
                 );
             case "ended":
                 return (
-                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                    <p className="bg-admin-warning ml-auto rounded-md px-6 py-2 text-base">
                         This pool has ended. Participation is no longer possible.
                     </p>
                 );
             case "canceled":
                 return (
-                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+                    <p className="bg-admin-warning ml-auto rounded-md px-6 py-2 text-base">
                         This pool has been manually canceled by the Project Owner.
                     </p>
                 );
@@ -114,4 +113,4 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
     );
 };
 
-export default AdminBurnPoolDetail;
+export default AdminSwapPoolDetail;
