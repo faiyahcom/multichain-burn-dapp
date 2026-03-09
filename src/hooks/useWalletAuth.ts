@@ -122,7 +122,7 @@ export function useWalletAuth() {
 
         // Step 6: Update auth state with complete user info
         login({
-          user: { id: userInfo.id, address: userInfo.address || address },
+          user: { id: userInfo.id, address: userInfo.address || address, role: userInfo.role },
           accessToken: tempToken,
         })
 

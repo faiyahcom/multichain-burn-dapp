@@ -1,16 +1,22 @@
 import AdminMasterPoolManagementSearch from "@/views/admin/master-pool-management/search";
 import AdminMasterPoolManagementTable from "@/views/admin/master-pool-management/table";
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
+import { useAuthStore } from "@/stores/authStore";
 
 export const Route = createFileRoute("/admin/master-pool-management/")({
-  component: RouteComponent,
+    beforeLoad: () => {
+        if (useAuthStore.getState().user?.role !== "admin") {
+            throw redirect({ to: "/" });
+        }
+    },
+    component: RouteComponent,
 });
 
 function RouteComponent() {
-  return (
-    <div className="space-y-5.5">
-      <AdminMasterPoolManagementSearch />
-      <AdminMasterPoolManagementTable />
-    </div>
-  );
+    return (
+        <div className="space-y-5.5">
+            <AdminMasterPoolManagementSearch />
+            <AdminMasterPoolManagementTable />
+        </div>
+    );
 }
