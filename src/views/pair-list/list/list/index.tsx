@@ -48,15 +48,9 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
             return (
               <TableRow key={index}>
                 <TableCell>
-                  <div className="flex items-center gap-3.25 pl-15.75">
+                  <div className="flex w-max items-center gap-3.25 pl-15.75">
+                    {/* Client wants the order to be token out / token in, refers to MB-415 */}
                     <div className="flex items-center gap-px">
-                      <TokenImage
-                        src={item.tokenInImageUri}
-                        alt={item.tokenInSymbol}
-                        classNames={{
-                          common: "size-6.25",
-                        }}
-                      />
                       <TokenImage
                         src={item.tokenOutImageUri}
                         alt={item.tokenOutSymbol}
@@ -64,10 +58,17 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                           common: "size-6.25",
                         }}
                       />
+                      <TokenImage
+                        src={item.tokenInImageUri}
+                        alt={item.tokenInSymbol}
+                        classNames={{
+                          common: "size-6.25",
+                        }}
+                      />
                     </div>
                     <span>
-                      {item.tokenInSymbolCustom ?? item.tokenInSymbol}/
-                      {item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
+                      {item.tokenOutSymbolCustom ?? item.tokenOutSymbol}/
+                      {item.tokenInSymbolCustom ?? item.tokenInSymbol}
                     </span>
                   </div>
                 </TableCell>
@@ -89,7 +90,7 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                 <TableCell>
                   <Link
                     to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
-                    className="block h-full w-full"
+                    className="block h-full w-full text-left"
                   >
                     <ArrowIcon direction="right" />
                   </Link>

@@ -66,21 +66,22 @@ const PairDetailDetailHeader = () => {
   return (
     <div className="flex items-center gap-16">
       <div className="flex items-center gap-2.75">
+        {/* Client wants the order to be token out / token in, refers to MB-415 */}
         <div className="relative flex items-center gap-0.5 py-1.5 pr-1.5">
-          <TokenImage
-            isLoading={isPairDetailStatsPending}
-            src={pairDetailStats?.pair.tokenInImageUri}
-            alt={
-              pairDetailStats?.pair.tokenInSymbolCustom ??
-              pairDetailStats?.pair.tokenInSymbol
-            }
-          />
           <TokenImage
             isLoading={isPairDetailStatsPending}
             src={pairDetailStats?.pair.tokenOutImageUri}
             alt={
               pairDetailStats?.pair.tokenOutSymbolCustom ??
               pairDetailStats?.pair.tokenOutSymbol
+            }
+          />
+          <TokenImage
+            isLoading={isPairDetailStatsPending}
+            src={pairDetailStats?.pair.tokenInImageUri}
+            alt={
+              pairDetailStats?.pair.tokenInSymbolCustom ??
+              pairDetailStats?.pair.tokenInSymbol
             }
           />
           <NetworkDisplay
@@ -101,11 +102,11 @@ const PairDetailDetailHeader = () => {
           <Skeleton className="h-10 w-45" />
         ) : (
           <h1 className="text-3xl font-semibold">
-            {pairDetailStats?.pair.tokenInSymbolCustom ??
-              pairDetailStats?.pair.tokenInSymbol}
-            /
             {pairDetailStats?.pair.tokenOutSymbolCustom ??
               pairDetailStats?.pair.tokenOutSymbol}
+            /
+            {pairDetailStats?.pair.tokenInSymbolCustom ??
+              pairDetailStats?.pair.tokenInSymbol}
           </h1>
         )}
       </div>
