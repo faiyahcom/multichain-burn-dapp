@@ -13,7 +13,7 @@ import {
   type BurnPoolStatus,
 } from "@/types/admin/master-pool-management";
 
-const BurnPoolListSearch = () => {
+const PoolListSearch = () => {
   const { filter, setFilter } = useBurnPoolListSearchFilterStore();
 
   const statusOptions = userViewBurnPoolStatuses.map((status) => ({
@@ -85,4 +85,4 @@ const BurnPoolListSearch = () => {
   );
 };
 
-export default BurnPoolListSearch;
+export default PoolListSearch;

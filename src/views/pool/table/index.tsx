@@ -32,7 +32,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
-const BurnPoolListTable = () => {
+const PoolListTable = () => {
   const { filter, setFilter } = useBurnPoolListSearchFilterStore();
   const limit = 10;
 
@@ -219,4 +219,4 @@ const BurnPoolListTable = () => {
   );
 };
 
-export default BurnPoolListTable;
+export default PoolListTable;
