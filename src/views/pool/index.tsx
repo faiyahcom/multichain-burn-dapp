@@ -11,8 +11,8 @@ const CommonPoolLayout: React.FC<Props> = ({ poolType }) => {
   return (
     <>
       <PoolListHeader poolType={poolType} />
-      <PoolListSearch />
-      <PoolListTable />
+      <PoolListSearch poolType={poolType} />
+      <PoolListTable poolType={poolType} />
     </>
   );
 };

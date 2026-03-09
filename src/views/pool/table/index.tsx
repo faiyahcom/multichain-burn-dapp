@@ -18,11 +18,13 @@ import {
 import { networkIdToChainId } from "@/config/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
-import { useBurnPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
 import {
   getPoolStatusColor,
   getPoolStatusLabel,
   userHiddenBurnPoolStatuses,
+  userHiddenSwapPoolStatuses,
+  type PoolType,
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import {
@@ -32,13 +34,18 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
-const PoolListTable = () => {
-  const { filter, setFilter } = useBurnPoolListSearchFilterStore();
+interface Props {
+  poolType: PoolType;
+}
+
+const PoolListTable: React.FC<Props> = ({ poolType }) => {
+  const isBurnPool = poolType === 0;
+  const { filter, setFilter } = usePoolListSearchFilterStore(poolType);
   const limit = 10;
 
   const { data: burnPoolList, isPending: isBurnPoolListPending } = useQuery({
     queryKey: poolQueryKeys.list({
-      burn: "burn",
+      type: poolType,
       ...filter,
     }),
     queryFn: async () => {
@@ -49,10 +56,14 @@ const PoolListTable = () => {
           array: filter.network?.map((network) => networkIdToChainId(network)),
         }),
         excludeStatuses: convertArrayToStringParam({
-          array: [...userHiddenBurnPoolStatuses],
+          array: [
+            ...(isBurnPool
+              ? userHiddenBurnPoolStatuses
+              : userHiddenSwapPoolStatuses),
+          ],
         }),
         includeStatuses: convertArrayToStringParam({ array: filter.status }),
-        kind: "0", // burn pool
+        kind: poolType.toString(),
         search: filter.text || undefined,
         sortBy: filter.sortBy,
         sortDirection: filter.sortOrder,
@@ -65,29 +76,43 @@ const PoolListTable = () => {
       name: "Pool",
     },
     {
-      name: "Time",
+      name: isBurnPool ? "Time" : "Ratio",
     },
-    {
-      name: "Burn",
-    },
-    {
-      name: "Reward",
-    },
+    ...(isBurnPool
+      ? [
+          {
+            name: "Burn",
+          },
+          {
+            name: "Reward",
+          },
+        ]
+      : []),
     {
       name: "Network",
     },
     {
-      name: "TVL",
-      tip: (
+      name: isBurnPool ? "TVL" : "TVL/Budget",
+      tip: isBurnPool ? (
         <InfoTooltip content="The total amount of reward token deposited by maker when create Burn Pool" />
+      ) : (
+        <></>
       ),
     },
-    {
-      name: "Ratio",
-    },
-    {
-      name: "Status",
-    },
+    ...(isBurnPool
+      ? [
+          {
+            name: "Ratio",
+          },
+          {
+            name: "Status",
+          },
+        ]
+      : [
+          {
+            name: "Join",
+          },
+        ]),
   ];
 
   return (
@@ -144,65 +169,104 @@ const PoolListTable = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {timeStart && timeEnd && (
-                    <div className="flex flex-col items-center justify-center gap-0.5 2xl:flex-row">
-                      <span>{timeStart}</span>
-                      <span className="hidden 2xl:block">-</span>
-                      <span>{timeEnd}</span>
-                    </div>
+                  {isBurnPool ? (
+                    timeStart &&
+                    timeEnd && (
+                      <div className="flex flex-col items-center justify-center gap-0.5 2xl:flex-row">
+                        <span>{timeStart}</span>
+                        <span className="hidden 2xl:block">-</span>
+                        <span>{timeEnd}</span>
+                      </div>
+                    )
+                  ) : (
+                    <>
+                      <span>
+                        {pool.rewardDenominator}{" "}
+                        {pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                      </span>
+                      <span>{" = "}</span>
+                      <span>
+                        {pool.rewardNumerator}{" "}
+                        {pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                      </span>
+                    </>
                   )}
                 </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center gap-1">
-                    <TokenImage
-                      src={pool.tokenInImageUri}
-                      alt={pool.tokenInSymbol}
-                      classNames={{
-                        common: "size-4.25",
-                      }}
-                    />
-                    <span>
-                      {pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
-                    </span>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center gap-1">
-                    <TokenImage
-                      src={pool.tokenOutImageUri}
-                      alt={pool.tokenOutSymbol}
-                      classNames={{
-                        common: "size-4.25",
-                      }}
-                    />
-                    <span>
-                      {pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
-                    </span>
-                  </div>
-                </TableCell>
+                {isBurnPool && (
+                  <>
+                    <TableCell>
+                      <div className="flex items-center justify-center gap-1">
+                        <TokenImage
+                          src={pool.tokenInImageUri}
+                          alt={pool.tokenInSymbol}
+                          classNames={{
+                            common: "size-4.25",
+                          }}
+                        />
+                        <span>
+                          {pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                        </span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-center gap-1">
+                        <TokenImage
+                          src={pool.tokenOutImageUri}
+                          alt={pool.tokenOutSymbol}
+                          classNames={{
+                            common: "size-4.25",
+                          }}
+                        />
+                        <span>
+                          {pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                        </span>
+                      </div>
+                    </TableCell>
+                  </>
+                )}
                 <TableCell>
                   <NetworkDisplay chainId={pool.chainId} />
                 </TableCell>
                 <TableCell>
                   <MetricNumber number={pool.tvl} unit="ETH" />
                 </TableCell>
-                <TableCell>
-                  {/* TODO: might need to change later */}
-                  Dynamic
-                </TableCell>
-                <TableCell>
-                  <AnimateIconButton
-                    variant="letter-icon"
-                    iconLetter={getPoolStatusLabel(pool.status).slice(0, 1)}
-                    textVariant="text-container-center"
-                    hasGroupHover
-                    color={getPoolStatusColor(pool.status)}
-                    text={getPoolStatusLabel(pool.status)}
-                    classNames={{
-                      btn: "min-w-33 mx-auto",
-                    }}
-                  />
-                </TableCell>
+                {isBurnPool ? (
+                  <>
+                    <TableCell>
+                      {/* TODO: might need to change later */}
+                      Dynamic
+                    </TableCell>
+                    <TableCell>
+                      <AnimateIconButton
+                        variant="letter-icon"
+                        iconLetter={getPoolStatusLabel(pool.status).slice(0, 1)}
+                        textVariant="text-container-center"
+                        hasGroupHover
+                        color={getPoolStatusColor(pool.status)}
+                        text={getPoolStatusLabel(pool.status)}
+                        classNames={{
+                          btn: "min-w-33 mx-auto",
+                        }}
+                      />
+                    </TableCell>
+                  </>
+                ) : (
+                  <TableCell>
+                    <Link to={`/swap/detail/${pool.address}`}>
+                      <AnimateIconButton
+                        variant="letter-icon"
+                        textVariant="text-container-center"
+                        iconLetter="P"
+                        hasGroupHover
+                        color="#6E37FF"
+                        text="Swap"
+                        classNames={{
+                          btn: "min-w-20.5 mx-auto",
+                        }}
+                      />
+                    </Link>
+                  </TableCell>
+                )}
               </TableRow>
             );
           })}
