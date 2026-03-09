@@ -107,8 +107,12 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                 await depositSwapPoolETH({
                     poolAddress: poolDetail.pool.address,
                     amountIn: data.burnAmount,
-                    decimals: burnToken?.decimals ?? 18,
-                    tokenInAddress: burnToken?.address ?? "",
+                    // Use decimals from poolDetail directly — authoritative source.
+                    // burnToken lookup can be undefined if address casing differs,
+                    // which would cause parseUnits to use wrong decimals (18 instead of e.g. 9)
+                    // sending 10^9× too large an amount → contract reverts InsufficientReward.
+                    decimals: poolDetail.pool.tokenInDecimals,
+                    tokenInAddress: poolDetail.pool.tokenIn,
                 });
             }
 
