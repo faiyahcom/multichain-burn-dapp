@@ -8,15 +8,15 @@ import { NETWORK_CONFIGS } from "@/config/networks";
 import { useBurnPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
 import {
   burnPoolStatusColors,
-  burnPoolStatuses,
   burnPoolStatusLabels,
+  userViewBurnPoolStatuses,
   type BurnPoolStatus,
 } from "@/types/admin/master-pool-management";
 
 const BurnPoolListSearch = () => {
   const { filter, setFilter } = useBurnPoolListSearchFilterStore();
 
-  const statusOptions = burnPoolStatuses.map((status) => ({
+  const statusOptions = userViewBurnPoolStatuses.map((status) => ({
     label: burnPoolStatusLabels[status],
     value: status,
     icon: ({ className }: { className?: string }) => (

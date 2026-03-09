@@ -1,12 +1,16 @@
-import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
-import PairDetailDetailListCardLayout from "./card";
-import PairDetailDetailListListLayout from "./list";
-import { useQuery } from "@tanstack/react-query";
-import { poolQueryKeys } from "@/services/queries/queryKey";
+import CustomPagination from "@/components/common/pagination";
 import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { poolService } from "@/services/poolService";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
+import {
+  userHiddenBurnPoolStatuses,
+  userHiddenSwapPoolStatuses,
+} from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
-import CustomPagination from "@/components/common/pagination";
+import { useQuery } from "@tanstack/react-query";
+import PairDetailDetailListCardLayout from "./card";
+import PairDetailDetailListListLayout from "./list";
 
 const PairDetailDetailList = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
@@ -22,7 +26,12 @@ const PairDetailDetailList = () => {
         chainIds: chainId,
         tokenIn,
         tokenReward: tokenOut,
-        excludeStatuses: "draft", // user do not need to see draft pool
+        excludeStatuses: convertArrayToStringParam({
+          array:
+            filter.type === 0
+              ? [...userHiddenBurnPoolStatuses]
+              : [...userHiddenSwapPoolStatuses],
+        }),
         includeStatuses: convertArrayToStringParam({ array: filter.status }),
         kind: filter.type?.toString(),
         search: filter.text || undefined,

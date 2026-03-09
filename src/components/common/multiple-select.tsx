@@ -44,13 +44,15 @@ const MultipleSelect: React.FC<Props> = ({
   const isAnySelected = (selected?.length ?? 0) > 0;
   const atLeastOneIcon =
     showIconsInTriggerIfAny && options?.some((option) => option.icon);
-  const selectedLabels = selected?.map(
-    (value) => options?.find((option) => option.value === value)?.label,
-  ).filter(Boolean);
+  const selectedLabels = selected
+    ?.map((value) => options?.find((option) => option.value === value)?.label)
+    .filter(Boolean);
 
   // "All Tokens" label — use placeholderMultiple if provided, else just placeholder
   // (avoids "All All Tokens" when placeholder already says "All Tokens")
-  const allLabel = placeholderMultiple ? `All ${placeholderMultiple}` : placeholder;
+  const allLabel = placeholderMultiple
+    ? `All ${placeholderMultiple}`
+    : placeholder;
 
   const handleToggleAllCheck = () => {
     if (selected?.length === options?.length) {
@@ -97,9 +99,7 @@ const MultipleSelect: React.FC<Props> = ({
                     ?.map((option) => option.icon)
                     ?.filter((icon) => icon !== undefined)}
                 />
-                {isAllSelected && (
-                  <span>{allLabel}</span>
-                )}
+                {isAllSelected && <span>{allLabel}</span>}
               </div>
             ) : (
               <span className="truncate">
@@ -214,7 +214,10 @@ const SelectedIcons: React.FC<SelectedIconsProps> = ({ icons }) => {
     <div className="flex items-center">
       {count < 5 ? (
         icons?.map((Icon, index) => (
-          <Icon key={index} className="-ml-1.25 size-5.25" />
+          <Icon
+            key={index}
+            className={cn("-ml-1.25 size-5.25", { "ml-0": count === 1 })}
+          />
         ))
       ) : (
         <>

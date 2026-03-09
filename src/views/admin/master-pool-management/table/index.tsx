@@ -2,6 +2,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
+import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
   Table,
@@ -64,6 +65,11 @@ const AdminMasterPoolManagementTable = () => {
         </TableHeader>
         <TableBody>
           <TableSpinner isLoading={isPendingPools} colSpan={columns.length} />
+          <TableNoData
+            colSpan={columns.length}
+            data={pools?.pools}
+            isLoading={isPendingPools}
+          />
           {pools?.pools?.map((item) => {
             const timeStart = formatTimestampSecondsToDate({
               timestamp: item.timeStart,

@@ -4,6 +4,7 @@ import InfoTooltip from "@/components/common/info-tooltip";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
+import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import TokenImage from "@/components/common/token-image";
 import {
@@ -21,6 +22,7 @@ import { useBurnPoolListSearchFilterStore } from "@/stores/burn-pool-list/search
 import {
   getPoolStatusColor,
   getPoolStatusLabel,
+  userHiddenBurnPoolStatuses,
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import {
@@ -46,7 +48,9 @@ const BurnPoolListTable = () => {
         chainIds: convertArrayToStringParam({
           array: filter.network?.map((network) => networkIdToChainId(network)),
         }),
-        excludeStatuses: "draft", // user do not need to see draft pool
+        excludeStatuses: convertArrayToStringParam({
+          array: [...userHiddenBurnPoolStatuses],
+        }),
         includeStatuses: convertArrayToStringParam({ array: filter.status }),
         kind: "0", // burn pool
         search: filter.text || undefined,
@@ -102,6 +106,11 @@ const BurnPoolListTable = () => {
         <TableBody>
           <TableSpinner
             colSpan={columns.length}
+            isLoading={isBurnPoolListPending}
+          />
+          <TableNoData
+            colSpan={columns.length}
+            data={burnPoolList?.pools}
             isLoading={isBurnPoolListPending}
           />
           {burnPoolList?.pools.map((pool) => {
