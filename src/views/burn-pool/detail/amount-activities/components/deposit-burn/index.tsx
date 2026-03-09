@@ -144,7 +144,7 @@ const DepositBurnDialog = ({
         const amount = Number(amountStr);
         console.log("Calculating reward with amount:", amount);
         if (isNaN(amount)) return `0 ${poolDetail.pool.rewardTokenSymbol}`;
-        const reward = (amount / (Number(poolDetail.depositedAmount) || 1)) * (Number(poolDetail.pool.rewardAmount) / Math.pow(10, poolDetail.pool.rewardTokenDecimals));
+        const reward = (amount / (Number(poolDetail.depositedAmount + amount))) * (Number(poolDetail.pool.rewardAmount) / Math.pow(10, poolDetail.pool.rewardTokenDecimals));
         return `${reward} ${poolDetail.pool.rewardTokenSymbol}`;
     }, [poolDetail, ratio, amountStr]);
 
