@@ -2,10 +2,9 @@ import LetterIcon from "@/components/common/letter-icon";
 import MultipleSelect, {
   type MultipleSelectOption,
 } from "@/components/common/multiple-select";
-import NetworkImgIcon from "@/components/common/network-img-icon";
+import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SingleSelect from "@/components/common/single-select";
-import { NETWORK_CONFIGS } from "@/config/networks";
 import { useMasterPoolManagementSearchFilterStore } from "@/stores/admin/master-pool-management/search-filter-store";
 import {
   burnPoolStatusColors,
@@ -47,20 +46,6 @@ const AdminMasterPoolManagementSearch = () => {
             />
           ),
         }));
-
-  const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
-    (network) => ({
-      label: network.label,
-      value: network.id,
-      icon: ({ className }: { className?: string }) => (
-        <NetworkImgIcon
-          src={network.iconSrc}
-          className={className}
-          alt={network.label}
-        />
-      ),
-    }),
-  );
 
   const handleSelectType = (value: PoolTypeOptionValue) => {
     // swap pool has fewer statuses than burn pool
@@ -116,9 +101,7 @@ const AdminMasterPoolManagementSearch = () => {
               btn: "max-w-50",
             }}
           />
-          <MultipleSelect
-            options={networkOptions}
-            placeholder="Network"
+          <NetworkMultipleSelect
             selected={filter.network}
             onChange={(value) => setFilter({ network: value })}
           />
