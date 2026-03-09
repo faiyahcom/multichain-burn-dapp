@@ -40,7 +40,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 value={`${estmatedReward} ${pool?.rewardTokenSymbol ?? ""}`}
             />
             <div className="mx-6 inline-flex items-start gap-1">
-                <IconExclaimation className="inline size-3.5 translate-y-0.5" />
+                <IconExclaimation className="inline size-5 translate-y-0.5" />
                 <span className="text-sm text-greyed">
                     This pool was emergency closed by admin.
                 </span>

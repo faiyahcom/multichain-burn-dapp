@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
-import { IconTick } from "@/assets/react";
+import { IconExclaimation, IconTick } from "@/assets/react";
 import { useCancelPoolSolanaFn } from "./cancel-pool/useCancelSwapPoolSolana";
 import { useCancelSwapPoolEvmFn } from "./cancel-pool/useCancelSwapPoolEvmFn";
 import { useAppKitAccount } from "@reown/appkit/react";
@@ -98,6 +98,14 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     <IconTick className="inline size-3.5 translate-y-0.5" />
                     <span className="text-sm text-greyed">
                         Reward has been sent to your wallet after swap
+                    </span>
+                </div>
+            )}
+            {poolDetail?.pool.status === "closed" && (
+                <div className="mx-6 inline-flex items-start gap-1">
+                    <IconExclaimation className="inline size-5 translate-y-0.5" />
+                    <span className="text-sm text-greyed">
+                        This pool was emergency closed by admin.
                     </span>
                 </div>
             )}
