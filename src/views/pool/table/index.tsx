@@ -152,7 +152,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
               <TableRow key={pool.address}>
                 <TableCell className="pl-7.25 text-left">
                   <Link
-                    to={`/burn/detail/${pool.address}`}
+                    to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
                     className="block max-w-full truncate"
                     title={pool.name}
                   >
@@ -252,7 +252,10 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                   </>
                 ) : (
                   <TableCell>
-                    <Link to={`/swap/detail/${pool.address}`}>
+                    <Link
+                      to={`/swap/detail/${pool.address}`}
+                      className="mx-auto block max-w-max"
+                    >
                       <AnimateIconButton
                         variant="letter-icon"
                         textVariant="text-container-center"
@@ -261,7 +264,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                         color="#6E37FF"
                         text="Swap"
                         classNames={{
-                          btn: "min-w-20.5 mx-auto",
+                          btn: "after:text-primary-foreground min-w-20.5",
                         }}
                       />
                     </Link>
