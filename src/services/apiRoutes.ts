@@ -30,4 +30,8 @@ export const API_ROUTES = {
     LIST: "/pairs",
     STATS: (chainId: string) => `/pairs/stats/${chainId}`,
   },
+  TRANSFER_HISTORY: {
+    LIST: "/transfers",
+    ANALYSIS: "/transfers/analysis",
+  },
 } as const;
