@@ -76,12 +76,21 @@ export const useCreateSwapPoolEvmFn = () => {
 
         if (rewardIsNative) {
           const chainId = Number((await provider.getNetwork()).chainId);
-          rewardDecimals = getDecimalsTokenNativeByChainId(chainId)?.decimals;
+          rewardDecimals =
+            getDecimalsTokenNativeByChainId(chainId)?.decimals ??
+            DEFAULT_NATIVE_DECIMALS;
 
           parsedAmount = ethers.parseUnits(
             rewardAmount.toString(),
             rewardDecimals,
           );
+
+          const nativeBalance = await provider.getBalance(userAddress);
+          if (nativeBalance < parsedAmount) {
+            throw new Error(
+              `Insufficient native balance. Required: ${ethers.formatUnits(parsedAmount, rewardDecimals)}`,
+            );
+          }
         } else {
           const tokenContract = getERC20Contract(tokenReward, signer);
 
@@ -93,13 +102,28 @@ export const useCreateSwapPoolEvmFn = () => {
             rewardDecimals,
           );
 
-          const approveTx = await tokenContract.approve(
+          const rewardTokenBalance = await tokenContract.balanceOf(userAddress);
+
+          if (rewardTokenBalance < parsedAmount) {
+            throw new Error(
+              `Insufficient reward token balance. Required: ${ethers.formatUnits(parsedAmount, rewardDecimals)}`,
+            );
+          }
+
+          const currentAllowance = await tokenContract.allowance(
+            userAddress,
             CONTRACT_ADDRESS,
-            parsedAmount,
           );
 
-          const approveTxReceipt = await approveTx.wait();
-          console.log("approveTxReceipt", approveTxReceipt);
+          if (currentAllowance < parsedAmount) {
+            const approveTx = await tokenContract.approve(
+              CONTRACT_ADDRESS,
+              parsedAmount,
+            );
+
+            const approveTxReceipt = await approveTx.wait();
+            console.log("approveTxReceipt", approveTxReceipt);
+          }
         }
 
         const poolNameBytes32 = ethers.encodeBytes32String(
@@ -151,9 +175,11 @@ export const useCreateSwapPoolEvmFn = () => {
           })?.args?.pool;
 
         return poolAddress;
-      } catch (error: any) {
+      } catch (error: unknown) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
         toast.error("Failed to create pool", {
-          description: error?.message || String(error),
+          description: errorMessage,
         });
         throw error;
       }
