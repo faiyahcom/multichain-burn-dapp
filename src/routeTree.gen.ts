@@ -21,6 +21,7 @@ import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/inde
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
+import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
 import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
 import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
@@ -93,6 +94,11 @@ const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
   path: '/activity-history/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SwapCreateIndexRoute = SwapCreateIndexRouteImport.update({
+  id: '/swap/create/',
+  path: '/swap/create/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BurnCreateIndexRoute = BurnCreateIndexRouteImport.update({
   id: '/burn/create/',
   path: '/burn/create/',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/burn/create': typeof BurnCreateIndexRoute
+  '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/burn/create': typeof BurnCreateIndexRoute
+  '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -209,6 +217,7 @@ export interface FileRoutesById {
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
   '/burn/create/': typeof BurnCreateIndexRoute
+  '/swap/create/': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -234,6 +243,7 @@ export interface FileRouteTypes {
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
     | '/burn/create'
+    | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesByTo: FileRoutesByTo
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
     | '/burn/create'
+    | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   id:
@@ -280,6 +291,7 @@ export interface FileRouteTypes {
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
     | '/burn/create/'
+    | '/swap/create/'
     | '/admin/burn/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesById: FileRoutesById
@@ -304,6 +316,7 @@ export interface RootRouteChildren {
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
   BurnCreateIndexRoute: typeof BurnCreateIndexRoute
+  SwapCreateIndexRoute: typeof SwapCreateIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
 }
@@ -394,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivityHistoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/swap/create/': {
+      id: '/swap/create/'
+      path: '/swap/create'
+      fullPath: '/swap/create'
+      preLoaderRoute: typeof SwapCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/burn/create/': {
       id: '/burn/create/'
       path: '/burn/create'
@@ -480,6 +500,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
   BurnCreateIndexRoute: BurnCreateIndexRoute,
+  SwapCreateIndexRoute: SwapCreateIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
 }

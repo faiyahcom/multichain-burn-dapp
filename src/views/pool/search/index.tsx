@@ -5,16 +5,21 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SortSelect from "@/components/common/sort-select";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import { useBurnPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
 import {
   burnPoolStatusColors,
   burnPoolStatusLabels,
   userViewBurnPoolStatuses,
   type BurnPoolStatus,
+  type PoolType,
 } from "@/types/admin/master-pool-management";
 
-const BurnPoolListSearch = () => {
-  const { filter, setFilter } = useBurnPoolListSearchFilterStore();
+interface Props {
+  poolType: PoolType;
+}
+
+const PoolListSearch: React.FC<Props> = ({ poolType }) => {
+  const { filter, setFilter } = usePoolListSearchFilterStore(poolType);
 
   const statusOptions = userViewBurnPoolStatuses.map((status) => ({
     label: burnPoolStatusLabels[status],
@@ -58,31 +63,34 @@ const BurnPoolListSearch = () => {
         selected={filter.network}
         onChange={(value) => setFilter({ network: value })}
       />
-      <MultipleSelect
-        options={statusOptions}
-        selected={filter.status}
-        onChange={(value) =>
-          setFilter({
-            status: value as BurnPoolStatus[],
-          })
-        }
-        showIconsInTriggerIfAny={false}
-        placeholder="Status"
-        placeholderMultiple="Status"
-        classNames={{
-          btn: "max-w-50",
-        }}
-      />
+      {/* Swap pool only allow status ongoing so the status select is hidden */}
+      {poolType === 0 && (
+        <MultipleSelect
+          options={statusOptions}
+          selected={filter.status}
+          onChange={(value) =>
+            setFilter({
+              status: value as BurnPoolStatus[],
+            })
+          }
+          showIconsInTriggerIfAny={false}
+          placeholder="Status"
+          placeholderMultiple="Status"
+          classNames={{
+            btn: "max-w-50",
+          }}
+        />
+      )}
       <SortSelect
         options={["tvl", "volume", "timestamp"]}
         sortBy={filter.sortBy ?? "none"}
         sortOrder={filter.sortOrder}
         setSortBy={(sortBy) => setFilter({ sortBy })}
         setSortOrder={(sortOrder) => setFilter({ sortOrder })}
-        defaultSortBy="tvl"
+        defaultSortBy={poolType === 0 ? "tvl" : "timestamp"}
       />
     </div>
   );
 };
 
-export default BurnPoolListSearch;
+export default PoolListSearch;

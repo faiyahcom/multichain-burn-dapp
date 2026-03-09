@@ -1,6 +1,4 @@
-import BurnPoolListHeader from "@/views/burn-pool/list/header";
-import BurnPoolListSearch from "@/views/burn-pool/list/search";
-import BurnPoolListTable from "@/views/burn-pool/list/table";
+import CommonPoolLayout from "@/views/pool";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/burn/")({
@@ -8,11 +6,5 @@ export const Route = createFileRoute("/burn/")({
 });
 
 function RouteComponent() {
-  return (
-    <>
-      <BurnPoolListHeader />
-      <BurnPoolListSearch />
-      <BurnPoolListTable />
-    </>
-  );
+  return <CommonPoolLayout poolType={0} />;
 }
