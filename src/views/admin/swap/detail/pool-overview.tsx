@@ -7,6 +7,7 @@ import { truncateString } from "@/utils/helpers/string";
 import CopyableText from "@/components/common/copyable-text";
 import { toCleanRatio } from "@/views/swap-pool/detail/pool-overview";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import TokenImage from "@/components/common/token-image";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -80,13 +81,15 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     // value: `${poolDetail.pool.tokenInSymbol}`,
                     value: (
                         <div className="flex items-center gap-2">
-                            {burnTokenDisplay.imageUri && (
-                                <img
-                                    src={burnTokenDisplay.imageUri}
-                                    alt={burnTokenDisplay.name}
-                                    className="h-6 w-6 rounded-full"
-                                />
-                            )}
+                            <TokenImage
+                                src={burnTokenDisplay.imageUri}
+                                alt={burnTokenDisplay.name}
+                                classNames={{
+                                    common: "size-6",
+                                    img: "size-6",
+                                    placeholder: "size-6",
+                                }}
+                            />
                             <span>{burnTokenDisplay.symbol}</span>
                         </div>
                     ),
@@ -98,13 +101,15 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     label: "Reward Token",
                     value: (
                         <div className="flex items-center gap-2">
-                            {rewardTokenDisplay.imageUri && (
-                                <img
-                                    src={rewardTokenDisplay.imageUri}
-                                    alt={rewardTokenDisplay.name}
-                                    className="h-6 w-6 rounded-full"
-                                />
-                            )}
+                            <TokenImage
+                                src={rewardTokenDisplay.imageUri}
+                                alt={rewardTokenDisplay.name}
+                                classNames={{
+                                    common: "size-6",
+                                    img: "size-6",
+                                    placeholder: "size-6",
+                                }}
+                            />
                             <span>{rewardTokenDisplay.symbol}</span>
                         </div>
                     ),

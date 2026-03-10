@@ -24,6 +24,7 @@ import { toBaseUnits } from "@/utils/helpers/numbers";
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import TokenImage from "@/components/common/token-image";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -270,13 +271,15 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 />
 
                                 <div className="flex h-fit w-32 items-center justify-between bg-mb-popover px-4 py-1.5">
-                                    {burnTokenDisplay.imageUri && (
-                                        <img
-                                            src={burnTokenDisplay.imageUri}
-                                            alt={burnTokenDisplay.name}
-                                            className="size-6 rounded-full"
-                                        />
-                                    )}
+                                    <TokenImage
+                                        src={burnTokenDisplay.imageUri}
+                                        alt={burnTokenDisplay.name}
+                                        classNames={{
+                                            common: "size-6",
+                                            img: "size-6",
+                                            placeholder: "size-6",
+                                        }}
+                                    />
                                     <div className="text-xl">{burnTokenDisplay.symbol}</div>
                                 </div>
                             </div>
@@ -318,13 +321,15 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 />
 
                                 <div className="flex h-fit w-32 items-center justify-between bg-mb-popover px-4 py-1.5">
-                                    {rewardTokenDisplay.imageUri && (
-                                        <img
-                                            src={rewardTokenDisplay.imageUri}
-                                            alt={rewardTokenDisplay.name}
-                                            className="size-6 rounded-full"
-                                        />
-                                    )}
+                                    <TokenImage
+                                        src={rewardTokenDisplay.imageUri}
+                                        alt={rewardTokenDisplay.name}
+                                        classNames={{
+                                            common: "size-6",
+                                            img: "size-6",
+                                            placeholder: "size-6",
+                                        }}
+                                    />
                                     <div className="text-xl">{rewardTokenDisplay.symbol}</div>
                                 </div>
                             </div>

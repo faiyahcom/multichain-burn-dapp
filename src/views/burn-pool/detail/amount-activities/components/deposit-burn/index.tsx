@@ -18,6 +18,7 @@ import { formatUnits } from "viem";
 import { formatAmount, toBaseUnits } from "@/utils/helpers/numbers";
 import { Input } from "@/components/ui/input";
 import { IconWallet } from "@/assets/react";
+import TokenImage from "@/components/common/token-image";
 
 const depositFormSchema = z.object({
     amount: z
@@ -190,13 +191,15 @@ const DepositBurnDialog = ({
                                     label="Burn Token"
                                     value={
                                         <span className="flex items-center gap-2 font-semibold">
-                                            {burnToken?.imageUri && (
-                                                <img
-                                                    src={burnToken.imageUri}
-                                                    alt={burnToken.symbol}
-                                                    className="size-5 rounded-full"
-                                                />
-                                            )}
+                                            <TokenImage
+                                                src={burnToken?.imageUri}
+                                                alt={burnToken?.symbol}
+                                                classNames={{
+                                                    common: "size-5",
+                                                    img: "size-5",
+                                                    placeholder: "size-5",
+                                                }}
+                                            />
                                             {pool?.tokenInSymbol ?? "-"}
                                         </span>
                                     }
@@ -209,13 +212,15 @@ const DepositBurnDialog = ({
                                     label="Reward Token"
                                     value={
                                         <span className="flex items-center gap-2 font-semibold">
-                                            {rewardToken?.imageUri && (
-                                                <img
-                                                    src={rewardToken.imageUri}
-                                                    alt={rewardToken.symbol}
-                                                    className="size-5 rounded-full"
-                                                />
-                                            )}
+                                            <TokenImage
+                                                src={rewardToken?.imageUri}
+                                                alt={rewardToken?.symbol}
+                                                classNames={{
+                                                    common: "size-5",
+                                                    img: "size-5",
+                                                    placeholder: "size-5",
+                                                }}
+                                            />
                                             {pool?.rewardTokenSymbol ?? "-"}
                                         </span>
                                     }
@@ -256,13 +261,15 @@ const DepositBurnDialog = ({
                                         className="h-full flex-1 px-10 py-2 text-base"
                                     />
                                     <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
-                                        {burnToken?.imageUri && (
-                                            <img
-                                                src={burnToken.imageUri}
-                                                alt={burnToken.symbol}
-                                                className="size-5 rounded-full"
-                                            />
-                                        )}
+                                        <TokenImage
+                                            src={burnToken?.imageUri}
+                                            alt={burnToken?.symbol}
+                                            classNames={{
+                                                common: "size-5",
+                                                img: "size-5",
+                                                placeholder: "size-5",
+                                            }}
+                                        />
                                         <span>{pool?.tokenInSymbol ?? ""}</span>
                                     </div>
                                 </div>
