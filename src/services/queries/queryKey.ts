@@ -33,6 +33,10 @@ export const whitelistUserQueryKeys = {
       params?.chainIds,
       params?.tokenAddresses,
     ] as const,
+  analysis: (params?: Record<string, unknown>) =>
+    ["whitelist-users", "analysis", params] as const,
+  history: (params?: Record<string, unknown>) =>
+    ["whitelist-users", "history", params] as const,
 };
 
 export const pairQueryKeys = {
@@ -40,4 +44,10 @@ export const pairQueryKeys = {
     ["pairs", "list", params] as const,
   stats: (params?: Record<string, unknown>) =>
     ["pairs", "stats", params] as const,
+};
+
+export const transferHistoryQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["transfer-history", "list", params] as const,
+  analysis: () => ["transfer-history", "analysis"] as const,
 };

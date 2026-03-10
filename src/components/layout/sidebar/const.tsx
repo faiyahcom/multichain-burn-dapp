@@ -130,6 +130,11 @@ export const navItems: NavItem[] = [
     to: "/admin/whitelist-user",
   },
   {
+    label: "Transfer History",
+    section: navSection.admin,
+    to: "/admin/transfer-history",
+  },
+  {
     label: "Master Pool Management",
     section: navSection.admin,
     to: "/admin/master-pool-management",

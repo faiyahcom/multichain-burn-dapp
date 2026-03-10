@@ -3,8 +3,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
-import { formatUnits } from "ethers";
 
 const PairDetailStatistics = () => {
   const { chainId, tokenIn, tokenOut } = Route.useParams();
@@ -35,9 +35,9 @@ const PairDetailStatistics = () => {
         title="Volume"
         value={
           <MetricNumber
-            number={formatUnits(
-              pairDetailStats?.pair.volume ?? 0,
-              pairDetailStats?.pair.tokenInDecimals,
+            number={sciToFormatted(
+              pairDetailStats?.pair.volume ?? "0",
+              pairDetailStats?.pair.tokenInDecimals ?? 0,
             )}
             unit={
               pairDetailStats?.pair.tokenInSymbolCustom ??
@@ -54,9 +54,9 @@ const PairDetailStatistics = () => {
         title="TVL"
         value={
           <MetricNumber
-            number={formatUnits(
-              pairDetailStats?.pair.tvl ?? 0,
-              pairDetailStats?.pair.tokenOutDecimals,
+            number={sciToFormatted(
+              pairDetailStats?.pair.tvl ?? "0",
+              pairDetailStats?.pair.tokenOutDecimals ?? 0,
             )}
             unit={
               pairDetailStats?.pair.tokenOutSymbolCustom ??
