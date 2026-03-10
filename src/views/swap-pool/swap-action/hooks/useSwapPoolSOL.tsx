@@ -88,10 +88,13 @@ export const useSwapPoolSOL = () => {
                 // 2️⃣ Detect token programs
                 // ===============================
                 const depositAssetType = await detectAssetType(connection, depositMintPubkey);
-                const rewardAssetType = await detectAssetType(connection, rewardMintPubkey);
+
+                // Use the on-chain asset_reward_type from pool data directly
+                // (avoids potential PublicKey comparison issues with detectAssetType)
+                const isNativeReward = poolDetail.pool.assetTypeReward === AssetTypeEnum.NATIVE;
+                console.log('[useSwapPoolSOL] isNativeReward:', isNativeReward, 'assetTypeReward:', poolDetail.pool.assetTypeReward);
 
                 const depositTokenProgram = getTokenProgramFromAssetType(depositAssetType)!;
-                const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
 
                 // ===============================
                 // 3️⃣ Derive ATAs with correct programs
@@ -104,21 +107,30 @@ export const useSwapPoolSOL = () => {
                     ASSOCIATED_TOKEN_PROGRAM_ID,
                 );
 
-                const userRewardATA = await getAssociatedTokenAddress(
-                    rewardMintPubkey,
-                    walletPublicKey,
-                    false,
-                    rewardTokenProgram,
-                    ASSOCIATED_TOKEN_PROGRAM_ID,
-                );
+                // Only derive reward ATAs when reward is SPL (not native SOL)
+                let userRewardATA: PublicKey | null = null;
+                let treasuryRewardATA: PublicKey | null = null;
+                let rewardTokenProgram: PublicKey | null = null;
+                if (!isNativeReward) {
+                    const rewardAssetType = await detectAssetType(connection, rewardMintPubkey);
+                    rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
 
-                const treasuryRewardATA = await getAssociatedTokenAddress(
-                    rewardMintPubkey,
-                    treasuryPubkey,
-                    false,
-                    rewardTokenProgram,
-                    ASSOCIATED_TOKEN_PROGRAM_ID,
-                );
+                    userRewardATA = await getAssociatedTokenAddress(
+                        rewardMintPubkey,
+                        walletPublicKey,
+                        false,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+
+                    treasuryRewardATA = await getAssociatedTokenAddress(
+                        rewardMintPubkey,
+                        treasuryPubkey,
+                        false,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                }
 
                 const targetDepositATA = await getAssociatedTokenAddress(
                     depositMintPubkey,
@@ -160,7 +172,7 @@ export const useSwapPoolSOL = () => {
                     await maybeCreateATA(userDepositATA, depositMintPubkey, walletPublicKey, depositTokenProgram);
                     await maybeCreateATA(targetDepositATA, depositMintPubkey, targetAddressPubkey, depositTokenProgram);
                 }
-                if (rewardAssetType !== AssetTypeEnum.NATIVE) {
+                if (!isNativeReward && userRewardATA && treasuryRewardATA && rewardTokenProgram) {
                     await maybeCreateATA(userRewardATA, rewardMintPubkey, walletPublicKey, rewardTokenProgram);
                     await maybeCreateATA(treasuryRewardATA, rewardMintPubkey, treasuryPubkey, rewardTokenProgram);
                 }
@@ -182,32 +194,40 @@ export const useSwapPoolSOL = () => {
                             factory: factoryPDA,
                             pool: poolPDA,
                             userDeposit: userDepositPDA,
-                        })
+                            ownerAccount: targetAddressPubkey,
+                            // Optional SPL reward accounts (null when reward is native SOL)
+                            rewardVault: isNativeReward ? null : rewardVaultPDA,
+                            rewardMint: isNativeReward ? null : rewardMintPubkey,
+                            userRewardAta: isNativeReward ? null : userRewardATA,
+                            treasuryAta: isNativeReward ? null : treasuryRewardATA,
+                            rewardTokenProgram: isNativeReward ? null : rewardTokenProgram,
+                        } as any)
                         .instruction();
                 } else {
+                    const depositAmount = toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals);
+                    console.log('[useSwapPoolSOL] depositAmount (base units):', depositAmount.toString(), 'decimals:', poolDetail.pool.tokenInDecimals);
                     depositIx = await program.methods
-                        .depositToPoolSpl(
-                            toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals),
-                        )
+                        .depositToPoolSpl(depositAmount)
                         .accounts({
                             user: walletPublicKey,
                             treasury: treasuryPubkey,
                             factory: factoryPDA,
                             pool: poolPDA,
-                            rewardVault: rewardVaultPDA,
+                            // Pass null for reward SPL accounts when reward is native SOL
+                            rewardVault: isNativeReward ? null : rewardVaultPDA,
                             depositVault: depositVaultPDA,
-                            rewardMint: rewardMintPubkey,
+                            rewardMint: isNativeReward ? null : rewardMintPubkey,
                             depositMint: depositMintPubkey,
                             userDepositAta: userDepositATA,
-                            userRewardAta: userRewardATA,
-                            treasuryAta: treasuryRewardATA,
+                            userRewardAta: isNativeReward ? null : userRewardATA,
+                            treasuryAta: isNativeReward ? null : treasuryRewardATA,
                             userDeposit: userDepositPDA,
                             systemProgram: SystemProgram.programId,
                             depositTokenProgram,
-                            rewardTokenProgram,
+                            rewardTokenProgram: isNativeReward ? null : rewardTokenProgram,
                             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                             ownerDepositAta: targetDepositATA,
-                        })
+                        } as any)
                         .instruction();
                 }
 
@@ -240,6 +260,8 @@ export const useSwapPoolSOL = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Deposit failed", {
                     description: error?.message || String(error),
                 });

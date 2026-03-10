@@ -91,9 +91,14 @@ export const useDepositBurnSolFn = () => {
                             factory: factoryPDA,
                             pool: poolPDA,
                             userDeposit: userDepositPDA,
-                            // @ts-ignore — optional account, null for burn pools (ratio_bps == 0)
+                            // Optional accounts — null for burn pools
                             ownerAccount: null,
-                        })
+                            rewardVault: null,
+                            rewardMint: null,
+                            userRewardAta: null,
+                            treasuryAta: null,
+                            rewardTokenProgram: null,
+                        } as any)
                         .transaction();
 
                     const { blockhash, lastValidBlockHeight } =
@@ -126,6 +131,8 @@ export const useDepositBurnSolFn = () => {
                     const rewardAssetType = await detectAssetType(connection, rewardMint);
                     const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
 
+                    const isNativeReward = rewardAssetType === AssetTypeEnum.NATIVE;
+
                     const userDepositAta = await getAssociatedTokenAddress(
                         depositMint,
                         walletPublicKey,
@@ -134,21 +141,26 @@ export const useDepositBurnSolFn = () => {
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
 
-                    const userRewardAta = await getAssociatedTokenAddress(
-                        rewardMint,
-                        walletPublicKey,
-                        false,
-                        rewardTokenProgram,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
+                    // Only derive reward ATAs when reward is SPL (not native SOL)
+                    let userRewardAta: PublicKey | null = null;
+                    let treasuryAta: PublicKey | null = null;
+                    if (!isNativeReward) {
+                        userRewardAta = await getAssociatedTokenAddress(
+                            rewardMint,
+                            walletPublicKey,
+                            false,
+                            rewardTokenProgram,
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
+                        );
 
-                    const treasuryAta = await getAssociatedTokenAddress(
-                        rewardMint,
-                        treasuryPubkey,
-                        false,
-                        rewardTokenProgram,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
+                        treasuryAta = await getAssociatedTokenAddress(
+                            rewardMint,
+                            treasuryPubkey,
+                            false,
+                            rewardTokenProgram,
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
+                        );
+                    }
 
                     const tx = await program.methods
                         .depositToPoolSpl(amountBN)
@@ -157,30 +169,26 @@ export const useDepositBurnSolFn = () => {
                             treasury: treasuryPubkey,
                             factory: factoryPDA,
                             pool: poolPDA,
-                            rewardVault: rewardVaultPDA,
+                            rewardVault: isNativeReward ? null : rewardVaultPDA,
                             depositVault: depositVaultPDA,
-                            rewardMint,
+                            rewardMint: isNativeReward ? null : rewardMint,
                             depositMint,
                             userDeposit: userDepositPDA,
                             userDepositAta,
-                            userRewardAta,
-                            treasuryAta,
-                            rewardTokenProgram,
+                            userRewardAta: isNativeReward ? null : userRewardAta,
+                            treasuryAta: isNativeReward ? null : treasuryAta,
+                            rewardTokenProgram: isNativeReward ? null : rewardTokenProgram,
                             depositTokenProgram,
                             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                             systemProgram: SystemProgram.programId,
                             // @ts-ignore — optional account, null for burn pools
                             ownerDepositAta: null,
-                        })
+                        } as any)
                         .transaction();
 
                     // Create missing ATAs before the deposit instruction
                     const prependIxs = [];
-                    const [depositAtaInfo, rewardAtaInfo, treasuryAtaInfo] = await Promise.all([
-                        connection.getAccountInfo(userDepositAta),
-                        connection.getAccountInfo(userRewardAta),
-                        connection.getAccountInfo(treasuryAta),
-                    ]);
+                    const depositAtaInfo = await connection.getAccountInfo(userDepositAta);
 
                     if (!depositAtaInfo) {
                         prependIxs.push(
@@ -194,29 +202,38 @@ export const useDepositBurnSolFn = () => {
                             ),
                         );
                     }
-                    if (!rewardAtaInfo) {
-                        prependIxs.push(
-                            createAssociatedTokenAccountInstruction(
-                                walletPublicKey,
-                                userRewardAta,
-                                walletPublicKey,
-                                rewardMint,
-                                rewardTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
-                        );
-                    }
-                    if (!treasuryAtaInfo) {
-                        prependIxs.push(
-                            createAssociatedTokenAccountInstruction(
-                                walletPublicKey,
-                                treasuryAta,
-                                treasuryPubkey,
-                                rewardMint,
-                                rewardTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
-                        );
+
+                    // Only create reward ATAs when reward is SPL
+                    if (!isNativeReward && userRewardAta && treasuryAta) {
+                        const [rewardAtaInfo, treasuryAtaInfo] = await Promise.all([
+                            connection.getAccountInfo(userRewardAta),
+                            connection.getAccountInfo(treasuryAta),
+                        ]);
+
+                        if (!rewardAtaInfo) {
+                            prependIxs.push(
+                                createAssociatedTokenAccountInstruction(
+                                    walletPublicKey,
+                                    userRewardAta,
+                                    walletPublicKey,
+                                    rewardMint,
+                                    rewardTokenProgram,
+                                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                                ),
+                            );
+                        }
+                        if (!treasuryAtaInfo) {
+                            prependIxs.push(
+                                createAssociatedTokenAccountInstruction(
+                                    walletPublicKey,
+                                    treasuryAta,
+                                    treasuryPubkey,
+                                    rewardMint,
+                                    rewardTokenProgram,
+                                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                                ),
+                            );
+                        }
                     }
                     if (prependIxs.length > 0) {
                         tx.instructions.unshift(...prependIxs);
