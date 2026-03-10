@@ -18,6 +18,7 @@ import { useSystemStore } from "@/stores/systemStore";
 import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { type TransferRecord } from "@/services/transferHistoryService";
 import { transferHistoryQueryKeys } from "@/services/queries/queryKey";
+import { apiClient } from "@/config/axios";
 
 const LIMIT = 20;
 
@@ -37,64 +38,26 @@ function formatTokenAmount(amountOut: string, symbol: string): string {
   return value.toLocaleString("vi-VN", { maximumFractionDigits: 4 });
 }
 
-// ─── Mock data matching actual API response ────────────────────────────────────
-const MOCK_TRANSFERS: TransferRecord[] = [
-  {
-    poolName: "Pool 1",
-    chainId: "11155111",
-    tokenOut: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-    tokenOutSymbol: "USDT",
-    amountOut: "12000000",
-    timestamp: "1709850000000",
-    whitelistName: "Alice Nguyen",
-    whitelistEmail: "alice@example.com",
-    recipient: "0xaD45bF9e923aFC5e76800B47C0D5d2F2C8A82e10",
-  },
-  {
-    poolName: "Pool 2",
-    chainId: "11155111",
-    tokenOut: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    tokenOutSymbol: "USDC",
-    amountOut: "5000000",
-    timestamp: "1709950000000",
-    whitelistName: "Bob Tran",
-    whitelistEmail: "bob@example.com",
-    recipient: "0xaD45bF9e923aFC5e76800B47C0D5d2F2C8A82e10",
-  },
-  {
-    poolName: "Pool 3",
-    chainId: "11155111",
-    tokenOut: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-    tokenOutSymbol: "ETH",
-    amountOut: "500000000000000000",
-    timestamp: "1710050000000",
-    whitelistName: "Charlie Vo",
-    whitelistEmail: "charlie@example.com",
-    recipient: "0xaD45bF9e923aFC5e76800B47C0D5d2F2C8A82e10",
-  },
-  {
-    poolName: "Pool 4",
-    chainId: "11155111",
-    tokenOut: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
-    tokenOutSymbol: "USDT",
-    amountOut: "8500000",
-    timestamp: "1710150000000",
-    whitelistName: "Diana Le",
-    whitelistEmail: "diana@example.com",
-    recipient: "0xaD45bF9e923aFC5e76800B47C0D5d2F2C8A82e10",
-  },
-  {
-    poolName: "Pool 5",
-    chainId: "11155111",
-    tokenOut: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
-    tokenOutSymbol: "USDC",
-    amountOut: "22000000",
-    timestamp: "1710250000000",
-    whitelistName: "Ethan Pham",
-    whitelistEmail: "ethan@example.com",
-    recipient: "0xaD45bF9e923aFC5e76800B47C0D5d2F2C8A82e10",
-  },
-];
+type TransferHistoryApiTxn = {
+  id: string;
+  hash: string;
+  recipient: string | null;
+  poolAddress: string;
+  poolName: string | null;
+  chainId: string;
+  tokenOut: string;
+  tokenOutSymbol: string;
+  amountOut: string;
+  timestamp: string; // unix seconds (as string)
+  whitelistName: string | null;
+  whitelistEmail: string | null;
+};
+
+type TransferHistoryApiResponse = {
+  page: number;
+  total: number;
+  txns: TransferHistoryApiTxn[];
+};
 
 const AdminTransferHistoryTable = () => {
   const { filter, setFilter } = useAdminTransferHistoryFilterStore();
@@ -106,32 +69,47 @@ const AdminTransferHistoryTable = () => {
     return networkIdToChainId(networkId) ?? undefined;
   }, [filter.network, selectedNetworkId]);
 
+  const apiChainId = useMemo(() => {
+    if (!resolvedChainId) return undefined;
+    return resolvedChainId === "11155111" ? "-1" : resolvedChainId;
+  }, [resolvedChainId]);
+
   const queryParams = useMemo(
     () => ({
       page: filter.page,
       limit: LIMIT,
-      chainIds: resolvedChainId,
-      tokens: filter.tokens.length > 0 ? filter.tokens.join(",") : undefined,
+      chainId: apiChainId,
+      tokenOut: filter.tokens.length === 1 ? filter.tokens[0] : undefined,
       search: filter.text || undefined,
-      amountMin: filter.amountMin || undefined,
-      amountMax: filter.amountMax || undefined,
+      amountOutMin: filter.amountMin || undefined,
+      amountOutMax: filter.amountMax || undefined,
       dateFrom: filter.dateFrom || undefined,
       dateTo: filter.dateTo || undefined,
     }),
-    [filter, resolvedChainId],
+    [filter, apiChainId],
   );
 
-  // TODO: replace queryFn with real API call when endpoint is available
   const { data, isPending } = useQuery({
     queryKey: transferHistoryQueryKeys.list(queryParams),
     queryFn: async () => {
-      // Simulate a small network delay for realism
-      await new Promise((resolve) => setTimeout(resolve, 300));
-      return {
-        transfers: MOCK_TRANSFERS,
-        total: MOCK_TRANSFERS.length,
-        page: filter.page,
-      };
+      const response = await apiClient.get<TransferHistoryApiResponse>(
+        "/whitelist-users/history",
+        { params: queryParams },
+      );
+      const transfers: TransferRecord[] = (response.txns ?? []).map((t) => ({
+        poolName: t.poolName,
+        chainId: t.chainId,
+        tokenOut: t.tokenOut,
+        tokenOutSymbol: t.tokenOutSymbol,
+        amountOut: t.amountOut,
+        // API returns seconds → convert to milliseconds for table formatter
+        timestamp: String(Number(t.timestamp) * 1000),
+        whitelistName: t.whitelistName,
+        whitelistEmail: t.whitelistEmail,
+        recipient: t.recipient,
+      }));
+
+      return { page: response.page, total: response.total, transfers };
     },
   });
 
