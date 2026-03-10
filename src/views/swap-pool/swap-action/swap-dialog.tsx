@@ -20,8 +20,11 @@ import { useSwapPoolSOL } from "./useSwapPoolSOL";
 import { useMemo, useState } from "react";
 import BN from "bn.js";
 import { formatUnits } from "viem";
-import { formatAmount, toBaseUnits } from "@/utils/helpers/numbers";
+import { toBaseUnits } from "@/utils/helpers/numbers";
 import { ArrowIcon } from "@/components/common/arrow-icon";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import TokenImage from "@/components/common/token-image";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -43,6 +46,18 @@ type Props = {
 
 const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
     const [openFeePopUp, setOpenFeePopUp] = useState(false);
+
+    const formatBalanceDisplay = (value?: string) => {
+        if (!value) return "0";
+
+        const numericValue = Number(value);
+        if (!Number.isFinite(numericValue)) return value;
+
+        return numericValue.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 3,
+        });
+    };
 
     const handleOpenFeePopUp = () => {
         setOpenFeePopUp(!openFeePopUp);
@@ -70,11 +85,11 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
     });
 
     const handleSelectPercent = (percent: number) => {
-        if (!burnBalanceFormatted || !burnToken?.decimals) return;
+        if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null) return;
 
         try {
             const balanceBN = new BN(
-                toBaseUnits(burnBalanceFormatted, burnToken.decimals),
+                toBaseUnits(burnBalanceFormatted, poolDetail.pool.tokenInDecimals),
             );
 
             if (balanceBN.isZero()) return;
@@ -84,7 +99,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
 
             const formatted = formatUnits(
                 BigInt(amountBN.toString()),
-                burnToken.decimals,
+                poolDetail.pool.tokenInDecimals,
             );
 
             setValue("burnAmount", formatted, { shouldValidate: true });
@@ -135,15 +150,30 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
     const rewardToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === poolDetail?.pool.rewardToken,
     );
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.pool.tokenInSymbol,
+        whitelistToken: burnToken,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.pool.rewardTokenSymbol,
+        whitelistToken: rewardToken,
+    });
 
     const {
         formatted: burnBalanceFormatted,
         symbol: burnBalanceSymbol,
         isLoading: isLoadingBurnBalance,
     } = useTokenBalance({
-        tokenAddress: burnToken?.address,
-        decimals: burnToken?.decimals,
-        symbol: burnToken?.symbol,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        decimals: poolDetail?.pool.tokenInDecimals,
+        symbol: poolDetail?.pool.tokenInSymbol,
     });
 
     const {
@@ -151,9 +181,9 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
         symbol: rewardBalanceSymbol,
         isLoading: isLoadingRewardBalance,
     } = useTokenBalance({
-        tokenAddress: rewardToken?.address,
-        decimals: rewardToken?.decimals,
-        symbol: rewardToken?.symbol,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        decimals: poolDetail?.pool.rewardTokenDecimals,
+        symbol: poolDetail?.pool.rewardTokenSymbol,
     });
 
     const formattedEstimatedRewardAmount = useMemo(() => {
@@ -171,9 +201,24 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
 
             if (amountInBN.isZero()) return "0";
 
-            const rewardBN = amountInBN
-                .mul(new BN(rewardNumerator))
-                .div(new BN(rewardDenominator));
+            const rewardNumeratorBN = new BN(rewardNumerator);
+            const rewardDenominatorBN = new BN(rewardDenominator);
+            const decimalDiff = rewardTokenDecimals - tokenInDecimals;
+
+            let rewardBN: BN;
+
+            if (decimalDiff >= 0) {
+                const scaleUpBN = new BN(10).pow(new BN(decimalDiff));
+                rewardBN = amountInBN
+                    .mul(rewardNumeratorBN)
+                    .mul(scaleUpBN)
+                    .div(rewardDenominatorBN);
+            } else {
+                const scaleDownBN = new BN(10).pow(new BN(Math.abs(decimalDiff)));
+                rewardBN = amountInBN
+                    .mul(rewardNumeratorBN)
+                    .div(rewardDenominatorBN.mul(scaleDownBN));
+            }
 
             const feeBN = rewardBN
                 .mul(new BN(settlementFee ?? "0"))
@@ -226,12 +271,16 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 />
 
                                 <div className="flex h-fit w-32 items-center justify-between bg-mb-popover px-4 py-1.5">
-                                    <img
-                                        src={burnToken?.imageUri}
-                                        alt={burnToken?.symbol}
-                                        className="size-6 rounded-full"
+                                    <TokenImage
+                                        src={burnTokenDisplay.imageUri}
+                                        alt={burnTokenDisplay.name}
+                                        classNames={{
+                                            common: "size-6",
+                                            img: "size-6",
+                                            placeholder: "size-6",
+                                        }}
                                     />
-                                    <div className="text-xl">{burnToken?.symbol}</div>
+                                    <div className="text-xl">{burnTokenDisplay.symbol}</div>
                                 </div>
                             </div>
 
@@ -245,7 +294,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                             <div className="mt-1 flex w-full justify-end text-xl">
                                 {isLoadingBurnBalance
                                     ? "Checking balance..."
-                                    : `${formatAmount(burnBalanceFormatted, 0)} ${burnBalanceSymbol ?? burnToken?.symbol ?? ""
+                                    : `${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""
                                     }`}
                             </div>
 
@@ -272,12 +321,16 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 />
 
                                 <div className="flex h-fit w-32 items-center justify-between bg-mb-popover px-4 py-1.5">
-                                    <img
-                                        src={rewardToken?.imageUri}
-                                        alt={rewardToken?.symbol}
-                                        className="size-6 rounded-full"
+                                    <TokenImage
+                                        src={rewardTokenDisplay.imageUri}
+                                        alt={rewardTokenDisplay.name}
+                                        classNames={{
+                                            common: "size-6",
+                                            img: "size-6",
+                                            placeholder: "size-6",
+                                        }}
                                     />
-                                    <div className="text-xl">{rewardToken?.symbol}</div>
+                                    <div className="text-xl">{rewardTokenDisplay.symbol}</div>
                                 </div>
                             </div>
                             {/* separator */}
@@ -285,7 +338,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                             <div className="mt-1 flex w-full justify-end text-xl">
                                 {isLoadingRewardBalance
                                     ? "Checking balance..."
-                                    : `${formatAmount(rewardBalanceFormatted, 0)} ${rewardBalanceSymbol ?? rewardToken?.symbol ?? ""
+                                    : `${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardBalanceSymbol ?? rewardTokenDisplay.symbol ?? ""
                                     }`}
                             </div>
                         </div>
@@ -310,7 +363,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                         />
 
                         <div className="mt-2.5 flex w-full cursor-pointer justify-between rounded-2xl bg-white px-4 text-base transition-all duration-300 hover:bg-inactive">
-                            <p>{`1 ${burnToken?.symbol ?? ""} = ${Number(poolDetail?.pool?.rewardNumerator) / Number(poolDetail?.pool?.rewardDenominator)} ${rewardToken?.symbol ?? ""}`}</p>
+                            <p>{`1 ${burnTokenDisplay.symbol} = ${Number(poolDetail?.pool?.rewardNumerator) / Number(poolDetail?.pool?.rewardDenominator)} ${rewardTokenDisplay.symbol}`}</p>
                             <ArrowIcon className="rotate-90" onClick={handleOpenFeePopUp} />
                         </div>
                     </form>

@@ -9,6 +9,7 @@ import {
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { DEFAULT_NATIVE_DECIMALS, ZERO_ADDRESS } from "@/config/constant";
 import { getDecimalsTokenNativeByChainId } from "@/config/networks";
+import { normalizeRatioToIntegers } from "@/utils/helpers/ratio";
 
 const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS;
 
@@ -130,8 +131,10 @@ export const useCreateSwapPoolEvmFn = () => {
           poolName.slice(0, 31),
         );
 
-        const rewardNumerator = BigInt(ratioNumerator);
-        const rewardDenominator = BigInt(ratioDenominator);
+        const { burnUnits, rewardUnits } = normalizeRatioToIntegers(
+          ratioNumerator,
+          ratioDenominator,
+        );
 
         const payload = {
           poolName: poolNameBytes32,
@@ -141,8 +144,8 @@ export const useCreateSwapPoolEvmFn = () => {
           tokenIn: depositIsNative ? ZERO_ADDRESS : tokenIn,
           assetTypeIn: depositAssetType,
           targetAddress: userAddress,
-          rewardNumerator: rewardDenominator, // It's reward num and dem, not ratio on onchain
-          rewardDenominator: rewardNumerator,
+          rewardNumerator: rewardUnits, // It's reward num and dem, not ratio on onchain
+          rewardDenominator: burnUnits,
           rewardAmount: parsedAmount,
         };
 
