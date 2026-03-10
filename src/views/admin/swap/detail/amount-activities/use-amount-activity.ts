@@ -19,6 +19,7 @@ import { useCancelRequestApproveEvmFn } from "@/views/burn-pool/detail/amount-ac
 import { useCancelRequestApproveSolFn } from "@/views/burn-pool/detail/amount-activities/hooks/useCancelRequestApproveSolFn";
 import { useAdminClosePoolEvmFn } from "./hooks/useAdminClosePoolEvmFn";
 import { useAdminClosePoolSolFn } from "./hooks/useAdminClosePoolSolFn";
+import { poolService } from "@/services/poolService";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -166,12 +167,15 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         toast.info("Edit is not available yet");
     };
 
-    const handleAdminClose = async () => {
+    const handleAdminClose = async (reason?: string) => {
         if (!pool?.address) return;
         if (isSolana && poolDetail) {
             await adminClosePoolSol({ poolAddress: pool.address, poolDetail });
         } else {
             await adminClosePoolEvm({ poolAddress: pool.address });
+        }
+        if (reason?.trim()) {
+            await poolService.postReasonClosePool(pool.address, reason);
         }
         invalidatePoolQueries(pool.address);
     };

@@ -3,7 +3,11 @@ import { ActionBtn, StatRow } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
-import { useBatchTransferSolFn, type BatchRecipient, type TokenMode } from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferSolFn";
+import {
+    useBatchTransferSolFn,
+    type BatchRecipient,
+    type TokenMode,
+} from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferSolFn";
 import { useBatchTransferEvmFn } from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferEvmFn";
 import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
 
@@ -35,7 +39,20 @@ const ClosedStatus = ({ poolDetail }: Props) => {
             ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
             : undefined;
 
-    const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
+    const formattedTotalDeposited =
+        poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
+            ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
+            : undefined;
+
+    const formattedCurrentRewardAmount =
+        pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
+            ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
+            : undefined;
+
+    const handleTransfer = async (
+        recipients: BatchRecipient[],
+        mode: TokenMode,
+    ) => {
         if (!pool) return;
         if (isSolana) {
             await batchTransferSol({
@@ -57,15 +74,17 @@ const ClosedStatus = ({ poolDetail }: Props) => {
 
     return (
         <>
-            <StatRow
-                label="Close Reward"
-                value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
+            {/* <StatRow
+                label="Total Deposited"
+                value={`${formattedTotalDeposited} ${pool?.tokenInSymbol ?? ""}`}
                 className="font-medium text-active"
                 valueClassName="text-2xl font-bold"
-            />
+            /> */}
             <StatRow
-                label="Your Burned Amount"
-                value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
+                label="Remaining Reward"
+                value={`${formattedCurrentRewardAmount} ${pool?.rewardTokenSymbol ?? ""}`}
+                className="font-medium text-active"
+                valueClassName="text-2xl font-bold"
             />
             <ActionBtn
                 letter="T"
@@ -88,6 +107,14 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 }}
                 onTransfer={handleTransfer}
             />
+            {poolDetail?.pool?.adminCloseReason && (
+                <div className="flex gap-1 text-[15px]">
+                    <span className="font-medium text-foreground">
+                        Reason close pool:{" "}
+                    </span>
+                    <p className="text-greyed">{poolDetail.pool.adminCloseReason}</p>
+                </div>
+            )}
         </>
     );
 };

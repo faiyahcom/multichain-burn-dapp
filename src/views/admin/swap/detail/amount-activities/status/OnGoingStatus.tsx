@@ -11,7 +11,6 @@ import {
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
@@ -24,7 +23,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
         useAmountActivity(poolDetail);
 
     const handleConfirmClose = async () => {
-        await handleAdminClose();
+        await handleAdminClose(reason);
         setDialogOpen(false);
         setReason("");
     };

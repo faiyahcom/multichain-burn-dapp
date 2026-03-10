@@ -43,4 +43,13 @@ export const poolService = {
     );
     return response;
   },
+  postReasonClosePool: async (address: string, reason: string) => {
+    const response = await apiClient.post(
+      `${POOLS_API_ROUTES.REASON_CLOSE_POOL(address)}`,
+      {
+        reason,
+      },
+    );
+    return response;
+  }
 };
