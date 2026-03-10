@@ -22,6 +22,7 @@ import { formatUnits } from "viem";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import SellSection from "./sell-section";
 import BuySection from "./buy-section";
 import FeePanel from "./fee-panel";
@@ -195,7 +196,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
             onSuccess();
         } catch (error: any) {
             toast.error("Swap failed", {
-                description: error?.message || String(error),
+                description: getErrorMessage({ error }),
             });
         }
     };

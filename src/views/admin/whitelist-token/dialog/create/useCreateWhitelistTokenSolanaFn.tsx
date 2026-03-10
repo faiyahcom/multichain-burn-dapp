@@ -11,6 +11,7 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export const useCreateWhitelistTokenSolanaFn = () => {
   const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
@@ -76,7 +77,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         return true;
       } catch (error: any) {
         toast.error("Failed to create whitelist token", {
-          description: error?.message || String(error),
+          description: getErrorMessage({ error }),
         });
         return false;
       }

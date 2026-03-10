@@ -8,6 +8,7 @@ import {
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS } from "@/web3";
 import { ZERO_ADDRESS } from "@/config/constant";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 
 export interface DepositRewardParams {
@@ -58,7 +59,7 @@ export const useDepositRewardEvmFn = () => {
                 return receipt.hash;
             } catch (error: any) {
                 toast.error("Failed to deposit reward", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

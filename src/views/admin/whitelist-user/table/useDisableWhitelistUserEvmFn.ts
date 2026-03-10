@@ -14,6 +14,7 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import type { Abi, Address, Hex } from "viem";
 
 export const useDisableWhitelistUserEvmFn = () => {
@@ -127,12 +128,10 @@ export const useDisableWhitelistUserEvmFn = () => {
         return true;
       } catch (error: unknown) {
         console.error("[toggleWhitelistUserEvm] error:", error);
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
         toast.error(
           whitelist ? "Failed to enable user" : "Failed to remove user from whitelist",
           {
-            description: errorMessage,
+            description: getErrorMessage({ error }),
           },
         );
         return false;

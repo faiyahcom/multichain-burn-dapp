@@ -11,6 +11,7 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export const useDisableWhitelistUserSolanaFn = () => {
     const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
@@ -65,7 +66,7 @@ export const useDisableWhitelistUserSolanaFn = () => {
                 return true;
             } catch (error: any) {
                 toast.error(whitelist ? "Failed to enable user" : "Failed to remove user from whitelist", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 return false;
             }

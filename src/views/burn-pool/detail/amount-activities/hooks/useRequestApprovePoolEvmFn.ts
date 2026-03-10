@@ -3,6 +3,7 @@ import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { getContractBurnFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export const useRequestApprovePoolEvmFn = () => {
     const { isConnected } = useAppKitAccount();
@@ -31,7 +32,7 @@ export const useRequestApprovePoolEvmFn = () => {
                 return receipt.hash;
             } catch (error: any) {
                 toast.error("Failed to request pool approval", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

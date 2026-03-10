@@ -6,6 +6,7 @@ import {
     getContractBurnFactory,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { ZERO_ADDRESS } from "@/config/constant";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 
 const isNativeToken = (address: string) =>
@@ -93,7 +94,7 @@ export const useCreateBurnPoolEvmFn = () => {
                 return poolAddress as string | undefined;
             } catch (error: any) {
                 toast.error("Failed to create burn pool", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

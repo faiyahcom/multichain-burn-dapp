@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -159,7 +160,7 @@ export const useCancelPoolSolanaFn = () => {
                 return poolPDA.toBase58();
             } catch (error: any) {
                 toast.error("Failed to cancel pool", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

@@ -6,6 +6,7 @@ import {
   getContractBurnFactory,
   getContractBurnFactoryInterface,
 } from "@/web3/contracts/multichainBurnContractEVM";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export const useCancelRequestApproveEvmFn = () => {
   const { isConnected, address } = useAppKitAccount();
@@ -59,24 +60,10 @@ export const useCancelRequestApproveEvmFn = () => {
 
         return receipt.hash;
       } catch (error: any) {
-        let message = "Transaction failed";
-
-        /**
-         * 3️⃣ Try decode custom contract errors
-         */
-        try {
-          if (error?.data) {
-            const decoded = iface.parseError(error.data);
-            message = decoded.name;
-          }
-        } catch {}
-
-        /**
-         * fallback
-         */
-        if (error?.shortMessage) message = error.shortMessage;
-        if (error?.reason) message = error.reason;
-        if (error?.message) message = error.message;
+        const message = getErrorMessage({
+          error,
+          fallbackMsg: "Transaction failed",
+        });
 
         toast.error("Failed to cancel approval request", {
           description: message,

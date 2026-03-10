@@ -14,6 +14,7 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import type { Abi, Address, Hex } from "viem";
 
 export const useDisableWhitelistTokenEvmFn = () => {
@@ -109,7 +110,7 @@ export const useDisableWhitelistTokenEvmFn = () => {
         return true;
       } catch (error: any) {
         toast.error("Failed to disable whitelist token", {
-          description: error?.message || String(error),
+          description: getErrorMessage({ error }),
         });
         console.log("error", error);
         return false;
