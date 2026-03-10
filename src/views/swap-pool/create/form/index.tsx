@@ -9,7 +9,7 @@ import { useCreateSwapPoolSolanaFn } from "@/views/swap-pool/create/useCreateSwa
 import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
 

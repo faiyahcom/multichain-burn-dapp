@@ -1,6 +1,6 @@
 import { IconCopy } from "@/assets/react";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 
 interface Props {
   content?: string;

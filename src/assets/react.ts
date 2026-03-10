@@ -39,3 +39,8 @@ export { default as IconClipboard } from "./icons/clipboard.svg?react";
 export { default as IconWallet } from "./icons/wallet.svg?react";
 
 export { default as IconSpinner } from "./icons/spinner.svg?react";
+
+export { default as IconToastError } from "./icons/toast-error.svg?react";
+export { default as IconToastInfo } from "./icons/toast-info.svg?react";
+export { default as IconToastSuccess } from "./icons/toast-success.svg?react";
+export { default as IconToastWarning } from "./icons/toast-warning.svg?react";

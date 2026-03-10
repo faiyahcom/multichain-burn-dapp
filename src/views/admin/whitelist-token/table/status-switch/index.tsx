@@ -10,7 +10,7 @@ import {
 } from "@/services/whitelistService";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useCreateWhitelistTokenSolanaFn } from "../../dialog/create/useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "../../dialog/create/useCreateWhitelistTokenEvmFn";
 import { WRONG_NETWORK_ERROR_MESSAGE } from "@/config/constant";

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider, type Log } from "ethers";
 import { MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS } from "@/web3";

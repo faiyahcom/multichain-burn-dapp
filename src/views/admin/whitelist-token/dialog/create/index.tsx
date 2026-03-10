@@ -30,7 +30,7 @@ import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { whitelistService } from "@/services/whitelistService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { booleanString } from "@/types/common";
 

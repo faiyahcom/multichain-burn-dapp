@@ -5,7 +5,7 @@ import { poolService } from "@/services/poolService";
 import { useEditPoolEvmFn } from "./hooks/useEditPoolEvmFn";
 import { useEditPoolSolFn } from "./hooks/useEditPoolSolFn";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";

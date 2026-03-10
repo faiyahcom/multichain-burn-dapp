@@ -35,7 +35,7 @@ import { NETWORK_CONFIGS, chainIdToNetworkConfig } from "@/config/networks";
 import { useDisableWhitelistUserEvmFn } from "./useDisableWhitelistUserEvmFn";
 import { useDisableWhitelistUserSolanaFn } from "./useDisableWhitelistUserSolanaFn";
 import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 

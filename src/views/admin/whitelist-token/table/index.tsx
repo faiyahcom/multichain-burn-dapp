@@ -38,7 +38,7 @@ import { truncateString } from "@/utils/helpers/string";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
 import StatusSwitch from "./status-switch";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";

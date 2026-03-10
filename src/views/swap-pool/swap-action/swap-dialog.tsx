@@ -12,7 +12,7 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { IconArrowDownWithStem } from "@/assets/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useTokenBalance } from "../../../hooks/useTokenBalance";
 import { useSystemStore } from "@/stores/systemStore";
 import { useSwapPoolETH } from "./useSwapPoolETH";

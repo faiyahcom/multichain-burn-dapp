@@ -18,7 +18,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { useState } from "react";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import type { WhitelistUser } from "@/services/whitelistUserService";
 
 const editUserSchema = z.object({
