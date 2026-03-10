@@ -22,7 +22,6 @@ import {
     getRewardVaultPDA,
     getDepositVaultPDA,
     detectAssetType,
-    AssetTypeEnum,
     getTokenProgramFromAssetType,
 } from "@/web3/helpers";
 
@@ -72,22 +71,18 @@ export const useCreateBurnPoolSolFn = () => {
                 const depositTokenProgramId = getTokenProgramFromAssetType(assetType);
 
                 // ==============================
-                // ATA only if NOT native
+                // ATA for owner reward — always needed (even for native SOL,
+                // which uses NATIVE_MINT, a real SPL token under TOKEN_PROGRAM_ID)
                 // ==============================
-                let ownerRewardAta: PublicKey | null = null;
-                let ataInfo = null;
+                const ownerRewardAta = await getAssociatedTokenAddress(
+                    rewardMint,
+                    walletPublicKey,
+                    false,
+                    rewardTokenProgramId!,
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                );
 
-                if (assetRewardType !== AssetTypeEnum.NATIVE) {
-                    ownerRewardAta = await getAssociatedTokenAddress(
-                        rewardMint,
-                        walletPublicKey,
-                        false,
-                        rewardTokenProgramId!,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
-
-                    ataInfo = await connection.getAccountInfo(ownerRewardAta);
-                }
+                const ataInfo = await connection.getAccountInfo(ownerRewardAta);
 
                 // ==============================
                 // Derive PDAs
@@ -136,17 +131,17 @@ export const useCreateBurnPoolSolFn = () => {
                         systemProgram: SystemProgram.programId,
                         rewardTokenProgram: rewardTokenProgramId!,
                         depositTokenProgram: depositTokenProgramId!,
-                        ownerRewardAta: ownerRewardAta ?? walletPublicKey,
+                        ownerRewardAta,
                         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                     })
                     .transaction();
 
-                // Create ATA if needed
-                if (assetRewardType !== AssetTypeEnum.NATIVE && !ataInfo) {
+                // Create ATA if it doesn't exist
+                if (!ataInfo) {
                     tx.instructions.unshift(
                         createAssociatedTokenAccountInstruction(
                             walletPublicKey,
-                            ownerRewardAta!,
+                            ownerRewardAta,
                             walletPublicKey,
                             rewardMint,
                             rewardTokenProgramId!,
