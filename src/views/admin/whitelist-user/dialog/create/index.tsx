@@ -22,7 +22,7 @@ import { useCreateWhitelistUserEvmFn } from "./useCreateWhitelistUserEvmFn";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import { cn } from "@/lib/utils";
 
