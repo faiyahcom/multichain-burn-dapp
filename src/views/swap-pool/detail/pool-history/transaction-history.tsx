@@ -105,7 +105,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                 : tx.amountOut && tx.tokenOutDecimals != null
                                     ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
                                     : "—";
-                        const token = tx.tokenInSymbol || tx.tokenOutSymbol || "—";
+                        const token = amount === formatAmount(tx.amountIn, tx.tokenInDecimals) ? tx.tokenInSymbol : tx.tokenOutSymbol || "—";
                         const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
                         return (

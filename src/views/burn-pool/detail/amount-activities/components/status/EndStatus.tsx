@@ -10,6 +10,7 @@ type Props = {
 const EndStatus = ({ poolDetail }: Props) => {
     const { pool, formattedReward, formattedBurned, handleClaim } = useAmountActivity(poolDetail);
     const [isLoading, setIsLoading] = useState(false);
+    const canClaim = poolDetail?.userAmount.canClaim ?? false;
 
     const handleClaimWithLoading = async () => {
         setIsLoading(true);
@@ -32,7 +33,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 label="Your Burned Amount"
                 value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
             />
-            <ActionBtn letter="C" text="Claim" isLoading={isLoading} onClick={handleClaimWithLoading} />
+            <ActionBtn letter="C" text="Claim" isLoading={isLoading} disabled={!canClaim} onClick={handleClaimWithLoading} />
         </>
     );
 };
