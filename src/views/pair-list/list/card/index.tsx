@@ -5,8 +5,8 @@ import TokenImage from "@/components/common/token-image";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { Link } from "@tanstack/react-router";
-import { formatUnits } from "ethers";
 
 interface Props {
   data?: PairItemType[];
@@ -97,13 +97,13 @@ const CardItem: React.FC<PairItemType> = ({
         <CardInfoRow
           title="Volume"
           tooltipContent="The total value of burn tokens deposited by taker into Swap Pools and Burn Pools of the pair"
-          value={Number(formatUnits(volume ?? 0, tokenInDecimals)) || 0}
+          value={Number(sciToFormatted(volume ?? 0, tokenInDecimals)) || 0}
           unit={tokenInSymbolCustom ?? tokenInSymbol}
         />
         <CardInfoRow
           title="TVL"
           tooltipContent="The total amount of reward tokens deposited by all makers when creating Swap Pools and Burn Pools within the same pair."
-          value={Number(formatUnits(tvl ?? 0, tokenOutDecimals)) || 0}
+          value={Number(sciToFormatted(tvl ?? 0, tokenOutDecimals)) || 0}
           unit={tokenOutSymbolCustom ?? tokenOutSymbol}
         />
       </div>
