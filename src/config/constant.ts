@@ -9,7 +9,7 @@ export const API_BASE_URL =
     : "http://localhost:8080";
 
 export const ZERO_ADDRESS = ethers.ZeroAddress;
-export const WSOL_ADDRESS = NATIVE_MINT;
+export const WSOL_ADDRESS = NATIVE_MINT.toString();
 export const DEFAULT_NATIVE_DECIMALS = 18;
 
 export const WRONG_NETWORK_ERROR_MESSAGE =

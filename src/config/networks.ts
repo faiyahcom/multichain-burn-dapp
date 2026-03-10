@@ -26,6 +26,8 @@ export type NetworkConfig = {
   iconSrc: string;
   color: string;
   shortLabel: string;
+  /** Base URL for the block explorer, e.g. "https://sepolia.etherscan.io" */
+  scanUrl: string;
 };
 
 export type nativeCurrency = {
@@ -44,6 +46,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/ethereum.png",
     color: "#5779FE",
     shortLabel: "ETH",
+    scanUrl: "https://sepolia.etherscan.io",
   },
   {
     id: "binanceTestnet",
@@ -54,6 +57,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/binance.png",
     color: "#f9b845",
     shortLabel: "BNB",
+    scanUrl: "https://testnet.bscscan.com",
   },
   {
     id: "xphereTestnet",
@@ -64,6 +68,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
     shortLabel: "XPH",
+    scanUrl: "https://explorer.xphere.io",
   },
   {
     id: "solanaDevnet",
@@ -74,6 +79,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/solana.png",
     color: "#b07be0",
     shortLabel: "SOL",
+    scanUrl: "https://explorer.solana.com",
   },
 ];
 
