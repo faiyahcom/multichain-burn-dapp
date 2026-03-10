@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import type { MultipleSelectOption } from "@/components/common/multiple-select";
 import MultipleSelect from "@/components/common/multiple-select";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import { ArrowIcon } from "@/components/common/arrow-icon";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, networkIdToChainId } from "@/config/networks";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
@@ -17,29 +18,68 @@ import {
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { useSystemStore } from "@/stores/systemStore";
+import { transferHistoryQueryKeys } from "@/services/queries/queryKey";
+import type { AnalysisItem, GetTransferAnalysisResponse } from "@/services/transferHistoryService";
 
 // ─── Stat card ───────────────────────────────────────────────────────────────
 interface StatCardProps {
-  label: string;
-  transfers: number;
-  tokens: number;
+  symbol: string;
+  txnCount: number;
+  formattedAmount: string;
 }
 
-const StatCard = ({ label, transfers, tokens }: StatCardProps) => (
-  <div className="flex-1 rounded-xl border border-border bg-white px-5 py-4">
-    <p className="text-base font-semibold">{label}</p>
+const StatCard = ({ symbol, txnCount, formattedAmount }: StatCardProps) => (
+  <div className="h-[87px] w-[276px] rounded-[15px] border-2 border-[#DEE4F6] bg-white px-6 py-4">
+    <p className="text-base font-semibold">{symbol}</p>
     <p className="mt-0.5 text-sm text-secondary-text">
-      {transfers} {transfers === 1 ? "transfer" : "transfers"} · {tokens} tokens
+      {txnCount} {txnCount === 1 ? "transfer" : "transfers"} · {formattedAmount} tokens
     </p>
   </div>
 );
 
-const MOCK_STATS = NETWORK_CONFIGS.map((n, i) => ({
-  id: n.id,
-  label: n.shortLabel,
-  transfers: i === 0 ? 15 : 1,
-  tokens: 10,
-}));
+// Mock API response (keep field names unchanged)
+const MOCK_ANALYSIS_RESPONSE: GetTransferAnalysisResponse = {
+  analysis: [
+    {
+      chainId: "11155111",
+      tokenAddress: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+      tokenSymbol: "USDC",
+      tokenDecimals: 6,
+      totalAmount: "47500000000",
+      txnCount: 18,
+    },
+    {
+      chainId: "11155111",
+      tokenAddress: "0xdAC17F958D2ee523a2206206994597C13D831ec7",
+      tokenSymbol: "USDT",
+      tokenDecimals: 6,
+      totalAmount: "12000000",
+      txnCount: 3,
+    },
+    {
+      chainId: "11155111",
+      tokenAddress: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      tokenSymbol: "ETH",
+      tokenDecimals: 18,
+      totalAmount: "8500000000000000000",
+      txnCount: 7,
+    },
+    {
+      chainId: "900",
+      tokenAddress: "So11111111111111111111111111111111111111112",
+      tokenSymbol: "SOL",
+      tokenDecimals: 9,
+      totalAmount: "15200000000",
+      txnCount: 12,
+    },
+  ],
+};
+
+function formatTokenAmount(totalAmount: string, tokenDecimals: number): string {
+  const value = Number(totalAmount) / Math.pow(10, tokenDecimals);
+  return value.toLocaleString("vi-VN", { maximumFractionDigits: 4 });
+}
 
 // ─── Network single-select ───────────────────────────────────────────────────
 interface NetworkOptionItemProps {
@@ -94,20 +134,22 @@ const NetworkSelect = ({ value, onChange }: NetworkSelectProps) => {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button variant={selectedCfg ? "mb-active" : "mb-inactive"} size="mb-btn">
-          <div className="size-2.5" />
           {selectedCfg ? (
-            <span className="flex items-center gap-1.75">
+            <span className="flex items-center justify-center gap-2">
               <NetworkImgIcon
                 src={selectedCfg.iconSrc}
                 alt={selectedCfg.label}
                 className="size-5"
               />
-              <span>{selectedCfg.shortLabel}</span>
+              <span className="font-semibold">{selectedCfg.shortLabel}</span>
+              <ArrowIcon direction="down" />
             </span>
           ) : (
-            <span>Network</span>
+            <span className="flex items-center justify-center gap-2">
+              <span>Network</span>
+              <ArrowIcon direction="down" />
+            </span>
           )}
-          <ArrowIcon direction="down" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -146,12 +188,33 @@ const AdminTransferHistoryHeader = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>();
   const [dateTo, setDateTo] = useState<Date | undefined>();
 
+  // Use chainId from user's login/connected network
+  const { selectedNetworkId } = useSystemStore();
+  const currentBackendChainId = useMemo(() => {
+    return networkIdToChainId(selectedNetworkId) ?? undefined;
+  }, [selectedNetworkId]);
+
+  const { data: analysisData } = useQuery({
+    queryKey: transferHistoryQueryKeys.analysis(),
+    queryFn: async () => {
+      // Mocking API for now
+      await new Promise((resolve) => setTimeout(resolve, 200));
+      return MOCK_ANALYSIS_RESPONSE;
+    },
+  });
+
+  const filteredAnalysis: AnalysisItem[] = useMemo(() => {
+    const all = analysisData?.analysis ?? [];
+    if (!currentBackendChainId) return all;
+    return all.filter((x) => x.chainId === currentBackendChainId);
+  }, [analysisData, currentBackendChainId]);
+
   const tokenOptions: MultipleSelectOption[] = [];
 
   return (
-    <div className="space-y-4 pt-12.75 pr-13.5 pl-21">
+    <div className="space-y-4 pt-12.75 pr-13.5 ">
       {/* Title */}
-      <div className="space-y-1">
+      <div className="space-y-1 ml-[84px]">
         <h1 className="text-3xl font-semibold">Transfer History</h1>
         <p className="text-base text-secondary-text">
           View all completed token transfers and their details
@@ -159,13 +222,13 @@ const AdminTransferHistoryHeader = () => {
       </div>
 
       {/* Stats cards */}
-      <div className="flex items-stretch gap-4">
-        {MOCK_STATS.map((stat) => (
+      <div className="flex items-stretch gap-[25px] pl-[54px]">
+        {filteredAnalysis.map((item) => (
           <StatCard
-            key={stat.id}
-            label={stat.label}
-            transfers={stat.transfers}
-            tokens={stat.tokens}
+            key={item.tokenAddress}
+            symbol={item.tokenSymbol}
+            txnCount={item.txnCount}
+            formattedAmount={formatTokenAmount(item.totalAmount, item.tokenDecimals)}
           />
         ))}
       </div>
@@ -190,7 +253,7 @@ const AdminTransferHistoryHeader = () => {
       </div>
 
       {/* Filters row 2: amount range */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 pl-[54px]">
         <span className="w-16 text-sm font-medium text-secondary-text">Amount</span>
         <Input
           type="number"
@@ -210,7 +273,7 @@ const AdminTransferHistoryHeader = () => {
       </div>
 
       {/* Filters row 3: date range */}
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3 pl-[54px]">
         <span className="w-16 text-sm font-medium text-secondary-text">Date</span>
         <DatePicker value={dateFrom} onChange={setDateFrom} className="w-48" />
         <span className="text-sm text-secondary-text">to</span>

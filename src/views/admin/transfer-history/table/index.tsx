@@ -150,7 +150,7 @@ const AdminTransferHistoryTable = () => {
   ];
 
   return (
-    <div className="space-y-10 pb-10 pl-14">
+    <div className="space-y-10 pb-10">
       <Table>
         <TableHeader>
           <TableRow>
