@@ -169,14 +169,17 @@ export const useDepositBurnSolFn = () => {
                             depositTokenProgram,
                             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                             systemProgram: SystemProgram.programId,
+                            // @ts-ignore — optional account, null for burn pools
+                            ownerDepositAta: null,
                         })
                         .transaction();
 
                     // Create missing ATAs before the deposit instruction
                     const prependIxs = [];
-                    const [depositAtaInfo, rewardAtaInfo] = await Promise.all([
+                    const [depositAtaInfo, rewardAtaInfo, treasuryAtaInfo] = await Promise.all([
                         connection.getAccountInfo(userDepositAta),
                         connection.getAccountInfo(userRewardAta),
+                        connection.getAccountInfo(treasuryAta),
                     ]);
 
                     if (!depositAtaInfo) {
@@ -197,6 +200,18 @@ export const useDepositBurnSolFn = () => {
                                 walletPublicKey,
                                 userRewardAta,
                                 walletPublicKey,
+                                rewardMint,
+                                rewardTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+                    if (!treasuryAtaInfo) {
+                        prependIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                treasuryAta,
+                                treasuryPubkey,
                                 rewardMint,
                                 rewardTokenProgram,
                                 ASSOCIATED_TOKEN_PROGRAM_ID,
