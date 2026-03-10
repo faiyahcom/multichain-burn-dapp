@@ -115,21 +115,10 @@ const RewardAmount = ({ poolDetail }: Props) => {
                             )}
                         </div>
                     ))}
-                            </div>
-                            {row[1] && (
-                                <div className="grid grid-cols-2">
-                                    <span className="text-xl text-greyed">{row[1].label}:</span>
-                                    <span className="text-xl text-foreground">
-                                        {row[1].value}
-                                    </span>
-                                </div>
-                            )}
-                        </div>
-                    ))}
                 </div>
             )}
         </div>
     );
-};
+}
 
 export default RewardAmount;
