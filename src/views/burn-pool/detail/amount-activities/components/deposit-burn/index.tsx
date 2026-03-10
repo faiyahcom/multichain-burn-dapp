@@ -9,16 +9,16 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { PoolDetailResponse } from "@/types/pool";
-import { useGetWhitelistTokens } from "@/services/queries/queries";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useMemo } from "react";
-import BN from "bn.js";
-import { formatUnits } from "viem";
-import { formatAmount, toBaseUnits } from "@/utils/helpers/numbers";
+import { formatUnits, parseUnits } from "viem";
+import { formatAmount } from "@/utils/helpers/numbers";
 import { Input } from "@/components/ui/input";
 import { IconWallet } from "@/assets/react";
 import TokenImage from "@/components/common/token-image";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { AssetTypeEnum } from "@/web3/helpers";
 
 const depositFormSchema = z.object({
     amount: z
@@ -79,15 +79,6 @@ const DepositBurnDialog = ({
 
     const amountStr = watch("amount");
 
-    const { data: whitelistTokens } = useGetWhitelistTokens();
-
-    const burnToken = whitelistTokens?.whitelistTokens?.find(
-        (token) => token.address === pool?.tokenIn,
-    );
-    const rewardToken = whitelistTokens?.whitelistTokens?.find(
-        (token) => token.address === pool?.rewardToken,
-    );
-
     const { formatted: burnBalanceFormatted, isLoading: isLoadingBurnBalance } =
         useTokenBalance({
             tokenAddress: pool?.tokenIn,
@@ -102,24 +93,68 @@ const DepositBurnDialog = ({
         )
         : "-";
 
+    const yourCurrentDepositedAmount = poolDetail?.userAmount.deposited;
+    const formattedCurrentDepositedAmount = yourCurrentDepositedAmount
+        ? formatAmount(yourCurrentDepositedAmount, poolDetail.pool.tokenInDecimals)
+        : "0";
+
     const handleSelectPercent = (percent: number) => {
         if (!burnBalanceFormatted || pool?.tokenInDecimals == null) return;
         try {
-            const balanceBN = new BN(
-                toBaseUnits(burnBalanceFormatted, pool.tokenInDecimals),
-            );
-            if (balanceBN.isZero()) return;
-            const amountBN =
-                percent === 100 ? balanceBN : balanceBN.muln(percent).divn(100);
-            const formatted = formatUnits(
-                BigInt(amountBN.toString()),
+            const balanceBase = parseUnits(
+                burnBalanceFormatted,
                 pool.tokenInDecimals,
             );
+            if (balanceBase === 0n) return;
+            const amountBase =
+                percent === 100 ? balanceBase : (balanceBase * BigInt(percent)) / 100n;
+            const formatted = formatUnits(amountBase, pool.tokenInDecimals);
             setValue("amount", formatted, { shouldValidate: true });
         } catch {
             return;
         }
     };
+
+    const networkConfig = useMemo(
+        () => (pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined),
+        [pool?.chainId],
+    );
+
+    const tokenInDisplay = useMemo(() => {
+        if (pool?.assetTypeIn === AssetTypeEnum.NATIVE && networkConfig) {
+            const native = networkConfig.appKitNetwork.nativeCurrency;
+            return {
+                imageUri: networkConfig.iconSrc,
+                customSymbol: native.symbol,
+                customName: native.name,
+            };
+        }
+        return poolDetail?.tokenIn
+            ? {
+                imageUri: poolDetail.tokenIn.imageUri,
+                customSymbol: poolDetail.tokenIn.customSymbol,
+                customName: poolDetail.tokenIn.customName,
+            }
+            : undefined;
+    }, [pool?.assetTypeIn, networkConfig, poolDetail?.tokenIn]);
+
+    const tokenOutDisplay = useMemo(() => {
+        if (pool?.assetTypeReward === AssetTypeEnum.NATIVE && networkConfig) {
+            const native = networkConfig.appKitNetwork.nativeCurrency;
+            return {
+                imageUri: networkConfig.iconSrc,
+                customSymbol: native.symbol,
+                customName: native.name,
+            };
+        }
+        return poolDetail?.tokenOut
+            ? {
+                imageUri: poolDetail.tokenOut.imageUri,
+                customSymbol: poolDetail.tokenOut.customSymbol,
+                customName: poolDetail.tokenOut.customName,
+            }
+            : undefined;
+    }, [pool?.assetTypeReward, networkConfig, poolDetail?.tokenOut]);
 
     const ratio = useMemo(() => {
         if (!pool) return "-";
@@ -136,18 +171,30 @@ const DepositBurnDialog = ({
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         return `${raw.toLocaleString(undefined, {
             maximumFractionDigits: poolDetail.pool.tokenInDecimals,
-        })} ${poolDetail.pool.tokenInSymbol}`;
-    }, [poolDetail]);
+        })} ${tokenInDisplay?.customSymbol ?? poolDetail.pool.tokenInSymbol}`;
+    }, [poolDetail, tokenInDisplay]);
 
     const estmatedReward = useMemo(() => {
         if (!poolDetail) return "-";
-        if (!amountStr) return `0 ${poolDetail.pool.rewardTokenSymbol}`;
+        const rewardSymbol =
+            tokenOutDisplay?.customSymbol ?? poolDetail.pool.rewardTokenSymbol;
+        if (!amountStr) return `0 ${rewardSymbol}`;
         const amount = Number(amountStr);
-        console.log("Calculating reward with amount:", amount);
-        if (isNaN(amount)) return `0 ${poolDetail.pool.rewardTokenSymbol}`;
-        const reward = (amount / (Number(poolDetail.depositedAmount + amount))) * (Number(poolDetail.pool.rewardAmount) / Math.pow(10, poolDetail.pool.rewardTokenDecimals));
-        return `${reward} ${poolDetail.pool.rewardTokenSymbol}`;
-    }, [poolDetail, ratio, amountStr]);
+        if (isNaN(amount) || amount <= 0) return `0 ${rewardSymbol}`;
+        const totalDeposited =
+            Number(poolDetail.depositedAmount) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        const rewardPool =
+            Number(poolDetail.pool.rewardAmount) /
+            Math.pow(10, poolDetail.pool.rewardTokenDecimals);
+        const yourCurrentDeposited =
+            Number(poolDetail.userAmount.deposited) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        const reward =
+            ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
+            rewardPool;
+        return `${reward} ${rewardSymbol}`;
+    }, [poolDetail, tokenOutDisplay, ratio, amountStr]);
 
     const onSubmit = async (data: DepositFormValues) => {
         await onConfirm(data.amount);
@@ -192,15 +239,15 @@ const DepositBurnDialog = ({
                                     value={
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
-                                                src={burnToken?.imageUri}
-                                                alt={burnToken?.symbol}
+                                                src={tokenInDisplay?.imageUri}
+                                                alt={tokenInDisplay?.customSymbol}
                                                 classNames={{
                                                     common: "size-5",
                                                     img: "size-5",
                                                     placeholder: "size-5",
                                                 }}
                                             />
-                                            {pool?.tokenInSymbol ?? "-"}
+                                            {tokenInDisplay?.customSymbol ?? "-"}
                                         </span>
                                     }
                                 />
@@ -213,15 +260,15 @@ const DepositBurnDialog = ({
                                     value={
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
-                                                src={rewardToken?.imageUri}
-                                                alt={rewardToken?.symbol}
+                                                src={tokenOutDisplay?.imageUri}
+                                                alt={tokenOutDisplay?.customSymbol}
                                                 classNames={{
                                                     common: "size-5",
                                                     img: "size-5",
                                                     placeholder: "size-5",
                                                 }}
                                             />
-                                            {pool?.rewardTokenSymbol ?? "-"}
+                                            {tokenOutDisplay?.customSymbol ?? "-"}
                                         </span>
                                     }
                                 />
@@ -241,13 +288,22 @@ const DepositBurnDialog = ({
                             {/* Deposit Amount Input */}
                             <div className="space-y-2">
                                 <div className="flex items-center justify-between">
+                                    <span>Your Deposited Amount</span>
+                                    <span className="flex items-center space-x-2 font-medium text-foreground">
+                                        <span>
+                                            {formattedCurrentDepositedAmount ?? "0"}{" "}
+                                            {tokenInDisplay?.customSymbol ?? ""}
+                                        </span>
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
                                     <span>Deposit Amount</span>
                                     <span className="flex items-center space-x-2 text-secondary-text">
                                         <IconWallet />
                                         <span>
                                             {isLoadingBurnBalance
                                                 ? "Loading..."
-                                                : `${burnBalanceFormatted ?? "0"} ${burnToken?.symbol ?? ""}`}
+                                                : `${burnBalanceFormatted ?? "0"} ${tokenInDisplay?.customSymbol ?? ""}`}
                                         </span>
                                     </span>
                                 </div>
@@ -262,15 +318,15 @@ const DepositBurnDialog = ({
                                     />
                                     <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
                                         <TokenImage
-                                            src={burnToken?.imageUri}
-                                            alt={burnToken?.symbol}
+                                            src={tokenInDisplay?.imageUri}
+                                            alt={tokenInDisplay?.customSymbol}
                                             classNames={{
                                                 common: "size-5",
                                                 img: "size-5",
                                                 placeholder: "size-5",
                                             }}
                                         />
-                                        <span>{pool?.tokenInSymbol ?? ""}</span>
+                                        <span>{tokenInDisplay?.customSymbol ?? ""}</span>
                                     </div>
                                 </div>
 

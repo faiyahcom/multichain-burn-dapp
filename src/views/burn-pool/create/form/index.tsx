@@ -73,6 +73,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                 navigate({
                     to: "/burn/detail/$address",
                     params: { address: poolAddress },
+                    search: { depositReward: true },
                 });
             }
             return;
@@ -91,6 +92,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                 navigate({
                     to: "/burn/detail/$address",
                     params: { address: poolAddress },
+                    search: { depositReward: true },
                 });
             }
             return;

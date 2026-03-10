@@ -118,12 +118,15 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         className={cn(
           "text-base font-normal",
           {
-            "flex-1 text-center":
+            "text-center":
               textVariant === "text-container-center" ||
               textVariant === "text-self-center",
           },
           {
-            "flex-0 font-medium text-primary-foreground": isDisabled,
+            "flex-1": !isDisabled
+          },
+          {
+            "font-medium text-primary-foreground": isDisabled,
           },
           classNames?.text,
         )}

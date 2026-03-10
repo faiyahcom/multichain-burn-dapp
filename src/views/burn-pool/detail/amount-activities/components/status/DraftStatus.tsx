@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearch, useNavigate } from "@tanstack/react-router";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
@@ -17,6 +18,20 @@ const DraftStatus = ({ poolDetail }: Props) => {
         handleEdit,
         handleRequestApprove,
     } = useAmountActivity(poolDetail);
+
+    const { depositReward } = useSearch({ from: '/burn/detail/$address' });
+    const navigate = useNavigate({ from: '/burn/detail/$address' });
+
+    useEffect(() => {
+        if (depositReward) {
+            setDepositRewardOpen(true);
+            navigate({
+                search: (prev: Record<string, unknown>) => { const { depositReward: _, ...rest } = prev; return rest as never; },
+                replace: true,
+            });
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const [activeAction, setActiveAction] = useState<"cancel" | "approve" | null>(null);
     const isRunning = activeAction !== null;

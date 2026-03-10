@@ -27,13 +27,13 @@ import {
   type PoolType,
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { formatUnits } from "ethers";
 
 interface Props {
   poolType: PoolType;
@@ -240,7 +240,10 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={formatUnits(pool.tvl ?? 0, pool.tokenOutDecimals)}
+                    number={sciToFormatted(
+                      pool.tvl ?? 0,
+                      pool.tokenOutDecimals,
+                    )}
                     unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
                   />
                 </TableCell>
