@@ -14,8 +14,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { PairItemType } from "@/types/pair";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { Link } from "@tanstack/react-router";
-import { formatUnits } from "ethers";
 
 interface Props {
   data?: PairItemType[];
@@ -74,13 +74,13 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={formatUnits(item.volume ?? 0, item.tokenInDecimals)}
+                    number={sciToFormatted(item.volume, item.tokenInDecimals)}
                     unit={item.tokenInSymbolCustom ?? item.tokenInSymbol}
                   />
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={formatUnits(item.tvl ?? 0, item.tokenOutDecimals)}
+                    number={sciToFormatted(item.tvl, item.tokenOutDecimals)}
                     unit={item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
                   />
                 </TableCell>

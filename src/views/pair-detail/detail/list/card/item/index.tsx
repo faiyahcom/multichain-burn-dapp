@@ -7,12 +7,12 @@ import {
   getPoolStatusLabel,
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
-import { formatUnits } from "ethers";
 import type React from "react";
 
 interface Props {
@@ -32,7 +32,7 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="Volume"
           value={
             <MetricNumber
-              number={formatUnits(data?.volume ?? 0, data?.tokenInDecimals)}
+              number={sciToFormatted(data?.volume ?? 0, data?.tokenInDecimals)}
               unit={data?.tokenInSymbolCustom ?? data?.tokenInSymbol}
               classNames={{
                 container: "justify-end",
@@ -44,7 +44,7 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="TVL"
           value={
             <MetricNumber
-              number={formatUnits(data?.tvl ?? 0, data?.tokenOutDecimals)}
+              number={sciToFormatted(data?.tvl ?? 0, data?.tokenOutDecimals)}
               unit={data?.tokenOutSymbolCustom ?? data?.tokenOutSymbol}
               classNames={{
                 container: "justify-end",

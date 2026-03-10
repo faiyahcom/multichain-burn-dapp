@@ -1,9 +1,10 @@
 import BN from "bn.js";
+import { formatUnits } from "ethers";
 
 export function toBaseUnits(amount: string, decimals: number): BN {
-    const [whole, fraction = ""] = amount.split(".");
-    const paddedFraction = fraction.padEnd(decimals, "0").slice(0, decimals);
-    return new BN(whole + paddedFraction);
+  const [whole, fraction = ""] = amount.split(".");
+  const paddedFraction = fraction.padEnd(decimals, "0").slice(0, decimals);
+  return new BN(whole + paddedFraction);
 }
 
 export function formatAmount(amount: string, decimals: number): string {
@@ -14,4 +15,11 @@ export function formatAmount(amount: string, decimals: number): string {
     minimumFractionDigits: 0,
     maximumFractionDigits: Math.min(decimals, 4),
   });
+}
+
+export function sciToFormatted(value: string, decimals: number): string {
+  // Expand scientific notation without precision loss
+  const expanded = BigInt(Math.round(Number(value))).toString();
+  const bn = new BN(expanded);
+  return formatUnits(bn.toString(), decimals);
 }
