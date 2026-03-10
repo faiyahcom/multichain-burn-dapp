@@ -6,7 +6,8 @@ export const API_ROUTES = {
     SIGN_IN_SOLANA: "/users/solana/sign-in",
     GET_CURRENT_USER: "/users/me",
     GET_PARTICIPATED_POOLS: "/users/pools",
-    GET_POOL_MERKLE_PROOF: (poolAddress: string) => `/users/pools/${poolAddress}/proof`,
+    GET_POOL_MERKLE_PROOF: (poolAddress: string) =>
+      `/users/pools/${poolAddress}/proof`,
   },
   POOLS: {
     LIST: "/pools",
@@ -27,6 +28,8 @@ export const API_ROUTES = {
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
     UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
+    ANALYSIS: "/whitelist-users/analysis",
+    HISTORY: "/whitelist-users/history",
   },
   PAIRS: {
     LIST: "/pairs",

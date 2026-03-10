@@ -163,11 +163,11 @@ const AdminTransferHistoryTable = () => {
               {/* Recipient — name + email subtitle */}
               <TableCell className="pl-8">
                 <div className="flex flex-col items-start text-left">
-                  <span className="text-[var(--mb-table-text)] font-medium group-hover:font-bold group-hover:text-[var(--active)]">
+                  <span className="text-mb-table-text font-medium group-hover:font-bold group-hover:text-active">
                     {item.whitelistName ?? "-"}
                   </span>
                   {item.whitelistEmail && (
-                    <span className="text-xs !text-[var(--foreground)] !font-normal group-hover:!text-[var(--foreground)] group-hover:!font-normal">
+                    <span className="text-xs text-foreground! font-normal! group-hover:text-foreground! group-hover:font-normal!">
                       {item.whitelistEmail}
                     </span>
                   )}

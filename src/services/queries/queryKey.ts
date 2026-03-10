@@ -33,6 +33,10 @@ export const whitelistUserQueryKeys = {
       params?.chainIds,
       params?.tokenAddresses,
     ] as const,
+  analysis: (params?: Record<string, unknown>) =>
+    ["whitelist-users", "analysis", params] as const,
+  history: (params?: Record<string, unknown>) =>
+    ["whitelist-users", "history", params] as const,
 };
 
 export const pairQueryKeys = {

@@ -1,14 +1,14 @@
 import { create } from "zustand";
 
 type AdminTransferHistoryFilterType = {
-  tokens: string[];      // token addresses
+  tokens: string[]; // token addresses
   tokenOutDecimals: number | null; // decimals when exactly one token selected
-  network: string;       // single NetworkId or "" for all
-  text: string;          // search keyword
+  network: string; // single NetworkId or "" for all
+  text: string; // search keyword
   amountMin: string;
   amountMax: string;
-  dateFrom: string;      // ISO date string or ""
-  dateTo: string;        // ISO date string or ""
+  dateFrom: string; // ISO date string or ""
+  dateTo: string; // ISO date string or ""
   page: number;
 };
 
@@ -35,6 +35,7 @@ export const useAdminTransferHistoryFilterStore =
         filter: {
           ...state.filter,
           ...partial,
+          page: partial.page ?? 1,
         },
       })),
   }));
