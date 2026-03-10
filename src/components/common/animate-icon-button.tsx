@@ -104,11 +104,11 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         {
           "after:content-(--btn-after-text)": afterText,
         },
-        classNames?.btn,
         {
-          "justify-center gap-4 border-mb-btn-loading bg-mb-btn-loading after:hidden":
+          "justify-center gap-4 border-mb-btn-loading! bg-mb-btn-loading! after:hidden":
             isDisabled,
         },
+        classNames?.btn,
       )}
       {...btnProps}
       disabled={isDisabled}
