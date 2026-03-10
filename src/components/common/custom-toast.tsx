@@ -25,7 +25,7 @@ const variantConfig: Record<
 > = {
   default: {
     icon: ({ className }) => <div className={className} />,
-    color: "",
+    color: "transparent",
   },
   success: {
     icon: IconToastSuccess,
@@ -47,7 +47,7 @@ const variantConfig: Record<
     icon: ({ className }) => (
       <IconSpinner className={cn("animate-spin", className)} />
     ),
-    color: "",
+    color: "transparent",
   },
 };
 
