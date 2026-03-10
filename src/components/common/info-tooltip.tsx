@@ -7,6 +7,9 @@ interface Props {
   sideOffset?: React.ComponentProps<typeof TooltipContent>["sideOffset"];
   classNames?: {
     icon?: string;
+    contentContainer?: string;
+    textContainer?: string;
+    text?: string;
   };
 }
 
@@ -29,12 +32,18 @@ const InfoTooltip: React.FC<Props> = ({
         </span>
       </TooltipTrigger>
       <TooltipContent
-        className="max-w-101.25 rounded-5px bg-mb-popover p-3 pt-2.75 popover-shadow"
+        className={cn(
+          "max-w-101.25 rounded-5px bg-mb-popover p-3 pt-2.75 popover-shadow",
+          classNames?.contentContainer,
+        )}
         sideOffset={sideOffset}
         side={side}
       >
-        <div className="rounded-5px bg-primary-foreground py-3.25 pr-2.75 pl-2.25 min-h-20.25">
-          <p className="text-15px font-normal text-foreground">{content}</p>
+        <div className={cn(
+          "rounded-5px bg-primary-foreground py-3.25 pr-2.75 pl-2.25 min-h-20.25",
+          classNames?.textContainer,
+        )}>
+          <p className={cn("text-15px font-normal text-foreground", classNames?.text)}>{content}</p>
         </div>
       </TooltipContent>
     </Tooltip>

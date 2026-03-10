@@ -1,6 +1,5 @@
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Button } from "@/components/ui/button";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { PublicKey } from "@solana/web3.js";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -12,6 +11,7 @@ import { NETWORK_CONFIGS } from "@/config/networks";
 import { toast } from "@/components/common/custom-toast";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
+import InfoTooltip from "@/components/common/info-tooltip";
 
 type CreateSwapPoolFormValues = {
     poolName: string;
@@ -157,7 +157,18 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                    <span className="text-[13px]">Ratio</span>
+                    <span className="text-[13px]">
+                        Ratio{" "}
+                        <InfoTooltip
+                            classNames={{
+                                icon: "size-3.5 text-xs",
+                                contentContainer: "max-h-fit",
+                                textContainer: "min-h-10",
+                            }}
+                            side="right"
+                            content="Token burn : token reward"
+                        />
+                    </span>
                     <div className="flex items-center gap-3">
                         <Input
                             placeholder="1:1"
