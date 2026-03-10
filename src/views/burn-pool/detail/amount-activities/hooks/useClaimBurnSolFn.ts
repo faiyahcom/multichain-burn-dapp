@@ -79,12 +79,12 @@ export const useClaimBurnSolFn = () => {
                 );
 
                 // ── 2. Proof args ──────────────────────────────────────────
-                // API returns hex-encoded ASCII of "0xSOMEHASH"; decode twice to get 32-byte hashes
-                // IDL expects `proof: bytes` — a flat buffer of concatenated 32-byte hashes
+                // API returns hex strings like "0xABCD..." — each is a 32-byte hash.
+                // IDL expects `proof: bytes` — a flat buffer of concatenated 32-byte hashes.
                 const proofBuffer = Buffer.concat(
                     merkleProof.map((h) => {
-                        const hexStr = Buffer.from(h, "hex").toString("ascii").replace(/^0x/, "");
-                        return Buffer.from(hexStr, "hex");
+                        const hex = h.replace(/^0x/, "");
+                        return Buffer.from(hex, "hex");
                     }),
                 );
                 const indexBN = new BN(proofIndex);
