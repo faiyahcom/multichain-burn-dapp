@@ -141,6 +141,36 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
         }
     };
 
+    const maxBurnLeft = useMemo(() => {
+        if (!poolDetail) return "0";
+        try {
+            const numeratorBN = new BN(poolDetail.pool.rewardNumerator ?? "0");
+            const denominatorBN = new BN(poolDetail.pool.rewardDenominator ?? "0");
+            if (numeratorBN.isZero() || denominatorBN.isZero()) return "0";
+            const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
+            const burnDecimals = poolDetail.pool.tokenInDecimals;
+            const rewardAmountBN = new BN(poolDetail.rewardAmount ?? "0");
+            const rewardDecimalsBN = new BN(10).pow(new BN(rewardDecimals));
+            const burnDecimalsBN = new BN(10).pow(new BN(burnDecimals));
+            const maxBurnRaw = rewardAmountBN
+                .mul(denominatorBN)
+                .mul(burnDecimalsBN)
+                .div(numeratorBN.mul(rewardDecimalsBN));
+            const depositedBN = new BN(poolDetail.depositedAmount ?? "0");
+            const remaining = maxBurnRaw.sub(depositedBN);
+            if (remaining.isNeg()) return "0";
+            return formatUnits(BigInt(remaining.toString()), burnDecimals);
+        } catch {
+            return "0";
+        }
+    }, [poolDetail]);
+
+    const isExceedingMax =
+        !!burnAmount &&
+        Number(burnAmount) > 0 &&
+        Number(maxBurnLeft) > 0 &&
+        Number(burnAmount) > Number(maxBurnLeft);
+
     const formattedEstimatedRewardAmount = useMemo(() => {
         if (!burnAmount || !poolDetail) return "0";
 
@@ -230,6 +260,8 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                             isLoadingBalance={isLoadingBurnBalance}
                             balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""}`}
                             poolDetail={poolDetail}
+                            maxBurnLeft={maxBurnLeft}
+                            isExceedingMax={isExceedingMax}
                         />
 
                         <BuySection
@@ -255,7 +287,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                             isLoadingText="Swapping..."
                             btnProps={{
                                 type: "submit",
-                                disabled: isSubmitting,
+                                disabled: isSubmitting || isExceedingMax,
                             }}
                         />
 
