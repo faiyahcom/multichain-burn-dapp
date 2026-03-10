@@ -1,7 +1,6 @@
 import { useMemo } from "react";
 import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
-import { useGetWhitelistTokens } from "@/services/queries/queries";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { truncateString } from "@/utils/helpers/string";
 import CopyableText from "@/components/common/copyable-text";
@@ -14,27 +13,26 @@ type Props = {
 };
 
 const PoolOverview = ({ poolDetail }: Props) => {
-    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } = useGetWhitelistTokens();
-    const burnToken = whitelistTokens?.whitelistTokens?.find(
-        (token) => token.address === poolDetail?.pool.tokenIn,
-    );
-    const rewardToken = whitelistTokens?.whitelistTokens?.find(
-        (token) => token.address === poolDetail?.pool.rewardToken,
-    );
     const network = poolDetail?.pool.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.pool.tokenInSymbol,
-        whitelistToken: burnToken,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.pool.rewardTokenSymbol,
-        whitelistToken: rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
     });
     const rows = useMemo(() => {
         if (!poolDetail) return [];
@@ -129,7 +127,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 </p>
             </div>
 
-{(!poolDetail || isLoadingWhitelistTokens) && !rows.length ? (
+            {(!poolDetail) && !rows.length ? (
                 <div className="space-y-2">
                     {/* owner row (full width) */}
                     <div className="grid grid-cols-2 space-x-2">

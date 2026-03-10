@@ -9,7 +9,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { PoolDetailResponse } from "@/types/pool";
-import { useGetWhitelistTokens } from "@/services/queries/queries";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { toast } from "@/components/common/custom-toast";
 import { useTokenBalance } from "../../../hooks/useTokenBalance";
@@ -19,13 +18,13 @@ import { useSwapPoolSOL } from "./hooks/useSwapPoolSOL";
 import { useMemo, useState } from "react";
 import BN from "bn.js";
 import { formatUnits } from "viem";
-import { toBaseUnits } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import SellSection from "./sell-section";
-import BuySection from "./buy-section";
-import FeePanel from "./fee-panel";
-import SwapRateRow from "./swap-rate-row";
+import SellSection from "./components/sell-section";
+import BuySection from "./components/buy-section";
+import FeePanel from "./components/fee-panel";
+import SwapRateRow from "./components/swap-rate-row";
+import { parseUnits } from "ethers";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -78,30 +77,27 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
 
     const burnAmount = watch("burnAmount");
 
-    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } = useGetWhitelistTokens();
-
     const network = poolDetail?.pool.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
 
-    const burnToken = whitelistTokens?.whitelistTokens?.find(
-        (token) => token.address === poolDetail?.pool.tokenIn,
-    );
-    const rewardToken = whitelistTokens?.whitelistTokens?.find(
-        (token) => token.address === poolDetail?.pool.rewardToken,
-    );
-
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.pool.tokenInSymbol,
-        whitelistToken: burnToken,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.pool.rewardTokenSymbol,
-        whitelistToken: rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
     });
 
     const {
@@ -125,10 +121,11 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
     });
 
     const handleSelectPercent = (percent: number) => {
-        if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null) return;
+        if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null)
+            return;
         try {
             const balanceBN = new BN(
-                toBaseUnits(burnBalanceFormatted, poolDetail.pool.tokenInDecimals),
+                parseUnits(burnBalanceFormatted, poolDetail.pool.tokenInDecimals).toString(),
             );
             if (balanceBN.isZero()) return;
             const amountBN =
@@ -145,6 +142,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
 
     const formattedEstimatedRewardAmount = useMemo(() => {
         if (!burnAmount || !poolDetail) return "0";
+
         try {
             const {
                 tokenInDecimals,
@@ -153,21 +151,31 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                 rewardDenominator,
                 settlementFee,
             } = poolDetail.pool;
-            const amountInBN = toBaseUnits(burnAmount, tokenInDecimals);
+
+            const amountInBN = new BN(
+                parseUnits(burnAmount || "0", tokenInDecimals).toString(),
+            );
+
             if (amountInBN.isZero()) return "0";
-            const rewardNumeratorBN = new BN(rewardNumerator);
-            const rewardDenominatorBN = new BN(rewardDenominator);
-            const decimalDiff = rewardTokenDecimals - tokenInDecimals;
-            let rewardBN: BN;
-            if (decimalDiff >= 0) {
-                const scaleUpBN = new BN(10).pow(new BN(decimalDiff));
-                rewardBN = amountInBN.mul(rewardNumeratorBN).mul(scaleUpBN).div(rewardDenominatorBN);
-            } else {
-                const scaleDownBN = new BN(10).pow(new BN(Math.abs(decimalDiff)));
-                rewardBN = amountInBN.mul(rewardNumeratorBN).div(rewardDenominatorBN.mul(scaleDownBN));
-            }
-            const feeBN = rewardBN.mul(new BN(settlementFee ?? "0")).div(new BN(10000));
-            return formatUnits(BigInt(rewardBN.sub(feeBN).toString()), rewardTokenDecimals);
+
+            const numeratorBN = new BN(rewardNumerator);
+            const denominatorBN = new BN(rewardDenominator);
+
+            const rewardDecimalsBN = new BN(10).pow(new BN(rewardTokenDecimals));
+            const tokenDecimalsBN = new BN(10).pow(new BN(tokenInDecimals));
+
+            const rewardBN = amountInBN
+                .mul(numeratorBN)
+                .mul(rewardDecimalsBN)
+                .div(denominatorBN.mul(tokenDecimalsBN));
+
+            const feeBN = rewardBN
+                .mul(new BN(settlementFee ?? "0"))
+                .div(new BN(10000));
+
+            const finalReward = rewardBN.sub(feeBN);
+
+            return formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
         } catch {
             return "0";
         }
@@ -214,17 +222,18 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <SellSection
                             tokenDisplay={burnTokenDisplay}
-                            isLoadingWhitelistTokens={isLoadingWhitelistTokens}
+                            isLoadingWhitelistTokens={!poolDetail}
                             register={register}
                             errors={errors}
                             onSelectPercent={handleSelectPercent}
                             isLoadingBalance={isLoadingBurnBalance}
                             balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""}`}
+                            poolDetail={poolDetail}
                         />
 
                         <BuySection
                             tokenDisplay={rewardTokenDisplay}
-                            isLoadingWhitelistTokens={isLoadingWhitelistTokens}
+                            isLoadingWhitelistTokens={!poolDetail}
                             estimatedAmount={formattedEstimatedRewardAmount}
                             isLoadingBalance={isLoadingRewardBalance}
                             balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardBalanceSymbol ?? rewardTokenDisplay.symbol ?? ""}`}

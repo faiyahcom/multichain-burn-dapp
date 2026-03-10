@@ -9,6 +9,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { SwapPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import ScanLink from "@/components/common/scan-link";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
     address: string;
@@ -30,21 +31,32 @@ const SwapPoolDetail = ({ address }: Props) => {
         <div className="pt-9.5 pl-14">
             <div className="space-y-2">
                 <div className="flex items-center gap-6">
-                    <h2 className="text-3xl font-semibold">{poolDetail?.pool.name}</h2>
-                    <AnimateIconButton
-                        iconLetter={SWAP_POOL_STATUS[safeStatus].letter}
-                        textVariant="text-container-center"
-                        text={formattedStatus}
-                        color={SWAP_POOL_STATUS[safeStatus].color}
-                        hasGroupHover
-                        classNames={{
-                            btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
-                            text: "text-2xl font-medium",
-                            icon: "size-9 text-3xl",
-                        }}
-                    />
+                    {isLoadingPoolDetail ? (
+                        <>
+                            <Skeleton className="h-9 w-48" />
+                            <Skeleton className="h-9 w-27" />
+                        </>
+                    ) : (
+                        <>
+                            <h2 className="text-3xl font-semibold">
+                                {poolDetail?.pool.name}
+                            </h2>
+                            <AnimateIconButton
+                                iconLetter={SWAP_POOL_STATUS[safeStatus].letter}
+                                textVariant="text-container-center"
+                                text={formattedStatus}
+                                color={SWAP_POOL_STATUS[safeStatus].color}
+                                hasGroupHover
+                                classNames={{
+                                    btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
+                                    text: "text-2xl font-medium",
+                                    icon: "size-9 text-3xl",
+                                }}
+                            />
+                        </>
+                    )}
                 </div>
-                <ScanLink address={poolDetail?.pool.address ?? ''} chainId={poolDetail?.pool.chainId} />
+                <ScanLink address={address ?? ""} chainId={poolDetail?.pool.chainId} />
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">

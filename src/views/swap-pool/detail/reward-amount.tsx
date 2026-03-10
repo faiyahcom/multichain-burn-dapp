@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { formatAmount } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -16,6 +18,27 @@ const RewardAmount = ({ poolDetail }: Props) => {
     const formattedBurned = poolDetail
         ? formatAmount(poolDetail.depositedAmount, poolDetail.pool.tokenInDecimals)
         : "-";
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
 
     const maxBurn = useMemo(() => {
         if (!poolDetail) return 0;
@@ -54,15 +77,14 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     <span>Reward Amount</span>
                 </div>
                 <p>
-                    {formattedReward} {poolDetail?.pool.rewardTokenSymbol}
+                    {formattedReward} {rewardTokenDisplay?.symbol}
                 </p>
             </div>
             <div>
                 <p className="text-base text-greyed">
                     <span>Total Burned Amount:</span>{" "}
                     <span className="ml-14">
-                        {formattedBurned} / {formattedMaxBurn}{" "}
-                        {poolDetail?.pool.tokenInSymbol}
+                        {formattedBurned} / {formattedMaxBurn} {burnTokenDisplay?.symbol}
                     </span>
                 </p>
                 <div>

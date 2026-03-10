@@ -1,6 +1,5 @@
 import { ZERO_ADDRESS } from "@/config/constant";
 import type { NetworkConfig } from "@/config/networks";
-import type { WhitelistToken } from "@/services/whitelistService";
 
 type DisplayToken = {
   imageUri: string;
@@ -12,7 +11,10 @@ type ResolvePoolTokenDisplayParams = {
   network?: NetworkConfig;
   tokenAddress?: string;
   tokenSymbol?: string;
-  whitelistToken?: Pick<WhitelistToken, "imageUri" | "name" | "symbol">;
+  tokenName?: string;
+  customName?: string;
+  customSymbol?: string;
+  imageUri?: string;
 };
 
 const isNativeToken = (address?: string) => {
@@ -27,26 +29,25 @@ const isNativeToken = (address?: string) => {
 export const resolvePoolTokenDisplay = ({
   network,
   tokenAddress,
+  tokenName,
   tokenSymbol,
-  whitelistToken,
+  customName,
+  customSymbol,
+  imageUri,
 }: ResolvePoolTokenDisplayParams): DisplayToken => {
   if (isNativeToken(tokenAddress)) {
     const nativeCurrency = network?.appKitNetwork.nativeCurrency;
 
     return {
       imageUri: network?.iconSrc ?? "",
-      name: nativeCurrency?.name ?? tokenSymbol ?? "Native",
-      symbol: nativeCurrency?.symbol ?? tokenSymbol ?? "Native",
+      name: nativeCurrency?.name ?? customName ?? tokenName ?? "Native",
+      symbol: nativeCurrency?.symbol ?? customSymbol ?? tokenSymbol ?? "Native",
     };
   }
 
-  if (whitelistToken) {
-    return whitelistToken;
-  }
-
   return {
-    imageUri: "",
-    name: tokenSymbol ?? "Unknown",
-    symbol: tokenSymbol ?? "-",
+    imageUri: imageUri ?? "",
+    name: customName ?? tokenName ?? "Unknown",
+    symbol: customSymbol ?? tokenSymbol ?? "-",
   };
 };
