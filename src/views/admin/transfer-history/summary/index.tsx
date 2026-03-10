@@ -62,6 +62,7 @@ const AdminTransferHistorySummary = () => {
         <div className="grid grid-cols-1 gap-6.25 md:grid-cols-2 lg:grid-cols-4">
           {groupedAnalysisData?.map((item) => (
             <StatCard
+              key={item.chainId}
               chainId={item.chainId}
               txnCount={item.txnCount}
               amount={item.totalAmount}

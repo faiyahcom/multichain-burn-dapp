@@ -126,6 +126,7 @@ const MultipleTokenSelect: React.FC<Props> = ({
               ? `Selected: ${selectedTokens?.map((token) => token.customName ?? token.name)?.join(", ")}`
               : allTokens
           }
+          className={classNames?.btn}
         >
           <div className="size-2.5" />
           {isAnySelected ? (

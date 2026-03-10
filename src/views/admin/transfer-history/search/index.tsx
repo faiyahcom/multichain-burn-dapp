@@ -6,7 +6,7 @@ import type { SingleSelectOption } from "@/components/common/single-select";
 import SingleSelect from "@/components/common/single-select";
 import { InputGroupAddon } from "@/components/ui/input-group";
 import { NETWORK_CONFIGS, networkIdToChainId } from "@/config/networks";
-import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store-v2";
+import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { DollarSignIcon } from "lucide-react";
 
 const AdminTransferHistorySearch = () => {

@@ -14,7 +14,7 @@ import {
 import { networkIdToChainId } from "@/config/networks";
 import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { whitelistUserService } from "@/services/whitelistUserService";
-import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store-v2";
+import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import {
