@@ -28,7 +28,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
     const rewardDec = poolDetail?.pool.rewardTokenDecimals ?? 0;
     const burnDec = poolDetail?.pool.tokenInDecimals ?? 0;
 
-    const formattedReward = fmt(poolDetail?.pool.currentRewardAmount, rewardDec);
+    const formattedReward = fmt(poolDetail?.pool.rewardAmount, rewardDec);
     const formattedClaimed = fmt(poolDetail?.claimedRewardAmount, rewardDec);
     const formattedRemaining = fmt(
         poolDetail?.pool.currentRewardAmount,

@@ -9,7 +9,7 @@ type Props = {
 const RewardAmount = ({ poolDetail }: Props) => {
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.pool.currentRewardAmount,
+            poolDetail.pool.rewardAmount,
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";

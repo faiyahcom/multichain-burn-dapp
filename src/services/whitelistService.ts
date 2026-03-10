@@ -22,8 +22,8 @@ export interface WhitelistToken {
 export interface ListTokensRequest {
   page?: number;
   limit?: number;
-  active?: BooleanString;
-  isDropped?: BooleanString; // soft delete
+  active?: 0 | 1;
+  isDropped?: 0 | 1; // soft delete
   chainIds?: string; // comma separated
   search?: string;
 }
