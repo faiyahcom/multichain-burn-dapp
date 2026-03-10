@@ -37,6 +37,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
         )
         : "-";
     const [openSwapDialog, setOpenSwapDialog] = useState(false);
+    const [isCancelLoading, setIsCancelLoading] = useState(false);
     const handleOpenSwapDialog = () => {
         setOpenSwapDialog(true);
     };
@@ -60,20 +61,25 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
 
     const handleCancelPool = async () => {
         if (!poolDetail) return;
-        if (isSolana) {
-            await cancelPoolSol({
-                poolAddress: poolDetail.pool.address,
-                poolDetail,
+        setIsCancelLoading(true);
+        try {
+            if (isSolana) {
+                await cancelPoolSol({
+                    poolAddress: poolDetail.pool.address,
+                    poolDetail,
+                });
+            } else {
+                await cancelPoolEvm({
+                    poolAddress: poolDetail.pool.address,
+                });
+            }
+            queryClient.invalidateQueries({
+                queryKey: poolQueryKeys.detail(poolDetail.pool.address),
+                exact: false,
             });
-        } else {
-            await cancelPoolEvm({
-                poolAddress: poolDetail.pool.address,
-            });
+        } finally {
+            setIsCancelLoading(false);
         }
-        queryClient.invalidateQueries({
-            queryKey: poolQueryKeys.detail(poolDetail.pool.address),
-            exact: false,
-        });
     };
 
     return (
@@ -148,6 +154,8 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                                     icon: "size-6",
                                 }}
                                 color="#966EFF"
+                                isLoading={isCancelLoading}
+                                isLoadingText="Cancelling..."
                                 btnProps={{
                                     onClick: handleCancelPool,
                                 }}

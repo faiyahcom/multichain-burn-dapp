@@ -301,6 +301,8 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
                                 icon: "size-7.5",
                             }}
                             color="#966EFF"
+                            isLoading={isSubmitting}
+                            isLoadingText="Swapping..."
                             btnProps={{
                                 type: "submit",
                                 disabled: isSubmitting,

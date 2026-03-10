@@ -324,6 +324,7 @@ const DepositRewardDialog = ({
                                 btnProps={{
                                     type: "button",
                                     onClick: handleCancel,
+                                    disabled: isSubmitting,
                                 }}
                             />
                             <AnimateIconButton
@@ -337,6 +338,8 @@ const DepositRewardDialog = ({
                                     icon: "size-7.5 text-2xl",
                                 }}
                                 color="#966EFF"
+                                isLoading={isSubmitting}
+                                isLoadingText="Depositing..."
                                 btnProps={{
                                     type: "submit",
                                     disabled: isSubmitting,

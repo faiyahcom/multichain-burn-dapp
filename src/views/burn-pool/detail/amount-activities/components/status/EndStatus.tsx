@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
@@ -8,6 +9,16 @@ type Props = {
 
 const EndStatus = ({ poolDetail }: Props) => {
     const { pool, formattedReward, formattedBurned, handleClaim } = useAmountActivity(poolDetail);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleClaimWithLoading = async () => {
+        setIsLoading(true);
+        try {
+            await handleClaim();
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     return (
         <>
@@ -21,7 +32,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 label="Your Burned Amount"
                 value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
             />
-            <ActionBtn letter="C" text="Claim" onClick={handleClaim} />
+            <ActionBtn letter="C" text="Claim" isLoading={isLoading} onClick={handleClaimWithLoading} />
         </>
     );
 };

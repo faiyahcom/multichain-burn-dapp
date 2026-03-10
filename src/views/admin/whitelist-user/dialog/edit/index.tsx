@@ -169,12 +169,14 @@ const AdminWhitelistUserDialogEdit: React.FC<Props> = ({
                         <AnimateIconButton
                             variant="letter-icon"
                             iconLetter="S"
-                            text={isLoading ? "Saving..." : "Save Changes"}
+                            text="Save Changes"
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
                                 btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
                             }}
+                            isLoading={isLoading}
+                            isLoadingText="Saving..."
                             btnProps={{
                                 type: "submit",
                                 disabled: isLoading,

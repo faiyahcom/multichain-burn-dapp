@@ -179,6 +179,7 @@ export default function EditPoolScreen({
           color="#FF8E97"
           btnProps={{
             type: "button",
+            disabled: saving,
             onClick: () => navigate({ to: `/burn/detail/${pool.address}` }),
           }}
         />
@@ -193,6 +194,8 @@ export default function EditPoolScreen({
             icon: "size-7.5 text-xl",
           }}
           color="#966EFF"
+          isLoading={saving}
+          isLoadingText="Saving..."
           btnProps={{
             type: "button",
             disabled: isSaveDisabled,

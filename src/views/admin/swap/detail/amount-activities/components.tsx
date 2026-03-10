@@ -25,11 +25,15 @@ export const ActionBtn = ({
     text,
     onClick,
     color = "#966EFF",
+    isLoading,
+    disabled,
 }: {
     letter: string;
     text: string;
     onClick?: () => void;
     color?: string;
+    isLoading?: boolean;
+    disabled?: boolean;
 }) => (
     <AnimateIconButton
         iconLetter={letter}
@@ -43,7 +47,8 @@ export const ActionBtn = ({
             icon: "size-6",
         }}
         color={color}
-        btnProps={{ onClick }}
+        isLoading={isLoading}
+        btnProps={{ onClick, disabled }}
     />
 );
 

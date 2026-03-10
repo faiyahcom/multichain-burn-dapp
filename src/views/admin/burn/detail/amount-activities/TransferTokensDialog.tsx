@@ -486,10 +486,12 @@ const TransferTokensDialog = ({
                     <AnimateIconButton
                         variant="letter-icon"
                         iconLetter="T"
-                        text={isTransferring ? "Transferring…" : "Transfer"}
+                        text="Transfer"
                         color="#9072f9"
                         textVariant="text-self-center"
                         classNames={{ btn: "sm:min-w-36 sm:py-3 sm:px-2 border border-mb-submit-border" }}
+                        isLoading={isTransferring}
+                        isLoadingText="Transferring…"
                         btnProps={{
                             onClick: handleTransfer,
                             disabled: !canTransfer || isTransferring,

@@ -338,19 +338,17 @@ const AdminWhitelistUserDialogCreate = () => {
                         <AnimateIconButton
                             variant="letter-icon"
                             iconLetter="A"
-                            text={
-                                isLoading
-                                    ? "Adding..."
-                                    : "Add to Whitelist"
-                            }
+                            text="Add to Whitelist"
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
                                 btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
                             }}
+                            isLoading={isLoading}
+                            isLoadingText="Adding..."
                             btnProps={{
                                 type: "submit",
-                                disabled: isLoading || selectedNetworks.length === 0 || networkTypeConflict,
+                                disabled: selectedNetworks.length === 0 || networkTypeConflict,
                             }}
                         />
                     </div>

@@ -21,10 +21,17 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
 
     const { handleAdminClose } = useAmountActivity(poolDetail);
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const handleConfirmClose = async () => {
-        await handleAdminClose(reason);
-        setDialogOpen(false);
-        setReason("");
+        setIsLoading(true);
+        try {
+            await handleAdminClose(reason);
+            setDialogOpen(false);
+            setReason("");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleCancel = () => {
@@ -87,7 +94,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                                 icon: "size-7.5 text-xl",
                                 text: "text-2xl",
                             }}
-                            btnProps={{ onClick: handleCancel }}
+                            btnProps={{ onClick: handleCancel, disabled: isLoading }}
                         />
                         <AnimateIconButton
                             variant="letter-icon"
@@ -100,6 +107,8 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                                 icon: "size-7.5 text-xl",
                                 text: "text-2xl",
                             }}
+                            isLoading={isLoading}
+                            isLoadingText="Closing..."
                             btnProps={{ onClick: handleConfirmClose }}
                         />
                     </DialogFooter>
