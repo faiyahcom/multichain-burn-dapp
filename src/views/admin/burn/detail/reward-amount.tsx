@@ -1,5 +1,6 @@
 import { formatAmount } from "@/utils/helpers/numbers";
 import type { BurnPoolStatus, PoolDetailResponse } from "@/types/pool";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -69,7 +70,9 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     <span>Reward Amount</span>
                 </div>
                 <p>
-                    {formattedReward} {rewardSymbol}
+                    {!poolDetail
+                        ? <Skeleton className="inline-block h-6 w-28" />
+                        : <>{formattedReward} {rewardSymbol}</>}
                 </p>
             </div>
 
@@ -79,15 +82,16 @@ const RewardAmount = ({ poolDetail }: Props) => {
                         <div className="grid grid-cols-2">
                             <span className="text-xl text-greyed">Settlement Fee:</span>
                             <span className="inline-flex items-center gap-1 text-xl text-foreground">
-                                {settlementFee}{" "}
-                                <span className="text-sm">(collected by the system)</span>
+                                {!poolDetail ? <Skeleton className="h-5 w-16" /> : <>{settlementFee}{" "}<span className="text-sm">(collected by the system)</span></>}
                             </span>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 space-x-2">
                         <div className="grid grid-cols-2">
                             <span className="text-xl text-greyed">Creation Fee:</span>
-                            <span className="text-xl text-foreground">{creationFee}</span>
+                            <span className="text-xl text-foreground">
+                                {!poolDetail ? <Skeleton className="h-5 w-12" /> : creationFee}
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -97,7 +101,20 @@ const RewardAmount = ({ poolDetail }: Props) => {
                         <div className="grid grid-cols-2 space-x-2" key={i}>
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">{row[0].label}:</span>
-                                <span className="text-xl text-foreground">{row[0].value}</span>
+                                <span className="text-xl text-foreground">
+                                    {!poolDetail ? <Skeleton className="h-5 w-24" /> : row[0].value}
+                                </span>
+                            </div>
+                            {row[1] && (
+                                <div className="grid grid-cols-2">
+                                    <span className="text-xl text-greyed">{row[1].label}:</span>
+                                    <span className="text-xl text-foreground">
+                                        {!poolDetail ? <Skeleton className="h-5 w-24" /> : row[1].value}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    ))}
                             </div>
                             {row[1] && (
                                 <div className="grid grid-cols-2">

@@ -2,7 +2,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { PoolDetailResponse } from "@/types/pool";
 import { formatAmount } from "@/utils/helpers/numbers";
 import SwapDialog from "../swap-action/swap-dialog";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
@@ -10,6 +10,9 @@ import { IconExclaimation, IconTick } from "@/assets/react";
 import { useCancelPoolSolanaFn } from "./cancel-pool/useCancelSwapPoolSolana";
 import { useCancelSwapPoolEvmFn } from "./cancel-pool/useCancelSwapPoolEvmFn";
 import { useAppKitAccount } from "@reown/appkit/react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { AssetTypeEnum } from "@/web3/helpers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -36,6 +39,25 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";
+
+    const networkConfig = useMemo(
+        () => poolDetail?.pool.chainId ? chainIdToNetworkConfig(poolDetail.pool.chainId) : undefined,
+        [poolDetail?.pool.chainId],
+    );
+    const tokenInSymbolDisplay = useMemo(() => {
+        const pool = poolDetail?.pool;
+        if (!pool) return "";
+        if (pool.assetTypeIn === AssetTypeEnum.NATIVE)
+            return networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool.tokenInSymbol ?? "";
+        return pool.tokenInSymbol ?? "";
+    }, [poolDetail?.pool, networkConfig]);
+    const rewardTokenSymbolDisplay = useMemo(() => {
+        const pool = poolDetail?.pool;
+        if (!pool) return "";
+        if (pool.assetTypeReward === AssetTypeEnum.NATIVE)
+            return networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool.rewardTokenSymbol ?? "";
+        return pool.rewardTokenSymbol ?? "";
+    }, [poolDetail?.pool, networkConfig]);
     const [openSwapDialog, setOpenSwapDialog] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
     const handleOpenSwapDialog = () => {
@@ -90,13 +112,17 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             <div className="flex items-center justify-between text-active">
                 <span className="text-sm font-medium">Claimed Reward</span>
                 <span className="text-2xl font-bold">
-                    {formattedReward} {poolDetail?.pool.rewardTokenSymbol}
+                    {poolDetail
+                        ? <>{formattedReward} {rewardTokenSymbolDisplay}</>
+                        : <Skeleton className="h-7 w-32" />}
                 </span>
             </div>
             <div className="flex items-center justify-between text-greyed">
                 <span className="text-sm">Your Burned Amount</span>
                 <span className="text-sm">
-                    {formattedBurned} {poolDetail?.pool.tokenInSymbol}
+                    {poolDetail
+                        ? <>{formattedBurned} {tokenInSymbolDisplay}</>
+                        : <Skeleton className="h-4 w-24" />}
                 </span>
             </div>
             {Number(poolDetail?.userAmount.claimed || "0") > 0 && (

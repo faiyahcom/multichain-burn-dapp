@@ -1,11 +1,14 @@
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, StatRow } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
+import { SOLANA_BACKEND_CHAIN_ID, chainIdToNetworkConfig } from "@/config/networks";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { useBatchTransferEvmFn } from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferEvmFn";
 import { useBatchTransferSolFn, type BatchRecipient, type TokenMode } from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferSolFn";
 import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
+import { useMemo } from "react";
+import { AssetTypeEnum } from "@/web3/helpers";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -24,6 +27,17 @@ const EndStatus = ({ poolDetail }: Props) => {
     const { batchTransferSol } = useBatchTransferSolFn();
     const { batchTransferEvm } = useBatchTransferEvmFn();
     const isSolana = pool?.chainId === SOLANA_BACKEND_CHAIN_ID;
+
+    const networkConfig = useMemo(
+        () => pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined,
+        [pool?.chainId],
+    );
+    const tokenInSymbolDisplay = pool?.assetTypeIn === AssetTypeEnum.NATIVE
+        ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.tokenInSymbol ?? "")
+        : (pool?.tokenInSymbol ?? "");
+    const rewardTokenSymbolDisplay = pool?.assetTypeReward === AssetTypeEnum.NATIVE
+        ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
+        : (pool?.rewardTokenSymbol ?? "");
 
     const formattedAvailable =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
@@ -59,13 +73,13 @@ const EndStatus = ({ poolDetail }: Props) => {
         <>
             <StatRow
                 label="Claimed Reward"
-                value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
+                value={!pool ? <Skeleton className="h-5 w-24" /> : `${formattedReward} ${rewardTokenSymbolDisplay}`}
                 className="font-medium text-active"
                 valueClassName="text-2xl font-bold"
             />
             <StatRow
                 label="Your Burned Amount"
-                value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
+                value={!pool ? <Skeleton className="h-4 w-20" /> : `${formattedBurned} ${tokenInSymbolDisplay}`}
             />
             <ActionBtn
                 letter="T"
@@ -79,8 +93,8 @@ const EndStatus = ({ poolDetail }: Props) => {
                 chainId={pool?.chainId ?? ""}
                 poolKind={pool?.kind}
                 poolInfo={{
-                    tokenInSymbol: pool?.tokenInSymbol,
-                    rewardTokenSymbol: pool?.rewardTokenSymbol,
+                    tokenInSymbol: tokenInSymbolDisplay,
+                    rewardTokenSymbol: rewardTokenSymbolDisplay,
                     currentRewardAmount: formattedAvailable,
                     currentDepositAmount: formattedDepositAvailable,
                     rewardTokenDecimals: pool?.rewardTokenDecimals,

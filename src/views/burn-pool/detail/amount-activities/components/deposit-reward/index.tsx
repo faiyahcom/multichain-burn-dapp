@@ -22,6 +22,7 @@ import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 import { Input } from "@/components/ui/input";
 import { IconWallet } from "@/assets/react";
 import TokenImage from "@/components/common/token-image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const depositFormSchema = z.object({
     amount: z
@@ -79,7 +80,7 @@ const DepositRewardDialog = ({
         resolver: zodResolver(depositFormSchema),
     });
 
-    const { data: whitelistTokens } = useGetWhitelistTokens();
+    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } = useGetWhitelistTokens();
 
     const rewardToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === pool?.rewardToken,
@@ -129,6 +130,11 @@ const DepositRewardDialog = ({
             ? { imageUri: rewardToken.imageUri, symbol: rewardToken.symbol, name: rewardToken.name }
             : undefined;
     }, [pool?.assetTypeReward, networkConfig, rewardToken]);
+
+    const isNativeIn = pool?.assetTypeIn === AssetTypeEnum.NATIVE;
+    const isNativeOut = pool?.assetTypeReward === AssetTypeEnum.NATIVE;
+    const isLoadingTokenIn = !isNativeIn && isLoadingWhitelistTokens;
+    const isLoadingTokenOut = !isNativeOut && isLoadingWhitelistTokens;
 
     const handleSelectPercent = (percent: number) => {
         if (!rewardBalanceFormatted || pool?.rewardTokenDecimals == null) return;
@@ -212,11 +218,12 @@ const DepositRewardDialog = ({
                                 Pool Summary
                             </div>
                             <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l-4 [&>*:nth-child(even)]:border-inactive [&>*:nth-child(n+3)]:border-t-4 [&>*:nth-child(n+3)]:border-inactive">
-                                <SummaryRow label="Pool Name" value={pool?.name ?? "-"} />
-                                <SummaryRow label="Duration" value={duration} />
+                                <SummaryRow label="Pool Name" value={!pool ? <Skeleton className="h-5 w-28" /> : pool.name} />
+                                <SummaryRow label="Duration" value={!pool ? <Skeleton className="h-5 w-36" /> : duration} />
                                 <SummaryRow
                                     label="Reward Token"
                                     value={
+                                        (!pool || isLoadingTokenOut) ? <Skeleton className="h-5 w-28" /> :
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
                                                 src={tokenOutDisplay?.imageUri}
@@ -227,13 +234,14 @@ const DepositRewardDialog = ({
                                                     placeholder: "size-5",
                                                 }}
                                             />
-                                            {tokenOutDisplay?.symbol ?? pool?.rewardTokenSymbol ?? "-"}
+                                            {tokenOutDisplay?.symbol ?? pool.rewardTokenSymbol ?? "-"}
                                         </span>
                                     }
                                 />
                                 <SummaryRow
                                     label="Burn token"
                                     value={
+                                        (!pool || isLoadingTokenIn) ? <Skeleton className="h-5 w-28" /> :
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
                                                 src={tokenInDisplay?.imageUri}
@@ -244,17 +252,18 @@ const DepositRewardDialog = ({
                                                     placeholder: "size-5",
                                                 }}
                                             />
-                                            {tokenInDisplay?.symbol ?? pool?.tokenInSymbol ?? "-"}
+                                            {tokenInDisplay?.symbol ?? pool.tokenInSymbol ?? "-"}
                                         </span>
                                     }
                                 />
                                 <SummaryRow
                                     label="Ratio"
-                                    value={<span className="font-semibold">{ratio}</span>}
+                                    value={!pool ? <Skeleton className="h-5 w-16" /> : <span className="font-semibold">{ratio}</span>}
                                 />
                                 <SummaryRow
                                     label="Network"
                                     value={
+                                        !pool ? <Skeleton className="h-5 w-24" /> :
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
                                                 src={networkConfig?.iconSrc}
@@ -287,7 +296,7 @@ const DepositRewardDialog = ({
                                     Current Reward Amount
                                 </span>
                                 <span className="text-2xl font-bold text-active">
-                                    {currentRewardFormatted}
+                                    {!pool ? <Skeleton className="h-8 w-36" /> : currentRewardFormatted}
                                 </span>
                             </div>
 
@@ -315,16 +324,25 @@ const DepositRewardDialog = ({
                                         className="h-full flex-1 px-10 py-2 text-base"
                                     />
                                     <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
-                                        <TokenImage
-                                            src={tokenOutDisplay?.imageUri}
-                                            alt={tokenOutDisplay?.symbol}
-                                            classNames={{
-                                                common: "size-5",
-                                                img: "size-5",
-                                                placeholder: "size-5",
-                                            }}
-                                        />
-                                        <span className="">{tokenOutDisplay?.symbol ?? pool?.rewardTokenSymbol ?? ""}</span>
+                                        {(!pool || isLoadingTokenOut) ? (
+                                            <>
+                                                <Skeleton className="size-5 rounded-full" />
+                                                <Skeleton className="h-5 w-12" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <TokenImage
+                                                    src={tokenOutDisplay?.imageUri}
+                                                    alt={tokenOutDisplay?.symbol}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                <span className="">{tokenOutDisplay?.symbol ?? pool.rewardTokenSymbol ?? ""}</span>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
 

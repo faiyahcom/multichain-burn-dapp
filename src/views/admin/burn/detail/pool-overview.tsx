@@ -7,13 +7,14 @@ import { truncateString } from "@/utils/helpers/string";
 import CopyableText from "@/components/common/copyable-text";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
 const PoolOverview = ({ poolDetail }: Props) => {
-    const { data: whitelistTokens } = useGetWhitelistTokens();
+    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } = useGetWhitelistTokens();
     const burnToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === poolDetail?.pool.tokenIn,
     );
@@ -128,26 +129,51 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 </p>
             </div>
 
-            <div className="space-y-2">
-                {rows.map((row, rowIndex) => (
-                    <div className="grid grid-cols-2 space-x-2" key={rowIndex}>
-                        <div className="grid grid-cols-2">
-                            <span className="text-xl text-greyed">{row[0]?.label}:</span>
-                            <span className="text-xl break-all text-black">
-                                {row[0]?.value}
-                            </span>
+{(!poolDetail || isLoadingWhitelistTokens) && !rows.length ? (
+                <div className="space-y-2">
+                    {/* owner row (full width) */}
+                    <div className="grid grid-cols-2 space-x-2">
+                        <div className="grid grid-cols-2 items-center gap-y-1">
+                            <Skeleton className="h-5 w-20" />
+                            <Skeleton className="h-5 w-32" />
                         </div>
-                        {row[1] && (
+                    </div>
+                    {/* 3 regular rows */}
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div className="grid grid-cols-2 space-x-2" key={i}>
+                            <div className="grid grid-cols-2 items-center gap-y-1">
+                                <Skeleton className="h-5 w-20" />
+                                <Skeleton className="h-5 w-24" />
+                            </div>
+                            <div className="grid grid-cols-2 items-center gap-y-1">
+                                <Skeleton className="h-5 w-20" />
+                                <Skeleton className="h-5 w-24" />
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                <div className="space-y-2">
+                    {rows.map((row, rowIndex) => (
+                        <div className="grid grid-cols-2 space-x-2" key={rowIndex}>
                             <div className="grid grid-cols-2">
-                                <span className="text-xl text-greyed">{row[1]?.label}:</span>
+                                <span className="text-xl text-greyed">{row[0]?.label}:</span>
                                 <span className="text-xl break-all text-black">
-                                    {row[1]?.value}
+                                    {row[0]?.value}
                                 </span>
                             </div>
-                        )}
-                    </div>
-                ))}
-            </div>
+                            {row[1] && (
+                                <div className="grid grid-cols-2">
+                                    <span className="text-xl text-greyed">{row[1]?.label}:</span>
+                                    <span className="text-xl break-all text-black">
+                                        {row[1]?.value}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 };

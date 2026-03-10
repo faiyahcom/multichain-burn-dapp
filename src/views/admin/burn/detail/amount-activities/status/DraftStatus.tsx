@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, AmountInput } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { AssetTypeEnum } from "@/web3/helpers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -22,6 +24,14 @@ const DraftStatus = ({ poolDetail }: Props) => {
 
     const [activeAction, setActiveAction] = useState<"cancel" | "approve" | null>(null);
     const isRunning = activeAction !== null;
+
+    const networkConfig = useMemo(
+        () => pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined,
+        [pool?.chainId],
+    );
+    const rewardTokenSymbolDisplay = pool?.assetTypeReward === AssetTypeEnum.NATIVE
+        ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
+        : (pool?.rewardTokenSymbol ?? "");
 
     const run = async (name: "cancel" | "approve", fn: () => Promise<void>) => {
         setActiveAction(name);
@@ -51,7 +61,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 value={depositRewardInput}
                 onChange={setDepositRewardInput}
                 onConfirm={handleDepositReward}
-                placeholder={`Amount (${pool?.rewardTokenSymbol ?? ""})`}
+                placeholder={`Amount (${rewardTokenSymbolDisplay})`}
             />
             <ActionBtn letter="E" text="Edit" color="#7AF4CB" disabled={isRunning} onClick={handleEdit} />
             <ActionBtn letter="R" text="Request Approve" color="#A5B7FF"
