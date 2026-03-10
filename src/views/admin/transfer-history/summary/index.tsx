@@ -1,11 +1,11 @@
 import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { whitelistUserService } from "@/services/whitelistUserService";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
-import { formatUnits } from "ethers";
 import { useMemo, useState } from "react";
 import type { DialogData } from "./dialog";
-import StatCard from "./stat-card";
 import AdminTransferHistorySummaryDialog from "./dialog";
+import StatCard from "./stat-card";
 
 const AdminTransferHistorySummary = () => {
   const [dialogData, setDialogData] = useState<DialogData | null>(null);
@@ -25,7 +25,7 @@ const AdminTransferHistorySummary = () => {
       analysisData?.analysis?.reduce(
         (acc, item) => {
           const amount = Number(
-            formatUnits(item.totalAmount, item.tokenDecimals),
+            sciToFormatted(item.totalAmount, item.tokenDecimals),
           );
 
           if (!acc[item.chainId]) {

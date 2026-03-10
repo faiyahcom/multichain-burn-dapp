@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { WhitelistTransferHistoryAnalysisItem } from "@/services/whitelistUserService";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 
 export interface DialogData {
   chainId: string;
@@ -26,6 +27,12 @@ const AdminTransferHistorySummaryDialog: React.FC<Props> = ({
   const networkConfig = data?.chainId
     ? chainIdToNetworkConfig(data?.chainId)
     : undefined;
+
+  const tokenCount = data?.list?.length ?? 0;
+  const totalTransfers =
+    data?.list?.reduce((sum, item) => {
+      return sum + item.txnCount;
+    }, 0) ?? 0;
 
   if (!networkConfig || !data?.chainId) {
     return null;
@@ -55,11 +62,37 @@ const AdminTransferHistorySummaryDialog: React.FC<Props> = ({
           />
         </div>
 
-        <div className="space-y-2.25 w-full">
-            <div className="">
+        <div className="w-full space-y-2.25">
+          <div className="grid grid-cols-3 rounded-5px bg-inactive py-1.75 *:text-center *:text-base *:font-bold">
+            <div>Token</div>
+            <div>Transfers</div>
+            <div>Amount</div>
+          </div>
 
-            </div>
+          <div
+            className="max-h-[44dvh] space-y-2.25 overflow-y-auto"
+            style={{
+              scrollbarGutter: "stable both-edges",
+            }}
+          >
+            {data?.list?.map((item) => (
+              <div
+                className="grid grid-cols-3 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-15px *:font-normal"
+                key={item.tokenAddress}
+              >
+                <div>{item.tokenSymbol}</div>
+                <div>{item.txnCount}</div>
+                <div>
+                  {sciToFormatted(item.totalAmount, item.tokenDecimals)}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+
+        <p className="text-center text-15px font-normal text-secondary-text">
+          {totalTransfers} total transfers across {tokenCount} tokens
+        </p>
       </DialogContent>
     </Dialog>
   );
