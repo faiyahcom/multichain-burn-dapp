@@ -93,8 +93,8 @@ const ConfirmDialog: React.FC<Props> = ({
             }}
             btnProps={{
               onClick: handleConfirm,
-              disabled: isLoading,
             }}
+            isLoading={isLoading}
           />
         </DialogFooter>
       </DialogContent>
