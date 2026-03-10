@@ -91,6 +91,8 @@ export const useDepositBurnSolFn = () => {
                             factory: factoryPDA,
                             pool: poolPDA,
                             userDeposit: userDepositPDA,
+                            // @ts-ignore — optional account, null for burn pools (ratio_bps == 0)
+                            ownerAccount: null,
                         })
                         .transaction();
 
