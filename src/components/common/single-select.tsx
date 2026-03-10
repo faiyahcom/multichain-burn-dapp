@@ -13,6 +13,8 @@ import { ArrowIcon } from "./arrow-icon";
 export interface SingleSelectOption {
   label: string;
   value: string;
+  triggerLabel?: string;
+  icon?: React.ComponentType<{ className?: string }>;
 }
 
 interface Props {
@@ -33,9 +35,9 @@ const SingleSelect: React.FC<Props> = ({
   placeholder = "Select",
   classNames,
 }) => {
-  const selectedLabel = options?.find(
-    (option) => option.value === selected,
-  )?.label;
+  const selectedOption = options?.find((option) => option.value === selected);
+  const selectedLabel = selectedOption?.triggerLabel ?? selectedOption?.label;
+  const SelectedIcon = selectedOption?.icon;
 
   const handleToggleCheck = (value?: string) => {
     if (!value) return;
@@ -50,7 +52,13 @@ const SingleSelect: React.FC<Props> = ({
           size={"mb-btn"}
           className={classNames?.btn}
         >
-          <div className="size-2.5 shrink-0" />
+          {!!SelectedIcon ? (
+            <div className="flex size-5.75 shrink-0 items-center justify-center">
+              <SelectedIcon className="size-5.25 shrink-0" />
+            </div>
+          ) : (
+            <div className="size-2.5 shrink-0" />
+          )}
           <span>{selectedLabel ?? placeholder}</span>
           <ArrowIcon direction="down" />
         </Button>
@@ -73,6 +81,7 @@ const SingleSelect: React.FC<Props> = ({
             value={option.value}
             checked={selected === option.value}
             toggleCheck={handleToggleCheck}
+            icon={option.icon}
           />
         ))}
       </PopoverContent>
@@ -90,7 +99,10 @@ const OptionItem: React.FC<SingleSelectOption & OptionItemProps> = ({
   value,
   checked,
   toggleCheck,
+  icon,
 }) => {
+  const Icon = icon;
+
   return (
     <div
       className="group cursor-pointer rounded-5px bg-primary-foreground py-0.5 pr-0.75"
@@ -109,9 +121,13 @@ const OptionItem: React.FC<SingleSelectOption & OptionItemProps> = ({
             "flex items-center rounded-5px bg-transparent pt-2.5 pb-2.25 pl-11.25 transition-colors",
             { "bg-inactive": checked },
             "group-hover:bg-inactive",
+            { "pt-2 pb-1.75 pl-6.25": !!Icon },
           )}
         >
-          <p className="text-15px font-medium">{label}</p>
+          <div className="flex items-center gap-2.25">
+            {!!Icon && <Icon className="size-7.75 shrink-0" />}
+            <p className="text-15px font-medium">{label}</p>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,6 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
+import type { PaginationResponse } from "@/types/common";
 
 const WHITELIST_USERS_API_ROUTES = API_ROUTES.WHITELIST_USERS;
 
@@ -29,7 +30,7 @@ export interface ListUsersResponse {
   users: WhitelistUser[];
 }
 
-export interface WhitelistTransferHistoryAnalysisItem {
+export interface TransferHistoryAnalysisItem {
   chainId: string;
   tokenAddress: string;
   tokenSymbol: string;
@@ -38,8 +39,40 @@ export interface WhitelistTransferHistoryAnalysisItem {
   txnCount: number;
 }
 
-export interface WhitelistTransferHistoryAnalysisResponse {
-  analysis: WhitelistTransferHistoryAnalysisItem[];
+export interface TransferHistoryAnalysisResponse {
+  analysis: TransferHistoryAnalysisItem[];
+}
+
+export interface TransferHistoryRequest {
+  page: number;
+  limit: number;
+  search?: string;
+  chainId?: string;
+  tokenOut?: string;
+  amountOutMin?: string;
+  amountOutMax?: string;
+  dateFrom?: number; //timestamp ms
+  dateTo?: number; //timestamp ms
+}
+
+type TransferHistoryApiTxn = {
+  id: string;
+  hash: string;
+  recipient: string | null;
+  poolAddress: string;
+  poolName: string | null;
+  chainId: string;
+  tokenOut: string;
+  tokenOutSymbol: string;
+  tokenOutDecimals?: number;
+  amountOut: string;
+  timestamp: string; // unix seconds (as string)
+  whitelistName: string | null;
+  whitelistEmail: string | null;
+};
+
+export interface TransferHistoryResponse extends PaginationResponse {
+  txns: TransferHistoryApiTxn[];
 }
 
 export const whitelistUserService = {
@@ -86,10 +119,19 @@ export const whitelistUserService = {
   },
 
   getAnalysis: async () => {
-    const response =
-      await apiClient.get<WhitelistTransferHistoryAnalysisResponse>(
-        WHITELIST_USERS_API_ROUTES.ANALYSIS,
-      );
+    const response = await apiClient.get<TransferHistoryAnalysisResponse>(
+      WHITELIST_USERS_API_ROUTES.ANALYSIS,
+    );
+    return response;
+  },
+
+  getTransferHistory: async (params: TransferHistoryRequest) => {
+    const response = await apiClient.get<TransferHistoryResponse>(
+      WHITELIST_USERS_API_ROUTES.HISTORY,
+      {
+        params,
+      },
+    );
     return response;
   },
 };

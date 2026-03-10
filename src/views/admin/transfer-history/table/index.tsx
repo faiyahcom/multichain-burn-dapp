@@ -1,9 +1,8 @@
-import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
 import CopyableText from "@/components/common/copyable-text";
-import CustomPagination from "@/components/common/pagination";
-import TableSpinner from "@/components/common/table-spinner";
 import NetworkDisplay from "@/components/common/network-display";
+import CustomPagination from "@/components/common/pagination";
+import TableNoData from "@/components/common/table-no-data";
+import TableSpinner from "@/components/common/table-spinner";
 import {
   Table,
   TableBody,
@@ -12,128 +11,42 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { formatTimestampSecondsToDate, truncateString } from "@/utils/helpers/string";
 import { networkIdToChainId } from "@/config/networks";
-import { useSystemStore } from "@/stores/systemStore";
-import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
-import { type TransferRecord } from "@/services/transferHistoryService";
-import { transferHistoryQueryKeys } from "@/services/queries/queryKey";
-import { apiClient } from "@/config/axios";
-
-const LIMIT = 10;
-
-// ─── Decimals helper (fallback when API doesn't provide decimals) ──────────────
-const SYMBOL_DECIMALS: Record<string, number> = {
-  USDT: 6,
-  USDC: 6,
-  ETH: 18,
-  BNB: 18,
-  SOL: 9,
-  WBTC: 8,
-};
-
-// Fallback for filters when token decimals can't be determined (e.g. no token selected)
-const DEFAULT_FILTER_DECIMALS = 6;
-
-function formatTokenAmount(amountOut: string, decimals?: number | null, symbol?: string): string {
-  const resolvedDecimals = decimals ?? (symbol ? SYMBOL_DECIMALS[symbol] : undefined) ?? 18;
-  const value = Number(amountOut) / Math.pow(10, resolvedDecimals);
-  return value.toLocaleString("vi-VN", { maximumFractionDigits: 4 });
-}
-
-function humanAmountToRawString(amount: string, decimals: number): string {
-  const normalized = amount.trim().replace(",", ".");
-  if (!normalized) return "";
-  const [intPartRaw, fracPartRaw = ""] = normalized.split(".");
-  const intPart = (intPartRaw || "0").replace(/^0+(?=\d)/, "") || "0";
-  const fracPart = fracPartRaw.slice(0, decimals).padEnd(decimals, "0");
-  const digits = `${intPart}${fracPart}`.replace(/^0+(?=\d)/, "") || "0";
-  return BigInt(digits).toString();
-}
-
-type TransferHistoryApiTxn = {
-  id: string;
-  hash: string;
-  recipient: string | null;
-  poolAddress: string;
-  poolName: string | null;
-  chainId: string;
-  tokenOut: string;
-  tokenOutSymbol: string;
-  tokenOutDecimals?: number;
-  amountOut: string;
-  timestamp: string; // unix seconds (as string)
-  whitelistName: string | null;
-  whitelistEmail: string | null;
-};
-
-type TransferHistoryApiResponse = {
-  page: number;
-  total: number;
-  txns: TransferHistoryApiTxn[];
-};
+import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
+import { whitelistUserService } from "@/services/whitelistUserService";
+import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store-v2";
+import { convertArrayToStringParam } from "@/utils/helpers/array";
+import { sciToFormatted } from "@/utils/helpers/numbers";
+import {
+  formatTimestampSecondsToDate,
+  truncateString,
+} from "@/utils/helpers/string";
+import { useQuery } from "@tanstack/react-query";
 
 const AdminTransferHistoryTable = () => {
   const { filter, setFilter } = useAdminTransferHistoryFilterStore();
+  const limit = 10;
 
-  // Fall back to the user's connected chain when no network filter is selected
-  const { selectedNetworkId } = useSystemStore();
-  const resolvedChainId = useMemo(() => {
-    const networkId = filter.network || selectedNetworkId;
-    return networkIdToChainId(networkId) ?? undefined;
-  }, [filter.network, selectedNetworkId]);
-
-  const apiChainId = useMemo(() => {
-    if (!resolvedChainId) return undefined;
-    return resolvedChainId === "11155111" ? "-1" : resolvedChainId;
-  }, [resolvedChainId]);
-
-  const queryParams = useMemo(
-    () => ({
-      page: filter.page,
-      limit: LIMIT,
-      chainId: apiChainId,
-      tokenOut: filter.tokens.length > 0 ? filter.tokens.join(",") : undefined,
-      search: filter.text || undefined,
-      amountOutMin: filter.amountMin
-        ? humanAmountToRawString(filter.amountMin, filter.tokenOutDecimals ?? DEFAULT_FILTER_DECIMALS)
-        : undefined,
-      amountOutMax: filter.amountMax
-        ? humanAmountToRawString(filter.amountMax, filter.tokenOutDecimals ?? DEFAULT_FILTER_DECIMALS)
-        : undefined,
-      dateFrom: filter.dateFrom || undefined,
-      dateTo: filter.dateTo || undefined,
-    }),
-    [filter, apiChainId],
-  );
-
-  const { data, isPending } = useQuery({
-    queryKey: transferHistoryQueryKeys.list(queryParams),
+  const { data: transfers, isPending: isPendingTransfers } = useQuery({
+    queryKey: whitelistUserQueryKeys.history(filter),
     queryFn: async () => {
-      const response = await apiClient.get<TransferHistoryApiResponse>("/whitelist-users/history", {
-        params: queryParams,
+      return whitelistUserService.getTransferHistory({
+        page: filter.page,
+        limit: limit,
+        search: filter.text || undefined,
+        chainId: networkIdToChainId(filter.networkId),
+        tokenOut: convertArrayToStringParam({ array: filter.tokens }),
+        dateFrom: filter.dateFrom
+          ? filter.dateFrom.getTime() / 1000
+          : undefined,
+        dateTo: filter.dateTo ? filter.dateTo.getTime() / 1000 : undefined,
+        amountOutMin:
+          filter.amountOutMin !== "" ? filter.amountOutMin : undefined,
+        amountOutMax:
+          filter.amountOutMax !== "" ? filter.amountOutMax : undefined,
       });
-
-      const transfers: TransferRecord[] = (response.txns ?? []).map((t) => ({
-        poolName: t.poolName,
-        chainId: t.chainId,
-        tokenOut: t.tokenOut,
-        tokenOutSymbol: t.tokenOutSymbol,
-        tokenOutDecimals: t.tokenOutDecimals ?? null,
-        amountOut: t.amountOut,
-        // API returns seconds → convert to milliseconds for table formatter
-        timestamp: String(Number(t.timestamp) * 1000),
-        whitelistName: t.whitelistName,
-        whitelistEmail: t.whitelistEmail,
-        recipient: t.recipient,
-      }));
-
-      return { page: response.page, total: response.total, transfers };
     },
   });
-
-  const transfers = data?.transfers ?? [];
-  const total = data?.total ?? 0;
 
   const columns = [
     "Recipient",
@@ -147,7 +60,7 @@ const AdminTransferHistoryTable = () => {
   ];
 
   return (
-    <div className="space-y-10 pb-10">
+    <div className="space-y-10 pb-10 pl-3.75">
       <Table>
         <TableHeader>
           <TableRow>
@@ -157,17 +70,31 @@ const AdminTransferHistoryTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableSpinner isLoading={isPending} colSpan={columns.length} />
-          {transfers.map((item, index) => (
+          <TableSpinner
+            isLoading={isPendingTransfers}
+            colSpan={columns.length}
+          />
+          <TableNoData
+            data={transfers?.txns}
+            isLoading={isPendingTransfers}
+            colSpan={columns.length}
+          />
+          {transfers?.txns?.map((item, index) => (
             <TableRow key={index} className="group">
               {/* Recipient — name + email subtitle */}
               <TableCell className="pl-8">
-                <div className="flex flex-col items-start text-left">
-                  <span className="text-mb-table-text font-medium group-hover:font-bold group-hover:text-active">
+                <div className="flex max-w-full flex-col items-start text-left">
+                  <span
+                    className="block max-w-full truncate font-medium text-mb-table-text group-hover:font-bold group-hover:text-active"
+                    title={item.whitelistName ?? "-"}
+                  >
                     {item.whitelistName ?? "-"}
                   </span>
                   {item.whitelistEmail && (
-                    <span className="text-xs text-foreground! font-normal! group-hover:text-foreground! group-hover:font-normal!">
+                    <span
+                      className="block max-w-full truncate text-xs font-normal! text-foreground! group-hover:font-normal! group-hover:text-foreground!"
+                      title={item.whitelistEmail}
+                    >
                       {item.whitelistEmail}
                     </span>
                   )}
@@ -175,7 +102,9 @@ const AdminTransferHistoryTable = () => {
               </TableCell>
 
               {/* Pool — poolName */}
-              <TableCell>{item.poolName ?? "-"}</TableCell>
+              <TableCell>
+                <p className="max-w-full truncate">{item.poolName ?? "-"}</p>
+              </TableCell>
 
               {/* Wallet Address (recipient from API) */}
               <TableCell>
@@ -207,13 +136,13 @@ const AdminTransferHistoryTable = () => {
 
               {/* Amount — amountOut formatted */}
               <TableCell className="font-medium">
-                {formatTokenAmount(item.amountOut, item.tokenOutDecimals, item.tokenOutSymbol)}
+                {sciToFormatted(item.amountOut, item.tokenOutDecimals ?? 0)}
               </TableCell>
 
               {/* Date — timestamp (milliseconds → date) */}
               <TableCell>
                 {formatTimestampSecondsToDate({
-                  timestamp: String(Math.floor(Number(item.timestamp) / 1000)),
+                  timestamp: item.timestamp,
                   notFound: "-",
                 })}
               </TableCell>
@@ -224,8 +153,8 @@ const AdminTransferHistoryTable = () => {
 
       <CustomPagination
         currentPage={filter.page}
-        totalCount={total}
-        pageSize={LIMIT}
+        totalCount={transfers?.total ?? 0}
+        pageSize={limit}
         onPageChange={(page) => setFilter({ page: Number(page) })}
       />
     </div>
@@ -233,4 +162,3 @@ const AdminTransferHistoryTable = () => {
 };
 
 export default AdminTransferHistoryTable;
-

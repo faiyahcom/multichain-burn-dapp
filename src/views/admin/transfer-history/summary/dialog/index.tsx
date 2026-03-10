@@ -7,12 +7,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { chainIdToNetworkConfig } from "@/config/networks";
-import type { WhitelistTransferHistoryAnalysisItem } from "@/services/whitelistUserService";
+import type { TransferHistoryAnalysisItem } from "@/services/whitelistUserService";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 
 export interface DialogData {
   chainId: string;
-  list: WhitelistTransferHistoryAnalysisItem[];
+  list: TransferHistoryAnalysisItem[];
 }
 
 interface Props {
