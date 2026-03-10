@@ -15,6 +15,14 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -222,14 +230,90 @@ const AdminTransferHistoryHeader = () => {
       </div>
 
       {/* Stats cards */}
-      <div className="flex items-stretch gap-[25px] pl-[54px]">
+      <div className="flex items-stretch space-y-0 gap-[5px] pl-[54px]">
         {filteredAnalysis.map((item) => (
-          <StatCard
-            key={item.tokenAddress}
-            symbol={item.tokenSymbol}
-            txnCount={item.txnCount}
-            formattedAmount={formatTokenAmount(item.totalAmount, item.tokenDecimals)}
-          />
+          <Dialog key={item.tokenAddress}>
+            <DialogTrigger asChild>
+              <button type="button" className="outline-none focus-visible:outline-none">
+                <StatCard
+                  symbol={item.tokenSymbol}
+                  txnCount={item.txnCount}
+                  formattedAmount={formatTokenAmount(item.totalAmount, item.tokenDecimals)}
+                />
+              </button>
+            </DialogTrigger>
+            <DialogContent showCloseButton className="h-[747px] sm:max-w-[612px] gap-0">
+              <div className="h-5 text-center">
+                <h2 className="text-2xl font-semibold">
+                  {item.tokenSymbol} Token Breakdown
+                </h2>
+                <p className="text-sm text-secondary-text">
+                  Detailed breakdown of all tokens transferred on the {item.tokenSymbol} network
+                </p>
+              </div>
+
+              <div className="mt-[20px] flex h-4 items-center justify-start gap-2 text-sm leading-none">
+                <span className="text-secondary-text">All token balances on</span>
+                <button
+                  type="button"
+                  className="flex h-4 items-center rounded-full bg-active px-3 text-[11px] font-semibold text-white"
+                >
+                  {item.tokenSymbol}
+                </button>
+              </div>
+
+              <div className="flex justify-center">
+                <div className="max-h-[503px] w-[561px]">
+                  {/* Header bar */}
+                  <div className="flex h-[37px] w-[561px] items-center rounded-[5px] bg-[#DEE4F6] px-6 text-sm font-semibold leading-none text-[#27273B]">
+                    <div className="flex flex-1 items-center justify-start">
+                      <span className="whitespace-nowrap">Token</span>
+                    </div>
+                    <div className="flex flex-1 items-center justify-center">
+                      <span className="whitespace-nowrap text-center">Transfers</span>
+                    </div>
+                    <div className="flex flex-1 items-center justify-end">
+                      <span className="whitespace-nowrap text-right">Amount</span>
+                    </div>
+                  </div>
+                  {/* Body rows */}
+                  <div className="mt-2 h-[503px] min-h-0 w-[561px] space-y-2 overflow-y-auto bg-transparent token-breakdown-scroll">
+                    {[
+                      { token: "USDC", transfers: 3, amount: "9,700" },
+                      { token: "USDT", transfers: 2, amount: "6,000" },
+                      { token: "WBTC", transfers: 1, amount: "1,500" },
+                      { token: "MKR", transfers: 1, amount: "1,100" },
+                      { token: "COMP", transfers: 1, amount: "900" },
+                      { token: "ETH", transfers: 3, amount: "880" },
+                      { token: "LINK", transfers: 1, amount: "800" },
+                      { token: "DAI", transfers: 1, amount: "750" },
+                      { token: "AAVE", transfers: 1, amount: "350" },
+                      { token: "UNI", transfers: 1, amount: "300" },
+                    ].map((row) => (
+                      <div
+                        key={`${item.tokenSymbol}-${row.token}`}
+                        className="flex h-[37px] w-[561px] items-center rounded-[5px] bg-[#DEE4F6]/50 px-6 text-sm text-[#27273B]"
+                      >
+                        <div className="flex flex-1 items-center justify-start">
+                          <span className="whitespace-nowrap">{row.token}</span>
+                        </div>
+                        <div className="flex flex-1 items-center justify-center">
+                          <span className="whitespace-nowrap text-center">{row.transfers}</span>
+                        </div>
+                        <div className="flex flex-1 items-center justify-end">
+                          <span className="whitespace-nowrap text-right">{row.amount}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <p className="text-center text-xs text-secondary-text">
+                15 total transfers across 10 tokens
+              </p>
+            </DialogContent>
+          </Dialog>
         ))}
       </div>
 
