@@ -17,6 +17,7 @@ import BN from "bn.js";
 import { formatUnits } from "viem";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { AssetTypeEnum } from "@/web3/helpers";
 import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 import { Input } from "@/components/ui/input";
 import { IconWallet } from "@/assets/react";
@@ -96,7 +97,38 @@ const DepositRewardDialog = ({
         symbol: pool?.rewardTokenSymbol,
     });
 
-    const networkConfig = chainIdToNetworkConfig(pool?.chainId ?? "");
+    const networkConfig = useMemo(
+        () => (pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined),
+        [pool?.chainId],
+    );
+
+    const tokenInDisplay = useMemo(() => {
+        if (pool?.assetTypeIn === AssetTypeEnum.NATIVE && networkConfig) {
+            const native = networkConfig.appKitNetwork.nativeCurrency;
+            return {
+                imageUri: networkConfig.iconSrc,
+                symbol: native.symbol,
+                name: native.name,
+            };
+        }
+        return burnToken
+            ? { imageUri: burnToken.imageUri, symbol: burnToken.symbol, name: burnToken.name }
+            : undefined;
+    }, [pool?.assetTypeIn, networkConfig, burnToken]);
+
+    const tokenOutDisplay = useMemo(() => {
+        if (pool?.assetTypeReward === AssetTypeEnum.NATIVE && networkConfig) {
+            const native = networkConfig.appKitNetwork.nativeCurrency;
+            return {
+                imageUri: networkConfig.iconSrc,
+                symbol: native.symbol,
+                name: native.name,
+            };
+        }
+        return rewardToken
+            ? { imageUri: rewardToken.imageUri, symbol: rewardToken.symbol, name: rewardToken.name }
+            : undefined;
+    }, [pool?.assetTypeReward, networkConfig, rewardToken]);
 
     const handleSelectPercent = (percent: number) => {
         if (!rewardBalanceFormatted || pool?.rewardTokenDecimals == null) return;
@@ -123,8 +155,8 @@ const DepositRewardDialog = ({
             Number(pool.currentRewardAmount) / Math.pow(10, pool.rewardTokenDecimals);
         return `${raw.toLocaleString(undefined, {
             maximumFractionDigits: pool.rewardTokenDecimals,
-        })} ${pool.rewardTokenSymbol}`;
-    }, [pool]);
+        })} ${tokenOutDisplay?.symbol ?? pool.rewardTokenSymbol}`;
+    }, [pool, tokenOutDisplay]);
 
     const duration = useMemo(() => {
         if (!pool) return "-";
@@ -187,15 +219,15 @@ const DepositRewardDialog = ({
                                     value={
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
-                                                src={rewardToken?.imageUri}
-                                                alt={rewardToken?.symbol}
+                                                src={tokenOutDisplay?.imageUri}
+                                                alt={tokenOutDisplay?.symbol}
                                                 classNames={{
                                                     common: "size-5",
                                                     img: "size-5",
                                                     placeholder: "size-5",
                                                 }}
                                             />
-                                            {pool?.rewardTokenSymbol ?? "-"}
+                                            {tokenOutDisplay?.symbol ?? pool?.rewardTokenSymbol ?? "-"}
                                         </span>
                                     }
                                 />
@@ -204,15 +236,15 @@ const DepositRewardDialog = ({
                                     value={
                                         <span className="flex items-center gap-2 font-semibold">
                                             <TokenImage
-                                                src={burnToken?.imageUri}
-                                                alt={burnToken?.symbol}
+                                                src={tokenInDisplay?.imageUri}
+                                                alt={tokenInDisplay?.symbol}
                                                 classNames={{
                                                     common: "size-5",
                                                     img: "size-5",
                                                     placeholder: "size-5",
                                                 }}
                                             />
-                                            {pool?.tokenInSymbol ?? "-"}
+                                            {tokenInDisplay?.symbol ?? pool?.tokenInSymbol ?? "-"}
                                         </span>
                                     }
                                 />
@@ -268,7 +300,7 @@ const DepositRewardDialog = ({
                                         <span>
                                             {isLoadingRewardBalance
                                                 ? "Loading..."
-                                                : `${rewardBalanceFormatted ?? "0"} ${rewardToken?.symbol ?? ""}`}
+                                                : `${rewardBalanceFormatted ?? "0"} ${tokenOutDisplay?.symbol ?? ""}`}
                                         </span>
                                     </span>
                                 </div>
@@ -284,15 +316,15 @@ const DepositRewardDialog = ({
                                     />
                                     <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
                                         <TokenImage
-                                            src={rewardToken?.imageUri}
-                                            alt={rewardToken?.symbol}
+                                            src={tokenOutDisplay?.imageUri}
+                                            alt={tokenOutDisplay?.symbol}
                                             classNames={{
                                                 common: "size-5",
                                                 img: "size-5",
                                                 placeholder: "size-5",
                                             }}
                                         />
-                                        <span className="">{pool?.rewardTokenSymbol ?? ""}</span>
+                                        <span className="">{tokenOutDisplay?.symbol ?? pool?.rewardTokenSymbol ?? ""}</span>
                                     </div>
                                 </div>
 

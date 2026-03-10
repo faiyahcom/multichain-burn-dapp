@@ -72,7 +72,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
 
   const description = toastProps.data?.description;
   const shortenDescription =
-    typeof description === "string" && description?.length > 150
+    (typeof description === "string" && description?.length > 150)
       ? description.slice(0, 150) + "..."
       : description;
 
@@ -92,7 +92,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
         <p className="text-base font-semibold text-(--color)">
           {toastProps.message}
         </p>
-        {description && (
+        {!!description && (
           <p className="pl-0.75 text-[13px] font-normal text-[#5B5B5B]">
             {shortenDescription}
           </p>
@@ -103,6 +103,8 @@ const CustomToast: React.FC<CustomToastProps> = ({
 };
 
 const showToast = ({ variant, toastProps }: CustomToastProps) => {
+  const { description, ...restData } = toastProps.data || {};
+
   return sonnerToast.custom(
     (id) => (
       <CustomToast
@@ -112,7 +114,7 @@ const showToast = ({ variant, toastProps }: CustomToastProps) => {
       />
     ),
     {
-      ...toastProps.data,
+      ...restData,
     },
   );
 };
