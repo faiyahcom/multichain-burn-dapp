@@ -1,12 +1,14 @@
-import SwapPool from '@/views/swap-pool'
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/')({
+export const Route = createFileRoute("/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
   return (
-    <SwapPool />
-  )
+    <div className="flex h-full w-full flex-col items-center justify-center gap-2.25">
+      <h1 className="text-40px font-extrabold">WELCOME TO SERVICE ENTRY</h1>
+      <p className="text-2xl font-normal">Your Gateway to DeFi Services</p>
+    </div>
+  );
 }

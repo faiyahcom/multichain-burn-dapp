@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -9,7 +9,7 @@ import {
 import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
     getMultichainBurnProgram,
@@ -19,6 +19,8 @@ import {
     getRewardVaultPDA,
     getDepositVaultPDA,
     getFactoryPDA,
+    detectAssetType,
+    getTokenProgramFromAssetType,
 } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
 
@@ -58,12 +60,23 @@ export const useCancelPoolSolanaFn = () => {
                 const rewardMint = new PublicKey(params.poolDetail.pool.rewardToken);
                 const depositMint = new PublicKey(params.poolDetail.pool.tokenIn);
 
+                // Detect token programs (Token-2022 support)
+                const [rewardAssetType, depositAssetType] = await Promise.all([
+                    detectAssetType(connection, rewardMint),
+                    detectAssetType(connection, depositMint),
+                ]);
+                const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
+                const depositTokenProgram = getTokenProgramFromAssetType(depositAssetType)!;
+
                 // =============================
                 // 2️⃣ Derive ATA for owner reward
                 // =============================
                 const ownerRewardAta = await getAssociatedTokenAddress(
                     rewardMint,
                     walletPublicKey,
+                    false, // allowOwnerOffCurve
+                    rewardTokenProgram, // Use the correct token program for the ATA
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
                 );
 
                 const ataInfo = await connection.getAccountInfo(ownerRewardAta);
@@ -95,7 +108,9 @@ export const useCancelPoolSolanaFn = () => {
                         rewardVault: rewardVaultPDA,
                         depositVault: depositVaultPDA,
                         ownerRewardAta: ownerRewardAta,
-                        tokenProgram: TOKEN_PROGRAM_ID,
+                        rewardTokenProgram: rewardTokenProgram, // Pass reward token program
+                        depositTokenProgram: depositTokenProgram, // Pass deposit token program
+                        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID, // Pass associated token program
                         systemProgram: SystemProgram.programId,
                     })
                     .transaction();
@@ -110,6 +125,8 @@ export const useCancelPoolSolanaFn = () => {
                             ownerRewardAta,
                             walletPublicKey,
                             rewardMint,
+                            rewardTokenProgram, // Use the correct token program for ATA creation
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
                         ),
                     );
                 }

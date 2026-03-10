@@ -21,6 +21,8 @@ import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/inde
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
+import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
+import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
 import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminTransferHistoryIndexRouteImport } from './routes/admin/transfer-history/index'
@@ -29,6 +31,7 @@ import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$add
 import { Route as BurnEditAddressRouteImport } from './routes/burn/edit/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
+import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
@@ -93,6 +96,16 @@ const ActivityHistoryIndexRoute = ActivityHistoryIndexRouteImport.update({
   path: '/activity-history/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SwapCreateIndexRoute = SwapCreateIndexRouteImport.update({
+  id: '/swap/create/',
+  path: '/swap/create/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BurnCreateIndexRoute = BurnCreateIndexRouteImport.update({
+  id: '/burn/create/',
+  path: '/burn/create/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminWhitelistUserIndexRoute = AdminWhitelistUserIndexRouteImport.update({
   id: '/admin/whitelist-user/',
   path: '/admin/whitelist-user/',
@@ -137,6 +150,11 @@ const PairDetailChainIdTokenInTokenOutRoute =
     path: '/pair-detail/$chainId/$tokenIn/$tokenOut',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminSwapDetailAddressRoute = AdminSwapDetailAddressRouteImport.update({
+  id: '/admin/swap/detail/$address',
+  path: '/admin/swap/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBurnDetailAddressRoute = AdminBurnDetailAddressRouteImport.update({
   id: '/admin/burn/detail/$address',
   path: '/admin/burn/detail/$address',
@@ -163,7 +181,10 @@ export interface FileRoutesByFullPath {
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/burn/create': typeof BurnCreateIndexRoute
+  '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
+  '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesByTo {
@@ -186,7 +207,10 @@ export interface FileRoutesByTo {
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
+  '/burn/create': typeof BurnCreateIndexRoute
+  '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
+  '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesById {
@@ -210,7 +234,10 @@ export interface FileRoutesById {
   '/admin/transfer-history/': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
+  '/burn/create/': typeof BurnCreateIndexRoute
+  '/swap/create/': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
+  '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRouteTypes {
@@ -235,7 +262,10 @@ export interface FileRouteTypes {
     | '/admin/transfer-history'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/burn/create'
+    | '/swap/create'
     | '/admin/burn/detail/$address'
+    | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -258,7 +288,10 @@ export interface FileRouteTypes {
     | '/admin/transfer-history'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
+    | '/burn/create'
+    | '/swap/create'
     | '/admin/burn/detail/$address'
+    | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   id:
     | '__root__'
@@ -281,7 +314,10 @@ export interface FileRouteTypes {
     | '/admin/transfer-history/'
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
+    | '/burn/create/'
+    | '/swap/create/'
     | '/admin/burn/detail/$address'
+    | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesById: FileRoutesById
 }
@@ -305,7 +341,10 @@ export interface RootRouteChildren {
   AdminTransferHistoryIndexRoute: typeof AdminTransferHistoryIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
+  BurnCreateIndexRoute: typeof BurnCreateIndexRoute
+  SwapCreateIndexRoute: typeof SwapCreateIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
+  AdminSwapDetailAddressRoute: typeof AdminSwapDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
 }
 
@@ -395,6 +434,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ActivityHistoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/swap/create/': {
+      id: '/swap/create/'
+      path: '/swap/create'
+      fullPath: '/swap/create'
+      preLoaderRoute: typeof SwapCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/burn/create/': {
+      id: '/burn/create/'
+      path: '/burn/create'
+      fullPath: '/burn/create'
+      preLoaderRoute: typeof BurnCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/whitelist-user/': {
       id: '/admin/whitelist-user/'
       path: '/admin/whitelist-user'
@@ -451,6 +504,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PairDetailChainIdTokenInTokenOutRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/swap/detail/$address': {
+      id: '/admin/swap/detail/$address'
+      path: '/admin/swap/detail/$address'
+      fullPath: '/admin/swap/detail/$address'
+      preLoaderRoute: typeof AdminSwapDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/burn/detail/$address': {
       id: '/admin/burn/detail/$address'
       path: '/admin/burn/detail/$address'
@@ -481,7 +541,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminTransferHistoryIndexRoute: AdminTransferHistoryIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
+  BurnCreateIndexRoute: BurnCreateIndexRoute,
+  SwapCreateIndexRoute: SwapCreateIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
+  AdminSwapDetailAddressRoute: AdminSwapDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
 }
 export const routeTree = rootRouteImport

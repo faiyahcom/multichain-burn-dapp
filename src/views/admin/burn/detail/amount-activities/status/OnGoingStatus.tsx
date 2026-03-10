@@ -9,9 +9,8 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import { ActionBtn, StatRow } from "../components";
+import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
@@ -20,13 +19,19 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [reason, setReason] = useState("");
 
-    const { pool, formattedBurned, formattedReturnReward, handleAdminClose } =
-        useAmountActivity(poolDetail);
+    const { handleAdminClose } = useAmountActivity(poolDetail);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleConfirmClose = async () => {
-        await handleAdminClose();
-        setDialogOpen(false);
-        setReason("");
+        setIsLoading(true);
+        try {
+            await handleAdminClose(reason);
+            setDialogOpen(false);
+            setReason("");
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     const handleCancel = () => {
@@ -36,16 +41,6 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
 
     return (
         <>
-            <StatRow
-                label="Remaining Reward"
-                value={`${formattedReturnReward} ${pool?.rewardTokenSymbol ?? ""}`}
-                className="font-medium text-active"
-                valueClassName="text-2xl font-bold"
-            />
-            <StatRow
-                label="Burn Amount"
-                value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
-            />
             <ActionBtn
                 letter="C"
                 text="Close Pool"
@@ -99,7 +94,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                                 icon: "size-7.5 text-xl",
                                 text: "text-2xl",
                             }}
-                            btnProps={{ onClick: handleCancel }}
+                            btnProps={{ onClick: handleCancel, disabled: isLoading }}
                         />
                         <AnimateIconButton
                             variant="letter-icon"
@@ -112,6 +107,8 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                                 icon: "size-7.5 text-xl",
                                 text: "text-2xl",
                             }}
+                            isLoading={isLoading}
+                            isLoadingText="Closing..."
                             btnProps={{ onClick: handleConfirmClose }}
                         />
                     </DialogFooter>

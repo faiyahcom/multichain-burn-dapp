@@ -16,7 +16,7 @@ import {
   booleanToTokenStatus,
   tokenStatusLabels,
 } from "@/types/admin/whitelist-token";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { format, isValid, parseISO } from "date-fns";
 
 interface Props {

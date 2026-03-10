@@ -5,7 +5,8 @@ import PendingHoldingStatus from "./status/PendingHoldingStatus";
 import UpcomingStatus from "./status/UpcomingStatus";
 import CanceledStatus from "./status/CanceledStatus";
 import OnGoingStatus from "./status/OnGoingStatus";
-import EndStatus from "./status/EndStatus";
+// import EndStatus from "./status/EndStatus";
+import ClosedStatus from "./status/ClosedStatus";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -34,10 +35,12 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             case "on_going":
                 return <OnGoingStatus poolDetail={poolDetail} />;
 
-            case "ended":
-                return <EndStatus poolDetail={poolDetail} />;
-
             case "closed":
+                return <ClosedStatus poolDetail={poolDetail} />;
+
+            // case "ended":
+            //     return <EndStatus poolDetail={poolDetail} />;
+
             default:
                 return null;
         }

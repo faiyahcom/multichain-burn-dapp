@@ -22,7 +22,7 @@ import { useCreateWhitelistUserEvmFn } from "./useCreateWhitelistUserEvmFn";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import { cn } from "@/lib/utils";
 
@@ -338,19 +338,17 @@ const AdminWhitelistUserDialogCreate = () => {
                         <AnimateIconButton
                             variant="letter-icon"
                             iconLetter="A"
-                            text={
-                                isLoading
-                                    ? "Adding..."
-                                    : "Add to Whitelist"
-                            }
+                            text="Add to Whitelist"
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
                                 btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
                             }}
+                            isLoading={isLoading}
+                            isLoadingText="Adding..."
                             btnProps={{
                                 type: "submit",
-                                disabled: isLoading || selectedNetworks.length === 0 || networkTypeConflict,
+                                disabled: selectedNetworks.length === 0 || networkTypeConflict,
                             }}
                         />
                     </div>

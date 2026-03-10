@@ -13,7 +13,7 @@ import { multicall, sendCalls, waitForCallsStatus } from "@wagmi/core";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import type { Abi, Address, Hex } from "viem";
 
 export const useCreateWhitelistUserEvmFn = () => {
@@ -33,7 +33,6 @@ export const useCreateWhitelistUserEvmFn = () => {
         if (!provider) {
           throw new Error("Provider not found");
         }
-
         const signer = await provider.getSigner();
         const swapFactoryContract = getContractSwapFactory(signer);
         const burnFactoryContract = getContractBurnFactory(signer);
@@ -50,6 +49,7 @@ export const useCreateWhitelistUserEvmFn = () => {
             userAddress,
             true,
           ]);
+        console.log("Checkpoint 1");
 
         const { id } = await sendCalls(wagmiAdapter.wagmiConfig, {
           account,
@@ -66,11 +66,13 @@ export const useCreateWhitelistUserEvmFn = () => {
             },
           ],
         });
+        console.log("Checkpoint 1");
 
         const callsStatus = await waitForCallsStatus(wagmiAdapter.wagmiConfig, {
           id,
           throwOnFailure: true,
         });
+        console.log("Checkpoint 1");
 
         const [isSwapFactoryWhitelisted, isBurnFactoryWhitelisted] =
           await multicall(wagmiAdapter.wagmiConfig, {

@@ -6,6 +6,7 @@ import { useReadContract, useBalance } from "wagmi";
 import type { Address } from "viem";
 import { formatUnits } from "viem";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
+import { ZERO_ADDRESS } from "@/config/constant";
 
 type UseTokenBalanceParams = {
   tokenAddress?: string;
@@ -13,7 +14,7 @@ type UseTokenBalanceParams = {
   symbol?: string;     // passed from parent
 };
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
+
 
 const isNativeToken = (address?: string) => {
   if (!address) return false;

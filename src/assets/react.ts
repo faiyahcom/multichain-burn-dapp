@@ -33,6 +33,14 @@ export { default as IconTrashCan } from "./icons/trash-can.svg?react";
 export { default as IconGoTo } from "./icons/go-to.svg?react";
 export { default as IconUpload2 } from "./icons/upload-2.svg?react";
 export { default as IconTick } from "./icons/tick.svg?react";
+export { default as IconExclaimation } from "./icons/exclaimation.svg?react";
 
 export { default as IconClipboard } from "./icons/clipboard.svg?react";
 export { default as IconWallet } from "./icons/wallet.svg?react";
+
+export { default as IconSpinner } from "./icons/spinner.svg?react";
+
+export { default as IconToastError } from "./icons/toast-error.svg?react";
+export { default as IconToastInfo } from "./icons/toast-info.svg?react";
+export { default as IconToastSuccess } from "./icons/toast-success.svg?react";
+export { default as IconToastWarning } from "./icons/toast-warning.svg?react";

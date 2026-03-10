@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
@@ -20,6 +20,7 @@ import { useCancelRequestApproveEvmFn } from "./hooks/useCancelRequestApproveEvm
 import { useCancelRequestApproveSolFn } from "./hooks/useCancelRequestApproveSolFn";
 import { useDepositRewardSolFn } from "./hooks/useDepositRewardSolFn";
 import { useDepositBurnSolFn } from "./hooks/useDepositBurnSolFn";
+import { userService } from "@/services/userService";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -112,7 +113,9 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
                 : false;
 
         if (isPastStartTime) {
-            toast.warning("Pool already past start time. Please edit pool start time.");
+            toast.warning(
+                "Pool already past start time. Please edit pool start time.",
+            );
             return;
         }
         if (!hasReward) {
@@ -131,7 +134,11 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const handleDepositReward = async (amountStr: string) => {
         if (!pool || !amountStr) return;
         if (isSolana && poolDetail) {
-            await depositRewardSol({ poolAddress: pool.address, poolDetail, amountStr });
+            await depositRewardSol({
+                poolAddress: pool.address,
+                poolDetail,
+                amountStr,
+            });
         } else {
             await depositRewardEvm({
                 poolAddress: pool.address,
@@ -147,7 +154,11 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const handleDepositBurn = async (amountStr: string) => {
         if (!pool || !amountStr) return;
         if (isSolana && poolDetail) {
-            await depositBurnSol({ poolAddress: pool.address, poolDetail, amountStr });
+            await depositBurnSol({
+                poolAddress: pool.address,
+                poolDetail,
+                amountStr,
+            });
         } else {
             await depositBurnEvm({
                 poolAddress: pool.address,
@@ -162,10 +173,23 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
 
     const handleClaim = async () => {
         if (!pool?.address) return;
+        const proof = await userService.getPoolMerkleProof(pool.address);
+        if (!proof) {
+            toast.error("You are not eligible to claim reward");
+            return;
+        }
         if (isSolana && poolDetail) {
-            await claimBurnSol({ poolAddress: pool.address, poolDetail });
+            await claimBurnSol({
+                poolAddress: pool.address,
+                poolDetail,
+                merkleProof: proof.merkleProof,
+                proofIndex: proof.proofIndex,
+            });
         } else {
-            await claimBurnReward({ poolAddress: pool.address });
+            await claimBurnReward({
+                poolAddress: pool.address,
+                merkleProof: proof.merkleProof,
+            });
         }
         invalidatePoolQueries(pool.address);
     };

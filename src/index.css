@@ -62,6 +62,9 @@
   --text-15px: 0.938rem;
   /* 15px */
   --text-11px: 0.688rem;
+  /* 11px */
+  --text-40px: 2.5rem;
+  /* 40px */
 
   /* Core semantic colors */
   --color-background: var(--background);
@@ -76,6 +79,7 @@
   --color-success: var(--success);
   --color-error: var(--error);
   --color-greyed: var(--greyed);
+  --color-admin-warning: var(--admin-warning);
 
   /* Status colors */
   --color-status-close: var(--status-close);
@@ -139,6 +143,7 @@
   --color-mb-summary-token-card: var(--mb-summary-token-card);
   --color-mb-gray-b5b7ca: var(--mb-gray-b5b7ca);
   --color-mb-gray-69: var(--mb-gray-69);
+  --color-mb-btn-loading: var(--mb-btn-loading);
 }
 
 /* Light mode design tokens (default) */
@@ -154,9 +159,10 @@
   --sub-text: #4e4e4e;
   --secondary-text: #7989ba;
 
-  --success: #7af4cb;
-  --error: #ff8e97;
+  --success: #00ff2f;
+  --error: #ff5562;
   --greyed: #696969;
+  --admin-warning: #ffe8d0;
 
   --status-close: #8eeaff;
   --status-end: #a5b7ff;
@@ -226,6 +232,7 @@
   --mb-summary-token-card: #ccd6f6;
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
+  --mb-btn-loading: #c2cdf5;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -301,6 +308,7 @@
   --mb-submit-border: #7452ff;
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
+  --mb-btn-loading: #c2cdf5;
 }
 
 @layer base {
@@ -317,6 +325,7 @@
   [role="button"]:not(:disabled) {
     cursor: pointer;
   }
+
   button:disabled,
   [role="button"]:disabled {
     cursor: not-allowed;

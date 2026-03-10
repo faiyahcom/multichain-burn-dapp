@@ -112,7 +112,7 @@ export const getTokenProgramFromAssetType = (
         case AssetTypeEnum.SPL2022:
             return TOKEN_2022_PROGRAM_ID;
         case AssetTypeEnum.NATIVE:
-            return NATIVE_MINT; // or NATIVE_MINT_2022
+            return TOKEN_PROGRAM_ID; // Wrapped SOL (NATIVE_MINT) is an SPL token owned by TOKEN_PROGRAM_ID
         default:
             throw new Error("Invalid asset type");
     }

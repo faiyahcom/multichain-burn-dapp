@@ -18,7 +18,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { useState } from "react";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import type { WhitelistUser } from "@/services/whitelistUserService";
 
 const editUserSchema = z.object({
@@ -169,12 +169,14 @@ const AdminWhitelistUserDialogEdit: React.FC<Props> = ({
                         <AnimateIconButton
                             variant="letter-icon"
                             iconLetter="S"
-                            text={isLoading ? "Saving..." : "Save Changes"}
+                            text="Save Changes"
                             color="#9072f9"
                             textVariant="text-self-center"
                             classNames={{
                                 btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
                             }}
+                            isLoading={isLoading}
+                            isLoadingText="Saving..."
                             btnProps={{
                                 type: "submit",
                                 disabled: isLoading,

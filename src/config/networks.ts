@@ -3,6 +3,8 @@
 import {
   sepolia,
   solanaDevnet,
+  bscTestnet,
+  xphereTestnet,
   type AppKitNetwork,
 } from "@reown/appkit/networks";
 
@@ -24,54 +26,14 @@ export type NetworkConfig = {
   iconSrc: string;
   color: string;
   shortLabel: string;
+  /** Base URL for the block explorer, e.g. "https://sepolia.etherscan.io" */
+  scanUrl: string;
 };
 
-/**
- * Custom EVM Networks
- */
-
-// 🔵 Binance Testnet (BSC Testnet)
-export const bscTestnet: AppKitNetwork = {
-  id: 97,
-  name: "BSC Testnet",
-  nativeCurrency: {
-    name: "BNB",
-    symbol: "tBNB",
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: {
-      http: ["https://data-seed-prebsc-1-s1.binance.org:8545"],
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "BscScan",
-      url: "https://testnet.bscscan.com",
-    },
-  },
-};
-
-// 🔴 Xphere Testnet (⚠️ replace with real RPC)
-export const xphereTestnet: AppKitNetwork = {
-  id: 12345, // 🔥 replace with real chainId
-  name: "Xphere Testnet",
-  nativeCurrency: {
-    name: "XPH",
-    symbol: "XPH",
-    decimals: 18,
-  },
-  rpcUrls: {
-    default: {
-      http: ["https://rpc-testnet.xphere.network"], // 🔥 replace if needed
-    },
-  },
-  blockExplorers: {
-    default: {
-      name: "Xphere Explorer",
-      url: "https://explorer-testnet.xphere.network",
-    },
-  },
+export type nativeCurrency = {
+  decimals: number;
+  name: string;
+  symbol: string;
 };
 
 export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
@@ -84,6 +46,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/ethereum.png",
     color: "#5779FE",
     shortLabel: "ETH",
+    scanUrl: "https://sepolia.etherscan.io",
   },
   {
     id: "binanceTestnet",
@@ -94,6 +57,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/binance.png",
     color: "#f9b845",
     shortLabel: "BNB",
+    scanUrl: "https://testnet.bscscan.com",
   },
   {
     id: "xphereTestnet",
@@ -104,6 +68,7 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
     shortLabel: "XPH",
+    scanUrl: "https://explorer.xphere.io",
   },
   {
     id: "solanaDevnet",
@@ -114,21 +79,26 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     iconSrc: "/network/solana.png",
     color: "#b07be0",
     shortLabel: "SOL",
+    scanUrl: "https://explorer.solana.com",
   },
 ];
 
 export const networkIdToChainId = (networkId: string): string | undefined => {
-  return NETWORK_CONFIGS.find(
-    (config) => config.id === networkId,
-  )?.backendChainId;
+  return NETWORK_CONFIGS.find((config) => config.id === networkId)
+    ?.backendChainId;
 };
 
 export const chainIdToNetworkConfig = (
   chainId: string,
 ): NetworkConfig | undefined => {
-  return NETWORK_CONFIGS.find(
-    (config) => config.backendChainId === chainId,
-  );
+  return NETWORK_CONFIGS.find((config) => config.backendChainId === chainId);
+};
+
+export const getDecimalsTokenNativeByChainId = (
+  chainId: string | number,
+): nativeCurrency => {
+  const networkConfig = chainIdToNetworkConfig(String(chainId));
+  return networkConfig?.appKitNetwork.nativeCurrency as nativeCurrency;
 };
 
 export const evmAppkitNetworks = [sepolia, bscTestnet, xphereTestnet];

@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import {
@@ -7,8 +7,8 @@ import {
     getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS } from "@/web3";
+import { ZERO_ADDRESS } from "@/config/constant";
 
-const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export interface DepositRewardParams {
     poolAddress: string;

@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { toast } from "sonner";
-import { PublicKey } from "@solana/web3.js";
+import { toast } from "@/components/common/custom-toast";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     useAppKitConnection,
@@ -8,10 +8,8 @@ import {
 } from "@reown/appkit-adapter-solana/react";
 import {
     getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
-    TOKEN_2022_PROGRAM_ID,
+    createAssociatedTokenAccountInstruction,
     ASSOCIATED_TOKEN_PROGRAM_ID,
-    getMint
 } from "@solana/spl-token";
 import { BN } from "bn.js";
 import {
@@ -22,6 +20,7 @@ import {
     getFactoryPDA,
     getRewardVaultPDA,
     detectAssetType,
+    getTokenProgramFromAssetType,
     AssetTypeEnum,
 } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
@@ -64,10 +63,6 @@ export const useDepositRewardSolFn = () => {
                 const { rewardTokenDecimals, assetTypeReward, rewardToken } =
                     poolDetail.pool;
 
-                // const rewardTokenInfo = await getMint(connection, new PublicKey(rewardToken), undefined, TOKEN_2022_PROGRAM_ID);
-                // console.log("Onchain reward token decimals:", rewardTokenInfo.decimals);
-                // console.log("Reward token decimals:", amountStr, rewardTokenDecimals, assetTypeReward, rewardToken);
-
                 const amountBN = new BN(
                     toBaseUnits(amountStr, rewardTokenDecimals).toString(),
                 );
@@ -77,6 +72,7 @@ export const useDepositRewardSolFn = () => {
                 let signature: string;
 
                 if (isNativeReward) {
+                    // Contract handles native SOL transfer internally
                     const tx = await program.methods
                         .depositRewardNative(amountBN)
                         .accounts({
@@ -104,14 +100,9 @@ export const useDepositRewardSolFn = () => {
                     const rewardMint = new PublicKey(rewardToken);
                     const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
 
-                    const rewardAssetType = await detectAssetType(
-                        connection,
-                        rewardMint,
-                    );
-                    const rewardTokenProgram =
-                        rewardAssetType === AssetTypeEnum.SPL2022
-                            ? TOKEN_2022_PROGRAM_ID
-                            : TOKEN_PROGRAM_ID;
+                    // Detect correct token program for the reward mint
+                    const rewardAssetType = await detectAssetType(connection, rewardMint);
+                    const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
 
                     const ownerRewardAta = await getAssociatedTokenAddress(
                         rewardMint,
@@ -120,8 +111,6 @@ export const useDepositRewardSolFn = () => {
                         rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
-
-                    console.log("amountBN", amountBN.toString());
 
                     const tx = await program.methods
                         .depositRewardSpl(amountBN)
@@ -133,8 +122,25 @@ export const useDepositRewardSolFn = () => {
                             rewardMint,
                             ownerRewardAta,
                             rewardTokenProgram,
+                            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                            systemProgram: SystemProgram.programId,
                         })
                         .transaction();
+
+                    // Create ownerRewardAta if it doesn't exist yet
+                    const ataInfo = await connection.getAccountInfo(ownerRewardAta);
+                    if (!ataInfo) {
+                        tx.instructions.unshift(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                ownerRewardAta,
+                                walletPublicKey,
+                                rewardMint,
+                                rewardTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
 
                     const { blockhash, lastValidBlockHeight } =
                         await connection.getLatestBlockhash();

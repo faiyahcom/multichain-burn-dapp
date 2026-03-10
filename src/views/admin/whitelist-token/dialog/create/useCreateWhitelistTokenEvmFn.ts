@@ -13,7 +13,7 @@ import { multicall, sendCalls, waitForCallsStatus } from "@wagmi/core";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import type { Abi, Address, Hex } from "viem";
 
 export const useCreateWhitelistTokenEvmFn = () => {
@@ -47,7 +47,7 @@ export const useCreateWhitelistTokenEvmFn = () => {
           swapFactoryContract.interface.encodeFunctionData("whitelistToken", [
             tokenAddress,
           ]);
-          
+
         const setBurnTokenWhitelistData =
           burnFactoryContract.interface.encodeFunctionData(
             "setTokenWhitelist",

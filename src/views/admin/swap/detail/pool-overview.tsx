@@ -1,0 +1,161 @@
+import { useMemo } from "react";
+import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
+import type { PoolDetailResponse } from "@/types/pool";
+import { useGetWhitelistTokens } from "@/services/queries/queries";
+import NetworkIcon from "@/components/layout/header/network-icon";
+import { truncateString } from "@/utils/helpers/string";
+import CopyableText from "@/components/common/copyable-text";
+import { toCleanRatio } from "@/views/swap-pool/detail/pool-overview";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import TokenImage from "@/components/common/token-image";
+
+type Props = {
+    poolDetail?: PoolDetailResponse;
+};
+
+const PoolOverview = ({ poolDetail }: Props) => {
+    const { data: whitelistTokens } = useGetWhitelistTokens();
+    const burnToken = whitelistTokens?.whitelistTokens?.find(
+        (token) => token.address === poolDetail?.pool.tokenIn,
+    );
+    const rewardToken = whitelistTokens?.whitelistTokens?.find(
+        (token) => token.address === poolDetail?.pool.rewardToken,
+    );
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.pool.tokenInSymbol,
+        whitelistToken: burnToken,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.pool.rewardTokenSymbol,
+        whitelistToken: rewardToken,
+    });
+    const rows = useMemo(() => {
+        if (!poolDetail) return [];
+
+        const cleanRatio = toCleanRatio(
+            poolDetail.pool.rewardDenominator,
+            poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
+        );
+
+        return [
+            [
+                {
+                    label: "Owner address",
+                    value: (
+                        <CopyableText
+                            classNames={{
+                                container: "inline-flex items-center gap-2",
+                                displayText: "text-xl",
+                            }}
+                            content={poolDetail?.pool.owner}
+                            displayText={truncateString({
+                                str: poolDetail?.pool.owner || "",
+                            })}
+                        />
+                    ),
+                },
+            ],
+            [
+                { label: "Pool Type", value: "Swap Pool" },
+                {
+                    label: "Network",
+                    value: (
+                        <div className="flex items-center gap-2">
+                            <NetworkIcon networkId={network?.id || ("" as NetworkId)} />
+                            <span>{network?.label}</span>
+                        </div>
+                    ),
+                },
+            ],
+            [
+                { label: "Ratio", value: cleanRatio },
+                {
+                    label: "Burn Token",
+                    // value: `${poolDetail.pool.tokenInSymbol}`,
+                    value: (
+                        <div className="flex items-center gap-2">
+                            <TokenImage
+                                src={burnTokenDisplay.imageUri}
+                                alt={burnTokenDisplay.name}
+                                classNames={{
+                                    common: "size-6",
+                                    img: "size-6",
+                                    placeholder: "size-6",
+                                }}
+                            />
+                            <span>{burnTokenDisplay.symbol}</span>
+                        </div>
+                    ),
+                },
+            ],
+            [
+                { label: "Burn Method", value: "Transfer to Maker" },
+                {
+                    label: "Reward Token",
+                    value: (
+                        <div className="flex items-center gap-2">
+                            <TokenImage
+                                src={rewardTokenDisplay.imageUri}
+                                alt={rewardTokenDisplay.name}
+                                classNames={{
+                                    common: "size-6",
+                                    img: "size-6",
+                                    placeholder: "size-6",
+                                }}
+                            />
+                            <span>{rewardTokenDisplay.symbol}</span>
+                        </div>
+                    ),
+                },
+            ],
+        ];
+    }, [burnTokenDisplay, network, poolDetail, rewardTokenDisplay]);
+
+    return (
+        <div className="mt-3 w-full py-4">
+            <div className="mb-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <div className="h-1.5 w-1.5 bg-black" />
+                    <span className="text-xl font-medium">Pool Overview</span>
+                </div>
+                {/* <p className="text-[13px] text-greyed">
+                    {poolDetail?.pool.timeStart && poolDetail?.pool.timeEnd
+                        ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
+                            Number(poolDetail.pool.timeEnd) * 1000,
+                        ).toLocaleDateString()}`
+                        : "No time limit"}
+                </p> */}
+            </div>
+
+            <div className="space-y-2">
+                {rows.map((row, rowIndex) => (
+                    <div className="grid grid-cols-2 space-x-2" key={rowIndex}>
+                        <div className="grid grid-cols-2">
+                            <span className="text-xl text-greyed">{row[0]?.label}:</span>
+                            <span className="text-xl break-all text-black">
+                                {row[0]?.value}
+                            </span>
+                        </div>
+                        {row[1] && (
+                            <div className="grid grid-cols-2">
+                                <span className="text-xl text-greyed">{row[1]?.label}:</span>
+                                <span className="text-xl break-all text-black">
+                                    {row[1]?.value}
+                                </span>
+                            </div>
+                        )}
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+export default PoolOverview;

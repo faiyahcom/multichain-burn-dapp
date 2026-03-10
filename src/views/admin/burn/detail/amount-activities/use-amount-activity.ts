@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
@@ -23,6 +23,7 @@ import { useAdminRejectPoolEvmFn } from "./hooks/useAdminRejectPoolEvmFn";
 import { useAdminRejectPoolSolFn } from "./hooks/useAdminRejectPoolSolFn";
 import { useAdminClosePoolEvmFn } from "./hooks/useAdminClosePoolEvmFn";
 import { useAdminClosePoolSolFn } from "./hooks/useAdminClosePoolSolFn";
+import { poolService } from "@/services/poolService";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -56,6 +57,8 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const [depositRewardOpen, setDepositRewardOpen] = useState(false);
     const [depositBurnInput, setDepositBurnInput] = useState("");
     const [depositBurnOpen, setDepositBurnOpen] = useState(false);
+    // ── Transfer dialog state ──────────────────────────────────
+    const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
     const pool = poolDetail?.pool;
     const userAmount = poolDetail?.userAmount;
@@ -148,12 +151,12 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const handleClaim = async () => {
+    const handleClaim = async (userAddress?: string) => {
         if (!pool?.address) return;
         if (isSolana && poolDetail) {
             await claimBurnSol({ poolAddress: pool.address, poolDetail });
         } else {
-            await claimBurnReward({ poolAddress: pool.address });
+            await claimBurnReward({ poolAddress: pool.address, userAddress });
         }
         invalidatePoolQueries(pool.address);
     };
@@ -192,12 +195,15 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const handleAdminClose = async () => {
+    const handleAdminClose = async (reason?: string) => {
         if (!pool?.address) return;
         if (isSolana && poolDetail) {
             await adminClosePoolSol({ poolAddress: pool.address, poolDetail });
         } else {
             await adminClosePoolEvm({ poolAddress: pool.address });
+        }
+        if (reason?.trim()) {
+            await poolService.postReasonClosePool(pool.address, reason);
         }
         invalidatePoolQueries(pool.address);
     };
@@ -221,6 +227,9 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         setDepositBurnInput,
         depositBurnOpen,
         setDepositBurnOpen,
+        // transfer dialog
+        transferDialogOpen,
+        setTransferDialogOpen,
         // action handlers
         handleCancelPool,
         handleRequestApprove,
@@ -233,5 +242,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         handleAdminApprove,
         handleAdminReject,
         handleAdminClose,
+        // util
+        invalidatePoolQueries,
     };
 };

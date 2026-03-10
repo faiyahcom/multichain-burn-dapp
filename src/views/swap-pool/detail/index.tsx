@@ -3,13 +3,12 @@ import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
 import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
-import { truncateString } from "@/utils/helpers/string";
 import AmountAndActivity from "./amount-activity";
-import { IconGoTo } from "@/assets/react";
 import { SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { SwapPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
+import ScanLink from "@/components/common/scan-link";
 
 type Props = {
     address: string;
@@ -45,9 +44,7 @@ const SwapPoolDetail = ({ address }: Props) => {
                         }}
                     />
                 </div>
-                <span className="flex items-baseline gap-3.5 text-base text-greyed">
-                    {truncateString({ str: poolDetail?.pool.address ?? '' })} <IconGoTo />
-                </span>
+                <ScanLink address={poolDetail?.pool.address ?? ''} chainId={poolDetail?.pool.chainId} />
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">

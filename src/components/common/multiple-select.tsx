@@ -21,13 +21,14 @@ interface Props {
   options?: MultipleSelectOption[];
   selected?: string[];
   onChange?: (value: string[]) => void;
-  placeholder?: string;
-  placeholderMultiple?: string;
+  placeholder?: string; // Usually the label of the category filtering, like "Network", "Status", etc.
+  placeholderMultiple?: string; // This is for when the placeholder has a special plural form. This is used when all is selected. If not provided, it will be "All {placeholder}s"
   showIconsInTriggerIfAny?: boolean;
   classNames?: {
     btn?: string;
     content?: string;
   };
+  defaultValuesWhenUncheckAll?: string[]; // By default, "clear" like action will result in an empty array. This will override that behavior.
 }
 
 const MultipleSelect: React.FC<Props> = ({
@@ -38,26 +39,41 @@ const MultipleSelect: React.FC<Props> = ({
   placeholderMultiple = "",
   showIconsInTriggerIfAny = true,
   classNames,
+  defaultValuesWhenUncheckAll,
 }) => {
   const isAllSelected =
     options && options.length > 0 && selected?.length === options.length;
   const isAnySelected = (selected?.length ?? 0) > 0;
-  const atLeastOneIcon =
+  const showIcon =
     showIconsInTriggerIfAny && options?.some((option) => option.icon);
-  const selectedLabels = selected?.map(
-    (value) => options?.find((option) => option.value === value)?.label,
-  ).filter(Boolean);
+  const selectedLabels = selected
+    ?.map((value) => options?.find((option) => option.value === value)?.label)
+    .filter(Boolean);
+
+  // "All Tokens" label — use placeholderMultiple if provided, else just placeholder
+  // (avoids "All All Tokens" when placeholder already says "All Tokens")
+  const allLabel = placeholderMultiple
+    ? placeholderMultiple
+    : `All ${placeholder}s`;
 
   const handleToggleAllCheck = () => {
     if (selected?.length === options?.length) {
-      onChange?.([]);
+      if (defaultValuesWhenUncheckAll) {
+        onChange?.(defaultValuesWhenUncheckAll);
+      } else {
+        onChange?.([]);
+      }
     } else {
       onChange?.(options?.map((option) => option.value) ?? []);
     }
   };
 
   const handleClearAllCheck = () => {
-    onChange?.([]);
+    if (defaultValuesWhenUncheckAll) {
+      onChange?.(defaultValuesWhenUncheckAll);
+    } else {
+      onChange?.([]);
+    }
   };
 
   const handleToggleCheck = (value?: string) => {
@@ -85,33 +101,26 @@ const MultipleSelect: React.FC<Props> = ({
         >
           <div className="size-2.5" />
           {isAnySelected ? (
-            atLeastOneIcon ? (
-              <div className="flex items-center gap-1.75">
+            <div className="flex min-w-0 items-center gap-1.75">
+              {showIcon && (
                 <SelectedIcons
                   icons={options
                     ?.filter((option) => selected?.includes(option.value))
                     ?.map((option) => option.icon)
                     ?.filter((icon) => icon !== undefined)}
                 />
-                {isAllSelected && (
-                  <span>
-                    All{" "}
-                    {placeholderMultiple
-                      ? placeholderMultiple
-                      : `${placeholder}s`}
-                  </span>
-                )}
-              </div>
-            ) : (
-              <span className="truncate">
-                {isAllSelected
-                  ? `All ${placeholderMultiple ? placeholderMultiple : `${placeholder}s`}`
-                  : options
-                      ?.filter((option) => selected?.includes(option.value))
-                      ?.map((option) => option.label)
-                      ?.join(", ")}
-              </span>
-            )
+              )}
+              {isAllSelected ? (
+                <span>{allLabel}</span>
+              ) : (
+                <span className="min-w-0 truncate">
+                  {options
+                    ?.filter((option) => selected?.includes(option.value))
+                    ?.map((option) => option.label)
+                    ?.join(", ")}
+                </span>
+              )}
+            </div>
           ) : (
             placeholder
           )}{" "}
@@ -135,7 +144,7 @@ const MultipleSelect: React.FC<Props> = ({
         */}
         <div className="max-h-[calc(var(--radix-popover-content-available-height)-var(--spacing)*21)] space-y-1 overflow-y-auto">
           <OptionItem
-            label={`All ${placeholder}`}
+            label={allLabel}
             value=""
             checked={isAllSelected}
             toggleCheck={handleToggleAllCheck}
@@ -211,11 +220,16 @@ interface SelectedIconsProps {
 const SelectedIcons: React.FC<SelectedIconsProps> = ({ icons }) => {
   const count = icons?.length ?? 0;
 
+  if (count === 0) return null;
+
   return (
     <div className="flex items-center">
       {count < 5 ? (
         icons?.map((Icon, index) => (
-          <Icon key={index} className="-ml-1.25 size-5.25" />
+          <Icon
+            key={index}
+            className={cn("-ml-1.25 size-5.25", { "ml-0": count === 1 })}
+          />
         ))
       ) : (
         <>

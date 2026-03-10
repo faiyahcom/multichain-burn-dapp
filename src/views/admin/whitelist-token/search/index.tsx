@@ -1,19 +1,16 @@
-import type { MultipleSelectOption } from "@/components/common/multiple-select";
-import MultipleSelect from "@/components/common/multiple-select";
-import NetworkImgIcon from "@/components/common/network-img-icon";
+import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { whitelistService } from "@/services/whitelistService";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
 import {
   tokenStatus,
   tokenStatusLabels,
   type TokenStatus,
 } from "@/types/admin/whitelist-token";
+import { useQuery } from "@tanstack/react-query";
 import AdminWhitelistTokenDialogCreate from "../dialog/create";
 import AdminWhitelistTokenSearchStatusPicker from "./status-picker";
-import { useQuery } from "@tanstack/react-query";
-import { whitelistQueryKeys } from "@/services/queries/queryKey";
-import { whitelistService } from "@/services/whitelistService";
 
 const AdminWhitelistTokenSearch = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
@@ -21,19 +18,6 @@ const AdminWhitelistTokenSearch = () => {
     label: tokenStatusLabels[status],
     value: status,
   }));
-  const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map(
-    (network) => ({
-      label: network.label,
-      value: network.id,
-      icon: ({ className }: { className?: string }) => (
-        <NetworkImgIcon
-          src={network.iconSrc}
-          className={className}
-          alt={network.label}
-        />
-      ),
-    }),
-  );
 
   const { data: summaryData } = useQuery({
     queryKey: whitelistQueryKeys.summary(),
@@ -70,9 +54,7 @@ const AdminWhitelistTokenSearch = () => {
           }}
         />
         <div className="flex items-center gap-3">
-          <MultipleSelect
-            options={networkOptions}
-            placeholder="Network"
+          <NetworkMultipleSelect
             selected={filter.network}
             onChange={(value) => setFilter({ network: value })}
           />

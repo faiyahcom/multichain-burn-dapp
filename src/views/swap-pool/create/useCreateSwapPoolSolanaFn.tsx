@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { toast } from "sonner";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { toast } from "@/components/common/custom-toast";
+import { PublicKey, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     useAppKitConnection,
@@ -10,6 +10,7 @@ import {
     createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     getMint,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import {
     getMultichainBurnProgram,
@@ -23,6 +24,7 @@ import {
     getFactoryPDA,
     detectAssetType,
     getTokenProgramFromAssetType,
+    AssetTypeEnum,
 } from "@/web3/helpers";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 
@@ -61,28 +63,7 @@ export const useCreateSwapPoolSolanaFn = () => {
                 const program = getMultichainBurnProgram(connection, anchorWallet);
 
                 // =============================
-                // 1️⃣ Derive ATA
-                // =============================
-                const ownerRewardAta = await getAssociatedTokenAddress(
-                    params.rewardMint,
-                    walletPublicKey,
-                );
-
-                const ataInfo = await connection.getAccountInfo(ownerRewardAta);
-
-                // =============================
-                // 2️⃣ Derive PDAs
-                // =============================
-                const factoryPDA = getFactoryPDA(program.programId);
-                // @ts-ignore
-                const factory = await program.account.factoryAccount.fetch(factoryPDA);
-                const treasuryPubkey = factory.treasury;
-                const poolPDA = getPoolPDA(factory.poolCount, program.programId);
-                const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
-                const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
-
-                // =============================
-                // 3️⃣ Detect token types
+                // 1️⃣ Detect token types
                 // =============================
                 const rewardAssetType = await detectAssetType(
                     connection,
@@ -100,9 +81,38 @@ export const useCreateSwapPoolSolanaFn = () => {
                 const depositTokenProgramId =
                     getTokenProgramFromAssetType(depositAssetType);
 
-                const rewardMintInfo = await getMint(connection, params.rewardMint);
+                const rewardMintInfo = await getMint(
+                    connection,
+                    params.rewardMint,
+                    undefined,
+                    rewardTokenProgramId!,
+                );
                 const rewardDecimals = rewardMintInfo.decimals;
                 console.log("rewardDecimals", rewardDecimals);
+
+                // =============================
+                // 2️⃣ Derive reward ATA
+                // =============================
+                const ownerRewardAta = await getAssociatedTokenAddress(
+                    params.rewardMint,
+                    walletPublicKey,
+                    false,
+                    rewardTokenProgramId!,
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                );
+
+                const ataInfo = await connection.getAccountInfo(ownerRewardAta);
+
+                // =============================
+                // 3️⃣ Derive PDAs
+                // =============================
+                const factoryPDA = getFactoryPDA(program.programId);
+                // @ts-ignore
+                const factory = await program.account.factoryAccount.fetch(factoryPDA);
+                const treasuryPubkey = factory.treasury;
+                const poolPDA = getPoolPDA(factory.poolCount, program.programId);
+                const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
+                const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
 
                 // =============================
                 // 4️⃣ Pool Config
@@ -112,17 +122,84 @@ export const useCreateSwapPoolSolanaFn = () => {
                 const ratioDenominator = params.ratioNumerator * ratioExtraDecimal;
 
                 const timeStart = Math.floor(Date.now() / 1000);
-                // This pool start like forever
-                const timeEnd = 9999999999; // timestamp max
+                const timeEnd = 9999999999; // max timestamp
 
                 // =============================
-                // 5️⃣ Build createPool TX (Anchor)
+                // 4.5 Balance check
+                //   → native (SOL): check native SOL balance — contract handles transfer internally
+                //   → SPL / SPL-2022: check ATA balance, create ATA if absent
                 // =============================
                 const rewardAmountInSmallestUnits = toBaseUnits(
                     params.rewardAmount.toString(),
                     rewardDecimals,
                 );
 
+                const isRewardNative = rewardAssetType === AssetTypeEnum.NATIVE;
+
+                // Pre-tx instructions (ATA creation for SPL only)
+                const prependIxs: TransactionInstruction[] = [];
+
+                if (isRewardNative) {
+                    // Contract does system_program::transfer internally for NATIVE.
+                    // But it still requires owner_reward_ata to be initialized (AccountNotInitialized).
+                    // Create the wSOL ATA if it doesn't exist — but don't fund it.
+                    if (!ataInfo) {
+                        prependIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                ownerRewardAta,
+                                walletPublicKey,
+                                params.rewardMint,
+                                rewardTokenProgramId!,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+
+                    // Verify the user has enough native SOL for the reward budget
+                    const nativeSolBalance = await connection.getBalance(walletPublicKey);
+                    const requiredLamports = rewardAmountInSmallestUnits.toNumber();
+                    if (nativeSolBalance < requiredLamports) {
+                        throw new Error(
+                            `Insufficient SOL balance. Required: ${params.rewardAmount} SOL, ` +
+                            `Available: ${(nativeSolBalance / 1e9).toFixed(6)} SOL`,
+                        );
+                    }
+                } else {
+                    // SPL / SPL-2022 — check ATA balance, create ATA if absent
+                    if (ataInfo) {
+                        const tokenBalance = await connection.getTokenAccountBalance(ownerRewardAta);
+                        const walletBalanceBN = new BN(tokenBalance.value.amount);
+                        if (walletBalanceBN.lt(rewardAmountInSmallestUnits)) {
+                            throw new Error(
+                                `Insufficient reward token balance. ` +
+                                `Required: ${params.rewardAmount}, ` +
+                                `Available: ${tokenBalance.value.uiAmountString ?? "0"}`,
+                            );
+                        }
+                    } else {
+                        if (params.rewardAmount > 0) {
+                            throw new Error(
+                                `Insufficient reward token balance. Required: ${params.rewardAmount}, Available: 0`,
+                            );
+                        }
+                        // ATA missing but rewardAmount = 0 — create it
+                        prependIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                ownerRewardAta,
+                                walletPublicKey,
+                                params.rewardMint,
+                                rewardTokenProgramId!,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+                }
+
+                // =============================
+                // 5️⃣ Build createPool TX (Anchor)
+                // =============================
                 const tx = await program.methods
                     .createPool({
                         projectOwner: walletPublicKey,
@@ -149,21 +226,15 @@ export const useCreateSwapPoolSolanaFn = () => {
                         rewardTokenProgram: rewardTokenProgramId!,
                         depositTokenProgram: depositTokenProgramId!,
                         ownerRewardAta,
+                        associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                     })
                     .transaction();
 
                 // =============================
-                // 6️⃣ If ATA doesn't exist → prepend instruction
+                // 6️⃣ Prepend pre-tx instructions (SPL ATA creation only)
                 // =============================
-                if (!ataInfo) {
-                    tx.instructions.unshift(
-                        createAssociatedTokenAccountInstruction(
-                            walletPublicKey,
-                            ownerRewardAta,
-                            walletPublicKey,
-                            params.rewardMint,
-                        ),
-                    );
+                if (prependIxs.length > 0) {
+                    tx.instructions.unshift(...prependIxs);
                 }
 
                 // =============================

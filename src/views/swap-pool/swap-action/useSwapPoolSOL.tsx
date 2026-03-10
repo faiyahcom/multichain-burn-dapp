@@ -7,6 +7,9 @@ import {
     getRewardVaultPDA,
     getDepositVaultPDA,
     getUserDepositPDA,
+    detectAssetType,
+    getTokenProgramFromAssetType,
+    AssetTypeEnum,
 } from "@/web3/helpers";
 import {
     useAppKitConnection,
@@ -15,11 +18,11 @@ import {
 import {
     getAssociatedTokenAddress,
     createAssociatedTokenAccountInstruction,
-    TOKEN_PROGRAM_ID,
+    ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useCallback } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { toBaseUnits } from "@/utils/helpers/numbers";
@@ -56,7 +59,6 @@ export const useSwapPoolSOL = () => {
                 // ===============================
                 // 1️⃣ PDAs
                 // ===============================
-
                 const factoryPDA = getFactoryPDA(program.programId);
 
                 // @ts-ignore
@@ -73,11 +75,9 @@ export const useSwapPoolSOL = () => {
                 );
 
                 const depositMintPubkey = new PublicKey(poolDetail.pool.tokenIn);
-
                 const rewardMintPubkey = new PublicKey(poolDetail.pool.rewardToken);
 
                 const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
-
                 const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
 
                 const targetAddressPubkey = new PublicKey(
@@ -85,109 +85,137 @@ export const useSwapPoolSOL = () => {
                 );
 
                 // ===============================
-                // 2️⃣ Derive ATAs
+                // 2️⃣ Detect token programs
                 // ===============================
+                const depositAssetType = await detectAssetType(connection, depositMintPubkey);
+                const rewardAssetType = await detectAssetType(connection, rewardMintPubkey);
 
+                const depositTokenProgram = getTokenProgramFromAssetType(depositAssetType)!;
+                const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
+
+                // ===============================
+                // 3️⃣ Derive ATAs with correct programs
+                // ===============================
                 const userDepositATA = await getAssociatedTokenAddress(
                     depositMintPubkey,
                     walletPublicKey,
+                    false,
+                    depositTokenProgram,
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
                 );
 
                 const userRewardATA = await getAssociatedTokenAddress(
                     rewardMintPubkey,
                     walletPublicKey,
+                    false,
+                    rewardTokenProgram,
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
                 );
 
                 const treasuryRewardATA = await getAssociatedTokenAddress(
                     rewardMintPubkey,
                     treasuryPubkey,
+                    false,
+                    rewardTokenProgram,
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
                 );
 
                 const targetDepositATA = await getAssociatedTokenAddress(
                     depositMintPubkey,
                     targetAddressPubkey,
+                    false,
+                    depositTokenProgram,
+                    ASSOCIATED_TOKEN_PROGRAM_ID,
                 );
 
                 // ===============================
-                // 3️⃣ Build transaction
+                // 4️⃣ Build transaction
                 // ===============================
-
                 const tx = new Transaction();
 
-                // Helper to auto-create ATA if missing
+                // Helper: create ATA only if it doesn't exist yet
                 const maybeCreateATA = async (
                     ata: PublicKey,
                     mint: PublicKey,
                     owner: PublicKey,
+                    tokenProgram: PublicKey,
                 ) => {
                     const accountInfo = await connection.getAccountInfo(ata);
-
                     if (!accountInfo) {
                         tx.add(
                             createAssociatedTokenAccountInstruction(
-                                walletPublicKey, // payer
+                                walletPublicKey,
                                 ata,
                                 owner,
                                 mint,
+                                tokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
                             ),
                         );
                     }
                 };
 
-                await maybeCreateATA(
-                    userDepositATA,
-                    depositMintPubkey,
-                    walletPublicKey,
-                );
-
-                await maybeCreateATA(userRewardATA, rewardMintPubkey, walletPublicKey);
-
-                await maybeCreateATA(
-                    treasuryRewardATA,
-                    rewardMintPubkey,
-                    treasuryPubkey,
-                );
-
-                await maybeCreateATA(
-                    targetDepositATA,
-                    depositMintPubkey,
-                    targetAddressPubkey,
-                );
+                // Only create SPL ATAs — native deposit handled via depositToPoolNative
+                if (depositAssetType !== AssetTypeEnum.NATIVE) {
+                    await maybeCreateATA(userDepositATA, depositMintPubkey, walletPublicKey, depositTokenProgram);
+                    await maybeCreateATA(targetDepositATA, depositMintPubkey, targetAddressPubkey, depositTokenProgram);
+                }
+                if (rewardAssetType !== AssetTypeEnum.NATIVE) {
+                    await maybeCreateATA(userRewardATA, rewardMintPubkey, walletPublicKey, rewardTokenProgram);
+                    await maybeCreateATA(treasuryRewardATA, rewardMintPubkey, treasuryPubkey, rewardTokenProgram);
+                }
 
                 // ===============================
-                // 4️⃣ Add deposit instruction
+                // 5️⃣ Add deposit instruction
                 // ===============================
+                const isNativeDeposit = depositAssetType === AssetTypeEnum.NATIVE;
 
-                const depositIx = await program.methods
-                    .depositToPoolSpl(
-                        toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals),
-                    )
-                    .accounts({
-                        user: walletPublicKey,
-                        treasury: treasuryPubkey,
-                        factory: factoryPDA,
-                        pool: poolPDA,
-                        rewardVault: rewardVaultPDA,
-                        depositVault: depositVaultPDA,
-                        rewardMint: rewardMintPubkey,
-                        depositMint: depositMintPubkey,
-                        userDepositAccount: userDepositATA,
-                        userRewardAccount: userRewardATA,
-                        treasuryRewardAccount: treasuryRewardATA,
-                        userDeposit: userDepositPDA,
-                        targetAccount: targetDepositATA,
-                        systemProgram: SystemProgram.programId,
-                        tokenProgram: TOKEN_PROGRAM_ID,
-                        ownerDepositAta: targetDepositATA,
-                    })
-                    .instruction();
+                let depositIx;
+                if (isNativeDeposit) {
+                    depositIx = await program.methods
+                        .depositToPoolNative(
+                            toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals),
+                        )
+                        .accounts({
+                            user: walletPublicKey,
+                            treasury: treasuryPubkey,
+                            factory: factoryPDA,
+                            pool: poolPDA,
+                            userDeposit: userDepositPDA,
+                        })
+                        .instruction();
+                } else {
+                    depositIx = await program.methods
+                        .depositToPoolSpl(
+                            toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals),
+                        )
+                        .accounts({
+                            user: walletPublicKey,
+                            treasury: treasuryPubkey,
+                            factory: factoryPDA,
+                            pool: poolPDA,
+                            rewardVault: rewardVaultPDA,
+                            depositVault: depositVaultPDA,
+                            rewardMint: rewardMintPubkey,
+                            depositMint: depositMintPubkey,
+                            userDepositAta: userDepositATA,
+                            userRewardAta: userRewardATA,
+                            treasuryAta: treasuryRewardATA,
+                            userDeposit: userDepositPDA,
+                            systemProgram: SystemProgram.programId,
+                            depositTokenProgram,
+                            rewardTokenProgram,
+                            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ownerDepositAta: targetDepositATA,
+                        })
+                        .instruction();
+                }
 
                 tx.add(depositIx);
 
                 // ===============================
-                // 5️⃣ Sign + Send
+                // 6️⃣ Sign + Send
                 // ===============================
-
                 const { blockhash, lastValidBlockHeight } =
                     await connection.getLatestBlockhash();
 

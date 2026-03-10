@@ -100,7 +100,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
                     {txns.map((tx) => {
                         const amount =
-                            tx.amountIn && tx.tokenInDecimals != null
+                            tx.amountIn && tx.amountIn.toString() !== "0" && tx.tokenInDecimals != null
                                 ? formatAmount(tx.amountIn, tx.tokenInDecimals)
                                 : tx.amountOut && tx.tokenOutDecimals != null
                                     ? formatAmount(tx.amountOut, tx.tokenOutDecimals)

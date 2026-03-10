@@ -1,6 +1,6 @@
 import { useCallback } from "react";
-import { toast } from "sonner";
-import { PublicKey } from "@solana/web3.js";
+import { toast } from "@/components/common/custom-toast";
+import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     useAppKitConnection,
@@ -8,8 +8,7 @@ import {
 } from "@reown/appkit-adapter-solana/react";
 import {
     getAssociatedTokenAddress,
-    TOKEN_PROGRAM_ID,
-    TOKEN_2022_PROGRAM_ID,
+    createAssociatedTokenAccountInstruction,
     ASSOCIATED_TOKEN_PROGRAM_ID,
 } from "@solana/spl-token";
 import { BN } from "bn.js";
@@ -23,6 +22,7 @@ import {
     getDepositVaultPDA,
     getUserDepositPDA,
     detectAssetType,
+    getTokenProgramFromAssetType,
     AssetTypeEnum,
 } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
@@ -91,6 +91,8 @@ export const useDepositBurnSolFn = () => {
                             factory: factoryPDA,
                             pool: poolPDA,
                             userDeposit: userDepositPDA,
+                            // @ts-ignore — optional account, null for burn pools (ratio_bps == 0)
+                            ownerAccount: null,
                         })
                         .transaction();
 
@@ -117,23 +119,12 @@ export const useDepositBurnSolFn = () => {
                         program.programId,
                     );
 
-                    const depositAssetType = await detectAssetType(
-                        connection,
-                        depositMint,
-                    );
-                    const depositTokenProgram =
-                        depositAssetType === AssetTypeEnum.SPL2022
-                            ? TOKEN_2022_PROGRAM_ID
-                            : TOKEN_PROGRAM_ID;
+                    // Detect correct token programs for each mint
+                    const depositAssetType = await detectAssetType(connection, depositMint);
+                    const depositTokenProgram = getTokenProgramFromAssetType(depositAssetType)!;
 
-                    const rewardAssetType = await detectAssetType(
-                        connection,
-                        rewardMint,
-                    );
-                    const rewardTokenProgram =
-                        rewardAssetType === AssetTypeEnum.SPL2022
-                            ? TOKEN_2022_PROGRAM_ID
-                            : TOKEN_PROGRAM_ID;
+                    const rewardAssetType = await detectAssetType(connection, rewardMint);
+                    const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
 
                     const userDepositAta = await getAssociatedTokenAddress(
                         depositMint,
@@ -176,8 +167,60 @@ export const useDepositBurnSolFn = () => {
                             treasuryAta,
                             rewardTokenProgram,
                             depositTokenProgram,
+                            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                            systemProgram: SystemProgram.programId,
+                            // @ts-ignore — optional account, null for burn pools
+                            ownerDepositAta: null,
                         })
                         .transaction();
+
+                    // Create missing ATAs before the deposit instruction
+                    const prependIxs = [];
+                    const [depositAtaInfo, rewardAtaInfo, treasuryAtaInfo] = await Promise.all([
+                        connection.getAccountInfo(userDepositAta),
+                        connection.getAccountInfo(userRewardAta),
+                        connection.getAccountInfo(treasuryAta),
+                    ]);
+
+                    if (!depositAtaInfo) {
+                        prependIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                userDepositAta,
+                                walletPublicKey,
+                                depositMint,
+                                depositTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+                    if (!rewardAtaInfo) {
+                        prependIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                userRewardAta,
+                                walletPublicKey,
+                                rewardMint,
+                                rewardTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+                    if (!treasuryAtaInfo) {
+                        prependIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                treasuryAta,
+                                treasuryPubkey,
+                                rewardMint,
+                                rewardTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+                    if (prependIxs.length > 0) {
+                        tx.instructions.unshift(...prependIxs);
+                    }
 
                     const { blockhash, lastValidBlockHeight } =
                         await connection.getLatestBlockhash();

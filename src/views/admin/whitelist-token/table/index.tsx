@@ -38,12 +38,13 @@ import { truncateString } from "@/utils/helpers/string";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { toast } from "sonner";
+import { toast } from "@/components/common/custom-toast";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
 import StatusSwitch from "./status-switch";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
 import TokenImage from "@/components/common/token-image";
+import TableNoData from "@/components/common/table-no-data";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
@@ -193,6 +194,11 @@ const AdminWhitelistTokenTable = () => {
               isLoading={isListTokensPending}
               colSpan={columns.length}
             />
+            <TableNoData
+              colSpan={columns.length}
+              data={listTokensData?.whitelistTokens}
+              isLoading={isListTokensPending}
+            />
             {listTokensData?.whitelistTokens?.map((item, index) => {
               const status = booleanToTokenStatus(item.enable);
 
@@ -200,7 +206,10 @@ const AdminWhitelistTokenTable = () => {
                 <TableRow key={index}>
                   <TableCell>
                     <div className="flex items-center gap-1.75 pl-[15%]">
-                      <TokenImage src={item.imageUri} alt={item.customName || item.name || "N/A"} />
+                      <TokenImage
+                        src={item.imageUri}
+                        alt={item.customName || item.name || "N/A"}
+                      />
                       <div className="text-left">
                         <p className="text-base">
                           {item.customName || item.name || "N/A"}

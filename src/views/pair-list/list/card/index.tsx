@@ -1,10 +1,12 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import InfoTooltip from "@/components/common/info-tooltip";
+import NoData from "@/components/common/no-data";
 import TokenImage from "@/components/common/token-image";
 import { Spinner } from "@/components/ui/spinner";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
 import { Link } from "@tanstack/react-router";
+import { formatUnits } from "ethers";
 
 interface Props {
   data?: PairItemType[];
@@ -20,6 +22,13 @@ const PairListListCardLayout: React.FC<Props> = ({ data, isLoading }) => {
         </div>
       )}
       <div className="grid w-full grid-cols-1 gap-x-8.5 gap-y-10.5 md:grid-cols-2 xl:grid-cols-3">
+        <NoData
+          isLoading={isLoading}
+          data={data}
+          classNames={{
+            container: "col-span-1 md:col-span-2 xl:col-span-3",
+          }}
+        />
         {data?.map((item, index) => (
           <CardItem key={index} {...item} />
         ))}
@@ -40,6 +49,8 @@ const CardItem: React.FC<PairItemType> = ({
   chainId,
   tokenIn,
   tokenOut,
+  tokenInDecimals,
+  tokenOutDecimals,
 }) => {
   return (
     <div
@@ -56,14 +67,8 @@ const CardItem: React.FC<PairItemType> = ({
         />
         <div className="absolute right-0 bottom-2 left-0">
           <div className="z-10 flex h-full w-full items-center gap-2.75 px-4.25 pt-0.75 pb-1 **:z-10">
+            {/* Client wants the order to be token out / token in, refers to MB-415 */}
             <div className="flex items-center gap-px">
-              <TokenImage
-                src={tokenInImageUri}
-                alt={tokenInSymbol}
-                classNames={{
-                  common: "size-5.75",
-                }}
-              />
               <TokenImage
                 src={tokenOutImageUri}
                 alt={tokenOutSymbol}
@@ -71,10 +76,17 @@ const CardItem: React.FC<PairItemType> = ({
                   common: "size-5.75",
                 }}
               />
+              <TokenImage
+                src={tokenInImageUri}
+                alt={tokenInSymbol}
+                classNames={{
+                  common: "size-5.75",
+                }}
+              />
             </div>
             <p className="text-xl font-semibold">
-              {tokenInSymbolCustom ?? tokenInSymbol}/
-              {tokenOutSymbolCustom ?? tokenOutSymbol}
+              {tokenOutSymbolCustom ?? tokenOutSymbol}/
+              {tokenInSymbolCustom ?? tokenInSymbol}
             </p>
           </div>
           <div className="absolute inset-0 z-0 h-full w-full bg-primary-foreground/50 backdrop-blur-[15px]" />
@@ -85,12 +97,14 @@ const CardItem: React.FC<PairItemType> = ({
         <CardInfoRow
           title="Volume"
           tooltipContent="The total value of burn tokens deposited by taker into Swap Pools and Burn Pools of the pair"
-          value={Number(volume) || 0}
+          value={Number(formatUnits(volume ?? 0, tokenInDecimals)) || 0}
+          unit={tokenInSymbolCustom ?? tokenInSymbol}
         />
         <CardInfoRow
           title="TVL"
           tooltipContent="The total amount of reward tokens deposited by all makers when creating Swap Pools and Burn Pools within the same pair."
-          value={Number(tvl) || 0}
+          value={Number(formatUnits(tvl ?? 0, tokenOutDecimals)) || 0}
+          unit={tokenOutSymbolCustom ?? tokenOutSymbol}
         />
       </div>
 
@@ -114,12 +128,14 @@ interface CardInfoRowProps {
   title: string;
   tooltipContent?: string;
   value: number;
+  unit?: string;
 }
 
 const CardInfoRow: React.FC<CardInfoRowProps> = ({
   title,
   tooltipContent,
   value,
+  unit,
 }) => {
   return (
     <div className="flex items-center justify-between gap-1">
@@ -136,7 +152,7 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
         <p className="min-w-0 truncate" title={value.toLocaleString("de-DE")}>
           {value.toLocaleString("de-DE")}
         </p>
-        <p>ETH</p>
+        <p>{unit}</p>
       </div>
     </div>
   );

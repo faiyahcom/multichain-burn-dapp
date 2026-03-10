@@ -20,6 +20,12 @@ type Props = {
     disabledAddress?: string;
 };
 
+const resolveSymbol = (token: { symbol: string; customSymbol?: string }) =>
+    token.customSymbol?.trim() || token.symbol;
+
+const resolveName = (token: { name: string; customName?: string }) =>
+    token.customName?.trim() || token.name;
+
 const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
 
@@ -63,7 +69,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
                                 src={selectedDetail.imageUri}
                                 alt={selectedDetail.name}
                             />
-                            <span>{`${selectedDetail.symbol} (${selectedDetail.name})`}</span>
+                            <span>{`${resolveSymbol(selectedDetail)} (${resolveName(selectedDetail)})`}</span>
                         </div>
                     ) : (
                         "Select Token"
@@ -137,10 +143,10 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
                                             className="size-7.75 rounded-full"
                                         />
                                         <div className="flex flex-col">
-                                            <span className="text-xs">{token.name}</span>
+                                            <span className="text-xs">{resolveName(token)}</span>
                                             <div className="flex gap-1.25">
                                                 <span className="text-[11px] font-normal text-secondary-text">
-                                                    {token.symbol}
+                                                    {resolveSymbol(token)}
                                                 </span>
                                                 <span className="text-tiny font-light text-secondary-text/80">
                                                     {truncateString({ str: token.address })}

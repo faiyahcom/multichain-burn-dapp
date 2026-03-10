@@ -278,6 +278,8 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                             icon: "size-8 text-xl",
                         }}
                         color="#966EFF"
+                        isLoading={isSubmitting}
+                        isLoadingText="Submitting..."
                         btnProps={{
                             type: "submit",
                             disabled: isSubmitting,

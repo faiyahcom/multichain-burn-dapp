@@ -18,35 +18,58 @@ export const POOL_KIND: Record<number, PoolKind> = {
     0: "burn_pool",
     1: "swap_pool",
 };
+interface TokenInfo {
+    address: string;
+    createdAt: string;
+    name: string;
+    symbol: string;
+    decimals: number;
+    enable: boolean;
+    chainId: string;
+    isDropped: boolean;
+    imageUri: string;
+    customName: string;
+    customSymbol: string;
+    description: string;
+    homepage: string;
+    whitepaper: string;
+}
 
 export interface PoolDetailResponse {
     userAmount: {
         address: string;
         deposited: string;
         claimed: string;
+        canClaim: boolean;
     };
     depositedAmount: string;
     claimedRewardAmount: string;
     rewardAmount: string;
+    tokenIn: TokenInfo;
+    tokenOut: TokenInfo;
     pool: {
         address: string;
         name: string;
         owner: string;
         rewardToken: string;
+        tokenIn: string;
+        pool_id: string;
         kind: number;
         chainId: string;
         timestamp: string;
         status: SwapPoolStatus | BurnPoolStatus;
         currentRewardAmount: string;
+        merkleRootStatus: string;
+        merkleRoot: string | null;
+        adminCloseReason: string;
         rewardTokenSymbol: string;
         rewardTokenDecimals: number;
         tokenInSymbol: string;
         tokenInDecimals: number;
-        burnToken: string;
-        targetVault: string;
+        burnToken?: string;
+        targetVault?: string;
         timeStart: string;
         timeEnd: string;
-        tokenIn: string;
         targetAddress: string;
         assetTypeReward: number;
         assetTypeIn: number;

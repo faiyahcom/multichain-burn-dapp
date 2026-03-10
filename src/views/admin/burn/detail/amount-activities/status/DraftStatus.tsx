@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, AmountInput } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
@@ -19,13 +20,30 @@ const DraftStatus = ({ poolDetail }: Props) => {
         handleRequestApprove,
     } = useAmountActivity(poolDetail);
 
+    const [activeAction, setActiveAction] = useState<"cancel" | "approve" | null>(null);
+    const isRunning = activeAction !== null;
+
+    const run = async (name: "cancel" | "approve", fn: () => Promise<void>) => {
+        setActiveAction(name);
+        try {
+            await fn();
+        } finally {
+            setActiveAction(null);
+        }
+    };
+
     return (
         <>
-            <ActionBtn letter="C" text="Cancel Pool" color="#FF8E97" onClick={handleCancelPool} />
+            <ActionBtn letter="C" text="Cancel Pool" color="#FF8E97"
+                isLoading={activeAction === "cancel"}
+                disabled={isRunning}
+                onClick={() => run("cancel", handleCancelPool)}
+            />
             <ActionBtn
                 letter="D"
                 text="Deposit Reward"
                 color="#FFC198"
+                disabled={isRunning}
                 onClick={() => setDepositRewardOpen((o) => !o)}
             />
             <AmountInput
@@ -35,8 +53,12 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 onConfirm={handleDepositReward}
                 placeholder={`Amount (${pool?.rewardTokenSymbol ?? ""})`}
             />
-            <ActionBtn letter="E" text="Edit" color="#7AF4CB" onClick={handleEdit} />
-            <ActionBtn letter="R" text="Request Approve" color="#A5B7FF" onClick={handleRequestApprove} />
+            <ActionBtn letter="E" text="Edit" color="#7AF4CB" disabled={isRunning} onClick={handleEdit} />
+            <ActionBtn letter="R" text="Request Approve" color="#A5B7FF"
+                isLoading={activeAction === "approve"}
+                disabled={isRunning}
+                onClick={() => run("approve", handleRequestApprove)}
+            />
         </>
     );
 };

@@ -38,7 +38,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                     </span>
                 </div>
             )} */}
-            <Button className="w-full" disabled>
+            <Button className="w-full rounded-sm" disabled>
                 Claim
             </Button>
             <ActionBtn
