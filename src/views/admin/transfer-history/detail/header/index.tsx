@@ -18,15 +18,13 @@ import {
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { DatePicker } from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { useSystemStore } from "@/stores/systemStore";
+import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { transferHistoryQueryKeys } from "@/services/queries/queryKey";
 import type { AnalysisItem, GetTransferAnalysisResponse } from "@/services/transferHistoryService";
 
@@ -188,13 +186,7 @@ const NetworkSelect = ({ value, onChange }: NetworkSelectProps) => {
 
 // ─── Main header ─────────────────────────────────────────────────────────────
 const AdminTransferHistoryHeader = () => {
-  const [selectedTokens, setSelectedTokens] = useState<string[]>([]);
-  const [selectedNetwork, setSelectedNetwork] = useState<string>("");
-  const [searchText, setSearchText] = useState<string>("");
-  const [amountMin, setAmountMin] = useState<string>("");
-  const [amountMax, setAmountMax] = useState<string>("");
-  const [dateFrom, setDateFrom] = useState<Date | undefined>();
-  const [dateTo, setDateTo] = useState<Date | undefined>();
+  const { filter, setFilter } = useAdminTransferHistoryFilterStore();
 
   // Use chainId from user's login/connected network
   const { selectedNetworkId } = useSystemStore();
@@ -217,7 +209,33 @@ const AdminTransferHistoryHeader = () => {
     return all.filter((x) => x.chainId === currentBackendChainId);
   }, [analysisData, currentBackendChainId]);
 
-  const tokenOptions: MultipleSelectOption[] = [];
+  const tokenOptions: MultipleSelectOption[] = useMemo(() => {
+    const items = filteredAnalysis.length > 0 ? filteredAnalysis : (analysisData?.analysis ?? []);
+    const uniq = new Map<string, string>();
+    items.forEach((x) => {
+      if (!uniq.has(x.tokenAddress)) uniq.set(x.tokenAddress, x.tokenSymbol);
+    });
+    return Array.from(uniq.entries()).map(([value, label]) => ({ value, label }));
+  }, [analysisData, filteredAnalysis]);
+
+  const tokenDecimalsByAddress = useMemo(() => {
+    const items = filteredAnalysis.length > 0 ? filteredAnalysis : (analysisData?.analysis ?? []);
+    const map = new Map<string, number>();
+    items.forEach((x) => map.set(x.tokenAddress, x.tokenDecimals));
+    return map;
+  }, [analysisData, filteredAnalysis]);
+
+  const dateFromValue = useMemo(() => {
+    if (!filter.dateFrom) return undefined;
+    const n = Number(filter.dateFrom);
+    return Number.isFinite(n) ? new Date(n) : undefined;
+  }, [filter.dateFrom]);
+
+  const dateToValue = useMemo(() => {
+    if (!filter.dateTo) return undefined;
+    const n = Number(filter.dateTo);
+    return Number.isFinite(n) ? new Date(n) : undefined;
+  }, [filter.dateTo]);
 
   return (
     <div className="space-y-4 pt-12.75 pr-13.5 ">
@@ -230,7 +248,7 @@ const AdminTransferHistoryHeader = () => {
       </div>
 
       {/* Stats cards */}
-      <div className="flex items-stretch space-y-0 gap-[5px] pl-[54px]">
+      <div className="flex items-stretch space-y-0 gap-[25px] pl-[54px]">
         {filteredAnalysis.map((item) => (
           <Dialog key={item.tokenAddress}>
             <DialogTrigger asChild>
@@ -322,16 +340,26 @@ const AdminTransferHistoryHeader = () => {
         <MultipleSelect
           options={tokenOptions}
           placeholder="All Tokens"
-          selected={selectedTokens}
-          onChange={setSelectedTokens}
+          selected={filter.tokens}
+          onChange={(tokens) =>
+            setFilter({
+              tokens,
+              tokenOutDecimals:
+                tokens.length === 1 ? (tokenDecimalsByAddress.get(tokens[0]) ?? null) : null,
+              page: 1,
+            })
+          }
         />
-        <NetworkSelect value={selectedNetwork} onChange={setSelectedNetwork} />
+        <NetworkSelect
+          value={filter.network}
+          onChange={(network) => setFilter({ network, page: 1 })}
+        />
         <SearchTextDebouncedInput
           inputProps={{
             placeholder: "Search by name, email, wallet address, or pool name",
           }}
-          value={searchText}
-          onValueChange={setSearchText}
+          value={filter.text}
+          onValueChange={(text) => setFilter({ text, page: 1 })}
           className="sm:max-w-80.75"
         />
       </div>
@@ -342,16 +370,16 @@ const AdminTransferHistoryHeader = () => {
         <Input
           type="number"
           placeholder="$ Min"
-          value={amountMin}
-          onChange={(e) => setAmountMin(e.target.value)}
+          value={filter.amountMin}
+          onChange={(e) => setFilter({ amountMin: e.target.value, page: 1 })}
           className="w-28 px-3"
         />
         <span className="text-sm text-secondary-text">to</span>
         <Input
           type="number"
           placeholder="$ Max"
-          value={amountMax}
-          onChange={(e) => setAmountMax(e.target.value)}
+          value={filter.amountMax}
+          onChange={(e) => setFilter({ amountMax: e.target.value, page: 1 })}
           className="w-28 px-3"
         />
       </div>
@@ -359,9 +387,17 @@ const AdminTransferHistoryHeader = () => {
       {/* Filters row 3: date range */}
       <div className="flex items-center gap-3 pl-[54px]">
         <span className="w-16 text-sm font-medium text-secondary-text">Date</span>
-        <DatePicker value={dateFrom} onChange={setDateFrom} className="w-48" />
+        <DatePicker
+          value={dateFromValue}
+          onChange={(d) => setFilter({ dateFrom: d ? String(d.getTime()) : "", page: 1 })}
+          className="w-48"
+        />
         <span className="text-sm text-secondary-text">to</span>
-        <DatePicker value={dateTo} onChange={setDateTo} className="w-48" />
+        <DatePicker
+          value={dateToValue}
+          onChange={(d) => setFilter({ dateTo: d ? String(d.getTime()) : "", page: 1 })}
+          className="w-48"
+        />
       </div>
     </div>
   );

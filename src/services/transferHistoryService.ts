@@ -22,6 +22,7 @@ export interface TransferRecord {
   chainId: string;
   tokenOut: string;
   tokenOutSymbol: string;
+  tokenOutDecimals?: number | null;
   amountOut: string;
   timestamp: string; // unix timestamp in milliseconds
   whitelistName: string | null;
@@ -52,13 +53,13 @@ export const transferHistoryService = {
       API_ROUTES.TRANSFER_HISTORY.LIST,
       { params },
     );
-    return response.data;
+    return response;
   },
 
   getAnalysis: async (): Promise<GetTransferAnalysisResponse> => {
     const response = await apiClient.get<GetTransferAnalysisResponse>(
       API_ROUTES.TRANSFER_HISTORY.ANALYSIS,
     );
-    return response.data;
+    return response;
   },
 };

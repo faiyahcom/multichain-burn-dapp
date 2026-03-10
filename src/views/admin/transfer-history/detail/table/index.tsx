@@ -20,9 +20,9 @@ import { type TransferRecord } from "@/services/transferHistoryService";
 import { transferHistoryQueryKeys } from "@/services/queries/queryKey";
 import { apiClient } from "@/config/axios";
 
-const LIMIT = 20;
+const LIMIT = 10;
 
-// ─── Decimals helper (used until API provides tokenOutDecimals) ────────────────
+// ─── Decimals helper (fallback when API doesn't provide decimals) ──────────────
 const SYMBOL_DECIMALS: Record<string, number> = {
   USDT: 6,
   USDC: 6,
@@ -32,10 +32,23 @@ const SYMBOL_DECIMALS: Record<string, number> = {
   WBTC: 8,
 };
 
-function formatTokenAmount(amountOut: string, symbol: string): string {
-  const decimals = SYMBOL_DECIMALS[symbol] ?? 18;
-  const value = Number(amountOut) / Math.pow(10, decimals);
+// Fallback for filters when token decimals can't be determined (e.g. no token selected)
+const DEFAULT_FILTER_DECIMALS = 6;
+
+function formatTokenAmount(amountOut: string, decimals?: number | null, symbol?: string): string {
+  const resolvedDecimals = decimals ?? (symbol ? SYMBOL_DECIMALS[symbol] : undefined) ?? 18;
+  const value = Number(amountOut) / Math.pow(10, resolvedDecimals);
   return value.toLocaleString("vi-VN", { maximumFractionDigits: 4 });
+}
+
+function humanAmountToRawString(amount: string, decimals: number): string {
+  const normalized = amount.trim().replace(",", ".");
+  if (!normalized) return "";
+  const [intPartRaw, fracPartRaw = ""] = normalized.split(".");
+  const intPart = (intPartRaw || "0").replace(/^0+(?=\d)/, "") || "0";
+  const fracPart = fracPartRaw.slice(0, decimals).padEnd(decimals, "0");
+  const digits = `${intPart}${fracPart}`.replace(/^0+(?=\d)/, "") || "0";
+  return BigInt(digits).toString();
 }
 
 type TransferHistoryApiTxn = {
@@ -47,6 +60,7 @@ type TransferHistoryApiTxn = {
   chainId: string;
   tokenOut: string;
   tokenOutSymbol: string;
+  tokenOutDecimals?: number;
   amountOut: string;
   timestamp: string; // unix seconds (as string)
   whitelistName: string | null;
@@ -79,10 +93,14 @@ const AdminTransferHistoryTable = () => {
       page: filter.page,
       limit: LIMIT,
       chainId: apiChainId,
-      tokenOut: filter.tokens.length === 1 ? filter.tokens[0] : undefined,
+      tokenOut: filter.tokens.length > 0 ? filter.tokens.join(",") : undefined,
       search: filter.text || undefined,
-      amountOutMin: filter.amountMin || undefined,
-      amountOutMax: filter.amountMax || undefined,
+      amountOutMin: filter.amountMin
+        ? humanAmountToRawString(filter.amountMin, filter.tokenOutDecimals ?? DEFAULT_FILTER_DECIMALS)
+        : undefined,
+      amountOutMax: filter.amountMax
+        ? humanAmountToRawString(filter.amountMax, filter.tokenOutDecimals ?? DEFAULT_FILTER_DECIMALS)
+        : undefined,
       dateFrom: filter.dateFrom || undefined,
       dateTo: filter.dateTo || undefined,
     }),
@@ -92,15 +110,16 @@ const AdminTransferHistoryTable = () => {
   const { data, isPending } = useQuery({
     queryKey: transferHistoryQueryKeys.list(queryParams),
     queryFn: async () => {
-      const response = await apiClient.get<TransferHistoryApiResponse>(
-        "/whitelist-users/history",
-        { params: queryParams },
-      );
+      const response = await apiClient.get<TransferHistoryApiResponse>("/whitelist-users/history", {
+        params: queryParams,
+      });
+
       const transfers: TransferRecord[] = (response.txns ?? []).map((t) => ({
         poolName: t.poolName,
         chainId: t.chainId,
         tokenOut: t.tokenOut,
         tokenOutSymbol: t.tokenOutSymbol,
+        tokenOutDecimals: t.tokenOutDecimals ?? null,
         amountOut: t.amountOut,
         // API returns seconds → convert to milliseconds for table formatter
         timestamp: String(Number(t.timestamp) * 1000),
@@ -188,13 +207,12 @@ const AdminTransferHistoryTable = () => {
 
               {/* Amount — amountOut formatted */}
               <TableCell className="font-medium">
-                {formatTokenAmount(item.amountOut, item.tokenOutSymbol)}
+                {formatTokenAmount(item.amountOut, item.tokenOutDecimals, item.tokenOutSymbol)}
               </TableCell>
 
               {/* Date — timestamp (milliseconds → date) */}
               <TableCell>
                 {formatTimestampSecondsToDate({
-                  // API returns ms → convert to seconds for the formatter
                   timestamp: String(Math.floor(Number(item.timestamp) / 1000)),
                   notFound: "-",
                 })}
@@ -215,3 +233,4 @@ const AdminTransferHistoryTable = () => {
 };
 
 export default AdminTransferHistoryTable;
+

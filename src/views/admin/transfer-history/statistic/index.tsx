@@ -1,5 +1,5 @@
 import AdminTransferHistoryHeader from "@/views/admin/transfer-history/detail/header";
-import AdminTransferHistoryTable from "@/views/admin/transfer-history/table";
+import AdminTransferHistoryTable from "@/views/admin/transfer-history/detail/table";
 
 const AdminTransferHistory = () => {
   return (
