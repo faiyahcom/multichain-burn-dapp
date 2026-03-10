@@ -89,9 +89,9 @@ const DepositBurnDialog = ({
 
     const { formatted: burnBalanceFormatted, isLoading: isLoadingBurnBalance } =
         useTokenBalance({
-            tokenAddress: burnToken?.address,
-            decimals: burnToken?.decimals,
-            symbol: burnToken?.symbol,
+            tokenAddress: pool?.tokenIn,
+            decimals: pool?.tokenInDecimals,
+            symbol: pool?.tokenInSymbol,
         });
 
     const formattedReward = poolDetail
@@ -102,17 +102,17 @@ const DepositBurnDialog = ({
         : "-";
 
     const handleSelectPercent = (percent: number) => {
-        if (!burnBalanceFormatted || !burnToken?.decimals) return;
+        if (!burnBalanceFormatted || pool?.tokenInDecimals == null) return;
         try {
             const balanceBN = new BN(
-                toBaseUnits(burnBalanceFormatted, burnToken.decimals),
+                toBaseUnits(burnBalanceFormatted, pool.tokenInDecimals),
             );
             if (balanceBN.isZero()) return;
             const amountBN =
                 percent === 100 ? balanceBN : balanceBN.muln(percent).divn(100);
             const formatted = formatUnits(
                 BigInt(amountBN.toString()),
-                burnToken.decimals,
+                pool.tokenInDecimals,
             );
             setValue("amount", formatted, { shouldValidate: true });
         } catch {

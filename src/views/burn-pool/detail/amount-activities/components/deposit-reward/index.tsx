@@ -90,25 +90,25 @@ const DepositRewardDialog = ({
         formatted: rewardBalanceFormatted,
         isLoading: isLoadingRewardBalance,
     } = useTokenBalance({
-        tokenAddress: rewardToken?.address,
-        decimals: rewardToken?.decimals,
-        symbol: rewardToken?.symbol,
+        tokenAddress: pool?.rewardToken,
+        decimals: pool?.rewardTokenDecimals,
+        symbol: pool?.rewardTokenSymbol,
     });
 
     const networkConfig = chainIdToNetworkConfig(pool?.chainId ?? "");
 
     const handleSelectPercent = (percent: number) => {
-        if (!rewardBalanceFormatted || !rewardToken?.decimals) return;
+        if (!rewardBalanceFormatted || pool?.rewardTokenDecimals == null) return;
         try {
             const balanceBN = new BN(
-                toBaseUnits(rewardBalanceFormatted, rewardToken.decimals),
+                toBaseUnits(rewardBalanceFormatted, pool.rewardTokenDecimals),
             );
             if (balanceBN.isZero()) return;
             const amountBN =
                 percent === 100 ? balanceBN : balanceBN.muln(percent).divn(100);
             const formatted = formatUnits(
                 BigInt(amountBN.toString()),
-                rewardToken.decimals,
+                pool.rewardTokenDecimals,
             );
             setValue("amount", formatted, { shouldValidate: true });
         } catch {

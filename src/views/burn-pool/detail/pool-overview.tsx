@@ -3,6 +3,7 @@ import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import NetworkIcon from "@/components/layout/header/network-icon";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -19,6 +20,18 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const network = poolDetail?.pool.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.pool.tokenInSymbol,
+        whitelistToken: burnToken,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.pool.rewardTokenSymbol,
+        whitelistToken: rewardToken,
+    });
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
@@ -31,12 +44,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                         // value: `${poolDetail.pool.tokenInSymbol}`,
                         value: (
                             <div className="flex items-center gap-2">
-                                <img
-                                    src={burnToken?.imageUri}
-                                    alt={burnToken?.symbol}
-                                    className="h-6 w-6 rounded-full"
-                                />
-                                <span>{burnToken?.symbol}</span>
+                                {burnTokenDisplay.imageUri && (
+                                    <img
+                                        src={burnTokenDisplay.imageUri}
+                                        alt={burnTokenDisplay.name}
+                                        className="h-6 w-6 rounded-full"
+                                    />
+                                )}
+                                <span>{burnTokenDisplay.symbol}</span>
                             </div>
                         ),
                     },
@@ -47,12 +62,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                         label: "Reward Token",
                         value: (
                             <div className="flex items-center gap-2">
-                                <img
-                                    src={rewardToken?.imageUri}
-                                    alt={rewardToken?.symbol}
-                                    className="h-6 w-6 rounded-full"
-                                />
-                                <span>{rewardToken?.symbol}</span>
+                                {rewardTokenDisplay.imageUri && (
+                                    <img
+                                        src={rewardTokenDisplay.imageUri}
+                                        alt={rewardTokenDisplay.name}
+                                        className="h-6 w-6 rounded-full"
+                                    />
+                                )}
+                                <span>{rewardTokenDisplay.symbol}</span>
                             </div>
                         ),
                     },
@@ -80,12 +97,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     // value: `${poolDetail.pool.tokenInSymbol}`,
                     value: (
                         <div className="flex items-center gap-2">
-                            <img
-                                src={burnToken?.imageUri}
-                                alt={burnToken?.symbol}
-                                className="h-6 w-6 rounded-full"
-                            />
-                            <span>{burnToken?.symbol}</span>
+                            {burnTokenDisplay.imageUri && (
+                                <img
+                                    src={burnTokenDisplay.imageUri}
+                                    alt={burnTokenDisplay.name}
+                                    className="h-6 w-6 rounded-full"
+                                />
+                            )}
+                            <span>{burnTokenDisplay.symbol}</span>
                         </div>
                     ),
                 },
@@ -96,18 +115,20 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     label: "Reward Token",
                     value: (
                         <div className="flex items-center gap-2">
-                            <img
-                                src={rewardToken?.imageUri}
-                                alt={rewardToken?.symbol}
-                                className="h-6 w-6 rounded-full"
-                            />
-                            <span>{rewardToken?.symbol}</span>
+                            {rewardTokenDisplay.imageUri && (
+                                <img
+                                    src={rewardTokenDisplay.imageUri}
+                                    alt={rewardTokenDisplay.name}
+                                    className="h-6 w-6 rounded-full"
+                                />
+                            )}
+                            <span>{rewardTokenDisplay.symbol}</span>
                         </div>
                     ),
                 },
             ],
         ];
-    }, [poolDetail]);
+    }, [burnTokenDisplay, network, poolDetail, rewardTokenDisplay]);
 
     return (
         <div className="mt-3 w-full py-4">
