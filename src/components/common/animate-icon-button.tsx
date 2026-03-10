@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import LetterIcon from "./letter-icon";
+import { IconSpinner } from "@/assets/react";
 
 interface BaseProps {
   textVariant?: "text-left" | "text-container-center" | "text-self-center";
@@ -14,6 +15,8 @@ interface BaseProps {
   color?: string;
   isActive?: boolean;
   btnProps?: Omit<React.ComponentProps<"button">, "className" | "style">;
+  isLoading?: boolean; // Show loading state, disable the button
+  isLoadingText?: string; // If not provided, will default to "Confirming…"
 }
 
 interface LetterIconVariantProps extends BaseProps {
@@ -38,9 +41,24 @@ const AnimateIconButton: React.FC<Props> = (props) => {
     color,
     isActive,
     btnProps,
+    isLoading,
+    isLoadingText = "Confirming…",
   } = props;
 
+  const isDisabled = isLoading || btnProps?.disabled;
+
   const resolveIcon = () => {
+    if (isDisabled) {
+      if (isLoading) {
+        return (
+          <IconSpinner
+            className={cn("size-5.5 animate-spin", classNames?.icon)}
+          />
+        );
+      }
+      return null;
+    }
+
     switch (props.variant ?? "letter-icon") {
       case "letter-icon":
         return (
@@ -74,21 +92,26 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         "relative overflow-hidden after:absolute after:top-0 after:left-full after:flex after:h-full after:w-full after:items-center after:justify-center after:rounded-sm",
         "after:bg-(--btn-bg) after:text-base after:font-medium after:text-foreground after:content-(--btn-text)",
         "after:transition-all after:duration-300",
-        "hover:border-(--btn-bg) hover:after:left-0",
+        { "hover:border-(--btn-bg) hover:after:left-0": !isDisabled },
         { "justify-center": textVariant === "text-container-center" },
         {
           "group-hover:border-(--btn-bg) group-hover:after:left-0":
-            hasGroupHover,
+            hasGroupHover && !isDisabled,
         },
         {
-          "border-(--btn-bg) after:left-0": isActive,
+          "border-(--btn-bg) after:left-0": isActive && !isDisabled,
         },
         {
           "after:content-(--btn-after-text)": afterText,
         },
         classNames?.btn,
+        {
+          "justify-center gap-4 border-mb-btn-loading bg-mb-btn-loading after:hidden":
+            isDisabled,
+        },
       )}
       {...btnProps}
+      disabled={isDisabled}
     >
       {resolveIcon()}
       <span
@@ -99,12 +122,15 @@ const AnimateIconButton: React.FC<Props> = (props) => {
               textVariant === "text-container-center" ||
               textVariant === "text-self-center",
           },
+          {
+            "flex-0 font-medium text-primary-foreground": isDisabled,
+          },
           classNames?.text,
         )}
       >
-        {text}
+        {!isLoading ? text : isLoadingText}
       </span>
-      {textVariant === "text-container-center" && (
+      {textVariant === "text-container-center" && !isDisabled && (
         <div className="size-5.5 shrink-0" />
       )}
     </button>

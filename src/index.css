@@ -143,6 +143,7 @@
   --color-mb-summary-token-card: var(--mb-summary-token-card);
   --color-mb-gray-b5b7ca: var(--mb-gray-b5b7ca);
   --color-mb-gray-69: var(--mb-gray-69);
+  --color-mb-btn-loading: var(--mb-btn-loading);
 }
 
 /* Light mode design tokens (default) */
@@ -231,6 +232,7 @@
   --mb-summary-token-card: #ccd6f6;
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
+  --mb-btn-loading: #c2cdf5;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -306,6 +308,7 @@
   --mb-submit-border: #7452ff;
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
+  --mb-btn-loading: #c2cdf5;
 }
 
 @layer base {
