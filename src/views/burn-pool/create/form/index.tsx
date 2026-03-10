@@ -6,10 +6,11 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCreateBurnPoolEvmFn } from "../useCreateBurnPoolEvmFn";
 import { useCreateBurnPoolSolFn } from "../useCreateBurnPoolSolFn";
 import { useSystemStore } from "@/stores/systemStore";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
 import { DatePicker } from "@/components/ui/date-picker";
+import NetworkIcon from "@/components/layout/header/network-icon";
 
 type CreateSwapPoolFormValues = {
     poolName: string;
@@ -36,6 +37,8 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
     const navigate = useNavigate();
     const { createPool: createPoolSol } = useCreateBurnPoolSolFn();
     const { createPool: createPoolEvm } = useCreateBurnPoolEvmFn();
+
+    const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
 
     const {
         register,
@@ -254,9 +257,12 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
 
                     <div className="flex items-end gap-10">
                         <span className="text-xl font-medium">Network</span>
-                        <div className="flex gap-2 rounded-md-plus bg-inactive px-14 py-1 text-[15px] text-nowrap">
-                            {NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId)?.label ||
-                                "Unknown Network"}
+                        <div className="relative flex gap-2 rounded-md-plus bg-inactive px-14 py-1 text-[15px] text-nowrap">
+                            <NetworkIcon
+                                networkId={network?.id || ("" as NetworkId)}
+                                className="absolute left-4"
+                            />
+                            <span>{network?.label}</span>
                         </div>
 
                         <div className="flex flex-col gap-1.5">
