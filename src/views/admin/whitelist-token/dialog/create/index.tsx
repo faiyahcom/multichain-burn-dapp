@@ -398,7 +398,7 @@ const AdminWhitelistTokenDialogCreate = () => {
             <AnimateIconButton
               variant="letter-icon"
               iconLetter="A"
-              text={isLoading ? "Adding..." : "Add to Whitelist"}
+              text={"Add to Whitelist"}
               color="#9072f9"
               textVariant="text-self-center"
               classNames={{
@@ -406,8 +406,9 @@ const AdminWhitelistTokenDialogCreate = () => {
               }}
               btnProps={{
                 type: "submit",
-                disabled: isLoading,
               }}
+              isLoading={isLoading}
+              isLoadingText="Adding..."
             />
           </div>
         </form>

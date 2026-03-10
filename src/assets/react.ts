@@ -37,3 +37,5 @@ export { default as IconExclaimation } from "./icons/exclaimation.svg?react";
 
 export { default as IconClipboard } from "./icons/clipboard.svg?react";
 export { default as IconWallet } from "./icons/wallet.svg?react";
+
+export { default as IconSpinner } from "./icons/spinner.svg?react";
