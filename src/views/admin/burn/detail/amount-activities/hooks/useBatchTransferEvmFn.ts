@@ -8,6 +8,7 @@ import {
 } from "@/web3/contracts/multichainBurnContractEVM";
 import type { PoolDetailResponse } from "@/types/pool";
 import type { BatchRecipient, TokenMode } from "./useBatchTransferSolFn";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export interface BatchTransferEvmParams {
     poolAddress: string;
@@ -81,7 +82,7 @@ export const useBatchTransferEvmFn = () => {
                 return receipt?.hash;
             } catch (error: any) {
                 toast.error("Failed to transfer tokens", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

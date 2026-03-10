@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { PublicKey } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -82,7 +83,7 @@ export const useCancelRequestApproveSolFn = () => {
                 return signature;
             } catch (error: any) {
                 toast.error("Failed to cancel approval request", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

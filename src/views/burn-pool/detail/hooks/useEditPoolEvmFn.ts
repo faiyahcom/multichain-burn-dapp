@@ -3,6 +3,7 @@ import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { getContractBurnFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export interface EditPoolEvmParams {
     poolAddress: string;
@@ -47,7 +48,7 @@ export const useEditPoolEvmFn = () => {
 
                 return receipt.hash;
             } catch (error: any) {
-                let message = error?.message || String(error);
+                const message = getErrorMessage({ error });
                 toast.error("Failed to update pool", { description: message });
                 throw error;
             }

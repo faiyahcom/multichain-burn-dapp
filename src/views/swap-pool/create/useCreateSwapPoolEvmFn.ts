@@ -9,6 +9,7 @@ import {
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { DEFAULT_NATIVE_DECIMALS, ZERO_ADDRESS } from "@/config/constant";
 import { getDecimalsTokenNativeByChainId } from "@/config/networks";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { normalizeRatioToIntegers } from "@/utils/helpers/ratio";
 
 const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS;
@@ -179,10 +180,8 @@ export const useCreateSwapPoolEvmFn = () => {
 
         return poolAddress;
       } catch (error: unknown) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
         toast.error("Failed to create pool", {
-          description: errorMessage,
+          description: getErrorMessage({ error }),
         });
         throw error;
       }

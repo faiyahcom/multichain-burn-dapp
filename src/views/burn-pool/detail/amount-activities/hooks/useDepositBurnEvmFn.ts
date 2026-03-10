@@ -8,6 +8,7 @@ import {
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_BURN_ADDRESS } from "@/web3";
 import { ZERO_ADDRESS } from "@/config/constant";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export interface DepositBurnParams {
     poolAddress: string;
@@ -57,7 +58,7 @@ export const useDepositBurnEvmFn = () => {
                 return receipt.hash;
             } catch (error: any) {
                 toast.error("Failed to deposit", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

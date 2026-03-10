@@ -3,6 +3,7 @@ import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { getContractBurnRouter } from "@/web3/contracts/multichainBurnContractEVM";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export interface ClaimBurnParams {
     poolAddress: string;
@@ -38,7 +39,7 @@ export const useClaimBurnEvmFn = () => {
                 return receipt.hash;
             } catch (error: any) {
                 toast.error("Failed to claim reward", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }

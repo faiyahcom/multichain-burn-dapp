@@ -1,5 +1,7 @@
 import type { ErrorResponseData } from "@/types/common";
 import axios from "axios";
+import { getReadableEvmErrorMessage } from "./evm-error";
+import { getReadableSolanaErrorMessage } from "./solana-error";
 
 export const getErrorMessage = ({
   error,
@@ -10,6 +12,16 @@ export const getErrorMessage = ({
 }) => {
   if (axios.isAxiosError<ErrorResponseData>(error)) {
     return error.response?.data?.message || fallbackMsg;
+  }
+
+  const solanaErrorMessage = getReadableSolanaErrorMessage(error);
+  if (solanaErrorMessage) {
+    return solanaErrorMessage;
+  }
+
+  const evmErrorMessage = getReadableEvmErrorMessage(error);
+  if (evmErrorMessage) {
+    return evmErrorMessage;
   }
 
   if (error instanceof Error) {

@@ -1,5 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { PublicKey } from "@solana/web3.js";
 import { BN } from "@coral-xyz/anchor";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
@@ -61,7 +62,7 @@ export const useEditPoolSolFn = () => {
                 toast.success("Pool updated successfully!", { description: `Tx: ${signature}` });
                 return signature;
             } catch (error: any) {
-                toast.error("Failed to update pool", { description: error?.message || String(error) });
+                toast.error("Failed to update pool", { description: getErrorMessage({ error }) });
                 throw error;
             }
         },

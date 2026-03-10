@@ -4,6 +4,7 @@ import { useAppKitAccount } from '@reown/appkit/react'
 import bs58 from 'bs58'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
+import { getErrorMessage } from '@/utils/helpers/error-message'
 
 type WalletType = 'evm' | 'solana'
 
@@ -128,8 +129,10 @@ export function useWalletAuth() {
 
         return { success: true }
       } catch (error: any) {
-        const errorMessage =
-          error?.message || 'Authentication failed. Please try again.'
+        const errorMessage = getErrorMessage({
+          error,
+          fallbackMsg: 'Authentication failed. Please try again.',
+        })
         setError(errorMessage)
         console.error('Authentication error:', error)
         return { success: false, error: errorMessage }

@@ -20,6 +20,7 @@ import BN from "bn.js";
 import { formatUnits } from "viem";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import SellSection from "./components/sell-section";
 import BuySection from "./components/buy-section";
 import FeePanel from "./components/fee-panel";
@@ -203,7 +204,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
             onSuccess();
         } catch (error: any) {
             toast.error("Swap failed", {
-                description: error?.message || String(error),
+                description: getErrorMessage({ error }),
             });
         }
     };

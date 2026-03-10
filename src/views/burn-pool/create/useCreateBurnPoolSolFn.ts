@@ -24,6 +24,7 @@ import {
     detectAssetType,
     getTokenProgramFromAssetType,
 } from "@/web3/helpers";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export type CreateBurnPoolSolParams = {
     poolName: string;
@@ -175,7 +176,7 @@ export const useCreateBurnPoolSolFn = () => {
                 return poolPDA.toBase58();
             } catch (error: any) {
                 toast.error("Create pool failed", {
-                    description: error?.message,
+                    description: getErrorMessage({ error }),
                 });
 
                 throw error;

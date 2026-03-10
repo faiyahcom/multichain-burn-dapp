@@ -2,6 +2,7 @@ import {
     type BrowserWallet,
     getMultichainBurnProgram,
 } from "@/web3/contracts/multichainBurnProgramSol";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import {
     getFactoryPDA,
     getRewardVaultPDA,
@@ -263,7 +264,7 @@ export const useSwapPoolSOL = () => {
                 console.log(error);
 
                 toast.error("Deposit failed", {
-                    description: error?.message || String(error),
+                    description: getErrorMessage({ error }),
                 });
                 throw error;
             }
