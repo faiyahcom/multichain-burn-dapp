@@ -364,12 +364,13 @@ const TransferTokensDialog = ({
                 </div>
 
                 {/* ── Token mode toggle ── */}
-                <div className="mx-6 mb-4 flex overflow-hidden rounded-lg border border-border">
+                <div className="mx-6 mb-4 grid grid-cols-2 rounded-lg border border-border bg-muted/30">
                     <button
+                        type="button"
                         className={cn(
-                            "flex-1 py-2.5 text-sm font-medium transition-all",
+                            "rounded-l-lg py-2.5 text-sm font-medium transition-all",
                             mode === "reward"
-                                ? "bg-primary text-white"
+                                ? "bg-primary text-white shadow-sm"
                                 : "bg-transparent text-secondary-text hover:bg-muted/40",
                         )}
                         onClick={() => setMode("reward")}
@@ -377,11 +378,12 @@ const TransferTokensDialog = ({
                         Reward Token
                     </button>
                     <button
+                        type="button"
                         disabled={isSwapPool}
                         className={cn(
-                            "flex-1 py-2.5 text-sm font-medium transition-all",
+                            "rounded-r-lg border-l border-border py-2.5 text-sm font-medium transition-all",
                             mode === "deposit" && !isSwapPool
-                                ? "bg-primary text-white"
+                                ? "bg-primary text-white shadow-sm"
                                 : "bg-transparent text-secondary-text",
                             isSwapPool
                                 ? "cursor-not-allowed opacity-35"
