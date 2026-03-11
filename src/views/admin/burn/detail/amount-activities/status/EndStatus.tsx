@@ -41,10 +41,12 @@ const EndStatus = ({ poolDetail }: Props) => {
         ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
         : (pool?.rewardTokenSymbol ?? "");
 
-    // For Solana pools, use actual on-chain vault balance instead of stale backend data
+    // Use actual on-chain vault balance instead of potentially stale backend data
     const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
         poolAddress: pool?.address,
         chainId: pool?.chainId,
+        rewardToken: pool?.rewardToken,
+        tokenIn: pool?.tokenIn,
         rewardTokenDecimals: pool?.rewardTokenDecimals,
         tokenInDecimals: pool?.tokenInDecimals,
         assetTypeReward: pool?.assetTypeReward,
@@ -55,7 +57,7 @@ const EndStatus = ({ poolDetail }: Props) => {
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
             ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
             : undefined;
-    const formattedAvailable = isSolana && onChainReward !== undefined
+    const formattedAvailable = onChainReward !== undefined
         ? onChainReward
         : formattedAvailableBackend;
 
@@ -63,7 +65,7 @@ const EndStatus = ({ poolDetail }: Props) => {
         poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
             ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
             : undefined;
-    const formattedDepositAvailable = isSolana && onChainDeposit !== undefined
+    const formattedDepositAvailable = onChainDeposit !== undefined
         ? onChainDeposit
         : formattedDepositAvailableBackend;
 
