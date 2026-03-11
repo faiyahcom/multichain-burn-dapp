@@ -8,9 +8,12 @@ type Props = {
 };
 
 const PendingHoldingStatus = ({ poolDetail }: Props) => {
-    const { handleAdminApprove, handleAdminReject, handleEdit } = useAmountActivity(poolDetail);
+    const { handleAdminApprove, handleAdminReject, handleEdit } =
+        useAmountActivity(poolDetail);
 
-    const [activeAction, setActiveAction] = useState<"approve" | "reject" | null>(null);
+    const [activeAction, setActiveAction] = useState<"approve" | "reject" | null>(
+        null,
+    );
     const isRunning = activeAction !== null;
 
     const run = async (name: "approve" | "reject", fn: () => Promise<void>) => {
@@ -24,13 +27,27 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
 
     return (
         <>
-            <ActionBtn letter="U" text="Update Pool" color="#FF8E97" disabled={isRunning} onClick={handleEdit} />
-            <ActionBtn letter="A" text="Approve Pool" color="#FFC198"
-                isLoading={activeAction === "approve"}
+            <ActionBtn
+                letter="U"
+                text="Update Pool"
+                color="#FF8E97"
                 disabled={isRunning}
-                onClick={() => run("approve", handleAdminApprove)}
+                onClick={handleEdit}
             />
-            <ActionBtn letter="R" text="Reject Pool" color="#A5B7FF"
+            {poolDetail?.pool.status === "pending" && (
+                <ActionBtn
+                    letter="A"
+                    text="Approve Pool"
+                    color="#FFC198"
+                    isLoading={activeAction === "approve"}
+                    disabled={isRunning}
+                    onClick={() => run("approve", handleAdminApprove)}
+                />
+            )}
+            <ActionBtn
+                letter="R"
+                text="Reject Pool"
+                color="#A5B7FF"
                 isLoading={activeAction === "reject"}
                 disabled={isRunning}
                 onClick={() => run("reject", handleAdminReject)}
@@ -40,4 +57,3 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
 };
 
 export default PendingHoldingStatus;
-
