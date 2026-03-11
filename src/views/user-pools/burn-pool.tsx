@@ -26,7 +26,7 @@ import { Link } from "@tanstack/react-router";
 import UserPoolsMenu from "./menu";
 import type { SortOption } from "./menu";
 import TokenDisplay from "@/components/common/token-display";
-import { formatUnits } from "ethers";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 
 export const BURN_CLAIMABLE_STATUSES = [
     "pending",
@@ -161,7 +161,7 @@ function UserBurnPools({ mode = "participated", title }: Props) {
                     {!isPending && data?.pools?.map((item) => {
                         const timeStart = formatTimestampSecondsToDate({ timestamp: item.timeStart, notFound: "" });
                         const timeEnd = formatTimestampSecondsToDate({ timestamp: item.timeEnd, notFound: "" });
-                        const tvl = formatUnits(item.tvl, item.tokenOutDecimals);
+                        const tvl = sciToFormatted(item.tvl, item.tokenOutDecimals);
 
                         return (
                             <TableRow key={item.address}>
