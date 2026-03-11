@@ -1,6 +1,7 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import MetricNumber from "@/components/common/metric-number";
+import RatioDisplay from "@/components/common/ratio-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
@@ -104,23 +105,12 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
                     </div>
                   )
                 ) : (
-                  <div className="flex max-w-full flex-wrap items-center justify-center gap-0.5">
-                    <MetricNumber
-                      number={pool.rewardDenominator}
-                      unit={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
-                      classNames={{
-                        container: "max-w-max",
-                      }}
-                    />
-                    <span>{" = "}</span>
-                    <MetricNumber
-                      number={pool.rewardNumerator}
-                      unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
-                      classNames={{
-                        container: "max-w-max",
-                      }}
-                    />
-                  </div>
+                  <RatioDisplay
+                    inValue={pool.rewardDenominator}
+                    outValue={pool.rewardNumerator}
+                    inSymbol={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                    outSymbol={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                  />
                 )}
               </TableCell>
               <TableCell>
