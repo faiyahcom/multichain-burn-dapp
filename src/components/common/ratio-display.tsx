@@ -8,16 +8,28 @@ interface Props {
   outSymbol: string;
 }
 
+const safeDecimalParse = (value: string) => {
+  try {
+    return new Decimal(value);
+  } catch (error) {
+    return null;
+  }
+};
+
 const RatioDisplay: React.FC<Props> = ({
   inValue,
   outValue,
   inSymbol,
   outSymbol,
 }) => {
-  const inValueDecimal = new Decimal(inValue);
-  const outValueDecimal = new Decimal(outValue);
+  const inValueDecimal = safeDecimalParse(inValue);
+  const outValueDecimal = safeDecimalParse(outValue);
 
-  if (inValueDecimal.isZero()) {
+  if (
+    inValueDecimal === null ||
+    outValueDecimal === null ||
+    inValueDecimal.isZero()
+  ) {
     return <span>-</span>;
   }
 

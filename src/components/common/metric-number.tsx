@@ -21,10 +21,14 @@ const MetricNumber: React.FC<Props> = ({ number, unit, classNames }) => {
   }
 
   const d = new Decimal(number).toDecimalPlaces(6);
-  const [intPart, decPart] = d.toFixed().split(".");
+  const isNegative = d.isNegative();
+  const abs = d.abs();
+  const [intPart, decPart] = abs.toFixed().split(".");
 
   const intFormatted = BigInt(intPart).toLocaleString("de-DE");
-  const display = decPart ? `${intFormatted},${decPart}` : intFormatted;
+  const display =
+    (isNegative ? "-" : "") +
+    (decPart ? `${intFormatted},${decPart}` : intFormatted);
 
   return (
     <div
