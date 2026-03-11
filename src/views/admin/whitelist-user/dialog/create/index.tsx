@@ -7,7 +7,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog";
-import { PlusIcon, CheckCircle2Icon, ArrowRightLeftIcon } from "lucide-react";
+import { PlusIcon, CheckCircle2Icon, ArrowRightLeftIcon, AlertCircleIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,7 @@ import { Input } from "@/components/ui/input";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import { useState, useMemo, useCallback } from "react";
-import { useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKitNetwork, useAppKitAccount, useAppKit } from "@reown/appkit/react";
 import { useCreateWhitelistUserSolanaFn } from "./useCreateWhitelistUserSolanaFn";
 import { useCreateWhitelistUserEvmFn } from "./useCreateWhitelistUserEvmFn";
 import { whitelistUserService } from "@/services/whitelistUserService";
@@ -63,6 +63,11 @@ const AdminWhitelistUserDialogCreate = () => {
     const [selectedNetworks, setSelectedNetworks] = useState<NetworkId[]>([]);
 
     const { caipNetwork, switchNetwork } = useAppKitNetwork();
+    const { open: openAppKit } = useAppKit();
+
+    // ── Track actual wallet connection per namespace ──────────────────────────
+    const { isConnected: isEvmConnected } = useAppKitAccount({ namespace: "eip155" });
+    const { isConnected: isSolanaConnected } = useAppKitAccount({ namespace: "solana" });
 
     const { createWhitelistUser: createSolana } = useCreateWhitelistUserSolanaFn();
     const { createWhitelistUser: createEvm } = useCreateWhitelistUserEvmFn();
@@ -73,10 +78,28 @@ const AdminWhitelistUserDialogCreate = () => {
     const networkTypeConflict = hasSolana && hasEvm;
 
     // ── connected network matching ─────────────────────────────────────────────
+    // Derive which network is ACTUALLY connected by checking both:
+    //   1) the caipNetwork matches a config entry
+    //   2) the wallet for that namespace is genuinely connected
     const connectedNetworkCfg = useMemo(() => {
         if (!caipNetwork) return undefined;
-        return NETWORK_CONFIGS.find((n) => n.appKitNetwork.id === caipNetwork.id);
-    }, [caipNetwork]);
+        const cfg = NETWORK_CONFIGS.find((n) => n.appKitNetwork.id === caipNetwork.id);
+        if (!cfg) return undefined;
+
+        // Verify the wallet is actually connected for this namespace
+        const isSolanaNetwork = cfg.id === SOLANA_NETWORK_ID;
+        const walletActuallyConnected = isSolanaNetwork ? isSolanaConnected : isEvmConnected;
+
+        return walletActuallyConnected ? cfg : undefined;
+    }, [caipNetwork, isEvmConnected, isSolanaConnected]);
+
+    // ── Determine if wallet connection is needed ──────────────────────────────
+    const needsWalletConnection = useMemo(() => {
+        if (selectedNetworks.length === 0 || networkTypeConflict) return false;
+        if (hasSolana && !isSolanaConnected) return "solana";
+        if (hasEvm && !isEvmConnected) return "evm";
+        return false;
+    }, [selectedNetworks, networkTypeConflict, hasSolana, hasEvm, isSolanaConnected, isEvmConnected]);
 
     // ── address validation depends on selection type ───────────────────────────
     const schema = useMemo(() => buildSchema(hasSolana && !hasEvm), [hasSolana, hasEvm]);
@@ -120,6 +143,17 @@ const AdminWhitelistUserDialogCreate = () => {
             toast.error("Cannot mix Solana and EVM networks");
             return;
         }
+
+        // Check actual wallet connection for the target namespace
+        if (hasSolana && !isSolanaConnected) {
+            toast.error("Please connect your Solana wallet before submitting");
+            return;
+        }
+        if (hasEvm && !isEvmConnected) {
+            toast.error("Please connect your EVM wallet before submitting");
+            return;
+        }
+
         if (!connectedNetworkCfg || !selectedNetworks.includes(connectedNetworkCfg.id)) {
             toast.error("Switch to one of the selected networks to proceed");
             return;
@@ -165,6 +199,7 @@ const AdminWhitelistUserDialogCreate = () => {
         ? "e.g. 9noXzpXnLLrrTn…"
         : "0x0000000000000000000000000000000000000000";
 
+
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
             <DialogTrigger asChild>
@@ -193,7 +228,13 @@ const AdminWhitelistUserDialogCreate = () => {
                         <div className="flex flex-wrap gap-2">
                             {NETWORK_CONFIGS.map((n) => {
                                 const isSelected = selectedNetworks.includes(n.id);
-                                const isConnected = connectedNetworkCfg?.id === n.id;
+                                // Use actual wallet connection, not just caipNetwork match
+                                const isSolanaNetwork = n.id === SOLANA_NETWORK_ID;
+                                const isWalletConnected = isSolanaNetwork
+                                    ? isSolanaConnected
+                                    : isEvmConnected;
+                                const isNetworkConnected =
+                                    connectedNetworkCfg?.id === n.id && isWalletConnected;
                                 return (
                                     <button
                                         key={n.id}
@@ -208,7 +249,7 @@ const AdminWhitelistUserDialogCreate = () => {
                                     >
                                         <NetworkImgIcon src={n.iconSrc} alt={n.label} className="size-4" />
                                         {n.label}
-                                        {isConnected && isSelected && (
+                                        {isNetworkConnected && isSelected && (
                                             <CheckCircle2Icon className="size-3.5 text-green-500" />
                                         )}
                                     </button>
@@ -222,28 +263,42 @@ const AdminWhitelistUserDialogCreate = () => {
                         )}
                     </div>
 
+
+
                     {/* ── Per-network status + switch buttons ── */}
                     {selectedNetworks.length > 0 && !networkTypeConflict && (
                         <div className="flex flex-wrap gap-2">
                             {selectedNetworks.map((id) => {
                                 const cfg = NETWORK_CONFIGS.find((n) => n.id === id)!;
-                                const isConnected = connectedNetworkCfg?.id === id;
+                                const isSolanaNetwork = id === SOLANA_NETWORK_ID;
+                                const isWalletConnected = isSolanaNetwork
+                                    ? isSolanaConnected
+                                    : isEvmConnected;
+                                const isNetworkConnected =
+                                    connectedNetworkCfg?.id === id && isWalletConnected;
                                 return (
                                     <div
                                         key={id}
                                         className={cn(
                                             "flex items-center gap-2 rounded-lg border px-3 py-2 text-xs",
-                                            isConnected
+                                            isNetworkConnected
                                                 ? "border-green-500/30 bg-green-500/10 text-green-400"
-                                                : "border-border text-secondary-text",
+                                                : !isWalletConnected
+                                                  ? "border-amber-500/30 bg-amber-500/10 text-amber-400"
+                                                  : "border-border text-secondary-text",
                                         )}
                                     >
                                         <NetworkImgIcon src={cfg.iconSrc} alt={cfg.label} className="size-3.5" />
                                         <span>{cfg.label}</span>
-                                        {isConnected ? (
+                                        {isNetworkConnected ? (
                                             <span className="flex items-center gap-1">
                                                 <CheckCircle2Icon className="size-3" />
                                                 Connected
+                                            </span>
+                                        ) : !isWalletConnected ? (
+                                            <span className="flex items-center gap-1 text-amber-400">
+                                                <AlertCircleIcon className="size-3" />
+                                                Wallet not connected
                                             </span>
                                         ) : (
                                             <button
@@ -335,22 +390,39 @@ const AdminWhitelistUserDialogCreate = () => {
                                 disabled: isLoading,
                             }}
                         />
-                        <AnimateIconButton
-                            variant="letter-icon"
-                            iconLetter="A"
-                            text="Add to Whitelist"
-                            color="#9072f9"
-                            textVariant="text-self-center"
-                            classNames={{
-                                btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
-                            }}
-                            isLoading={isLoading}
-                            isLoadingText="Adding..."
-                            btnProps={{
-                                type: "submit",
-                                disabled: selectedNetworks.length === 0 || networkTypeConflict,
-                            }}
-                        />
+                        {needsWalletConnection ? (
+                            <AnimateIconButton
+                                variant="letter-icon"
+                                iconLetter="W"
+                                text="Connect Wallet"
+                                color="#9072f9"
+                                textVariant="text-self-center"
+                                classNames={{
+                                    btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
+                                }}
+                                btnProps={{
+                                    type: "button",
+                                    onClick: () => openAppKit(),
+                                }}
+                            />
+                        ) : (
+                            <AnimateIconButton
+                                variant="letter-icon"
+                                iconLetter="A"
+                                text="Add to Whitelist"
+                                color="#9072f9"
+                                textVariant="text-self-center"
+                                classNames={{
+                                    btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border ml-5",
+                                }}
+                                isLoading={isLoading}
+                                isLoadingText="Adding..."
+                                btnProps={{
+                                    type: "submit",
+                                    disabled: selectedNetworks.length === 0 || networkTypeConflict,
+                                }}
+                            />
+                        )}
                     </div>
                 </form>
             </DialogContent>
