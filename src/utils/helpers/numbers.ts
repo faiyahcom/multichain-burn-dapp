@@ -19,6 +19,10 @@ export function formatAmount(amount: string, decimals: number): string {
 }
 
 export function sciToFormatted(value: string, decimals: number): string {
-  const expanded = new Decimal(value).toFixed(0);
-  return formatUnits(expanded, decimals);
+  try {
+    const expanded = new Decimal(value).toFixed(0);
+    return formatUnits(expanded, decimals);
+  } catch (error) {
+    return "0";
+  }
 }
