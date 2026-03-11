@@ -99,13 +99,18 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 </TableHeader>
                 <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
                     {txns.map((tx) => {
-                        const amount =
-                            tx.amountIn && tx.tokenInDecimals != null
-                                ? formatAmount(tx.amountIn, tx.tokenInDecimals)
-                                : tx.amountOut && tx.tokenOutDecimals != null
-                                    ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
-                                    : "—";
-                        const token = amount === formatAmount(tx.amountIn, tx.tokenInDecimals) ? tx.tokenInSymbol : tx.tokenOutSymbol || "—";
+                        const hasAmountIn = tx.amountIn != null && tx.amountIn.toString() !== "0" && tx.tokenInDecimals != null;
+                        const hasAmountOut = tx.amountOut != null && tx.amountOut.toString() !== "0" && tx.tokenOutDecimals != null;
+                        const amount = hasAmountIn
+                            ? formatAmount(tx.amountIn, tx.tokenInDecimals)
+                            : hasAmountOut
+                                ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
+                                : "—";
+                        const token = hasAmountIn
+                            ? tx.tokenInSymbol
+                            : hasAmountOut
+                                ? tx.tokenOutSymbol
+                                : "—";
                         const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
                         return (

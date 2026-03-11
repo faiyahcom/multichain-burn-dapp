@@ -53,7 +53,11 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const { data: poolTxns, isLoading } = useQuery({
         queryKey: poolQueryKeys.txns(poolDetail?.pool.address || "", page),
         queryFn: () =>
-            poolService.getPoolTxns(page, DEFAULT_PAGE_SIZE, poolDetail?.pool.address || ""),
+            poolService.getPoolTxns(
+                page,
+                DEFAULT_PAGE_SIZE,
+                poolDetail?.pool.address || "",
+            ),
         enabled: !!poolDetail?.pool.address,
     });
 
@@ -77,7 +81,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
 
     return (
         <>
-            <Table className="border-spacing-y-0 mb-2 rounded-b-lg border border-progress-bg">
+            <Table className="mb-2 border-spacing-y-0 rounded-b-lg border border-progress-bg">
                 <TableHeader>
                     <TableRow>
                         <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
@@ -99,13 +103,18 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 </TableHeader>
                 <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
                     {txns.map((tx) => {
-                        const amount =
-                            tx.amountIn && tx.amountIn.toString() !== "0" && tx.tokenInDecimals != null
-                                ? formatAmount(tx.amountIn, tx.tokenInDecimals)
-                                : tx.amountOut && tx.tokenOutDecimals != null
-                                    ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
-                                    : "—";
-                        const token = tx.tokenInSymbol || tx.tokenOutSymbol || "—";
+                        const hasAmountIn = tx.amountIn != null && tx.amountIn.toString() !== "0" && tx.tokenInDecimals != null;
+                        const hasAmountOut = tx.amountOut != null && tx.amountOut.toString() !== "0" && tx.tokenOutDecimals != null;
+                        const amount = hasAmountIn
+                            ? formatAmount(tx.amountIn, tx.tokenInDecimals)
+                            : hasAmountOut
+                                ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
+                                : "—";
+                        const token = hasAmountIn
+                            ? tx.tokenInSymbol
+                            : hasAmountOut
+                                ? tx.tokenOutSymbol
+                                : "—";
                         const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
                         return (
@@ -115,7 +124,11 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                 <TableCell>{amount}</TableCell>
                                 <TableCell>{token}</TableCell>
                                 <TableCell>
-                                    <a href={explorerUrl} target="_blank" rel="noopener noreferrer">
+                                    <a
+                                        href={explorerUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
                                         {`${tx.hash.slice(0, 6)}...${tx.hash.slice(-4)}`}
                                     </a>
                                 </TableCell>

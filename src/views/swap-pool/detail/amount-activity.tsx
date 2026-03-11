@@ -39,6 +39,12 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";
+    const formattedReturning = poolDetail?.returningAmountOnCanceling
+        ? formatAmount(
+            poolDetail.returningAmountOnCanceling.amount,
+            poolDetail.pool.rewardTokenDecimals,
+        )
+        : "-";
 
     const network = poolDetail?.pool.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
@@ -115,17 +121,25 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             <div className="flex items-center justify-between text-active">
                 <span className="text-sm font-medium">Claimed Reward</span>
                 <span className="text-2xl font-bold">
-                    {poolDetail
-                        ? <>{formattedReward} {rewardTokenDisplay.symbol}</>
-                        : <Skeleton className="h-7 w-32" />}
+                    {poolDetail ? (
+                        <>
+                            {formattedReward} {rewardTokenDisplay.symbol}
+                        </>
+                    ) : (
+                        <Skeleton className="h-7 w-32" />
+                    )}
                 </span>
             </div>
             <div className="flex items-center justify-between text-greyed">
                 <span className="text-sm">Your Burned Amount</span>
                 <span className="text-sm">
-                    {poolDetail
-                        ? <>{formattedBurned} {burnTokenDisplay.symbol}</>
-                        : <Skeleton className="h-4 w-24" />}
+                    {poolDetail ? (
+                        <>
+                            {formattedBurned} {burnTokenDisplay.symbol}
+                        </>
+                    ) : (
+                        <Skeleton className="h-4 w-24" />
+                    )}
                 </span>
             </div>
             {Number(poolDetail?.userAmount.claimed || "0") > 0 && (
@@ -141,6 +155,20 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     <IconExclaimation className="inline size-5 translate-y-0.5" />
                     <span className="text-sm text-greyed">
                         This pool was emergency closed by admin.
+                    </span>
+                </div>
+            )}
+            {poolDetail?.pool.status === "canceled" && isPoolOwner && (
+                <div className="flex items-center justify-between text-active">
+                    <span className="text-sm font-medium">Your reward token return</span>
+                    <span className="text-sm font-bold">
+                        {poolDetail ? (
+                            <>
+                                {formattedReturning} {rewardTokenDisplay.symbol}
+                            </>
+                        ) : (
+                            <Skeleton className="h-7 w-32" />
+                        )}
                     </span>
                 </div>
             )}
@@ -161,6 +189,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                             color="#966EFF"
                             btnProps={{
                                 onClick: handleOpenSwapDialog,
+                                disabled: isCancelLoading
                             }}
                         />
                     </div>

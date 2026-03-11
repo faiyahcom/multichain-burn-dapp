@@ -79,6 +79,10 @@ export interface PoolDetailResponse {
         settlementFee: string;
         poolCreationFee: string;
     };
+    returningAmountOnCanceling?: {
+        amount: string;
+        to: string;
+    };
 }
 
 export interface PoolTxnsResponse {
@@ -108,6 +112,7 @@ export const txnKind = {
     2: "Refund to Whitelist User",
     3: "Maker Deposit Reward",
     4: "Taker Claim Reward",
+    5: "Refund to Maker",
 } as const;
 
 export const activityKind = {
