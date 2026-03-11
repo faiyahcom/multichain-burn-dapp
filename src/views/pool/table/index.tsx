@@ -261,11 +261,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                   </>
                 ) : (
                   <TableCell>
-                    {/* <Link
-                      to={`/swap/detail/${pool.address}`} */}
-                    <div
-                      className="mx-auto block max-w-max"
-                    >
+                    <div className="mx-auto block max-w-max">
                       <AnimateIconButton
                         variant="letter-icon"
                         textVariant="text-container-center"
@@ -283,7 +279,6 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                           },
                         }}
                       />
-                      {/* </Link> */}
                     </div>
                   </TableCell>
                 )}
@@ -295,11 +290,16 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
 
       <SwapDialog
         open={!!swapPoolAddress}
-        onOpenChange={(open) => { if (!open) setSwapPoolAddress(undefined); }}
+        onOpenChange={(open) => {
+          if (!open) setSwapPoolAddress(undefined);
+        }}
         poolAddress={swapPoolAddress}
         onSuccess={() => {
           setSwapPoolAddress(undefined);
-          queryClient.invalidateQueries({ queryKey: ["pools", "list"], exact: false });
+          queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.list(),
+            exact: false,
+          });
         }}
       />
 
