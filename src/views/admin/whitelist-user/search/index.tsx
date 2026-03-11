@@ -13,7 +13,7 @@ import {
 } from "@/types/admin/whitelist-user";
 import AdminWhitelistUserDialogCreate from "../dialog/create";
 import AdminWhitelistUserSearchStatusPicker from "./status-picker";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
     Popover,
@@ -149,29 +149,32 @@ const AdminWhitelistUserSearch = () => {
         value: status,
     }));
 
-    // Build chainId → networkId lookup
-    const chainIdToNetworkId = useMemo(() => {
-        const map = new Map<string, string>();
-        NETWORK_CONFIGS.forEach((n) => {
-            map.set(n.backendChainId, n.id);
-        });
-        return map;
-    }, []);
+    // Resolve the active network's backendChainId for the API query
+    const activeChainId = useMemo(() => {
+        if (!filter.network) return undefined;
+        return NETWORK_CONFIGS.find((n) => n.id === filter.network)?.backendChainId;
+    }, [filter.network]);
 
-    // Fetch all whitelisted tokens
-    const { data: tokensData, isLoading: isTokensLoading } = useGetWhitelistTokens();
+    // Fetch tokens for the active network directly from the API (server-side filter)
+    const { data: tokensData, isLoading: isTokensLoading } = useGetWhitelistTokens(
+        activeChainId ? { chainIds: activeChainId } : undefined,
+    );
 
-    // Filter tokens by the selected network (single value)
+    // Map fetched tokens to select options (already filtered by network via API)
     const tokenOptions: MultipleSelectOption[] = useMemo(() => {
         const tokens = tokensData?.whitelistTokens ?? [];
-        const filtered = filter.network
-            ? tokens.filter((t) => chainIdToNetworkId.get(t.chainId) === filter.network)
-            : tokens;
-        return filtered.map((t) => ({
+        return tokens.map((t) => ({
             label: t.customSymbol || t.symbol || t.name,
             value: t.address,
         }));
-    }, [tokensData, filter.network, chainIdToNetworkId]);
+    }, [tokensData]);
+
+    // Auto-select all tokens for the active network on initial load and network change
+    useEffect(() => {
+        if (isTokensLoading) return;
+        const allAddresses = (tokensData?.whitelistTokens ?? []).map((t) => t.address);
+        setFilter({ tokens: allAddresses });
+    }, [tokensData]);  // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <div className="space-y-4 pt-12.75 pr-13.5 pl-21">
