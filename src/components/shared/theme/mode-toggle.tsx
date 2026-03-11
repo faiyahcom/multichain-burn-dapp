@@ -17,7 +17,7 @@ export function ModeToggle() {
             <div className="items-end">
                 <Switch
                     checked={isDark}
-                    onCheckedChange={(checked) => setTheme(checked ? "dark" : "light")}
+                    onCheckedChange={(checked) => setTheme(checked ? "light" : "light")} // TODO: Update this when dark mode is ready
                     className="bg-inactive data-[state=checked]:bg-active"
                 />
             </div>
