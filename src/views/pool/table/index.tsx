@@ -33,8 +33,10 @@ import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
-import { useQuery } from "@tanstack/react-query";
+import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
 
 interface Props {
   poolType: PoolType;
@@ -44,6 +46,8 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
   const isBurnPool = poolType === 0;
   const { filter, setFilter } = usePoolListSearchFilterStore(poolType);
   const limit = 10;
+  const queryClient = useQueryClient();
+  const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
 
   const { data: burnPoolList, isPending: isBurnPoolListPending } = useQuery({
     queryKey: poolQueryKeys.list({
@@ -82,13 +86,13 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
     },
     ...(isBurnPool
       ? [
-          {
-            name: "Burn",
-          },
-          {
-            name: "Reward",
-          },
-        ]
+        {
+          name: "Burn",
+        },
+        {
+          name: "Reward",
+        },
+      ]
       : []),
     {
       name: "Network",
@@ -103,18 +107,18 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
     },
     ...(isBurnPool
       ? [
-          {
-            name: "Ratio",
-          },
-          {
-            name: "Status",
-          },
-        ]
+        {
+          name: "Ratio",
+        },
+        {
+          name: "Status",
+        },
+      ]
       : [
-          {
-            name: "Join",
-          },
-        ]),
+        {
+          name: "Join",
+        },
+      ]),
   ];
 
   return (
@@ -257,8 +261,9 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                   </>
                 ) : (
                   <TableCell>
-                    <Link
-                      to={`/swap/detail/${pool.address}`}
+                    {/* <Link
+                      to={`/swap/detail/${pool.address}`} */}
+                    <div
                       className="mx-auto block max-w-max"
                     >
                       <AnimateIconButton
@@ -271,8 +276,15 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                         classNames={{
                           btn: "after:text-primary-foreground min-w-20.5",
                         }}
+                        btnProps={{
+                          onClick: (e) => {
+                            e.stopPropagation();
+                            setSwapPoolAddress(pool.address);
+                          },
+                        }}
                       />
-                    </Link>
+                      {/* </Link> */}
+                    </div>
                   </TableCell>
                 )}
               </TableRow>
@@ -280,6 +292,16 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
           })}
         </TableBody>
       </Table>
+
+      <SwapDialog
+        open={!!swapPoolAddress}
+        onOpenChange={(open) => { if (!open) setSwapPoolAddress(undefined); }}
+        poolAddress={swapPoolAddress}
+        onSuccess={() => {
+          setSwapPoolAddress(undefined);
+          queryClient.invalidateQueries({ queryKey: ["pools", "list"], exact: false });
+        }}
+      />
 
       <CustomPagination
         currentPage={filter.page}

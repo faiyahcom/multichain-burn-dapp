@@ -26,6 +26,9 @@ import BuySection from "./components/buy-section";
 import FeePanel from "./components/fee-panel";
 import SwapRateRow from "./components/swap-rate-row";
 import { parseUnits } from "ethers";
+import { poolService } from "@/services/poolService";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { useQuery } from "@tanstack/react-query";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -52,10 +55,19 @@ type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     poolDetail?: PoolDetailResponse;
+    poolAddress?: string;
     onSuccess: () => void;
 };
 
-const SwapDialog = ({ open, onOpenChange, poolDetail, onSuccess }: Props) => {
+const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddress, onSuccess }: Props) => {
+    const { data: fetchedPoolDetail } = useQuery({
+        queryKey: poolQueryKeys.detail(poolAddress!),
+        queryFn: () => poolService.getPoolDetail(poolAddress!),
+        enabled: !poolDetailProp && !!poolAddress,
+    });
+
+    const poolDetail = poolDetailProp ?? fetchedPoolDetail;
+
     const [openFeePopUp, setOpenFeePopUp] = useState(false);
 
     const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
