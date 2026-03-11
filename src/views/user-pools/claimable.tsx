@@ -16,8 +16,8 @@ import { truncateString } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
 import UserPoolsMenu from "./menu";
 import type { SortOption } from "./menu";
-import { formatUnits } from "ethers";
 import TokenDisplay from "@/components/common/token-display";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 
 const ALL_NETWORK_IDS = NETWORK_CONFIGS.map((n) => n.id);
 const LIMIT = 20;
@@ -78,8 +78,8 @@ function UserClaimablePool() {
                 <TableBody>
                     <TableSpinner isLoading={isPending} colSpan={columns.length} />
                     {!isPending && data?.pools?.map((item) => {
-                        const amountBurned = formatUnits(item.amountBurned, item.tokenInDecimals);
-                        const claimableReward = formatUnits(item.claimableReward, item.tokenOutDecimals);
+                        const amountBurned = sciToFormatted(item.amountBurned, item.tokenInDecimals);
+                        const claimableReward = sciToFormatted(item.claimableReward, item.tokenOutDecimals);
 
                         return (
                             <TableRow key={item.address}>

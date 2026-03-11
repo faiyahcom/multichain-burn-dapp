@@ -27,7 +27,7 @@ import { truncateString } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
 import UserPoolsMenu from "./menu";
 import type { SortOption } from "./menu";
-import { formatUnits } from "ethers";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 
 const SWAP_POOL_STATUSES = ["on_going", "ended", "canceled", "closed"] as const;
 export type SwapPoolParticipatedStatus = (typeof SWAP_POOL_STATUSES)[number];
@@ -143,7 +143,7 @@ function UserSwapPools({ mode = "participated", title }: Props) {
                 <TableBody>
                     <TableSpinner isLoading={isPending} colSpan={columns.length} />
                     {!isPending && data?.pools?.map((item) => {
-                        const tvl = formatUnits(item.tvl, item.tokenOutDecimals);
+                        const tvl = sciToFormatted(item.tvl, item.tokenOutDecimals);
                         const participated = item as ParticipatedUserPool;
 
                         return (
