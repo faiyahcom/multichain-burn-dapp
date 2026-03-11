@@ -1,5 +1,6 @@
 import BN from "bn.js";
 import { formatUnits } from "ethers";
+import Decimal from "decimal.js";
 
 export function toBaseUnits(amount: string, decimals: number): BN {
   const [whole, fraction = ""] = amount.split(".");
@@ -18,8 +19,6 @@ export function formatAmount(amount: string, decimals: number): string {
 }
 
 export function sciToFormatted(value: string, decimals: number): string {
-  // Expand scientific notation without precision loss
-  const expanded = BigInt(Math.round(Number(value))).toString();
-  const bn = new BN(expanded);
-  return formatUnits(bn.toString(), decimals);
+  const expanded = new Decimal(value).toFixed(0);
+  return formatUnits(expanded, decimals);
 }
