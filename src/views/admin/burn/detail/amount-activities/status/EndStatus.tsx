@@ -5,6 +5,7 @@ import TransferTokensDialog from "../TransferTokensDialog";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { useBatchTransferSolFn } from "../hooks/useBatchTransferSolFn";
 import { useBatchTransferEvmFn } from "../hooks/useBatchTransferEvmFn";
+import { useOnChainVaultBalance } from "../hooks/useOnChainVaultBalance";
 import { SOLANA_BACKEND_CHAIN_ID, chainIdToNetworkConfig } from "@/config/networks";
 import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
 import { useMemo } from "react";
@@ -40,15 +41,33 @@ const EndStatus = ({ poolDetail }: Props) => {
         ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
         : (pool?.rewardTokenSymbol ?? "");
 
-    const formattedAvailable =
+    // Use actual on-chain vault balance instead of potentially stale backend data
+    const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
+        poolAddress: pool?.address,
+        chainId: pool?.chainId,
+        rewardToken: pool?.rewardToken,
+        tokenIn: pool?.tokenIn,
+        rewardTokenDecimals: pool?.rewardTokenDecimals,
+        tokenInDecimals: pool?.tokenInDecimals,
+        assetTypeReward: pool?.assetTypeReward,
+        assetTypeIn: pool?.assetTypeIn,
+    });
+
+    const formattedAvailableBackend =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
             ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
             : undefined;
+    const formattedAvailable = onChainReward !== undefined
+        ? onChainReward
+        : formattedAvailableBackend;
 
-    const formattedDepositAvailable =
+    const formattedDepositAvailableBackend =
         poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
             ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
             : undefined;
+    const formattedDepositAvailable = onChainDeposit !== undefined
+        ? onChainDeposit
+        : formattedDepositAvailableBackend;
 
     const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
         if (!pool) return;

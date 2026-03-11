@@ -56,6 +56,27 @@ function toRawAmount(humanStr: string, decimals: number): InstanceType<typeof BN
     return new BN(raw.toString());
 }
 
+// ── Helper: query vault balance (handles native SOL vs SPL token) ─────────────
+
+async function queryVaultBalance(
+    connection: import("@solana/web3.js").Connection,
+    vaultPDA: PublicKey,
+    isNative: boolean,
+): Promise<InstanceType<typeof BN>> {
+    if (isNative) {
+        // For native SOL: query lamport balance on the vault PDA directly
+        const lamports = await connection.getBalance(vaultPDA);
+        return new BN(lamports.toString());
+    }
+    // For SPL / Token-2022: use the RPC's token account parser
+    try {
+        const resp = await connection.getTokenAccountBalance(vaultPDA);
+        return new BN(resp.value.amount);
+    } catch {
+        // Vault does not exist or is not a token account → balance is 0
+        return new BN(0);
+    }
+}
 
 // ── Hook ──────────────────────────────────────────────────────────────────────
 
@@ -97,6 +118,9 @@ export const useBatchTransferSolFn = () => {
                 const rewardAssetType = await detectAssetType(connection, rewardMint);
                 const depositAssetType = await detectAssetType(connection, depositMint);
 
+                const isNativeReward = rewardAssetType === AssetTypeEnum.NATIVE;
+                const isNativeDeposit = depositAssetType === AssetTypeEnum.NATIVE;
+
                 const rewardTokenProgram =
                     rewardAssetType === AssetTypeEnum.SPL2022 ? TOKEN_2022_PROGRAM_ID : TOKEN_PROGRAM_ID;
                 const depositTokenProgram =
@@ -104,24 +128,25 @@ export const useBatchTransferSolFn = () => {
 
                 // Determine which mint we're withdrawing and its decimals
                 const tokenMint = mode === "reward" ? rewardMint : depositMint;
-                const tokenMintInfo = await getMint(
-                    connection,
-                    tokenMint,
-                    undefined,
-                    mode === "reward" ? rewardTokenProgram : depositTokenProgram,
-                );
-                const decimals = tokenMintInfo.decimals;
+                const isNativeToken = mode === "reward" ? isNativeReward : isNativeDeposit;
 
-                // ── Pre-flight: read ACTUAL vault token balance ──────────────────
-                const vaultPDA = mode === "reward" ? rewardVaultPDA : depositVaultPDA;
-                const vaultInfo = await connection.getAccountInfo(vaultPDA);
-                if (!vaultInfo) {
-                    throw new Error(`${mode} vault account not found on-chain.`);
+                // Native SOL (So111…) uses 9 decimals; SPL/Token-2022 fetch from on-chain mint
+                let decimals: number;
+                if (isNativeToken) {
+                    decimals = 9;
+                } else {
+                    const tokenMintInfo = await getMint(
+                        connection,
+                        tokenMint,
+                        undefined,
+                        mode === "reward" ? rewardTokenProgram : depositTokenProgram,
+                    );
+                    decimals = tokenMintInfo.decimals;
                 }
 
-                // Parse SPL / Token-2022 token account to read the amount field
-                // Layout: first 64 bytes are mint(32) + owner(32), then u64 amount at offset 64
-                const vaultBalance = new BN(vaultInfo.data.subarray(64, 72), "le");
+                // ── Pre-flight: check vault balance & pool tracked balance ──────
+                const vaultPDA = mode === "reward" ? rewardVaultPDA : depositVaultPDA;
+                const vaultBalance = await queryVaultBalance(connection, vaultPDA, isNativeToken);
 
                 // Also fetch the pool's tracked balance for comparison
                 // @ts-ignore
@@ -135,6 +160,15 @@ export const useBatchTransferSolFn = () => {
                     return sum.add(toRawAmount(r.amountStr, decimals));
                 }, new BN(0));
 
+                if (vaultBalance.isZero() || trackedBalance.isZero()) {
+                    throw new Error(
+                        `The pool's ${mode} vault is empty ` +
+                        `(vault: ${(vaultBalance.toNumber() / 10 ** decimals).toFixed(4)}, ` +
+                        `tracked: ${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}). ` +
+                        `No tokens available to transfer.`
+                    );
+                }
+
                 if (totalRawRequested.gt(vaultBalance)) {
                     const availableHuman = (vaultBalance.toNumber() / 10 ** decimals).toFixed(4);
                     throw new Error(
@@ -145,8 +179,8 @@ export const useBatchTransferSolFn = () => {
 
                 if (totalRawRequested.gt(trackedBalance)) {
                     throw new Error(
-                        `Total requested (${(totalRawRequested.toNumber() / 10 ** decimals).toFixed(4)}) exceeds ` +
-                        `the pool's tracked ${mode} balance (${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}). ` +
+                        `Total requested exceeds the pool's tracked ${mode} balance ` +
+                        `(${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}). ` +
                         `The on-chain contract will reject this transfer.`
                     );
                 }
