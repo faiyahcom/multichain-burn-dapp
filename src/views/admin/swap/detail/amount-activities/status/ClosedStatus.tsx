@@ -9,6 +9,7 @@ import {
     type TokenMode,
 } from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferSolFn";
 import { useBatchTransferEvmFn } from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferEvmFn";
+import { useOnChainVaultBalance } from "@/views/admin/burn/detail/amount-activities/hooks/useOnChainVaultBalance";
 import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
 import { useMemo } from "react";
 import { AssetTypeEnum } from "@/web3/helpers";
@@ -41,20 +42,39 @@ const ClosedStatus = ({ poolDetail }: Props) => {
         ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
         : (pool?.rewardTokenSymbol ?? "");
 
-    const formattedAvailable =
+    // For Solana pools, use actual on-chain vault balance instead of stale backend data
+    const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
+        poolAddress: pool?.address,
+        chainId: pool?.chainId,
+        rewardTokenDecimals: pool?.rewardTokenDecimals,
+        tokenInDecimals: pool?.tokenInDecimals,
+        assetTypeReward: pool?.assetTypeReward,
+        assetTypeIn: pool?.assetTypeIn,
+    });
+
+    const formattedAvailableBackend =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
             ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
             : undefined;
+    const formattedAvailable = isSolana && onChainReward !== undefined
+        ? onChainReward
+        : formattedAvailableBackend;
 
-    const formattedDepositAvailable =
+    const formattedDepositAvailableBackend =
         poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
             ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
             : undefined;
+    const formattedDepositAvailable = isSolana && onChainDeposit !== undefined
+        ? onChainDeposit
+        : formattedDepositAvailableBackend;
 
-    const formattedCurrentRewardAmount =
+    const formattedCurrentRewardAmountBackend =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
             ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
             : undefined;
+    const formattedCurrentRewardAmount = isSolana && onChainReward !== undefined
+        ? onChainReward
+        : formattedCurrentRewardAmountBackend;
 
     const handleTransfer = async (
         recipients: BatchRecipient[],
