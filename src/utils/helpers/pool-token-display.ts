@@ -1,4 +1,4 @@
-import { ZERO_ADDRESS } from "@/config/constant";
+import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import type { NetworkConfig } from "@/config/networks";
 
 type DisplayToken = {
@@ -22,6 +22,7 @@ const isNativeToken = (address?: string) => {
 
   return (
     address.toLowerCase() === ZERO_ADDRESS.toLowerCase() ||
+    address.toLowerCase() === WSOL_ADDRESS.toLowerCase() ||
     address.toLowerCase() === "native"
   );
 };
