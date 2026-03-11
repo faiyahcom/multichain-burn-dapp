@@ -80,7 +80,7 @@ const AdminTransferHistorySummaryDialog: React.FC<Props> = ({
                 className="grid grid-cols-3 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-15px *:font-normal"
                 key={item.tokenAddress}
               >
-                <div>{item.tokenSymbol}</div>
+                <div>{item.tokenCustomSymbol ?? item.tokenSymbol}</div>
                 <div>{item.txnCount}</div>
                 <div>
                   {sciToFormatted(item.totalAmount, item.tokenDecimals)}
