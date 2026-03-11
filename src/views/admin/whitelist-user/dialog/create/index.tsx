@@ -25,6 +25,9 @@ import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
 import { toast } from "@/components/common/custom-toast";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import { cn } from "@/lib/utils";
+import { useQueryClient } from "@tanstack/react-query";
+import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
+import { useAdminWhitelistUserSearchFilterStore } from "@/stores/admin/whitelist-user/search-filter-store";
 
 // ─── address schema ───────────────────────────────────────────────────────────
 const baseSchema = {
@@ -71,6 +74,26 @@ const AdminWhitelistUserDialogCreate = () => {
 
     const { createWhitelistUser: createSolana } = useCreateWhitelistUserSolanaFn();
     const { createWhitelistUser: createEvm } = useCreateWhitelistUserEvmFn();
+
+    const queryClient = useQueryClient();
+    const { filter } = useAdminWhitelistUserSearchFilterStore();
+
+    const refetchUsers = useCallback(async () => {
+        await new Promise((res) => setTimeout(res, 500));
+        const chainIds = filter.network
+            ? (() => {
+                  const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
+                  return cfg ? [Number(cfg.backendChainId)] : undefined;
+              })()
+            : undefined;
+        queryClient.invalidateQueries({
+            queryKey: whitelistUserQueryKeys.listUsers({
+                search: filter.text || undefined,
+                chainIds,
+                tokenAddresses: filter.tokens.length > 0 ? filter.tokens : undefined,
+            }),
+        });
+    }, [queryClient, filter]);
 
     // ── derive whether selection is Solana or EVM type ────────────────────────
     const hasSolana = selectedNetworks.includes(SOLANA_NETWORK_ID);
@@ -183,6 +206,9 @@ const AdminWhitelistUserDialogCreate = () => {
                 return;
             }
         }
+
+        // Refresh the list with the current filter
+        refetchUsers();
 
         // Remove this network from the selection — if more remain, keep dialog open
         const remaining = selectedNetworks.filter((n) => n !== connectedNetworkCfg.id);

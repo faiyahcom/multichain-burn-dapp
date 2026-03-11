@@ -199,18 +199,15 @@ const UserNetworkIcons: React.FC<{ user: WhitelistUser }> = ({ user }) => {
     if (networks.length === 0) return <span className="text-secondary-text text-xs">—</span>;
 
     return (
-        <div className="flex items-center gap-1.5">
+        <div className="flex flex-col gap-1">
             {networks.map((n) => (
-                <div key={n.id} className="group relative">
+                <div key={n.id} className="flex items-center gap-1.5">
                     <NetworkImgIcon
                         src={n.iconSrc}
                         alt={n.label}
-                        className="size-5 transition-transform group-hover:scale-110"
+                        className="size-5 shrink-0"
                     />
-                    {/* Tooltip */}
-                    <span className="pointer-events-none absolute bottom-full left-1/2 mb-1 -translate-x-1/2 whitespace-nowrap rounded bg-foreground/90 px-1.5 py-0.5 text-[10px] text-background opacity-0 transition-opacity group-hover:opacity-100">
-                        {n.label}
-                    </span>
+                    <span className="text-sm font-medium whitespace-nowrap">{n.label}</span>
                 </div>
             ))}
         </div>
@@ -295,7 +292,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                         <TableHead>User</TableHead>
                         <TableHead>Status</TableHead>
                         <TableHead>Address</TableHead>
-                        <TableHead>Network</TableHead>
+                        <TableHead className="text-center">Network</TableHead>
                         <TableHead>Description</TableHead>
                         <TableHead>Added</TableHead>
                         <TableHead>Action</TableHead>
@@ -364,8 +361,10 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                     </TableCell>
 
                                     {/* Network icons from whitelistChainId */}
-                                    <TableCell>
-                                        <UserNetworkIcons user={user} />
+                                    <TableCell className="text-center">
+                                        <div className="flex justify-center">
+                                            <UserNetworkIcons user={user} />
+                                        </div>
                                     </TableCell>
 
                                     {/* Description — token allocations */}
