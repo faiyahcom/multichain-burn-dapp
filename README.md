@@ -1,3 +1,8 @@
+# Branches
+- main: for development
+- beta: for beta testing (with mapped domain)
+- prod: for production (with mapped domain)
+
 # React + TypeScript + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
