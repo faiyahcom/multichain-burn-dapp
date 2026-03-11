@@ -10,6 +10,8 @@ export interface TokenAllocation {
   tokenDecimals: number;
   chainId: string; // stringified BigInt from backend
   amount: string; // raw BigInt string
+  customName: string | null;
+  customSymbol: string | null;
 }
 
 export interface WhitelistUser {
@@ -37,6 +39,8 @@ export interface TransferHistoryAnalysisItem {
   tokenDecimals: number;
   totalAmount: string;
   txnCount: number;
+  tokenCustomName: string | null;
+  tokenCustomSymbol: string | null;
 }
 
 export interface TransferHistoryAnalysisResponse {
@@ -69,6 +73,8 @@ type TransferHistoryApiTxn = {
   timestamp: string; // unix seconds (as string)
   whitelistName: string | null;
   whitelistEmail: string | null;
+  tokenOutCustomName: string | null;
+  tokenOutCustomSymbol: string | null;
 };
 
 export interface TransferHistoryResponse extends PaginationResponse {

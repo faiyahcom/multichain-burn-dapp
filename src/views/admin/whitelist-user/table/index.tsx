@@ -109,7 +109,7 @@ const TokenAllocationChips: React.FC<{
                         className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
                     >
                         <span>{formatTokenAmount(a.amount, a.tokenDecimals)}</span>
-                        <span className="text-primary/70">{a.tokenSymbol}</span>
+                        <span className="text-primary/70">{a.customSymbol ?? a.tokenSymbol}</span>
                     </span>
                 ))}
                 {hidden > 0 && (
@@ -161,7 +161,7 @@ const TokenAllocationChips: React.FC<{
                                         key={`${a.tokenAddress}-${i}`}
                                         className="bg-muted/20 hover:bg-muted/30 rounded-sm p-10"
                                     >
-                                        <TableCell className="text-center py-3">{a.tokenSymbol}</TableCell>
+                                        <TableCell className="text-center py-3">{a.customSymbol ?? a.tokenSymbol}</TableCell>
                                         <TableCell className="text-center py-3">
                                             {formatTokenAmount(a.amount, a.tokenDecimals)}
                                         </TableCell>

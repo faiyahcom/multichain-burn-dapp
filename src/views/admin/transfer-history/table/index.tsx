@@ -132,7 +132,9 @@ const AdminTransferHistoryTable = () => {
               </TableCell>
 
               {/* Symbol — tokenOutSymbol */}
-              <TableCell>{item.tokenOutSymbol}</TableCell>
+              <TableCell>
+                {item.tokenOutCustomSymbol ?? item.tokenOutSymbol}
+              </TableCell>
 
               {/* Amount — amountOut formatted */}
               <TableCell className="font-medium">
