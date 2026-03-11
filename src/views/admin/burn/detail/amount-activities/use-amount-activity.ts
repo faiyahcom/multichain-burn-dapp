@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuthStore } from "@/stores/authStore";
@@ -24,6 +23,7 @@ import { useAdminRejectPoolSolFn } from "./hooks/useAdminRejectPoolSolFn";
 import { useAdminClosePoolEvmFn } from "./hooks/useAdminClosePoolEvmFn";
 import { useAdminClosePoolSolFn } from "./hooks/useAdminClosePoolSolFn";
 import { poolService } from "@/services/poolService";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -171,8 +171,13 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
+    const navigate = useNavigate();
     const handleEdit = () => {
-        toast.info("Edit is not available yet");
+        if (!pool?.address) return;
+        navigate({
+            to: "/admin/burn/edit/$address",
+            params: { address: pool.address },
+        });
     };
 
     const handleAdminApprove = async () => {

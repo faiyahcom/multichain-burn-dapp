@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import { format } from "date-fns";
 import { DatePicker } from "@/components/ui/date-picker";
 import { poolService } from "@/services/poolService";
-import { useEditPoolEvmFn } from "./hooks/useEditPoolEvmFn";
-import { useEditPoolSolFn } from "./hooks/useEditPoolSolFn";
+import { useEditPoolEvmFn } from "../../../../burn-pool/detail/hooks/useEditPoolEvmFn";
+import { useEditPoolSolFn } from "../../../../burn-pool/detail/hooks/useEditPoolSolFn";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { toast } from "@/components/common/custom-toast";
 import { useNavigate } from "@tanstack/react-router";
@@ -12,7 +12,7 @@ import { poolQueryKeys } from "@/services/queries/queryKey";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { BurnPoolStatus } from "@/types/pool";
-import PoolOverview from "./pool-overview";
+import PoolOverview from "../../../../burn-pool/detail/pool-overview";
 
 export default function EditPoolScreen({
   poolAddress,
@@ -68,7 +68,7 @@ export default function EditPoolScreen({
         });
       }
       toast.success("Pool updated!");
-      navigate({ to: `/burn/detail/${pool.address}` });
+      navigate({ to: `/admin/burn/detail/${pool.address}` });
     } catch (e) {
       // error handled in hook
     } finally {
@@ -180,7 +180,7 @@ export default function EditPoolScreen({
           btnProps={{
             type: "button",
             disabled: saving,
-            onClick: () => navigate({ to: `/burn/detail/${pool.address}` }),
+            onClick: () => navigate({ to: `/admin/burn/detail/${pool.address}` }),
           }}
         />
         <AnimateIconButton

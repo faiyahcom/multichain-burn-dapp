@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import EditPoolScreen from "@/views/burn-pool/detail/EditPoolScreen";
+import EditPoolScreen from "@/views/admin/burn/detail/amount-activities/EditPoolScreen";
 
-export const Route = createFileRoute("/burn/edit/$address")({
+export const Route = createFileRoute("/admin/burn/edit/$address")({
   component: RouteComponent,
 });
 

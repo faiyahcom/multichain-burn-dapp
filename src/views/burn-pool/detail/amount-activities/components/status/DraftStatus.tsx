@@ -4,6 +4,7 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import DepositRewardDialog from "../deposit-reward";
+import EditPoolDialog from "../edit-pool";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -13,6 +14,8 @@ const DraftStatus = ({ poolDetail }: Props) => {
     const {
         depositRewardOpen,
         setDepositRewardOpen,
+        editPoolOpen,
+        setEditPoolOpen,
         handleCancelPool,
         handleDepositReward,
         handleEdit,
@@ -62,7 +65,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 disabled={isRunning}
                 onClick={() => setDepositRewardOpen(true)}
             />
-            <ActionBtn letter="E" text="Edit" color="#7AF4CB" disabled={isRunning} onClick={handleEdit} />
+            <ActionBtn letter="E" text="Edit" color="#7AF4CB" disabled={isRunning} onClick={() => setEditPoolOpen(true)} />
             <ActionBtn
                 letter="R"
                 text="Request Approve"
@@ -76,6 +79,12 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 onOpenChange={setDepositRewardOpen}
                 poolDetail={poolDetail}
                 onConfirm={handleDepositReward}
+            />
+            <EditPoolDialog
+                open={editPoolOpen}
+                onOpenChange={setEditPoolOpen}
+                poolDetail={poolDetail}
+                onConfirm={handleEdit}
             />
         </>
     );

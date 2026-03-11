@@ -1,5 +1,4 @@
 import { useMemo, useState } from "react";
-import { useNavigate } from "@tanstack/react-router";
 import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -21,6 +20,8 @@ import { useCancelRequestApproveSolFn } from "./hooks/useCancelRequestApproveSol
 import { useDepositRewardSolFn } from "./hooks/useDepositRewardSolFn";
 import { useDepositBurnSolFn } from "./hooks/useDepositBurnSolFn";
 import { userService } from "@/services/userService";
+import { useEditPoolEvmFn } from "../hooks/useEditPoolEvmFn";
+import { useEditPoolSolFn } from "../hooks/useEditPoolSolFn";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -44,9 +45,13 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { depositRewardSol } = useDepositRewardSolFn();
     const { depositBurnSol } = useDepositBurnSolFn();
 
+    const { editPool: editPoolEvm } = useEditPoolEvmFn();
+    const { editPool: editPoolSol } = useEditPoolSolFn();
+
     // ── Amount-input state ─────────────────────────────────────
     const [depositRewardOpen, setDepositRewardOpen] = useState(false);
     const [depositBurnOpen, setDepositBurnOpen] = useState(false);
+    const [editPoolOpen, setEditPoolOpen] = useState(false);
 
     const pool = poolDetail?.pool;
     const userAmount = poolDetail?.userAmount;
@@ -204,13 +209,29 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const navigate = useNavigate();
-    const handleEdit = () => {
+    const handleEdit = async (values: {
+        name: string;
+        startTime: number;
+        endTime: number;
+    }) => {
         if (!pool?.address) return;
-        navigate({
-            to: "/burn/edit/$address",
-            params: { address: pool.address },
-        });
+        if (isSolana && poolDetail) {
+            await editPoolSol({
+                poolAddress: pool.address,
+                poolDetail,
+                startTime: values.startTime,
+                endTime: values.endTime,
+            });
+        } else {
+            await editPoolEvm({
+                poolAddress: pool.address,
+                name: values.name,
+                startTime: values.startTime,
+                endTime: values.endTime,
+            });
+        }
+        setEditPoolOpen(false);
+        invalidatePoolQueries(pool.address);
     };
 
     return {
@@ -236,5 +257,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         handleClaim,
         handleCancelApprovalRequest,
         handleEdit,
+        editPoolOpen,
+        setEditPoolOpen,
     };
 };
