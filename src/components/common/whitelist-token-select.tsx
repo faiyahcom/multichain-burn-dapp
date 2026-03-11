@@ -35,7 +35,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
     const { data: whitelistTokens, isLoading } = useGetWhitelistTokens({
-        chainIds: networkConfig?.backendChainId, active: 1,
+        chainIds: networkConfig?.backendChainId, active: 1,isDropped:0
     });
 
     // Native token entry shown at top of list
