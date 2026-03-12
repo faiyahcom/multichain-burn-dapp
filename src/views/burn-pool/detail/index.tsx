@@ -12,6 +12,7 @@ import { useState, useEffect, useRef } from "react";
 import InfoTooltip from "@/components/common/info-tooltip";
 import ScanLink from "@/components/common/scan-link";
 import { useQueryClient } from "@tanstack/react-query";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
     address: string;
@@ -72,10 +73,19 @@ const formatCountdown = (remaining: {
     return parts.join(" ");
 };
 
-const UpcomingCountdown = ({ startTime, poolAddress }: { startTime: string; poolAddress: string }) => {
+const UpcomingCountdown = ({
+    startTime,
+    poolAddress,
+}: {
+    startTime: string;
+    poolAddress: string;
+}) => {
     const queryClient = useQueryClient();
     const remaining = useCountdown(startTime, () => {
-        queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress), exact: false });
+        queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.detail(poolAddress),
+            exact: false,
+        });
     });
     if (!remaining) return null;
     return (
@@ -86,10 +96,19 @@ const UpcomingCountdown = ({ startTime, poolAddress }: { startTime: string; pool
     );
 };
 
-const EndingCountdown = ({ endTime, poolAddress }: { endTime: string; poolAddress: string }) => {
+const EndingCountdown = ({
+    endTime,
+    poolAddress,
+}: {
+    endTime: string;
+    poolAddress: string;
+}) => {
     const queryClient = useQueryClient();
     const remaining = useCountdown(endTime, () => {
-        queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress), exact: false });
+        queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.detail(poolAddress),
+            exact: false,
+        });
     });
     if (!remaining) return null;
     return (
@@ -104,6 +123,7 @@ const BurnPoolDetail = ({ address }: Props) => {
     const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
+        refetchInterval: 2_500, // Poll every 2.5s to update countdown and status
     });
 
     const status = poolDetail?.pool.status;
@@ -121,7 +141,10 @@ const BurnPoolDetail = ({ address }: Props) => {
                 );
             case "upcoming":
                 return poolDetail?.pool.timeStart ? (
-                    <UpcomingCountdown startTime={poolDetail.pool.timeStart} poolAddress={address} />
+                    <UpcomingCountdown
+                        startTime={poolDetail.pool.timeStart}
+                        poolAddress={address}
+                    />
                 ) : null;
             case "holding":
                 return (
@@ -132,7 +155,10 @@ const BurnPoolDetail = ({ address }: Props) => {
                 );
             case "on_going":
                 return poolDetail?.pool.timeEnd ? (
-                    <EndingCountdown endTime={poolDetail.pool.timeEnd} poolAddress={address} />
+                    <EndingCountdown
+                        endTime={poolDetail.pool.timeEnd}
+                        poolAddress={address}
+                    />
                 ) : null;
             case "canceled":
             case "ended":
@@ -147,24 +173,36 @@ const BurnPoolDetail = ({ address }: Props) => {
         <div className="pt-9.5 pl-14">
             <div className="space-y-2">
                 <div className="flex items-center gap-6">
-                    <h2 className="text-3xl font-semibold">
-                        {poolDetail?.pool.name.slice(0, 20)}
-                    </h2>
-                    <AnimateIconButton
-                        iconLetter={BURN_POOL_STATUS[safeStatus].letter}
-                        textVariant="text-container-center"
-                        text={BURN_POOL_STATUS[safeStatus]?.label}
-                        color={BURN_POOL_STATUS[safeStatus].color}
-                        hasGroupHover
-                        classNames={{
-                            btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
-                            text: "text-2xl font-medium",
-                            icon: "size-9 text-3xl",
-                        }}
-                    />
-                    <div className="flex flex-1">{renderExtraContent()}</div>
+                    {isLoadingPoolDetail ? (
+                        <>
+                            <Skeleton className="h-9 w-48" />
+                            <Skeleton className="h-9 w-27" />
+                        </>
+                    ) : (
+                        <>
+                            <h2 className="text-3xl font-semibold">
+                                {poolDetail?.pool.name.slice(0, 20)}
+                            </h2>
+                            <AnimateIconButton
+                                iconLetter={BURN_POOL_STATUS[safeStatus].letter}
+                                textVariant="text-container-center"
+                                text={BURN_POOL_STATUS[safeStatus]?.label}
+                                color={BURN_POOL_STATUS[safeStatus].color}
+                                hasGroupHover
+                                classNames={{
+                                    btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
+                                    text: "text-2xl font-medium",
+                                    icon: "size-9 text-3xl",
+                                }}
+                            />
+                            <div className="flex flex-1">{renderExtraContent()}</div>
+                        </>
+                    )}
                 </div>
-                <ScanLink address={poolDetail?.pool.address ?? ""} chainId={poolDetail?.pool.chainId} />
+                <ScanLink
+                    address={poolDetail?.pool.address ?? ""}
+                    chainId={poolDetail?.pool.chainId}
+                />
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">

@@ -22,9 +22,7 @@ import { useDepositBurnSolFn } from "./hooks/useDepositBurnSolFn";
 import { userService } from "@/services/userService";
 import { useEditPoolEvmFn } from "../hooks/useEditPoolEvmFn";
 import { useEditPoolSolFn } from "../hooks/useEditPoolSolFn";
-import { getErrorMessage } from "@/utils/helpers/error-message";
-import type { ErrorResponseData } from "@/types/common";
-import axios from "axios";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -32,6 +30,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const namespace = caipAddress?.split(":")[0];
     const isSolana = namespace === "solana";
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
 
     // ── EVM hooks ──────────────────────────────────────────────
     const { cancelBurnPool } = useCancelBurnPoolEvmFn();
@@ -215,6 +214,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         } else {
             await cancelRequestApproveEvm({ poolAddress: pool.address });
         }
+        navigate({ to: `/admin/master-pool-management` });
         invalidatePoolQueries(pool.address);
     };
 

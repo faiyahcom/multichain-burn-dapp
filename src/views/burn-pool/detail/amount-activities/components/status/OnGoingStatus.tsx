@@ -4,6 +4,9 @@ import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import DepositBurnDialog from "../deposit-burn";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
+import { useMemo } from "react";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -11,25 +14,62 @@ type Props = {
 
 const OnGoingStatus = ({ poolDetail }: Props) => {
     const {
-        pool,
-        formattedReward,
         formattedBurned,
         depositBurnOpen,
         setDepositBurnOpen,
         handleDepositBurn,
     } = useAmountActivity(poolDetail);
 
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
+
+    const estmatedReward = useMemo(() => {
+        if (!poolDetail) return "-";
+        const rewardSymbol =
+            rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+        const totalDeposited =
+            Number(poolDetail.depositedAmount) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        const rewardPool =
+            Number(poolDetail.pool.rewardAmount) /
+            Math.pow(10, poolDetail.pool.rewardTokenDecimals);
+        const yourCurrentDeposited =
+            Number(poolDetail.userAmount.deposited) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        const reward = (yourCurrentDeposited / totalDeposited) * rewardPool;
+        return `${reward} ${rewardSymbol}`;
+    }, [poolDetail, rewardTokenDisplay]);
+
     return (
         <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <StatRow
-                label="Claimed Reward"
-                value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
+                label="Estimated Claimable Reward"
+                value={`${estmatedReward}`}
                 className="font-medium text-active"
                 valueClassName="text-2xl font-bold"
             />
             <StatRow
                 label="Your Burned Amount"
-                value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
+                value={`${formattedBurned} ${burnTokenDisplay?.symbol ?? ""}`}
             />
             {/* {hasClaimed && (
                 <div className="mx-1 inline-flex items-start gap-1">
