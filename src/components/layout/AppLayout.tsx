@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Sidebar } from "./sidebar/Sidebar";
 import { MainHeader } from "./header/MainHeader";
+import { SwitchNetworkModal } from "./SwitchNetworkModal";
 
 type AppLayoutProps = {
   children: ReactNode;
@@ -10,6 +11,7 @@ export function AppLayout({ children }: AppLayoutProps) {
   return (
     <div className="flex min-h-dvh flex-col bg-background text-foreground">
       <MainHeader />
+      <SwitchNetworkModal />
 
       <div className="flex flex-1">
         <Sidebar />

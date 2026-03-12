@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -23,7 +24,7 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <ActionBtn letter="C" text="Cancel Pool" color="#FF8E97"
                 isLoading={activeAction === "cancel"}
                 disabled={isRunning}
@@ -37,7 +38,7 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
                 disabled={isRunning}
                 onClick={() => run("cancelApproval", handleCancelApprovalRequest)}
             />
-        </>
+        </PoolChainGuard>
     );
 };
 

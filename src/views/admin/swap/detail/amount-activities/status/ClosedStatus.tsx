@@ -14,6 +14,7 @@ import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/Tr
 import { useMemo } from "react";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -102,7 +103,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={pool?.chainId}>
             {/* <StatRow
                 label="Total Deposited"
                 value={`${formattedTotalDeposited} ${pool?.tokenInSymbol ?? ""}`}
@@ -146,7 +147,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                     <p className="text-greyed">{poolDetail.pool.adminCloseReason}</p>
                 </div>
             )}
-        </>
+        </PoolChainGuard>
     );
 };
 

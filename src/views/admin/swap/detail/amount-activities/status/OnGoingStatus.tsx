@@ -11,6 +11,7 @@ import {
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
@@ -41,7 +42,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <ActionBtn
                 letter="C"
                 text="Close Pool"
@@ -115,7 +116,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                     </DialogFooter>
                 </DialogContent>
             </Dialog>
-        </>
+        </PoolChainGuard>
     );
 };
 

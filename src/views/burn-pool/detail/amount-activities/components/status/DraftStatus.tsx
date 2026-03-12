@@ -5,6 +5,7 @@ import { ActionBtn } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import DepositRewardDialog from "../deposit-reward";
 import EditPoolDialog from "../edit-pool";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -49,7 +50,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <ActionBtn
                 letter="C"
                 text="Cancel Pool"
@@ -86,7 +87,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 poolDetail={poolDetail}
                 onConfirm={handleEdit}
             />
-        </>
+        </PoolChainGuard>
     );
 };
 

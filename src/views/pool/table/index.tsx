@@ -34,6 +34,7 @@ import {
   truncateString,
 } from "@/utils/helpers/string";
 import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
@@ -262,23 +263,25 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                 ) : (
                   <TableCell>
                     <div className="mx-auto block max-w-max">
-                      <AnimateIconButton
-                        variant="letter-icon"
-                        textVariant="text-container-center"
-                        iconLetter="P"
-                        hasGroupHover
-                        color="#6E37FF"
-                        text="Swap"
-                        classNames={{
-                          btn: "after:text-primary-foreground min-w-20.5",
-                        }}
-                        btnProps={{
-                          onClick: (e) => {
-                            e.stopPropagation();
-                            setSwapPoolAddress(pool.address);
-                          },
-                        }}
-                      />
+                      <PoolChainGuard chainId={pool.chainId}>
+                        <AnimateIconButton
+                          variant="letter-icon"
+                          textVariant="text-container-center"
+                          iconLetter="P"
+                          hasGroupHover
+                          color="#6E37FF"
+                          text="Swap"
+                          classNames={{
+                            btn: "after:text-primary-foreground min-w-20.5",
+                          }}
+                          btnProps={{
+                            onClick: (e) => {
+                              e.stopPropagation();
+                              setSwapPoolAddress(pool.address);
+                            },
+                          }}
+                        />
+                      </PoolChainGuard>
                     </div>
                   </TableCell>
                 )}

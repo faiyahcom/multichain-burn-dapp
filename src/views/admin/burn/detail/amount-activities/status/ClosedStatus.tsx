@@ -12,6 +12,7 @@ import { useMemo } from "react";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -102,7 +103,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={pool?.chainId}>
             <StatRow
                 label="Total Deposited"
                 value={formattedTotalDeposited !== undefined
@@ -148,7 +149,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                     <p className="text-greyed">{poolDetail.pool.adminCloseReason}</p>
                 </div>
             )}
-        </>
+        </PoolChainGuard>
     );
 };
 

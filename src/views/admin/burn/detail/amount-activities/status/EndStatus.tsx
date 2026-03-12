@@ -11,6 +11,7 @@ import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
 import { useMemo } from "react";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -90,7 +91,7 @@ const EndStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={pool?.chainId}>
             <StatRow
                 label="Claimed Reward"
                 value={!pool ? <Skeleton className="h-5 w-24" /> : `${formattedReward} ${rewardTokenSymbolDisplay}`}
@@ -122,7 +123,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 }}
                 onTransfer={handleTransfer}
             />
-        </>
+        </PoolChainGuard>
     );
 };
 

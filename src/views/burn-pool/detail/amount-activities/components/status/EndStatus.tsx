@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -22,7 +23,7 @@ const EndStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <StatRow
                 label="Claimed Reward"
                 value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
@@ -34,7 +35,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
             />
             <ActionBtn letter="C" text="Claim" isLoading={isLoading} disabled={!canClaim} onClick={handleClaimWithLoading} />
-        </>
+        </PoolChainGuard>
     );
 };
 

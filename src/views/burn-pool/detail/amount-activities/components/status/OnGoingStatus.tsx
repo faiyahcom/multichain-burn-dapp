@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import DepositBurnDialog from "../deposit-burn";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -19,7 +20,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
     } = useAmountActivity(poolDetail);
 
     return (
-        <>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <StatRow
                 label="Claimed Reward"
                 value={`${formattedReward} ${pool?.rewardTokenSymbol ?? ""}`}
@@ -52,7 +53,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
                 poolDetail={poolDetail}
                 onConfirm={handleDepositBurn}
             />
-        </>
+        </PoolChainGuard>
     );
 };
 
