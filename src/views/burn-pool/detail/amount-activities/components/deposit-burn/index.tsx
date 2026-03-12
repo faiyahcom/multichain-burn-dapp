@@ -20,6 +20,7 @@ import TokenImage from "@/components/common/token-image";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 const depositFormSchema = z.object({
     amount: z
@@ -116,46 +117,27 @@ const DepositBurnDialog = ({
         }
     };
 
-    const networkConfig = useMemo(
-        () => (pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined),
-        [pool?.chainId],
-    );
-
-    const tokenInDisplay = useMemo(() => {
-        if (pool?.assetTypeIn === AssetTypeEnum.NATIVE && networkConfig) {
-            const native = networkConfig.appKitNetwork.nativeCurrency;
-            return {
-                imageUri: networkConfig.iconSrc,
-                customSymbol: native.symbol,
-                customName: native.name,
-            };
-        }
-        return poolDetail?.tokenIn
-            ? {
-                imageUri: poolDetail.tokenIn.imageUri,
-                customSymbol: poolDetail.tokenIn.customSymbol,
-                customName: poolDetail.tokenIn.customName,
-            }
-            : undefined;
-    }, [pool?.assetTypeIn, networkConfig, poolDetail?.tokenIn]);
-
-    const tokenOutDisplay = useMemo(() => {
-        if (pool?.assetTypeReward === AssetTypeEnum.NATIVE && networkConfig) {
-            const native = networkConfig.appKitNetwork.nativeCurrency;
-            return {
-                imageUri: networkConfig.iconSrc,
-                customSymbol: native.symbol,
-                customName: native.name,
-            };
-        }
-        return poolDetail?.tokenOut
-            ? {
-                imageUri: poolDetail.tokenOut.imageUri,
-                customSymbol: poolDetail.tokenOut.customSymbol,
-                customName: poolDetail.tokenOut.customName,
-            }
-            : undefined;
-    }, [pool?.assetTypeReward, networkConfig, poolDetail?.tokenOut]);
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
 
     const ratio = useMemo(() => {
         if (!pool) return "-";
@@ -172,13 +154,13 @@ const DepositBurnDialog = ({
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         return `${raw.toLocaleString(undefined, {
             maximumFractionDigits: poolDetail.pool.tokenInDecimals,
-        })} ${tokenInDisplay?.customSymbol ?? poolDetail.pool.tokenInSymbol}`;
-    }, [poolDetail, tokenInDisplay]);
+        })} ${burnTokenDisplay?.symbol ?? poolDetail.pool.tokenInSymbol}`;
+    }, [poolDetail, burnTokenDisplay]);
 
     const estmatedReward = useMemo(() => {
         if (!poolDetail) return "-";
         const rewardSymbol =
-            tokenOutDisplay?.customSymbol ?? poolDetail.pool.rewardTokenSymbol;
+            rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
         if (!amountStr) return `0 ${rewardSymbol}`;
         const amount = Number(amountStr);
         if (isNaN(amount) || amount <= 0) return `0 ${rewardSymbol}`;
@@ -195,7 +177,7 @@ const DepositBurnDialog = ({
             ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
             rewardPool;
         return `${reward} ${rewardSymbol}`;
-    }, [poolDetail, tokenOutDisplay, ratio, amountStr]);
+    }, [poolDetail, rewardTokenDisplay, ratio, amountStr]);
 
     const onSubmit = async (data: DepositFormValues) => {
         await onConfirm(data.amount);
@@ -239,18 +221,18 @@ const DepositBurnDialog = ({
                                     label="Burn Token"
                                     value={
                                         !pool ? <Skeleton className="h-5 w-28" /> :
-                                        <span className="flex items-center gap-2 font-semibold">
-                                            <TokenImage
-                                                src={tokenInDisplay?.imageUri}
-                                                alt={tokenInDisplay?.customSymbol}
-                                                classNames={{
-                                                    common: "size-5",
-                                                    img: "size-5",
-                                                    placeholder: "size-5",
-                                                }}
-                                            />
-                                            {tokenInDisplay?.customSymbol ?? "-"}
-                                        </span>
+                                            <span className="flex items-center gap-2 font-semibold">
+                                                <TokenImage
+                                                    src={burnTokenDisplay?.imageUri}
+                                                    alt={burnTokenDisplay?.symbol}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                {burnTokenDisplay?.symbol ?? "-"}
+                                            </span>
                                     }
                                 />
                                 <SummaryRow
@@ -261,18 +243,18 @@ const DepositBurnDialog = ({
                                     label="Reward Token"
                                     value={
                                         !pool ? <Skeleton className="h-5 w-28" /> :
-                                        <span className="flex items-center gap-2 font-semibold">
-                                            <TokenImage
-                                                src={tokenOutDisplay?.imageUri}
-                                                alt={tokenOutDisplay?.customSymbol}
-                                                classNames={{
-                                                    common: "size-5",
-                                                    img: "size-5",
-                                                    placeholder: "size-5",
-                                                }}
-                                            />
-                                            {tokenOutDisplay?.customSymbol ?? "-"}
-                                        </span>
+                                            <span className="flex items-center gap-2 font-semibold">
+                                                <TokenImage
+                                                    src={rewardTokenDisplay?.imageUri}
+                                                    alt={rewardTokenDisplay?.symbol}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                {rewardTokenDisplay?.symbol ?? "-"}
+                                            </span>
                                     }
                                 />
                                 <SummaryRow label="" value="" />
@@ -294,10 +276,10 @@ const DepositBurnDialog = ({
                                     <span>Your Deposited Amount</span>
                                     <span className="flex items-center space-x-2 font-medium text-foreground">
                                         {!poolDetail ? <Skeleton className="h-5 w-28" /> : (
-                                        <span>
-                                            {formattedCurrentDepositedAmount ?? "0"}{" "}
-                                            {tokenInDisplay?.customSymbol ?? ""}
-                                        </span>
+                                            <span>
+                                                {formattedCurrentDepositedAmount ?? "0"}{" "}
+                                                {burnTokenDisplay?.symbol ?? ""}
+                                            </span>
                                         )}
                                     </span>
                                 </div>
@@ -308,7 +290,7 @@ const DepositBurnDialog = ({
                                         <span>
                                             {isLoadingBurnBalance
                                                 ? "Loading..."
-                                                : `${burnBalanceFormatted ?? "0"} ${tokenInDisplay?.customSymbol ?? ""}`}
+                                                : `${burnBalanceFormatted ?? "0"} ${burnTokenDisplay?.symbol ?? ""}`}
                                         </span>
                                     </span>
                                 </div>
@@ -330,15 +312,15 @@ const DepositBurnDialog = ({
                                         ) : (
                                             <>
                                                 <TokenImage
-                                                    src={tokenInDisplay?.imageUri}
-                                                    alt={tokenInDisplay?.customSymbol}
+                                                    src={burnTokenDisplay?.imageUri}
+                                                    alt={burnTokenDisplay?.symbol}
                                                     classNames={{
                                                         common: "size-5",
                                                         img: "size-5",
                                                         placeholder: "size-5",
                                                     }}
                                                 />
-                                                <span>{tokenInDisplay?.customSymbol ?? ""}</span>
+                                                <span>{burnTokenDisplay?.symbol ?? ""}</span>
                                             </>
                                         )}
                                     </div>
