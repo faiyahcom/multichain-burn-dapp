@@ -13,6 +13,8 @@ import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { truncateString } from "@/utils/helpers/string";
+import { useState } from "react";
+import { Spinner } from "../ui/spinner";
 
 type Props = {
   value?: string;
@@ -27,6 +29,8 @@ const resolveName = (token: { name: string; customName?: string }) =>
   token.customName?.trim() || token.name;
 
 const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
+  const [open, setOpen] = useState(false);
+  const [textSearch, setTextSearch] = useState("");
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
 
   const networkConfig = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
@@ -34,11 +38,21 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
   const isSolana = selectedNetworkId === "solanaDevnet";
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
-  const { data: whitelistTokens, isLoading } = useGetWhitelistTokens({
-    chainIds: networkConfig?.backendChainId,
-    active: "1",
-    isDropped: "0",
-  });
+  const { data: whitelistTokens, isPending: isLoading } = useGetWhitelistTokens(
+    {
+      search: textSearch || undefined,
+      chainIds: networkConfig?.backendChainId,
+      active: "1",
+      isDropped: "0",
+    },
+  );
+
+  const handleOpenChange = (open: boolean) => {
+    if (!open) {
+      setTextSearch("");
+    }
+    setOpen(open);
+  };
 
   // Native token entry shown at top of list
   const nativeToken = nativeCurrency
@@ -58,7 +72,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
         );
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={handleOpenChange}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
@@ -83,14 +97,24 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
         align="end"
         sideOffset={6}
         className="w-(--radix-dropdown-menu-trigger-width) rounded-lg px-3 pt-3 pb-4"
+        style={{
+          maxHeight: "var(--radix-dropdown-menu-content-available-height)",
+        }}
       >
-        <SearchTextDebouncedInput className="bg-primary-foreground" />
+        <SearchTextDebouncedInput
+          className="bg-primary-foreground"
+          value={textSearch}
+          onValueChange={setTextSearch}
+          inputProps={{
+            onKeyDown: (e) => e.stopPropagation(), // Prevent dropdown menu behavior of switch focus to matching item
+          }}
+        />
         {isLoading ? (
           <div className="flex items-center justify-center py-4">
-            Loading tokens...
+            <Spinner />
           </div>
         ) : (
-          <div className="mt-2 space-y-1">
+          <div className="mt-2 max-h-[calc(var(--radix-dropdown-menu-content-available-height)*0.7)] space-y-1 overflow-y-auto">
             {nativeToken && (
               <DropdownMenuItem
                 key={nativeAddress}
