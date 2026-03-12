@@ -3,6 +3,7 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import Decimal from "decimal.js";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -41,34 +42,40 @@ const RewardAmount = ({ poolDetail }: Props) => {
     });
 
     const maxBurn = useMemo(() => {
-        if (!poolDetail) return 0;
+        if (!poolDetail) return new Decimal(0);
 
-        const num = Number(poolDetail.pool.rewardNumerator ?? 0); // N
-        const den = Number(poolDetail.pool.rewardDenominator ?? 0); // D;
+        const num = new Decimal(poolDetail.pool.rewardNumerator ?? 0); // N
+        const den = new Decimal(poolDetail.pool.rewardDenominator ?? 0); // D
 
-        if (!num || !den) return 0;
+        if (num.isZero() || den.isZero()) return new Decimal(0);
 
-        // Raw amounts (not formatted)
-        const rewardRaw = Number(poolDetail.rewardAmount);
+        // Raw reward amount (in base units)
+        const rewardRaw = new Decimal(poolDetail.rewardAmount ?? 0);
         const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
-        const burnDecimals = poolDetail.pool.tokenInDecimals;
 
-        // Convert reward to human readable
-        const rewardHuman = rewardRaw / 10 ** rewardDecimals;
+        // Convert reward to human-readable
+        const rewardHuman = rewardRaw.div(new Decimal(10).pow(rewardDecimals));
 
-        // maxBurn in human readable
-        const maxBurnHuman = rewardHuman * (den / num); // It's reward num and dem, not ratio on onchain
+        // maxBurn in human-readable: rewardHuman * (den / num)
+        const maxBurnHuman = rewardHuman.mul(den.div(num));
 
         return maxBurnHuman;
     }, [poolDetail]);
-    const formattedMaxBurn = maxBurn
-        ? formatAmount(
-            (maxBurn * 10 ** poolDetail!.pool.tokenInDecimals).toString(),
-            poolDetail!.pool.tokenInDecimals,
-        )
-        : "-";
 
-    const burnProgress = Number(formattedBurned) / Number(maxBurn);
+    const formattedMaxBurn = maxBurn.isZero()
+        ? "-"
+        : formatAmount(
+            maxBurn
+                .mul(new Decimal(10).pow(poolDetail!.pool.tokenInDecimals))
+                .toFixed(0),
+            poolDetail!.pool.tokenInDecimals,
+          );
+
+    const burnProgress = maxBurn.isZero()
+        ? 0
+        : new Decimal(poolDetail?.depositedAmount ?? 0)
+            .div(maxBurn.mul(new Decimal(10).pow(poolDetail!.pool.tokenInDecimals)))
+            .toNumber();
     return (
         <div className="mt-3 w-full py-4">
             <div className="flex items-center gap-14 pb-4 text-xl font-medium">
