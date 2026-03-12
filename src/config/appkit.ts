@@ -4,6 +4,8 @@ import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import { type AppKitNetwork } from "@reown/appkit/networks";
 import { APPKIT_PROJECT_ID } from "@/config/constant";
 import { NETWORK_CONFIGS, type NetworkConfig } from "./networks";
+import { http } from "viem";
+import { xphereTestnet } from "@reown/appkit/networks";
 
 if (!APPKIT_PROJECT_ID) {
   // eslint-disable-next-line no-console
@@ -27,6 +29,9 @@ export const wagmiAdapter = new WagmiAdapter({
   projectId: APPKIT_PROJECT_ID ?? "",
   networks,
   ssr: false,
+  transports: {
+    [xphereTestnet.id]: http("https://testnet.x-phere.com"),
+  },
 });
 
 export const solanaAdapter = new SolanaAdapter();

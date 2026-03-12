@@ -67,8 +67,8 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     backendChainId: String(xphereTestnet.id),
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
-    shortLabel: "XPH",
-    scanUrl: "https://explorer.xphere.io",
+    shortLabel: "XPT",
+    scanUrl: "https://xpt.tamsa.io",
   },
   {
     id: "solanaDevnet",

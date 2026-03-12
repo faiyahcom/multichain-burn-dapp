@@ -6,18 +6,28 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkConfig } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import { useSystemStore } from "@/stores/systemStore";
 import NetworkIcon from "./network-icon";
+import { useAppKitNetwork } from "@reown/appkit/react";
 
 export default function NetworkSelect() {
   const selectedNetworkId = useSystemStore((s) => s.selectedNetworkId);
   const setSelectedNetworkId = useSystemStore((s) => s.setSelectedNetworkId);
-
+  const { switchNetwork } = useAppKitNetwork();
   const selectedNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === selectedNetworkId,
   );
+
+  const handleNetworkChange = async (network: NetworkConfig) => {
+    try {
+      await switchNetwork(network.appKitNetwork);
+      setSelectedNetworkId(network.id);
+    } catch {
+      // User rejected the switch — keep the current network selected.
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -42,7 +52,7 @@ export default function NetworkSelect() {
             return (
               <DropdownMenuItem
                 key={network.id}
-                onClick={() => setSelectedNetworkId(network.id)}
+                onClick={() => handleNetworkChange(network)}
                 className={cn(
                   "flex items-center gap-3 px-4 py-2",
                   isSelected && "bg-inactive font-bold text-active",
