@@ -8,15 +8,16 @@ import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import InfoTooltip from "@/components/common/info-tooltip";
 import ScanLink from "@/components/common/scan-link";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
     address: string;
 };
 
-const useCountdown = (targetTime: string) => {
+const useCountdown = (targetTime: string, onExpire?: () => void) => {
     const calcRemaining = () => {
         const diff = Number(targetTime) * 1000 - Date.now();
         if (diff <= 0) return null;
@@ -28,10 +29,29 @@ const useCountdown = (targetTime: string) => {
     };
 
     const [remaining, setRemaining] = useState(calcRemaining);
+    const onExpireRef = useRef(onExpire);
+    onExpireRef.current = onExpire;
+    const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+    const delayRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
-        const id = setInterval(() => setRemaining(calcRemaining()), 1_000);
-        return () => clearInterval(id);
+        const id = setInterval(() => {
+            const r = calcRemaining();
+            setRemaining(r);
+            if (r === null) {
+                clearInterval(id);
+                // Delay 1s, then poll onExpire repeatedly until unmount
+                delayRef.current = setTimeout(() => {
+                    onExpireRef.current?.();
+                    pollRef.current = setInterval(() => onExpireRef.current?.(), 2_000);
+                }, 1_000);
+            }
+        }, 1_000);
+        return () => {
+            clearInterval(id);
+            if (delayRef.current) clearTimeout(delayRef.current);
+            if (pollRef.current) clearInterval(pollRef.current);
+        };
     }, [targetTime]);
 
     return remaining;
@@ -48,12 +68,15 @@ const formatCountdown = (remaining: {
     const { days, hours, minutes, seconds } = remaining;
     const parts: string[] = [];
     if (days > 0) parts.push(`${days}d`);
-    parts.push(`${pad(hours)}h`, `${pad(minutes)}m`);
+    parts.push(`${pad(hours)}h`, `${pad(minutes)}m`, `${pad(seconds)}s`);
     return parts.join(" ");
 };
 
-const UpcomingCountdown = ({ startTime }: { startTime: string }) => {
-    const remaining = useCountdown(startTime);
+const UpcomingCountdown = ({ startTime, poolAddress }: { startTime: string; poolAddress: string }) => {
+    const queryClient = useQueryClient();
+    const remaining = useCountdown(startTime, () => {
+        queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress), exact: false });
+    });
     if (!remaining) return null;
     return (
         <p className="text-xl">
@@ -63,8 +86,11 @@ const UpcomingCountdown = ({ startTime }: { startTime: string }) => {
     );
 };
 
-const EndingCountdown = ({ endTime }: { endTime: string }) => {
-    const remaining = useCountdown(endTime);
+const EndingCountdown = ({ endTime, poolAddress }: { endTime: string; poolAddress: string }) => {
+    const queryClient = useQueryClient();
+    const remaining = useCountdown(endTime, () => {
+        queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress), exact: false });
+    });
     if (!remaining) return null;
     return (
         <p className="text-xl">
@@ -95,7 +121,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                 );
             case "upcoming":
                 return poolDetail?.pool.timeStart ? (
-                    <UpcomingCountdown startTime={poolDetail.pool.timeStart} />
+                    <UpcomingCountdown startTime={poolDetail.pool.timeStart} poolAddress={address} />
                 ) : null;
             case "holding":
                 return (
@@ -106,7 +132,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                 );
             case "on_going":
                 return poolDetail?.pool.timeEnd ? (
-                    <EndingCountdown endTime={poolDetail.pool.timeEnd} />
+                    <EndingCountdown endTime={poolDetail.pool.timeEnd} poolAddress={address} />
                 ) : null;
             case "canceled":
             case "ended":
