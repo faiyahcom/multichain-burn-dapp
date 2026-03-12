@@ -41,14 +41,11 @@ export function useWalletAuth() {
   const [isAuthenticating, setIsAuthenticating] = useState(false)
   const { login, setLoading, setError, user } = useAuthStore()
 
-  // EVM wallet hooks - use useAppKitAccount instead of deprecated useAccount
   const { address: evmAddress } = useAppKitAccount({
     namespace: 'eip155',
   })
-  // signMessageAsync đã deprecated, dùng mutateAsync thay thế
   const { mutateAsync: signEvmMessage } = useSignMessage()
 
-  // Solana wallet account
   const { address: solanaAddress } = useAppKitAccount({
     namespace: 'solana',
   })
@@ -56,27 +53,21 @@ export function useWalletAuth() {
   const authenticate = useCallback(
     async (walletType: WalletType, address: string) => {
       try {
-        console.log('Starting authentication for:', walletType, address)
         setIsAuthenticating(true)
         setLoading(true)
         setError(null)
 
-        // Step 1: Request signing message from server
-        console.log('Requesting signing message for address:', address)
         const response = await authService.requestSigningMessage({
           address,
         })
-        
+
         // Extract message from response
         // Response format: { "message": "1767860919362, Welcome" }
         const message = response.message
         if (!message) {
           throw new Error('Invalid response: message is missing')
         }
-        
-        console.log('Received signing message:', message)
 
-        // Step 2: Sign message with wallet
         let signature: string
 
         if (walletType === 'evm') {
@@ -86,16 +77,12 @@ export function useWalletAuth() {
           }
           console.log('Signing message with EVM wallet:', message)
           signature = await signEvmMessage({ message })
-          console.log('EVM signature received')
         } else {
           // Sign with Solana wallet
           console.log('Signing message with Solana wallet:', message)
           signature = await signSolanaMessage(message)
-          console.log('Solana signature received')
         }
 
-        // Step 3: Send signature to server for authentication
-        console.log('Sending signature to server for authentication')
         const signInMethod =
           walletType === 'evm'
             ? authService.signInEvm
@@ -108,20 +95,15 @@ export function useWalletAuth() {
         })
         console.log('Authentication successful, token received')
 
-        // Step 4: Set token temporarily to fetch user info
-        // Axios interceptor will automatically add token to Authorization header
         const tempToken = token
         login({
           user: { id: '', address }, // Temporary, will be updated below
           accessToken: tempToken,
         })
 
-        // Step 5: Get user info from server (token is now in Authorization header)
-        console.log('Fetching user info from server')
         const userInfo = await authService.getCurrentUser()
         console.log('User info received:', userInfo)
 
-        // Step 6: Update auth state with complete user info
         login({
           user: { id: userInfo.id, address: userInfo.address || address, role: userInfo.role },
           accessToken: tempToken,
