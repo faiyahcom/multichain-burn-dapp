@@ -11,21 +11,37 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import AdminWhitelistTokenDialogCreate from "../dialog/create";
 import AdminWhitelistTokenSearchStatusPicker from "./status-picker";
+import { networkIdToChainId } from "@/config/networks";
 
 const AdminWhitelistTokenSearch = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
+  const limit = 20;
   const statusOptions = tokenStatus.map((status) => ({
     label: tokenStatusLabels[status],
     value: status,
   }));
 
-  const { data: summaryData } = useQuery({
-    queryKey: whitelistQueryKeys.summary(),
-    queryFn: () => whitelistService.getWhitelistTokenSummary(),
+  const { data: listTokensData } = useQuery({
+    queryKey: whitelistQueryKeys.listTokens(filter),
+    queryFn: () =>
+      whitelistService.getListTokens({
+        page: filter.page,
+        limit: limit,
+        chainIds:
+          filter.network.length > 0
+            ? filter.network
+                .map((network) => networkIdToChainId(network))
+                .filter((chainId) => chainId)
+                .join(",")
+            : undefined,
+        active: filter.status === "all" ? undefined : filter.status,
+        search: filter.text ? filter.text : undefined,
+        isDropped: "false", // only show tokens that are not soft-deleted
+      }),
   });
 
-  const totalEnable = summaryData?.totalEnable ?? 0;
-  const totalDisable = summaryData?.totalDisable ?? 0;
+  const totalEnable = listTokensData?.totalEnable ?? 0;
+  const totalDisable = listTokensData?.totalDisable ?? 0;
   const totalTokens = totalEnable + totalDisable;
 
   return (

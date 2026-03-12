@@ -73,7 +73,7 @@ const AdminWhitelistTokenTable = () => {
   const limit = 20;
 
   const { data: listTokensData, isPending: isListTokensPending } = useQuery({
-    queryKey: [...whitelistQueryKeys.listTokens(), JSON.stringify(filter)],
+    queryKey: whitelistQueryKeys.listTokens(filter),
     queryFn: () =>
       whitelistService.getListTokens({
         page: filter.page,
