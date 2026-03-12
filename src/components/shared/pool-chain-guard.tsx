@@ -66,7 +66,7 @@ export function PoolChainGuard({ chainId, children }: Props) {
                 iconLetter="S"
                 text="Switch Network"
                 variant="letter-icon"
-                textVariant="text-container-center"
+                textVariant="text-self-center"
                 hasGroupHover
                 classNames={{
                     btn: "w-full text-center after:text-sm after:font-medium",
