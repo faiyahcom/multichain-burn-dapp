@@ -1,4 +1,4 @@
-import Decimal from "decimal.js";
+import { safeDecimalParse } from "@/utils/helpers/numbers";
 import MetricNumber from "./metric-number";
 
 interface Props {
@@ -8,22 +8,14 @@ interface Props {
   outSymbol: string;
 }
 
-const safeDecimalParse = (value: string) => {
-  try {
-    return new Decimal(value);
-  } catch (error) {
-    return null;
-  }
-};
-
 const RatioDisplay: React.FC<Props> = ({
   inValue,
   outValue,
   inSymbol,
   outSymbol,
 }) => {
-  const inValueDecimal = safeDecimalParse(inValue);
-  const outValueDecimal = safeDecimalParse(outValue);
+  const inValueDecimal = safeDecimalParse({ value: inValue });
+  const outValueDecimal = safeDecimalParse({ value: outValue });
 
   if (
     inValueDecimal === null ||

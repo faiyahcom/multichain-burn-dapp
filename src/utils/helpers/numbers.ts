@@ -31,3 +31,19 @@ export function sciToFormatted(value: string, decimals: number): string {
     return "0";
   }
 }
+
+export const safeDecimalParse = <
+  T extends string | null | undefined | number = null,
+>({
+  value,
+  throwValue = null as T,
+}: {
+  value: string;
+  throwValue?: T;
+}): Decimal | T => {
+  try {
+    return new Decimal(value);
+  } catch (error) {
+    return throwValue as T;
+  }
+};
