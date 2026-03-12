@@ -198,7 +198,26 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
             <Input
               placeholder="1:1"
               aria-invalid={!!errors.ratio}
-              {...register("ratio", { required: "Ratio is required" })}
+              {...register("ratio", {
+                required: "Ratio is required",
+                validate: (value) => {
+                  const trimmed = value.trim();
+
+                  // allow negative/decimal numbers through format check
+                  const match = trimmed.match(/^(-?[\d.]+):(-?[\d.]+)$/);
+                  if (!match) return 'Ratio must be in format "X:Y" (e.g. 1:2)';
+
+                  const left = Number(match[1]);
+                  const right = Number(match[2]);
+
+                  if (!Number.isInteger(left) || !Number.isInteger(right))
+                    return "Both numbers must be integers";
+                  if (left <= 0 || right <= 0)
+                    return "Both numbers must be greater than zero";
+
+                  return true;
+                },
+              })}
               className="w-20 px-2 text-center placeholder:text-center"
             />
             <RadioGroup value="fixed" className="flex items-center gap-2">
