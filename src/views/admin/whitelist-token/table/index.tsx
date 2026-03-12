@@ -18,8 +18,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { WRONG_NETWORK_ERROR_MESSAGE } from "@/config/constant";
-import { evmAppkitNetworks, networkIdToChainId } from "@/config/networks";
+import { networkIdToChainId, chainIdToNetworkConfig } from "@/config/networks";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { useSystemStore } from "@/stores/systemStore";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import {
   whitelistService,
@@ -60,9 +61,11 @@ const AdminWhitelistTokenTable = () => {
     DeleteWhitelistTokenRequestWithStatus | undefined
   >(undefined);
   const { caipAddress } = useAppKitAccount();
-  const namespace = caipAddress?.split(":")[0];
+  const { openSwitchNetworkModal } = useSystemStore();
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
   const isSolana = namespace === "solana";
   const isEvm = namespace === "eip155";
+  const currentNetworkId = namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { disableWhitelistToken: disableWhitelistTokenSolana } =
     useDisableWhitelistTokenSolanaFn();
@@ -115,6 +118,23 @@ const AdminWhitelistTokenTable = () => {
   const handleDeleteToken = (
     request: DeleteWhitelistTokenRequestWithStatus,
   ) => {
+    if (request.enabled) {
+      const tokenNetworkId = chainIdToNetworkConfig(request.chainId)?.id;
+      const tokenIsSolana = tokenNetworkId === "solanaDevnet";
+
+      if (tokenIsSolana && !isSolana) {
+        toast.error("Please connect your Solana wallet to manage this token");
+        return;
+      }
+      if (!tokenIsSolana && !isEvm) {
+        toast.error("Please connect your EVM wallet to manage this token");
+        return;
+      }
+      if (tokenNetworkId && currentNetworkId !== tokenNetworkId) {
+        openSwitchNetworkModal(currentNetworkId, tokenNetworkId);
+        return;
+      }
+    }
     setDeleteRequest(request);
   };
 
@@ -127,28 +147,15 @@ const AdminWhitelistTokenTable = () => {
       setIsScDeleting(true);
 
       if (isSolana) {
-        // Check that the token belongs to Solana network
-        if (String(request.chainId) !== "-1") {
-          toast.error(WRONG_NETWORK_ERROR_MESSAGE);
-        } else {
-          isDisabled = await disableWhitelistTokenSolana({
-            tokenAddress: request.address,
-          });
-        }
+        isDisabled = await disableWhitelistTokenSolana({
+          tokenAddress: request.address,
+        });
       }
 
       if (isEvm) {
-        // Check that the token belongs to an EVM network
-        const evmCheck = evmAppkitNetworks.some(
-          (network) => network.id.toString() === String(request.chainId),
-        );
-        if (!evmCheck) {
-          toast.error(WRONG_NETWORK_ERROR_MESSAGE);
-        } else {
-          isDisabled = await disableWhitelistTokenEvm({
-            tokenAddress: request.address,
-          });
-        }
+        isDisabled = await disableWhitelistTokenEvm({
+          tokenAddress: request.address,
+        });
       }
 
       setIsScDeleting(false);

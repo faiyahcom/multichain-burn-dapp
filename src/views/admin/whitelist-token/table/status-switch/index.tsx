@@ -13,8 +13,9 @@ import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
 import { useCreateWhitelistTokenSolanaFn } from "../../dialog/create/useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "../../dialog/create/useCreateWhitelistTokenEvmFn";
-import { WRONG_NETWORK_ERROR_MESSAGE } from "@/config/constant";
-import { evmAppkitNetworks } from "@/config/networks";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { useSystemStore } from "@/stores/systemStore";
 
 interface Props {
   switchProps?: React.ComponentProps<typeof BlueSwitch>;
@@ -26,9 +27,11 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
   const { caipAddress } = useAppKitAccount();
-  const namespace = caipAddress?.split(":")[0];
+  const { openSwitchNetworkModal } = useSystemStore();
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
   const isSolana = namespace === "solana";
   const isEvm = namespace === "eip155";
+  const currentNetworkId = namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { disableWhitelistToken: disableWhitelistTokenSolana } =
     useDisableWhitelistTokenSolanaFn();
@@ -51,9 +54,6 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.summary(),
-      });
-      queryClient.invalidateQueries({
         queryKey: whitelistQueryKeys.listTokens(),
         exact: false,
       });
@@ -75,43 +75,39 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
       return;
     }
 
+    const tokenNetworkId = chainIdToNetworkConfig(chainId)?.id;
+    const tokenIsSolana = tokenNetworkId === "solanaDevnet";
+
+    if (tokenIsSolana && !isSolana) {
+      toast.error("Please connect your Solana wallet to manage this token");
+      return;
+    }
+    if (!tokenIsSolana && !isEvm) {
+      toast.error("Please connect your EVM wallet to manage this token");
+      return;
+    }
+    if (tokenNetworkId && currentNetworkId !== tokenNetworkId) {
+      openSwitchNetworkModal(currentNetworkId, tokenNetworkId);
+      return;
+    }
+
     setIsCallingSc(true);
 
     let result = false;
 
     if (isSolana) {
-      // Check same network
-      if (chainId !== "-1") {
-        toast.error(WRONG_NETWORK_ERROR_MESSAGE);
+      if (isActive) {
+        result = await disableWhitelistTokenSolana({ tokenAddress: address });
       } else {
-        if (isActive) {
-          result = await disableWhitelistTokenSolana({
-            tokenAddress: address,
-          });
-        } else {
-          result = await enableWhitelistTokenSolana({
-            tokenAddress: address,
-          });
-        }
+        result = await enableWhitelistTokenSolana({ tokenAddress: address });
       }
     }
 
     if (isEvm) {
-      const evmCheck = evmAppkitNetworks.some(
-        (network) => network.id.toString() === chainId,
-      );
-      if (!evmCheck) {
-        toast.error(WRONG_NETWORK_ERROR_MESSAGE);
+      if (isActive) {
+        result = await disableWhitelistTokenEvm({ tokenAddress: address });
       } else {
-        if (isActive) {
-          result = await disableWhitelistTokenEvm({
-            tokenAddress: address,
-          });
-        } else {
-          result = await enableWhitelistTokenEvm({
-            tokenAddress: address,
-          });
-        }
+        result = await enableWhitelistTokenEvm({ tokenAddress: address });
       }
     }
 

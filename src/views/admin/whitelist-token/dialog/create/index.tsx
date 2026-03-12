@@ -23,8 +23,10 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import ImageUpload from "./image-upload";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useState, useEffect } from "react";
+import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
+import { useSystemStore } from "@/stores/systemStore";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useCreateWhitelistTokenSolanaFn } from "./useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -67,9 +69,13 @@ const AdminWhitelistTokenDialogCreate = () => {
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
   const { caipAddress } = useAppKitAccount();
-  const namespace = caipAddress?.split(":")[0];
+  const { open: openAppKit } = useAppKit();
+  const { openSwitchNetworkModal } = useSystemStore();
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
   const isSolana = namespace === "solana";
   const isEvm = namespace === "eip155";
+  const currentNetworkId =
+    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { createWhitelistToken: createWhitelistTokenSolana } =
     useCreateWhitelistTokenSolanaFn();
@@ -78,7 +84,7 @@ const AdminWhitelistTokenDialogCreate = () => {
 
   const queryClient = useQueryClient();
 
-  const { control, handleSubmit, resetField, reset } =
+  const { control, handleSubmit, resetField, reset, setValue } =
     useForm<WhitelistTokenFormValues>({
       defaultValues: {
         name: "",
@@ -92,6 +98,11 @@ const AdminWhitelistTokenDialogCreate = () => {
       },
       resolver: zodResolver(whitelistTokenSchema),
     });
+    
+  // Sync form field whenever the wallet switches network
+  useEffect(() => {
+    if (currentNetworkId) setValue("networkId", currentNetworkId);
+  }, [currentNetworkId, setValue]);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
@@ -274,9 +285,16 @@ const AdminWhitelistTokenDialogCreate = () => {
                             className={className}
                           />
                         )}
-                        isActive={field.value === network.id}
+                        isActive={currentNetworkId === network.id}
                         btnProps={{
-                          onClick: () => field.onChange(network.id),
+                          onClick: () => {
+                            if (currentNetworkId !== network.id) {
+                              openSwitchNetworkModal(
+                                currentNetworkId,
+                                network.id,
+                              );
+                            }
+                          },
                         }}
                         text={network.label}
                         color={network.color}
@@ -393,21 +411,35 @@ const AdminWhitelistTokenDialogCreate = () => {
                 disabled: isLoading,
               }}
             />
-            <AnimateIconButton
-              variant="letter-icon"
-              iconLetter="A"
-              text={"Add to Whitelist"}
-              color="#9072f9"
-              textVariant="text-self-center"
-              classNames={{
-                btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
-              }}
-              btnProps={{
-                type: "submit",
-              }}
-              isLoading={isLoading}
-              isLoadingText="Adding..."
-            />
+            {!caipAddress ? (
+              <AnimateIconButton
+                variant="letter-icon"
+                iconLetter="W"
+                text="Connect Wallet"
+                color="#9072f9"
+                textVariant="text-self-center"
+                classNames={{
+                  btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
+                }}
+                btnProps={{ type: "button", onClick: () => openAppKit() }}
+              />
+            ) : (
+              <AnimateIconButton
+                variant="letter-icon"
+                iconLetter="A"
+                text={"Add to Whitelist"}
+                color="#9072f9"
+                textVariant="text-self-center"
+                classNames={{
+                  btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
+                }}
+                btnProps={{
+                  type: "submit",
+                }}
+                isLoading={isLoading}
+                isLoadingText="Adding..."
+              />
+            )}
           </div>
         </form>
       </DialogContent>
