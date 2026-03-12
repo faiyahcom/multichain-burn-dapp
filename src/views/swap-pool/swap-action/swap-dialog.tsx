@@ -228,7 +228,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
             const formatted = formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
             const num = Number(formatted);
             if (!Number.isFinite(num)) return formatted;
-            return num.toLocaleString("en-US", {
+            return num.toLocaleString(undefined, {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 6,
             });
