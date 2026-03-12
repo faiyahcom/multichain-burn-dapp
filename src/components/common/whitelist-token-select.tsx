@@ -106,6 +106,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
           value={textSearch}
           onValueChange={setTextSearch}
           inputProps={{
+            placeholder: "Search Token",
             onKeyDown: (e) => e.stopPropagation(), // Prevent dropdown menu behavior of switch focus to matching item
           }}
         />
