@@ -6,7 +6,6 @@ import {
     getContractBurnFactory,
     getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
-import { MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS } from "@/web3";
 import { ZERO_ADDRESS } from "@/config/constant";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 
@@ -37,16 +36,17 @@ export const useDepositRewardEvmFn = () => {
                 const isNative =
                     rewardToken.toLowerCase() === ZERO_ADDRESS;
 
+                const contract = getContractBurnFactory(signer);
+
                 if (!isNative) {
                     const erc20 = getERC20Contract(rewardToken, signer);
                     const factoryAddress = ethers.getAddress(
-                        MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS.toLowerCase(),
+                        await contract.getAddress(),
                     );
                     const approveTx = await erc20.approve(factoryAddress, amount);
                     await approveTx.wait();
                 }
 
-                const contract = getContractBurnFactory(signer);
                 const tx = await contract.depositReward(poolAddress, amount, {
                     value: isNative ? amount : 0n,
                 });

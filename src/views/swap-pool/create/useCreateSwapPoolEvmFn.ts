@@ -2,7 +2,6 @@ import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider, type Log } from "ethers";
-import { MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS } from "@/web3";
 import {
   getERC20Contract,
   getContractSwapFactory,
@@ -11,8 +10,6 @@ import { DEFAULT_NATIVE_DECIMALS, ZERO_ADDRESS } from "@/config/constant";
 import { getDecimalsTokenNativeByChainId } from "@/config/networks";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { normalizeRatioToIntegers } from "@/utils/helpers/ratio";
-
-const CONTRACT_ADDRESS = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS;
 
 const AssetType = {
   ERC20: 0,
@@ -75,6 +72,9 @@ export const useCreateSwapPoolEvmFn = () => {
         // Determine token decimals on-chain (for ERC20)
         let rewardDecimals = DEFAULT_NATIVE_DECIMALS;
         let parsedAmount: bigint;
+
+        const swapContract = getContractSwapFactory(signer);
+        const CONTRACT_ADDRESS = await swapContract.getAddress();
 
         if (rewardIsNative) {
           const chainId = Number((await provider.getNetwork()).chainId);
