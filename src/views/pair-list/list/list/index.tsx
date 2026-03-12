@@ -27,7 +27,7 @@ interface Props {
 const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
   return (
     <div className="w-full pt-6 pb-7 pl-27.5">
-      <Table>
+      <Table className="table-auto">
         <TableHeader>
           <TableRow>
             <TableHead>Pair</TableHead>
@@ -71,10 +71,14 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
 
             return (
               <TableRow key={index}>
-                <TableCell>
-                  <div className="flex w-max max-w-full items-center gap-3.25 pl-15.75">
+                <TableCell
+                  style={{
+                    "--max-w": "300px",
+                  } as React.CSSProperties}
+                className="w-(--max-w) min-w-0">
+                  <div className="flex items-center gap-3.25 pl-15.75 min-w-0">
                     {/* Client wants the order to be token out / token in, refers to MB-415 */}
-                    <div className="flex items-center gap-px">
+                    <div className="flex items-center gap-px min-w-0">
                       <TokenImage
                         src={tokenOutDisplay.imageUri}
                         alt={tokenOutDisplay.symbol}
@@ -90,8 +94,9 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                         }}
                       />
                     </div>
+                    {/* max-w - 51px - 63px - 13px = max-w - 127px (31.75) */}
                     <span
-                      className="min-w-0 truncate"
+                      className="min-w-0 truncate max-w-[calc(var(--max-w)-var(--spacing)*31.75)]"
                       title={`${tokenOutDisplay.symbol}/${tokenInDisplay.symbol}`}
                     >
                       {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
@@ -102,18 +107,20 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                   <MetricNumber
                     number={sciToFormatted(item.volume, item.tokenInDecimals)}
                     unit={item.tokenInSymbolCustom ?? item.tokenInSymbol}
+                    isShorten
                   />
                 </TableCell>
                 <TableCell>
                   <MetricNumber
                     number={sciToFormatted(item.tvl, item.tokenOutDecimals)}
                     unit={item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
+                    isShorten
                   />
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
                 </TableCell>
-                <TableCell>
+                <TableCell className="pr-10">
                   <Link
                     to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
                     className="block h-full w-full text-left"
