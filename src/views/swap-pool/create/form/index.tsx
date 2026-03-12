@@ -49,7 +49,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
     formState: { errors, isSubmitting },
   } = useForm<CreateSwapPoolFormValues>({
     defaultValues: {
-      poolName: undefined,
+      poolName: "",
       tokenBurn: undefined,
       ratio: undefined,
       tokenReward: undefined,
