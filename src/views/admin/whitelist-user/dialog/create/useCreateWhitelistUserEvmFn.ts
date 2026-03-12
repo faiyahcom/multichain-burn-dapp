@@ -3,8 +3,8 @@ import {
   MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS,
   MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS,
 } from "@/web3";
-import MULTICHAIN_BURN_ABI_BURN_FACTORY from "@/web3/contracts/abi_evm_burn_factory.json";
-import MULTICHAIN_BURN_ABI_SWAP_FACTORY from "@/web3/contracts/abi_evm_swap_factory.json";
+import MULTICHAIN_BURN_ABI_BURN_FACTORY from "@/web3/contracts/abis/abi_evm_burn_factory.json";
+import MULTICHAIN_BURN_ABI_SWAP_FACTORY from "@/web3/contracts/abis/abi_evm_swap_factory.json";
 import {
   getContractBurnFactory,
   getContractSwapFactory,

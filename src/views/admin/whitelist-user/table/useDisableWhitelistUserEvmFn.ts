@@ -3,8 +3,8 @@ import {
   MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS,
   MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS,
 } from "@/web3";
-import MULTICHAIN_BURN_ABI_BURN_FACTORY from "@/web3/contracts/abi_evm_burn_factory.json";
-import MULTICHAIN_BURN_ABI_SWAP_FACTORY from "@/web3/contracts/abi_evm_swap_factory.json";
+import MULTICHAIN_BURN_ABI_BURN_FACTORY from "@/web3/contracts/abis/abi_evm_burn_factory.json";
+import MULTICHAIN_BURN_ABI_SWAP_FACTORY from "@/web3/contracts/abis/abi_evm_swap_factory.json";
 import {
   getContractBurnFactory,
   getContractSwapFactory,
@@ -53,13 +53,14 @@ export const useDisableWhitelistUserEvmFn = () => {
         const chainId = Number(network.chainId);
 
         const whitelistUserSwapData = whitelist
-          ? swapFactoryContract.interface.encodeFunctionData("whitelistAddress", [
-              userAddress,
-            ])
+          ? swapFactoryContract.interface.encodeFunctionData(
+            "whitelistAddress",
+            [userAddress],
+          )
           : swapFactoryContract.interface.encodeFunctionData(
-              "removeWhitelistAddress",
-              [userAddress],
-            );
+            "removeWhitelistAddress",
+            [userAddress],
+          );
 
         const setBurnUserWhitelistData =
           burnFactoryContract.interface.encodeFunctionData("setUserWhitelist", [
@@ -120,7 +121,9 @@ export const useDisableWhitelistUserEvmFn = () => {
         const txHash = callsStatus.receipts?.[0]?.transactionHash;
 
         toast.success(
-          whitelist ? "User added to whitelist!" : "User removed from whitelist!",
+          whitelist
+            ? "User added to whitelist!"
+            : "User removed from whitelist!",
           {
             description: txHash ? `Tx: ${txHash}` : `Batch: ${id}`,
           },
@@ -129,7 +132,9 @@ export const useDisableWhitelistUserEvmFn = () => {
       } catch (error: unknown) {
         console.error("[toggleWhitelistUserEvm] error:", error);
         toast.error(
-          whitelist ? "Failed to enable user" : "Failed to remove user from whitelist",
+          whitelist
+            ? "Failed to enable user"
+            : "Failed to remove user from whitelist",
           {
             description: getErrorMessage({ error }),
           },
