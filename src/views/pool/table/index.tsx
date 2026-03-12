@@ -16,7 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { networkIdToChainId } from "@/config/networks";
+import { chainIdToNetworkConfig, networkIdToChainId } from "@/config/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
@@ -38,6 +38,7 @@ import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 interface Props {
   poolType: PoolType;
@@ -155,6 +156,28 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
               notFound: "",
             });
 
+            const network = chainIdToNetworkConfig(pool.chainId);
+
+            const tokenOutDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: pool.tokenOut,
+              tokenSymbol: pool.tokenOutSymbol,
+              tokenName: pool.tokenOutSymbol,
+              customName: pool.tokenOutSymbolCustom ?? undefined,
+              customSymbol: pool.tokenOutSymbolCustom ?? undefined,
+              imageUri: pool.tokenOutImageUri ?? undefined,
+            });
+
+            const tokenInDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: pool.tokenIn,
+              tokenSymbol: pool.tokenInSymbol,
+              tokenName: pool.tokenInSymbol,
+              customName: pool.tokenInSymbolCustom ?? undefined,
+              customSymbol: pool.tokenInSymbolCustom ?? undefined,
+              imageUri: pool.tokenInImageUri ?? undefined,
+            });
+
             return (
               <TableRow key={pool.address}>
                 <TableCell className="pl-7.25 text-left">
@@ -201,28 +224,28 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                     <TableCell>
                       <div className="flex items-center justify-center gap-1">
                         <TokenImage
-                          src={pool.tokenInImageUri}
-                          alt={pool.tokenInSymbol}
+                          src={tokenInDisplay.imageUri}
+                          alt={tokenInDisplay.symbol}
                           classNames={{
                             common: "size-4.25",
                           }}
                         />
                         <span>
-                          {pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                          {tokenInDisplay.symbol}
                         </span>
                       </div>
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-center gap-1">
                         <TokenImage
-                          src={pool.tokenOutImageUri}
-                          alt={pool.tokenOutSymbol}
+                          src={tokenOutDisplay.imageUri}
+                          alt={tokenOutDisplay.symbol}
                           classNames={{
                             common: "size-4.25",
                           }}
                         />
                         <span>
-                          {pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                          {tokenOutDisplay.symbol}
                         </span>
                       </div>
                     </TableCell>

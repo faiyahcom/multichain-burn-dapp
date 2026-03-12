@@ -2,6 +2,7 @@ import NetworkDisplay from "@/components/common/network-display";
 import RadioGroupButton from "@/components/common/radio-group-btn";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { chainIdToNetworkConfig } from "@/config/networks";
 import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
@@ -14,6 +15,7 @@ import {
   type PoolType,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 
 const PairDetailDetailHeader = () => {
@@ -63,6 +65,28 @@ const PairDetailDetailHeader = () => {
     setFilter({ type: value });
   };
 
+  const network = chainId ? chainIdToNetworkConfig(chainId) : undefined;
+
+  const tokenOutDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: tokenOut,
+    tokenSymbol: pairDetailStats?.pair.tokenOutSymbol,
+    tokenName: pairDetailStats?.pair.tokenOutSymbol,
+    customName: pairDetailStats?.pair.tokenOutSymbolCustom ?? undefined,
+    customSymbol: pairDetailStats?.pair.tokenOutSymbolCustom ?? undefined,
+    imageUri: pairDetailStats?.pair.tokenOutImageUri ?? undefined,
+  });
+
+  const tokenInDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: tokenIn,
+    tokenSymbol: pairDetailStats?.pair.tokenInSymbol,
+    tokenName: pairDetailStats?.pair.tokenInSymbol,
+    customName: pairDetailStats?.pair.tokenInSymbolCustom ?? undefined,
+    customSymbol: pairDetailStats?.pair.tokenInSymbolCustom ?? undefined,
+    imageUri: pairDetailStats?.pair.tokenInImageUri ?? undefined,
+  });
+
   return (
     <div className="flex items-center gap-16">
       <div className="flex items-center gap-2.75">
@@ -70,19 +94,13 @@ const PairDetailDetailHeader = () => {
         <div className="relative flex items-center gap-0.5 py-1.5 pr-1.5">
           <TokenImage
             isLoading={isPairDetailStatsPending}
-            src={pairDetailStats?.pair.tokenOutImageUri}
-            alt={
-              pairDetailStats?.pair.tokenOutSymbolCustom ??
-              pairDetailStats?.pair.tokenOutSymbol
-            }
+            src={tokenOutDisplay.imageUri}
+            alt={tokenOutDisplay.symbol}
           />
           <TokenImage
             isLoading={isPairDetailStatsPending}
-            src={pairDetailStats?.pair.tokenInImageUri}
-            alt={
-              pairDetailStats?.pair.tokenInSymbolCustom ??
-              pairDetailStats?.pair.tokenInSymbol
-            }
+            src={tokenInDisplay.imageUri}
+            alt={tokenInDisplay.symbol}
           />
           <NetworkDisplay
             chainId={chainId}
