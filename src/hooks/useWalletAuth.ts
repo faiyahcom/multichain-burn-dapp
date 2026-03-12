@@ -1,11 +1,10 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import { useSignMessage } from 'wagmi'
 import { useAppKitAccount } from '@reown/appkit/react'
 import bs58 from 'bs58'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { getErrorMessage } from '@/utils/helpers/error-message'
-import { appKit } from '@/config/appkit'
 
 type WalletType = 'evm' | 'solana'
 
@@ -144,12 +143,6 @@ export function useWalletAuth() {
     },
     [signEvmMessage, login, setLoading, setError],
   )
-
-  // useEffect(() => {
-  //   if (!user) {
-  //     appKit.disconnect()
-  //   }
-  // }, [user]);
 
   const authenticateEvm = useCallback(
     async (address?: string) => {
