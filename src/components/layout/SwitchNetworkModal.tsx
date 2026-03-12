@@ -30,19 +30,20 @@ export function SwitchNetworkModal() {
   const handleSwitch = async () => {
     if (!toNetwork) return;
     try {
-      if (
-        targetNamespace === "solana" &&
-        targetNamespace !== currentNamespace
-      ) {
-        await open({ view: "Connect", namespace: "solana" });
-      }
+      // if (
+      //   targetNamespace === "solana" &&
+      //   targetNamespace !== currentNamespace
+      // ) {
+      //   await open({ view: "Connect", namespace: "solana" });
+      // }
 
-      if (targetNamespace === "eip155")
-        if (targetNamespace !== currentNamespace) {
-          await open({ view: "Connect", namespace: "eip155" });
-        } else {
-          await switchNetwork(toNetwork.appKitNetwork);
-        }
+      // if (targetNamespace === "eip155")
+      //   if (targetNamespace !== currentNamespace) {
+      //     await open({ view: "Connect", namespace: "eip155" });
+      //   } else {
+      //     await switchNetwork(toNetwork.appKitNetwork);
+      //   }
+      await switchNetwork(toNetwork.appKitNetwork);
     } catch {
       // user rejected or wallet error — close the modal either way
     }
