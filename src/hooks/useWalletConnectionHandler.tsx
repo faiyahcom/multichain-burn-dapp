@@ -6,26 +6,25 @@ import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
 
 const useWalletConnectionHandler = () => {
-    const { user, logout } = useAuthStore();
+    const { user, logout, _hasHydrated } = useAuthStore();
     const { isConnected, caipAddress } = useAppKitAccount();
     const { selectedNetworkId, setSelectedNetworkId } = useSystemStore();
     const { authenticateEvm, authenticateSolana } = useWalletAuth();
 
-    // Guard against concurrent authentication flows.
-    // When the wallet changes, logout() synchronously sets user=null, which
-    // re-fires this effect before the first authenticate() call finishes —
-    // producing a second sign-message popup. The ref prevents that re-entry.
     const isAuthenticating = useRef(false);
-    // Tracks the previous caipAddress chain key ("namespace:chainRef") to
-    // distinguish an initial connect from a post-connect chain switch.
+    const wasConnected = useRef(false);
     const prevChainKey = useRef<string | null>(null);
 
     useEffect(() => {
+        if (!_hasHydrated) return;
+
         if (!isConnected || !caipAddress) {
             prevChainKey.current = null;
-            if (user) logout();
+            if (wasConnected.current && user) logout();
             return;
         }
+
+        wasConnected.current = true;
 
         const [namespace, chainRef, address] = caipAddress.split(":");
         const currentChainKey = `${namespace}:${chainRef}`;
@@ -77,6 +76,7 @@ const useWalletConnectionHandler = () => {
             login();
         }
     }, [
+        _hasHydrated,
         isConnected,
         caipAddress,
         user,

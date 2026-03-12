@@ -12,10 +12,12 @@ type AuthState = {
   accessToken: string | null
   isLoading: boolean
   error: string | null
+  _hasHydrated: boolean
   login: (params: { user: AuthUser; accessToken: string }) => void
   logout: () => void
   setLoading: (value: boolean) => void
   setError: (message: string | null) => void
+  setHasHydrated: (value: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -25,6 +27,7 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isLoading: false,
       error: null,
+      _hasHydrated: false,
       login: ({ user, accessToken }) =>
         set({
           user,
@@ -47,6 +50,8 @@ export const useAuthStore = create<AuthState>()(
         set({
           error: message,
         }),
+      setHasHydrated: (value) =>
+        set({ _hasHydrated: value }),
     }),
     {
       name: 'auth-storage',
@@ -54,6 +59,9 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         accessToken: state.accessToken,
       }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      },
     },
   ),
 )
