@@ -10,22 +10,51 @@ import { NETWORK_CONFIGS, type NetworkConfig } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import { useSystemStore } from "@/stores/systemStore";
 import NetworkIcon from "./network-icon";
-import { useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
+import { appKit } from "@/config/appkit";
+import { useState, useEffect } from "react";
+import type { AppKitNetwork } from "@reown/appkit/networks";
 
 export default function NetworkSelect() {
   const selectedNetworkId = useSystemStore((s) => s.selectedNetworkId);
-  const setSelectedNetworkId = useSystemStore((s) => s.setSelectedNetworkId);
   const { switchNetwork } = useAppKitNetwork();
+  const { open } = useAppKit();
   const selectedNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === selectedNetworkId,
   );
 
+  const [pendingNetwork, setPendingNetwork] = useState<AppKitNetwork | null>(null);
+
+  useEffect(() => {
+    if (!pendingNetwork) return;
+
+    const unsubscribe = appKit.subscribeEvents(({ data }) => {
+      if (data.event === "MODAL_CLOSE") {
+        if (data.properties.connected) {
+          switchNetwork(pendingNetwork).catch(() => {});
+        }
+        setPendingNetwork(null);
+      }
+    });
+
+    return unsubscribe;
+  }, [pendingNetwork, switchNetwork]);
+
   const handleNetworkChange = async (network: NetworkConfig) => {
+    const targetNamespace = network.id === "solanaDevnet" ? "solana" : "eip155";
+    const alreadyConnectedToNamespace = !!appKit.getAddress(targetNamespace);
     try {
-      await switchNetwork(network.appKitNetwork);
-      setSelectedNetworkId(network.id);
+      if (alreadyConnectedToNamespace) {
+        // Already connected to the target namespace — switch directly to the exact chain.
+        await switchNetwork(network.appKitNetwork);
+      } else {
+        // Not yet connected to the target namespace — open connect modal,
+        // then switchNetwork to exact chain once MODAL_CLOSE fires with connected: true.
+        setPendingNetwork(network.appKitNetwork);
+        open({ view: "Connect", namespace: targetNamespace });
+      }
     } catch {
-      // User rejected the switch — keep the current network selected.
+      setPendingNetwork(null);
     }
   };
 

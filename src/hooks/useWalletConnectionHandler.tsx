@@ -9,12 +9,14 @@ import { appKit } from "@/config/appkit";
 const useWalletConnectionHandler = () => {
     const { user, logout, _hasHydrated } = useAuthStore();
     const { isConnected, caipAddress } = useAppKitAccount();
-    const { setSelectedNetworkId } = useSystemStore();
+    const { selectedNetworkId, setSelectedNetworkId } = useSystemStore();
     const { authenticateEvm, authenticateSolana } = useWalletAuth();
 
     const isAuthenticating = useRef(false);
     const wasConnected = useRef(false);
     const prevChainKey = useRef<string | null>(null);
+
+    console.log("selectedNetworkId", selectedNetworkId);
 
     useEffect(() => {
         if (!_hasHydrated) return;

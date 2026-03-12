@@ -11,12 +11,13 @@ import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import { useSystemStore } from "@/stores/systemStore";
+import { appKit } from "@/config/appkit";
+import { useState, useEffect } from "react";
+import type { AppKitNetwork } from "@reown/appkit/networks";
 
 export function SwitchNetworkModal() {
   const { switchNetworkRequest, closeSwitchNetworkModal } = useSystemStore();
-  const { switchNetwork, caipNetworkId } = useAppKitNetwork();
-  const targetNamespace = switchNetworkRequest?.toId.split(":")[0];
-  const targetChainId = switchNetworkRequest?.toId.split(":")[1];
+  const { switchNetwork } = useAppKitNetwork();
   const { open } = useAppKit();
   const fromNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === switchNetworkRequest?.fromId,
@@ -25,29 +26,47 @@ export function SwitchNetworkModal() {
     (n) => n.id === switchNetworkRequest?.toId,
   );
 
-  const currentNamespace = caipNetworkId?.split(":")[0];
+  // Holds the target network while waiting for a cross-namespace connect to complete.
+  const [pendingNetwork, setPendingNetwork] = useState<AppKitNetwork | null>(null);
+
+  useEffect(() => {
+    if (!pendingNetwork) return;
+
+    // Subscribe to AppKit modal close events. MODAL_CLOSE carries `connected: boolean`:
+    // true  → user just connected the new namespace → now switch to the exact chain.
+    // false → user dismissed without connecting → close our modal.
+    const unsubscribe = appKit.subscribeEvents(({ data }) => {
+      if (data.event === "MODAL_CLOSE") {
+        if (data.properties.connected) {
+          switchNetwork(pendingNetwork).catch(() => {});
+        }
+        setPendingNetwork(null);
+        closeSwitchNetworkModal();
+      }
+    });
+
+    return unsubscribe;
+  }, [pendingNetwork, switchNetwork, closeSwitchNetworkModal]);
 
   const handleSwitch = async () => {
     if (!toNetwork) return;
+    const targetNamespace = toNetwork.id === "solanaDevnet" ? "solana" : "eip155";
+    const alreadyConnectedToNamespace = !!appKit.getAddress(targetNamespace);
     try {
-      // if (
-      //   targetNamespace === "solana" &&
-      //   targetNamespace !== currentNamespace
-      // ) {
-      //   await open({ view: "Connect", namespace: "solana" });
-      // }
-
-      // if (targetNamespace === "eip155")
-      //   if (targetNamespace !== currentNamespace) {
-      //     await open({ view: "Connect", namespace: "eip155" });
-      //   } else {
-      //     await switchNetwork(toNetwork.appKitNetwork);
-      //   }
-      await switchNetwork(toNetwork.appKitNetwork);
+      if (alreadyConnectedToNamespace) {
+        // Already connected to the target namespace — switch directly to the exact chain.
+        await switchNetwork(toNetwork.appKitNetwork);
+        closeSwitchNetworkModal();
+      } else {
+        // Not yet connected to the target namespace — open connect modal,
+        // then switchNetwork to exact chain once MODAL_CLOSE fires with connected: true.
+        setPendingNetwork(toNetwork.appKitNetwork);
+        open({ view: "Connect", namespace: targetNamespace });
+      }
     } catch {
-      // user rejected or wallet error — close the modal either way
+      setPendingNetwork(null);
+      closeSwitchNetworkModal();
     }
-    closeSwitchNetworkModal();
   };
 
   return (
