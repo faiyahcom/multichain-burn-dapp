@@ -59,6 +59,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 poolDetail?.pool.address || "",
             ),
         enabled: !!poolDetail?.pool.address,
+        refetchInterval: 2_500, // Poll every 2.5s to update transactions
     });
 
     const txns = poolTxns?.txns ?? [];

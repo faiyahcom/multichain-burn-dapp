@@ -21,6 +21,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
         queryFn: () =>
             poolService.getPoolActivities(page, DEFAULT_PAGE_SIZE, poolDetail?.pool.address || ""),
         enabled: !!poolDetail?.pool.address,
+        refetchInterval: 2_500, // Poll every 2.5s to update activities
     });
 
     const activities = poolActivities?.activities ?? [];
