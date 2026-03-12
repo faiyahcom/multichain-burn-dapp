@@ -1,8 +1,4 @@
 import { wagmiAdapter } from "@/config/appkit";
-import {
-  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS,
-  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS,
-} from "@/web3";
 import MULTICHAIN_BURN_ABI_BURN_FACTORY from "@/web3/contracts/abis/abi_evm_burn_factory.json";
 import MULTICHAIN_BURN_ABI_SWAP_FACTORY from "@/web3/contracts/abis/abi_evm_swap_factory.json";
 import {
@@ -74,11 +70,11 @@ export const useDisableWhitelistUserEvmFn = () => {
           forceAtomic: true,
           calls: [
             {
-              to: MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS as Address,
+              to: (await swapFactoryContract.getAddress()) as Address,
               data: whitelistUserSwapData as Hex,
             },
             {
-              to: MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS as Address,
+              to: (await burnFactoryContract.getAddress()) as Address,
               data: setBurnUserWhitelistData as Hex,
             },
           ],
@@ -95,15 +91,13 @@ export const useDisableWhitelistUserEvmFn = () => {
             chainId,
             contracts: [
               {
-                address:
-                  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS as Address,
+                address: (await swapFactoryContract.getAddress()) as Address,
                 abi: MULTICHAIN_BURN_ABI_SWAP_FACTORY as Abi,
                 functionName: "isAddressWhitelisted",
                 args: [userAddress as Address],
               },
               {
-                address:
-                  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS as Address,
+                address: (await burnFactoryContract.getAddress()) as Address,
                 abi: MULTICHAIN_BURN_ABI_BURN_FACTORY as Abi,
                 functionName: "isWhitelistedUser",
                 args: [userAddress as Address],
