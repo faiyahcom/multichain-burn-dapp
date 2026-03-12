@@ -13,6 +13,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
 import InfoTooltip from "@/components/common/info-tooltip";
 import NetworkIcon from "@/components/layout/header/network-icon";
+import { safeDecimalParse } from "@/utils/helpers/numbers";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
@@ -241,8 +242,37 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
           <Input
             placeholder="0.0"
             aria-invalid={!!errors.budget}
-            {...register("budget", { required: "Budget is required" })}
             className="w-full max-w-40"
+            type="number"
+            {...register("budget", {
+              required: "Budget is required",
+              validate: {
+                validNumber: (value) => {
+                  const decimal = safeDecimalParse({ value });
+                  return decimal?.isFinite()
+                    ? true
+                    : "Budget must be a valid number";
+                },
+                moreThanZero: (value) => {
+                  const decimal = safeDecimalParse({ value });
+                  return decimal?.isZero()
+                    ? "Budget must be greater than zero"
+                    : true;
+                },
+                notNegative: (value) => {
+                  const decimal = safeDecimalParse({ value });
+                  return decimal?.isNegative()
+                    ? "Budget must be positive"
+                    : true;
+                },
+                maxDecimals: (value) => {
+                  const decimal = safeDecimalParse({ value });
+                  return decimal && decimal.decimalPlaces() <= 6
+                    ? true
+                    : "Budget must have 6 decimals or less";
+                },
+              },
+            })}
           />
           {errors.budget && (
             <p className="text-xs text-destructive">{errors.budget.message}</p>
