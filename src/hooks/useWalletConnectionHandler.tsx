@@ -4,11 +4,12 @@ import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
+import { appKit } from "@/config/appkit";
 
 const useWalletConnectionHandler = () => {
     const { user, logout, _hasHydrated } = useAuthStore();
     const { isConnected, caipAddress } = useAppKitAccount();
-    const { selectedNetworkId, setSelectedNetworkId } = useSystemStore();
+    const { setSelectedNetworkId } = useSystemStore();
     const { authenticateEvm, authenticateSolana } = useWalletAuth();
 
     const isAuthenticating = useRef(false);
@@ -34,22 +35,13 @@ const useWalletConnectionHandler = () => {
         const isInitialConnect = prev === null;
         const chainSwitched = !isInitialConnect && prev !== currentChainKey;
 
+        // Always sync selectedNetworkId to whatever chain the wallet reports.
         if (namespace === "solana") {
-            // Always sync to Solana when wallet is on Solana.
             setSelectedNetworkId("solanaDevnet");
-        } else if (chainSwitched) {
-            // User switched EVM chains in their wallet after being connected.
-            const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
-            if (systemNetwork) setSelectedNetworkId(systemNetwork);
-        } else if (isInitialConnect && selectedNetworkId === "solanaDevnet") {
-            // Reconnecting with EVM after previously being on Solana — pick up
-            // the actual wallet chain rather than leaving Solana selected.
+        } else if (isInitialConnect || chainSwitched) {
             const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
             if (systemNetwork) setSelectedNetworkId(systemNetwork);
         }
-        // Otherwise (initial EVM connect, already on an EVM network): keep the
-        // user's persisted selectedNetworkId — don't let AppKit's default chain
-        // (first entry = sepolia) stomp over a persisted Xphere selection.
 
         const walletChanged = user?.address && user.address !== address;
 
@@ -64,10 +56,16 @@ const useWalletConnectionHandler = () => {
             const login = async () => {
                 isAuthenticating.current = true;
                 try {
+                    let result;
                     if (namespace === "eip155") {
-                        await authenticateEvm(address);
+                        result = await authenticateEvm(address);
                     } else if (namespace === "solana") {
-                        await authenticateSolana(address);
+                        result = await authenticateSolana(address);
+                    }
+                    if (result && !result.success) {
+                        // User rejected signature or auth failed — disconnect
+                        // so the wallet doesn't stay in a connected+unauthenticated limbo.
+                        appKit.disconnect();
                     }
                 } finally {
                     isAuthenticating.current = false;
@@ -80,7 +78,6 @@ const useWalletConnectionHandler = () => {
         isConnected,
         caipAddress,
         user,
-        selectedNetworkId,
         logout,
         setSelectedNetworkId,
         authenticateEvm,
