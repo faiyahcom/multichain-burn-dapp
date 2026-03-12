@@ -7,17 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKitNetwork } from "@reown/appkit/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import { useSystemStore } from "@/stores/systemStore";
 
 export function SwitchNetworkModal() {
   const { switchNetworkRequest, closeSwitchNetworkModal } = useSystemStore();
-  const { switchNetwork, caipNetworkId } = useAppKitNetwork();
-  const targetNamespace = switchNetworkRequest?.toId.split(":")[0];
-  const targetChainId = switchNetworkRequest?.toId.split(":")[1];
-  const { open } = useAppKit();
+  const { switchNetwork } = useAppKitNetwork();
 
   const fromNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === switchNetworkRequest?.fromId,
@@ -26,24 +23,10 @@ export function SwitchNetworkModal() {
     (n) => n.id === switchNetworkRequest?.toId,
   );
 
-  const currentNamespace = caipNetworkId?.split(":")[0];
-
   const handleSwitch = async () => {
     if (!toNetwork) return;
     try {
-      if (
-        targetNamespace === "solana" &&
-        targetNamespace !== currentNamespace
-      ) {
-        await open({ view: "Connect", namespace: "solana" });
-      }
-
-      if (targetNamespace === "eip155")
-        if (targetNamespace !== currentNamespace) {
-          await open({ view: "Connect", namespace: "eip155" });
-        } else {
-          await switchNetwork(toNetwork.appKitNetwork);
-        }
+      await switchNetwork(toNetwork.appKitNetwork);
     } catch {
       // user rejected or wallet error — close the modal either way
     }
