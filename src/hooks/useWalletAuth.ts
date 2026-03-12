@@ -145,11 +145,11 @@ export function useWalletAuth() {
     [signEvmMessage, login, setLoading, setError],
   )
 
-  useEffect(() => {
-    if (!user) {
-      appKit.disconnect()
-    }
-  }, [user]);
+  // useEffect(() => {
+  //   if (!user) {
+  //     appKit.disconnect()
+  //   }
+  // }, [user]);
 
   const authenticateEvm = useCallback(
     async (address?: string) => {
