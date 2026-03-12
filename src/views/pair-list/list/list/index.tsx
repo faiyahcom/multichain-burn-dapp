@@ -13,8 +13,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PairItemType } from "@/types/pair";
 import { sciToFormatted } from "@/utils/helpers/numbers";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { Link } from "@tanstack/react-router";
 
 interface Props {
@@ -45,30 +47,54 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
           <TableSpinner isLoading={isLoading} colSpan={5} />
           <TableNoData colSpan={5} data={data} isLoading={isLoading} />
           {data?.map((item, index) => {
+            const network = chainIdToNetworkConfig(item.chainId);
+
+            const tokenOutDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: item.tokenOut,
+              tokenSymbol: item.tokenOutSymbol,
+              tokenName: item.tokenOutSymbol,
+              customName: item.tokenOutSymbolCustom ?? undefined,
+              customSymbol: item.tokenOutSymbolCustom ?? undefined,
+              imageUri: item.tokenOutImageUri ?? undefined,
+            });
+
+            const tokenInDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: item.tokenIn,
+              tokenSymbol: item.tokenInSymbol,
+              tokenName: item.tokenInSymbol,
+              customName: item.tokenInSymbolCustom ?? undefined,
+              customSymbol: item.tokenInSymbolCustom ?? undefined,
+              imageUri: item.tokenInImageUri ?? undefined,
+            });
+
             return (
               <TableRow key={index}>
                 <TableCell>
-                  <div className="flex w-max items-center gap-3.25 pl-15.75">
+                  <div className="flex w-max max-w-full items-center gap-3.25 pl-15.75">
                     {/* Client wants the order to be token out / token in, refers to MB-415 */}
                     <div className="flex items-center gap-px">
                       <TokenImage
-                        src={item.tokenOutImageUri}
-                        alt={item.tokenOutSymbol}
+                        src={tokenOutDisplay.imageUri}
+                        alt={tokenOutDisplay.symbol}
                         classNames={{
                           common: "size-6.25",
                         }}
                       />
                       <TokenImage
-                        src={item.tokenInImageUri}
-                        alt={item.tokenInSymbol}
+                        src={tokenInDisplay.imageUri}
+                        alt={tokenInDisplay.symbol}
                         classNames={{
                           common: "size-6.25",
                         }}
                       />
                     </div>
-                    <span>
-                      {item.tokenOutSymbolCustom ?? item.tokenOutSymbol}/
-                      {item.tokenInSymbolCustom ?? item.tokenInSymbol}
+                    <span
+                      className="min-w-0 truncate"
+                      title={`${tokenOutDisplay.symbol}/${tokenInDisplay.symbol}`}
+                    >
+                      {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
                     </span>
                   </div>
                 </TableCell>
