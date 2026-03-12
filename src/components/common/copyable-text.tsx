@@ -38,7 +38,12 @@ const CopyableText: React.FC<Props> = ({
       <span className={cn("text-sm", classNames?.displayText)} title={content}>
         {displayText ?? content}
       </span>
-      <button onClick={handleCopy}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          handleCopy();
+        }}
+      >
         <IconCopy className="text-mb-copy-gray" />
       </button>
     </div>
