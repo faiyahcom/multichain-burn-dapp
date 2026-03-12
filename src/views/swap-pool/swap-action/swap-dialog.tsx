@@ -29,6 +29,7 @@ import { parseUnits } from "ethers";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
+import { safeDecimalParse } from "@/utils/helpers/numbers";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -36,6 +37,12 @@ const swapFormSchema = z.object({
         .min(0, { message: "Burn amount is required" })
         .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
             message: "Burn amount must be a positive number",
+        })
+        .refine((value) => {
+            const decimal = safeDecimalParse({ value });
+            return decimal && decimal?.decimalPlaces() <= 6;
+        }, {
+            message: "Burn amount must have 6 decimals or less",
         }),
 });
 
@@ -218,7 +225,13 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
 
             const finalReward = rewardBN.sub(feeBN);
 
-            return formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
+            const formatted = formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
+            const num = Number(formatted);
+            if (!Number.isFinite(num)) return formatted;
+            return num.toLocaleString("en-US", {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 6,
+            });
         } catch {
             return "0";
         }
