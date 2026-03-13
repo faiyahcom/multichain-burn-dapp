@@ -256,10 +256,6 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
             const whitelist = !user.enabled; // toggle: if currently enabled → disable, else → enable
 
             if (isEvmAddress(addr)) {
-                if (namespace !== "eip155") {
-                    toast.error("Please connect your EVM wallet to manage this user");
-                    return;
-                }
                 // If on a different EVM chain, prompt to switch
                 const userNetworkId = mapChainToSystemNetwork("eip155", user.whitelistChainId?.find((id) => id !== "-1") ?? "");
                 if (userNetworkId && currentNetworkId !== userNetworkId) {
@@ -271,10 +267,6 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 setDisablingAddress(null);
                 if (ok) refetchUsers();
             } else if (isSolanaAddress(addr)) {
-                if (namespace !== "solana") {
-                    toast.error("Please connect your Solana wallet to manage this user");
-                    return;
-                }
                 setDisablingAddress(user.address);
                 const ok = await disableSolana({ userAddress: addr, whitelist });
                 setDisablingAddress(null);
