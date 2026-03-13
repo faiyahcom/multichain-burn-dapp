@@ -12,8 +12,6 @@ import { useSystemStore } from "@/stores/systemStore";
 import NetworkIcon from "./network-icon";
 import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import { appKit } from "@/config/appkit";
-import { useState, useEffect } from "react";
-import type { AppKitNetwork } from "@reown/appkit/networks";
 
 export default function NetworkSelect() {
   const selectedNetworkId = useSystemStore((s) => s.selectedNetworkId);
@@ -23,22 +21,7 @@ export default function NetworkSelect() {
     (n) => n.id === selectedNetworkId,
   );
 
-  const [pendingNetwork, setPendingNetwork] = useState<AppKitNetwork | null>(null);
-
-  useEffect(() => {
-    if (!pendingNetwork) return;
-
-    const unsubscribe = appKit.subscribeEvents(({ data }) => {
-      if (data.event === "MODAL_CLOSE") {
-        if (data.properties.connected) {
-          switchNetwork(pendingNetwork).catch(() => {});
-        }
-        setPendingNetwork(null);
-      }
-    });
-
-    return unsubscribe;
-  }, [pendingNetwork, switchNetwork]);
+  const setPendingNetworkSwitch = useSystemStore((s) => s.setPendingNetworkSwitch);
 
   const handleNetworkChange = async (network: NetworkConfig) => {
     const targetNamespace = network.id === "solanaDevnet" ? "solana" : "eip155";
@@ -48,13 +31,13 @@ export default function NetworkSelect() {
         // Already connected to the target namespace — switch directly to the exact chain.
         await switchNetwork(network.appKitNetwork);
       } else {
-        // Not yet connected to the target namespace — open connect modal,
-        // then switchNetwork to exact chain once MODAL_CLOSE fires with connected: true.
-        setPendingNetwork(network.appKitNetwork);
+        // Not yet connected to the target namespace — open connect modal.
+        // The root-level useAppKitEventHandler will finalise the switch on MODAL_CLOSE.
+        setPendingNetworkSwitch({ network: network.appKitNetwork, closeModalOnDone: false });
         open({ view: "Connect", namespace: targetNamespace });
       }
     } catch {
-      setPendingNetwork(null);
+      setPendingNetworkSwitch(null);
     }
   };
 

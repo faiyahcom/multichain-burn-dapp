@@ -12,8 +12,6 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import { useSystemStore } from "@/stores/systemStore";
 import { appKit } from "@/config/appkit";
-import { useState, useEffect } from "react";
-import type { AppKitNetwork } from "@reown/appkit/networks";
 
 export function SwitchNetworkModal() {
   const { switchNetworkRequest, closeSwitchNetworkModal } = useSystemStore();
@@ -26,27 +24,7 @@ export function SwitchNetworkModal() {
     (n) => n.id === switchNetworkRequest?.toId,
   );
 
-  // Holds the target network while waiting for a cross-namespace connect to complete.
-  const [pendingNetwork, setPendingNetwork] = useState<AppKitNetwork | null>(null);
-
-  useEffect(() => {
-    if (!pendingNetwork) return;
-
-    // Subscribe to AppKit modal close events. MODAL_CLOSE carries `connected: boolean`:
-    // true  → user just connected the new namespace → now switch to the exact chain.
-    // false → user dismissed without connecting → close our modal.
-    const unsubscribe = appKit.subscribeEvents(({ data }) => {
-      if (data.event === "MODAL_CLOSE") {
-        if (data.properties.connected) {
-          switchNetwork(pendingNetwork).catch(() => {});
-        }
-        setPendingNetwork(null);
-        closeSwitchNetworkModal();
-      }
-    });
-
-    return unsubscribe;
-  }, [pendingNetwork, switchNetwork, closeSwitchNetworkModal]);
+  const setPendingNetworkSwitch = useSystemStore((s) => s.setPendingNetworkSwitch);
 
   const handleSwitch = async () => {
     if (!toNetwork) return;
@@ -58,13 +36,14 @@ export function SwitchNetworkModal() {
         await switchNetwork(toNetwork.appKitNetwork);
         closeSwitchNetworkModal();
       } else {
-        // Not yet connected to the target namespace — open connect modal,
-        // then switchNetwork to exact chain once MODAL_CLOSE fires with connected: true.
-        setPendingNetwork(toNetwork.appKitNetwork);
+        // Not yet connected to the target namespace — open connect modal.
+        // The root-level useAppKitEventHandler will finalise the switch on MODAL_CLOSE
+        // and close this modal via closeModalOnDone: true.
+        setPendingNetworkSwitch({ network: toNetwork.appKitNetwork, closeModalOnDone: true });
         open({ view: "Connect", namespace: targetNamespace });
       }
     } catch {
-      setPendingNetwork(null);
+      setPendingNetworkSwitch(null);
       closeSwitchNetworkModal();
     }
   };

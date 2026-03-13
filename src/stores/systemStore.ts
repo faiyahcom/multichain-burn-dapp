@@ -1,4 +1,5 @@
 import type { NetworkConfig, NetworkId } from "@/config/networks";
+import type { AppKitNetwork } from "@reown/appkit/networks";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -9,6 +10,13 @@ export type SwitchNetworkRequest = {
   toId: NetworkId;
 };
 
+export type PendingNetworkSwitch = {
+  /** The AppKit network to switch to once MODAL_CLOSE fires with connected: true. */
+  network: AppKitNetwork;
+  /** Whether to close the SwitchNetworkModal once done (true when triggered from that modal). */
+  closeModalOnDone: boolean;
+};
+
 type SystemState = {
   selectedNetworkId: NetworkConfig["id"];
   setSelectedNetworkId: (id: NetworkConfig["id"]) => void;
@@ -17,6 +25,13 @@ type SystemState = {
   switchNetworkRequest: SwitchNetworkRequest | null;
   openSwitchNetworkModal: (fromId: NetworkId | null, toId: NetworkId) => void;
   closeSwitchNetworkModal: () => void;
+
+  /**
+   * Set by NetworkSelect / SwitchNetworkModal when a cross-namespace connect is in flight.
+   * Consumed by the root-level useAppKitEventHandler to finalise the switch on MODAL_CLOSE.
+   */
+  pendingNetworkSwitch: PendingNetworkSwitch | null;
+  setPendingNetworkSwitch: (v: PendingNetworkSwitch | null) => void;
 };
 
 export const useSystemStore = create<SystemState>()(
@@ -29,6 +44,9 @@ export const useSystemStore = create<SystemState>()(
       openSwitchNetworkModal: (fromId, toId) =>
         set({ switchNetworkRequest: { fromId, toId } }),
       closeSwitchNetworkModal: () => set({ switchNetworkRequest: null }),
+
+      pendingNetworkSwitch: null,
+      setPendingNetworkSwitch: (v) => set({ pendingNetworkSwitch: v }),
     }),
     {
       name: "mb-system-store",
