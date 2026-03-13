@@ -120,16 +120,7 @@ const AdminWhitelistTokenTable = () => {
   ) => {
     if (request.enabled) {
       const tokenNetworkId = chainIdToNetworkConfig(request.chainId)?.id;
-      const tokenIsSolana = tokenNetworkId === "solanaDevnet";
-
-      if (tokenIsSolana && !isSolana) {
-        toast.error("Please connect your Solana wallet to manage this token");
-        return;
-      }
-      if (!tokenIsSolana && !isEvm) {
-        toast.error("Please connect your EVM wallet to manage this token");
-        return;
-      }
+      
       if (tokenNetworkId && currentNetworkId !== tokenNetworkId) {
         openSwitchNetworkModal(currentNetworkId, tokenNetworkId);
         return;
