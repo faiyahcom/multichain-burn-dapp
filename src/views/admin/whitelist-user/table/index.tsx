@@ -41,40 +41,13 @@ import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 
 const MAX_VISIBLE_TOKENS = 3;
 
 /** Maps a chainId string back to the NetworkConfig */
 const getNetworkByChainId = (chainId: string) => {
     return chainIdToNetworkConfig(chainId);
-};
-
-/** Formats a raw BigInt amount string using token decimals into a human-readable value */
-const formatTokenAmount = (amount: string, decimals: number): string => {
-    try {
-        const raw = BigInt(amount);
-        if (decimals === 0) return raw.toLocaleString();
-
-        const divisor = BigInt(10 ** decimals);
-        const whole = raw / divisor;
-        const frac = raw % divisor;
-
-        if (frac === 0n) return whole.toLocaleString();
-
-        // Pad frac to full decimal width (e.g. "1000" → "000001000" for 9 decimals)
-        const fracStr = frac.toString().padStart(decimals, "0");
-
-        // Find the first non-zero digit and show up to 6 significant digits from there
-        const firstNonZero = fracStr.search(/[1-9]/);
-        if (firstNonZero === -1) return whole.toLocaleString();
-
-        const end = Math.min(firstNonZero + 6, decimals);
-        const sigDigits = fracStr.slice(0, end).replace(/0+$/, "");
-
-        return sigDigits ? `${whole.toLocaleString()}.${sigDigits}` : whole.toLocaleString();
-    } catch {
-        return amount;
-    }
 };
 
 const TokenAllocationChips: React.FC<{
@@ -111,7 +84,9 @@ const TokenAllocationChips: React.FC<{
                         key={`${a.tokenAddress}-${i}`}
                         className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary whitespace-nowrap"
                     >
-                        <span>{formatTokenAmount(a.amount, a.tokenDecimals)}</span>
+                        <span title={sciToFormatted(a.amount, a.tokenDecimals)}>
+                            {shortenNumber({number: Number(sciToFormatted(a.amount, a.tokenDecimals))})}
+                        </span>
                         <span className="text-primary/70">{a.customSymbol ?? a.tokenSymbol}</span>
                     </span>
                 ))}
@@ -165,8 +140,10 @@ const TokenAllocationChips: React.FC<{
                                         className="bg-muted/20 hover:bg-muted/30 rounded-sm p-10"
                                     >
                                         <TableCell className="text-center py-3">{a.customSymbol ?? a.tokenSymbol}</TableCell>
-                                        <TableCell className="text-center py-3">
-                                            {formatTokenAmount(a.amount, a.tokenDecimals)}
+                                        <TableCell className="text-center py-3" 
+                                            title={sciToFormatted(a.amount, a.tokenDecimals)}
+                                        >
+                                            {shortenNumber({number: Number(sciToFormatted(a.amount, a.tokenDecimals))})}
                                         </TableCell>
                                     </TableRow>
                                 ))}
