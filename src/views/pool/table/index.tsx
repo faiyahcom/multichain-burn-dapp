@@ -88,13 +88,13 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
     },
     ...(isBurnPool
       ? [
-        {
-          name: "Burn",
-        },
-        {
-          name: "Reward",
-        },
-      ]
+          {
+            name: "Burn",
+          },
+          {
+            name: "Reward",
+          },
+        ]
       : []),
     {
       name: "Network",
@@ -109,18 +109,18 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
     },
     ...(isBurnPool
       ? [
-        {
-          name: "Ratio",
-        },
-        {
-          name: "Status",
-        },
-      ]
+          {
+            name: "Ratio",
+          },
+          {
+            name: "Status",
+          },
+        ]
       : [
-        {
-          name: "Join",
-        },
-      ]),
+          {
+            name: "Join",
+          },
+        ]),
   ];
 
   return (
@@ -230,9 +230,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                             common: "size-4.25",
                           }}
                         />
-                        <span>
-                          {tokenInDisplay.symbol}
-                        </span>
+                        <span>{tokenInDisplay.symbol}</span>
                       </div>
                     </TableCell>
                     <TableCell>
@@ -244,9 +242,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                             common: "size-4.25",
                           }}
                         />
-                        <span>
-                          {tokenOutDisplay.symbol}
-                        </span>
+                        <span>{tokenOutDisplay.symbol}</span>
                       </div>
                     </TableCell>
                   </>
@@ -261,6 +257,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                       pool.tokenOutDecimals,
                     )}
                     unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                    isShorten
                   />
                 </TableCell>
                 {isBurnPool ? (

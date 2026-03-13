@@ -1,6 +1,7 @@
 import BN from "bn.js";
 import { formatUnits } from "ethers";
 import Decimal from "decimal.js";
+import numbro from "numbro";
 
 export function toBaseUnits(amount: string, decimals: number): BN {
   const [whole, fraction = ""] = amount.split(".");
@@ -46,4 +47,27 @@ export const safeDecimalParse = <
   } catch (error) {
     return throwValue as T;
   }
+};
+
+export const shortenNumber = ({
+  number,
+  customFormat,
+}: {
+  number: number;
+  customFormat?: numbro.Format;
+}) => {
+  return (
+    numbro(number)
+      .format({
+        average: true,
+        mantissa: 6,
+        trimMantissa: true,
+        ...customFormat,
+      })
+      // This is a hack to fix numbro's formatting to match the design:
+      // "." as thousands separator, "," as decimal separator
+      .replace(/,/g, "#") // temp placeholder
+      .replace(/\./g, ",") // . → ,
+      .replace(/#/g, ".") // , → .
+  );
 };
