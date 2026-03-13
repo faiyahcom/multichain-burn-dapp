@@ -139,7 +139,7 @@ function UserClaimablePool() {
                     <TokenDisplay
                       symbol={item.tokenOutSymbol}
                       customSymbol={item.tokenOutSymbolCustom ?? undefined}
-                      imageUri={item.tokenInImageUri ?? undefined}
+                      imageUri={item.tokenOutImageUri ?? undefined}
                     />
                   </TableCell>
                   <TableCell>

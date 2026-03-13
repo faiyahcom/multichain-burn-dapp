@@ -40,7 +40,7 @@ const ProfileMenu = ({}: Props) => {
           </p>
           <CopyableText
             content={user?.address}
-            displayText={truncateString({ str: user?.address })}
+            displayText={truncateString({ str: user?.address ?? "--" })}
           />
         </div>
       </div>

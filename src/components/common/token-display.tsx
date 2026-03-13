@@ -21,7 +21,7 @@ function TokenDisplay({
         alt={customSymbol ?? symbol}
         classNames={{
           common: cn(
-            "mr-1.5 size-4.75 shrink-0 rounded-full object-cover",
+            "size-4.75 shrink-0 rounded-full object-cover",
             className,
           ),
         }}
