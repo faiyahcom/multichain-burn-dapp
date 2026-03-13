@@ -27,10 +27,7 @@ export function PoolChainGuard({ chainId, children }: Props) {
     const { openSwitchNetworkModal } = useSystemStore();
 
     const poolNetwork = chainId ? chainIdToNetworkConfig(chainId) : undefined;
-    const poolNetworkId = poolNetwork?.id;
-
-    // Unknown / Solana pool — pass through without guarding.
-    if (!poolNetworkId || poolNetworkId === "solanaDevnet") return <>{children}</>;
+    const poolNetworkId = poolNetwork?.id ;
 
     // Wallet not connected.
     if (!user) {
@@ -76,7 +73,7 @@ export function PoolChainGuard({ chainId, children }: Props) {
                 color="#FF8E97"
                 btnProps={{
                     onClick: () =>
-                        openSwitchNetworkModal(currentNetworkId, poolNetworkId),
+                        openSwitchNetworkModal(currentNetworkId, poolNetworkId!),
                 }}
             />
         );
