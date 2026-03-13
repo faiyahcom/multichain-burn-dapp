@@ -263,6 +263,7 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
             aria-invalid={!!errors.budget}
             className="w-full max-w-40"
             type="number"
+            step={0.000001} // allow up to 6 decimals
             {...register("budget", {
               required: "Budget is required",
               validate: {
