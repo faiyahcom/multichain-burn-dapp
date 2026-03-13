@@ -6,18 +6,40 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { NETWORK_CONFIGS } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkConfig } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import { useSystemStore } from "@/stores/systemStore";
 import NetworkIcon from "./network-icon";
+import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
+import { appKit } from "@/config/appkit";
 
 export default function NetworkSelect() {
   const selectedNetworkId = useSystemStore((s) => s.selectedNetworkId);
-  const setSelectedNetworkId = useSystemStore((s) => s.setSelectedNetworkId);
-
+  const { switchNetwork } = useAppKitNetwork();
+  const { open } = useAppKit();
   const selectedNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === selectedNetworkId,
   );
+
+  const setPendingNetworkSwitch = useSystemStore((s) => s.setPendingNetworkSwitch);
+
+  const handleNetworkChange = async (network: NetworkConfig) => {
+    const targetNamespace = network.id === "solanaDevnet" ? "solana" : "eip155";
+    const alreadyConnectedToNamespace = !!appKit.getAddress(targetNamespace);
+    try {
+      if (alreadyConnectedToNamespace) {
+        // Already connected to the target namespace — switch directly to the exact chain.
+        await switchNetwork(network.appKitNetwork);
+      } else {
+        // Not yet connected to the target namespace — open connect modal.
+        // The root-level useAppKitEventHandler will finalise the switch on MODAL_CLOSE.
+        setPendingNetworkSwitch({ network: network.appKitNetwork, closeModalOnDone: false });
+        open({ view: "Connect", namespace: targetNamespace });
+      }
+    } catch {
+      setPendingNetworkSwitch(null);
+    }
+  };
 
   return (
     <DropdownMenu>
@@ -42,7 +64,7 @@ export default function NetworkSelect() {
             return (
               <DropdownMenuItem
                 key={network.id}
-                onClick={() => setSelectedNetworkId(network.id)}
+                onClick={() => handleNetworkChange(network)}
                 className={cn(
                   "flex items-center gap-3 px-4 py-2",
                   isSelected && "bg-inactive font-bold text-active",

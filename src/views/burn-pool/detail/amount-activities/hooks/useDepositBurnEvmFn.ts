@@ -6,7 +6,6 @@ import {
     getContractBurnRouter,
     getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
-import { MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_BURN_ADDRESS } from "@/web3";
 import { ZERO_ADDRESS } from "@/config/constant";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 
@@ -36,16 +35,17 @@ export const useDepositBurnEvmFn = () => {
                 const isNative =
                     burnToken.toLowerCase() === ZERO_ADDRESS;
 
+                const contract = getContractBurnRouter(signer);
+
                 if (!isNative) {
                     const erc20 = getERC20Contract(burnToken, signer);
                     const routerAddress = ethers.getAddress(
-                        MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_BURN_ADDRESS.toLowerCase(),
+                        await contract.getAddress(),
                     );
                     const approveTx = await erc20.approve(routerAddress, amount);
                     await approveTx.wait();
                 }
 
-                const contract = getContractBurnRouter(signer);
                 const tx = await contract.deposit(poolAddress, amount, {
                     value: isNative ? amount : 0n,
                 });

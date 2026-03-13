@@ -1,4 +1,5 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import type { PoolDetailResponse } from "@/types/pool";
 import { formatAmount } from "@/utils/helpers/numbers";
 import SwapDialog from "../swap-action/swap-dialog";
@@ -174,7 +175,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             )}
 
             {poolDetail?.pool.status === "on_going" && (
-                <>
+                <PoolChainGuard chainId={poolDetail?.pool.chainId}>
                     <div className="mx-2">
                         <AnimateIconButton
                             iconLetter="S"
@@ -220,7 +221,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                             />
                         </div>
                     )}
-                </>
+                </PoolChainGuard>
             )}
         </div>
     );

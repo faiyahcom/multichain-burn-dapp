@@ -11,6 +11,7 @@ import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
 import { useMemo } from "react";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -42,7 +43,7 @@ const EndStatus = ({ poolDetail }: Props) => {
         : (pool?.rewardTokenSymbol ?? "");
 
     // Use actual on-chain vault balance instead of potentially stale backend data
-    const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
+    const { rewardBalance: onChainReward, depositBalance: onChainDeposit, refetch: refetchVaultBalance } = useOnChainVaultBalance({
         poolAddress: pool?.address,
         chainId: pool?.chainId,
         rewardToken: pool?.rewardToken,
@@ -87,10 +88,11 @@ const EndStatus = ({ poolDetail }: Props) => {
             });
         }
         invalidatePoolQueries(pool.address);
+        refetchVaultBalance();
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={pool?.chainId}>
             <StatRow
                 label="Claimed Reward"
                 value={!pool ? <Skeleton className="h-5 w-24" /> : `${formattedReward} ${rewardTokenSymbolDisplay}`}
@@ -122,7 +124,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 }}
                 onTransfer={handleTransfer}
             />
-        </>
+        </PoolChainGuard>
     );
 };
 

@@ -1,9 +1,11 @@
 import { formatAmount } from "@/utils/helpers/numbers";
 import type { BurnPoolStatus, PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    vaultBalance?: VaultBalance;
 };
 
 const SIMPLE_STATUSES: BurnPoolStatus[] = [
@@ -19,7 +21,7 @@ const fmt = (raw: string | undefined, decimals: number) =>
 const fmtFee = (fee: string | undefined) =>
     fee !== undefined ? `${Number(fee) / 10000}%` : "-";
 
-const RewardAmount = ({ poolDetail }: Props) => {
+const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const status = (poolDetail?.pool.status ?? "on_going") as BurnPoolStatus;
     const isSimple = SIMPLE_STATUSES.includes(status);
 
@@ -30,11 +32,11 @@ const RewardAmount = ({ poolDetail }: Props) => {
 
     const formattedReward = fmt(poolDetail?.pool.currentRewardAmount, rewardDec);
     const formattedClaimed = fmt(poolDetail?.claimedRewardAmount, rewardDec);
-    const formattedRemaining = fmt(
+    const formattedRemaining = vaultBalance?.rewardBalance ?? fmt(
         poolDetail?.pool.currentRewardAmount,
         rewardDec,
     );
-    const formattedBurn = fmt(poolDetail?.depositedAmount, burnDec);
+    const formattedBurn = vaultBalance?.depositBalance ?? fmt(poolDetail?.depositedAmount, burnDec);
     const settlementFee = fmtFee(poolDetail?.pool.settlementFee);
     const creationFee = fmtFee(poolDetail?.pool.poolCreationFee);
 

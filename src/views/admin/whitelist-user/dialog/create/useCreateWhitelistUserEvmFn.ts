@@ -1,21 +1,9 @@
-import { wagmiAdapter } from "@/config/appkit";
-import {
-  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS,
-  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS,
-} from "@/web3";
-import MULTICHAIN_BURN_ABI_BURN_FACTORY from "@/web3/contracts/abi_evm_burn_factory.json";
-import MULTICHAIN_BURN_ABI_SWAP_FACTORY from "@/web3/contracts/abi_evm_swap_factory.json";
-import {
-  getContractBurnFactory,
-  getContractSwapFactory,
-} from "@/web3/contracts/multichainBurnContractEVM";
-import { multicall, sendCalls, waitForCallsStatus } from "@wagmi/core";
+import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import type { Abi, Address, Hex } from "viem";
 
 export const useCreateWhitelistUserEvmFn = () => {
   const { isConnected } = useAppKitAccount();
@@ -28,83 +16,15 @@ export const useCreateWhitelistUserEvmFn = () => {
           throw new Error("Wallet not connected");
         }
 
-        const provider = walletProvider
-          ? new ethers.BrowserProvider(walletProvider as Eip1193Provider)
-          : null;
-        if (!provider) {
-          throw new Error("Provider not found");
-        }
+        const provider = new ethers.BrowserProvider(walletProvider as Eip1193Provider);
         const signer = await provider.getSigner();
         const swapFactoryContract = getContractSwapFactory(signer);
-        const burnFactoryContract = getContractBurnFactory(signer);
-        const account = (await signer.getAddress()) as Address;
-        const network = await provider.getNetwork();
-        const chainId = Number(network.chainId);
 
-        const whitelistUserSwapData =
-          swapFactoryContract.interface.encodeFunctionData("whitelistAddress", [
-            userAddress,
-          ]);
-        const setBurnUserWhitelistData =
-          burnFactoryContract.interface.encodeFunctionData("setUserWhitelist", [
-            userAddress,
-            true,
-          ]);
-        console.log("Checkpoint 1");
-
-        const { id } = await sendCalls(wagmiAdapter.wagmiConfig, {
-          account,
-          chainId,
-          forceAtomic: true,
-          calls: [
-            {
-              to: MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS as Address,
-              data: whitelistUserSwapData as Hex,
-            },
-            {
-              to: MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS as Address,
-              data: setBurnUserWhitelistData as Hex,
-            },
-          ],
-        });
-        console.log("Checkpoint 1");
-
-        const callsStatus = await waitForCallsStatus(wagmiAdapter.wagmiConfig, {
-          id,
-          throwOnFailure: true,
-        });
-        console.log("Checkpoint 1");
-
-        const [isSwapFactoryWhitelisted, isBurnFactoryWhitelisted] =
-          await multicall(wagmiAdapter.wagmiConfig, {
-            allowFailure: false,
-            chainId,
-            contracts: [
-              {
-                address:
-                  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS as Address,
-                abi: MULTICHAIN_BURN_ABI_SWAP_FACTORY as Abi,
-                functionName: "isAddressWhitelisted",
-                args: [userAddress as Address],
-              },
-              {
-                address:
-                  MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS as Address,
-                abi: MULTICHAIN_BURN_ABI_BURN_FACTORY as Abi,
-                functionName: "isWhitelistedUser",
-                args: [userAddress as Address],
-              },
-            ],
-          });
-
-        if (!isSwapFactoryWhitelisted || !isBurnFactoryWhitelisted) {
-          throw new Error("Create whitelist user failed on one contract");
-        }
-
-        const txHash = callsStatus.receipts?.[0]?.transactionHash;
+        const tx = await swapFactoryContract.whitelistAddress(userAddress);
+        const receipt = await tx.wait();
 
         toast.success("User whitelisted on EVM successfully!", {
-          description: txHash ? `Tx: ${txHash}` : `Batch: ${id}`,
+          description: `Tx: ${receipt.hash}`,
         });
 
         return true;

@@ -4,6 +4,7 @@ import { ActionBtn, AmountInput } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { AssetTypeEnum } from "@/web3/helpers";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -43,7 +44,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
             <ActionBtn letter="C" text="Cancel Pool" color="#FF8E97"
                 isLoading={activeAction === "cancel"}
                 disabled={isRunning}
@@ -69,7 +70,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 disabled={isRunning}
                 onClick={() => run("approve", handleRequestApprove)}
             />
-        </>
+        </PoolChainGuard>
     );
 };
 

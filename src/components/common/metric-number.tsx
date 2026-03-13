@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import Decimal from "decimal.js";
 
 interface Props {
@@ -7,9 +8,15 @@ interface Props {
   classNames?: {
     container?: string;
   };
+  isShorten?: boolean;
 }
 
-const MetricNumber: React.FC<Props> = ({ number, unit, classNames }) => {
+const MetricNumber: React.FC<Props> = ({
+  number,
+  unit,
+  classNames,
+  isShorten = false,
+}) => {
   if (number === "" || number === null || number === undefined) {
     return null;
   }
@@ -37,8 +44,12 @@ const MetricNumber: React.FC<Props> = ({ number, unit, classNames }) => {
         classNames?.container,
       )}
     >
-      <p className="min-w-0 truncate" title={display}>
-        {display}
+      <p className="min-w-0 truncate uppercase" title={display}>
+        {isShorten
+          ? shortenNumber({
+              number: d.toNumber(),
+            })
+          : display}
       </p>
       {unit && <p className="shrink-0">{unit}</p>}
     </div>

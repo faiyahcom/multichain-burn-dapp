@@ -23,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { IconWallet } from "@/assets/react";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 const depositFormSchema = z.object({
     amount: z
@@ -80,7 +81,8 @@ const DepositRewardDialog = ({
         resolver: zodResolver(depositFormSchema),
     });
 
-    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } = useGetWhitelistTokens();
+    const { data: whitelistTokens, isLoading: isLoadingWhitelistTokens } =
+        useGetWhitelistTokens();
 
     const rewardToken = whitelistTokens?.whitelistTokens?.find(
         (token) => token.address === pool?.rewardToken,
@@ -103,33 +105,27 @@ const DepositRewardDialog = ({
         [pool?.chainId],
     );
 
-    const tokenInDisplay = useMemo(() => {
-        if (pool?.assetTypeIn === AssetTypeEnum.NATIVE && networkConfig) {
-            const native = networkConfig.appKitNetwork.nativeCurrency;
-            return {
-                imageUri: networkConfig.iconSrc,
-                symbol: native.symbol,
-                name: native.name,
-            };
-        }
-        return burnToken
-            ? { imageUri: burnToken.imageUri, symbol: burnToken.symbol, name: burnToken.name }
-            : undefined;
-    }, [pool?.assetTypeIn, networkConfig, burnToken]);
-
-    const tokenOutDisplay = useMemo(() => {
-        if (pool?.assetTypeReward === AssetTypeEnum.NATIVE && networkConfig) {
-            const native = networkConfig.appKitNetwork.nativeCurrency;
-            return {
-                imageUri: networkConfig.iconSrc,
-                symbol: native.symbol,
-                name: native.name,
-            };
-        }
-        return rewardToken
-            ? { imageUri: rewardToken.imageUri, symbol: rewardToken.symbol, name: rewardToken.name }
-            : undefined;
-    }, [pool?.assetTypeReward, networkConfig, rewardToken]);
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
 
     const isNativeIn = pool?.assetTypeIn === AssetTypeEnum.NATIVE;
     const isNativeOut = pool?.assetTypeReward === AssetTypeEnum.NATIVE;
@@ -161,8 +157,8 @@ const DepositRewardDialog = ({
             Number(pool.currentRewardAmount) / Math.pow(10, pool.rewardTokenDecimals);
         return `${raw.toLocaleString(undefined, {
             maximumFractionDigits: pool.rewardTokenDecimals,
-        })} ${tokenOutDisplay?.symbol ?? pool.rewardTokenSymbol}`;
-    }, [pool, tokenOutDisplay]);
+        })} ${rewardTokenDisplay?.symbol ?? pool.rewardTokenSymbol}`;
+    }, [pool, rewardTokenDisplay]);
 
     const duration = useMemo(() => {
         if (!pool) return "-";
@@ -218,64 +214,87 @@ const DepositRewardDialog = ({
                                 Pool Summary
                             </div>
                             <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l-4 [&>*:nth-child(even)]:border-inactive [&>*:nth-child(n+3)]:border-t-4 [&>*:nth-child(n+3)]:border-inactive">
-                                <SummaryRow label="Pool Name" value={!pool ? <Skeleton className="h-5 w-28" /> : pool.name} />
-                                <SummaryRow label="Duration" value={!pool ? <Skeleton className="h-5 w-36" /> : duration} />
+                                <SummaryRow
+                                    label="Pool Name"
+                                    value={!pool ? <Skeleton className="h-5 w-28" /> : pool.name}
+                                />
+                                <SummaryRow
+                                    label="Duration"
+                                    value={!pool ? <Skeleton className="h-5 w-36" /> : duration}
+                                />
                                 <SummaryRow
                                     label="Reward Token"
                                     value={
-                                        (!pool || isLoadingTokenOut) ? <Skeleton className="h-5 w-28" /> :
-                                        <span className="flex items-center gap-2 font-semibold">
-                                            <TokenImage
-                                                src={tokenOutDisplay?.imageUri}
-                                                alt={tokenOutDisplay?.symbol}
-                                                classNames={{
-                                                    common: "size-5",
-                                                    img: "size-5",
-                                                    placeholder: "size-5",
-                                                }}
-                                            />
-                                            {tokenOutDisplay?.symbol ?? pool.rewardTokenSymbol ?? "-"}
-                                        </span>
+                                        !pool || isLoadingTokenOut ? (
+                                            <Skeleton className="h-5 w-28" />
+                                        ) : (
+                                            <span className="flex items-center gap-2 font-semibold">
+                                                <TokenImage
+                                                    src={rewardTokenDisplay?.imageUri}
+                                                    alt={rewardTokenDisplay?.symbol}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                {rewardTokenDisplay?.symbol ??
+                                                    pool.rewardTokenSymbol ??
+                                                    "-"}
+                                            </span>
+                                        )
                                     }
                                 />
                                 <SummaryRow
                                     label="Burn token"
                                     value={
-                                        (!pool || isLoadingTokenIn) ? <Skeleton className="h-5 w-28" /> :
-                                        <span className="flex items-center gap-2 font-semibold">
-                                            <TokenImage
-                                                src={tokenInDisplay?.imageUri}
-                                                alt={tokenInDisplay?.symbol}
-                                                classNames={{
-                                                    common: "size-5",
-                                                    img: "size-5",
-                                                    placeholder: "size-5",
-                                                }}
-                                            />
-                                            {tokenInDisplay?.symbol ?? pool.tokenInSymbol ?? "-"}
-                                        </span>
+                                        !pool || isLoadingTokenIn ? (
+                                            <Skeleton className="h-5 w-28" />
+                                        ) : (
+                                            <span className="flex items-center gap-2 font-semibold">
+                                                <TokenImage
+                                                    src={burnTokenDisplay?.imageUri}
+                                                    alt={burnTokenDisplay?.symbol}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                {burnTokenDisplay?.symbol ?? pool.tokenInSymbol ?? "-"}
+                                            </span>
+                                        )
                                     }
                                 />
                                 <SummaryRow
                                     label="Ratio"
-                                    value={!pool ? <Skeleton className="h-5 w-16" /> : <span className="font-semibold">{ratio}</span>}
+                                    value={
+                                        !pool ? (
+                                            <Skeleton className="h-5 w-16" />
+                                        ) : (
+                                            <span className="font-semibold">{ratio}</span>
+                                        )
+                                    }
                                 />
                                 <SummaryRow
                                     label="Network"
                                     value={
-                                        !pool ? <Skeleton className="h-5 w-24" /> :
-                                        <span className="flex items-center gap-2 font-semibold">
-                                            <TokenImage
-                                                src={networkConfig?.iconSrc}
-                                                alt={networkConfig?.label}
-                                                classNames={{
-                                                    common: "size-5",
-                                                    img: "size-5",
-                                                    placeholder: "size-5",
-                                                }}
-                                            />
-                                            {networkConfig?.label ?? "-"}
-                                        </span>
+                                        !pool ? (
+                                            <Skeleton className="h-5 w-24" />
+                                        ) : (
+                                            <span className="flex items-center gap-2 font-semibold">
+                                                <TokenImage
+                                                    src={networkConfig?.iconSrc}
+                                                    alt={networkConfig?.label}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                {networkConfig?.label ?? "-"}
+                                            </span>
+                                        )
                                     }
                                 />
                                 <div className="col-span-2">
@@ -296,7 +315,11 @@ const DepositRewardDialog = ({
                                     Current Reward Amount
                                 </span>
                                 <span className="text-2xl font-bold text-active">
-                                    {!pool ? <Skeleton className="h-8 w-36" /> : currentRewardFormatted}
+                                    {!pool ? (
+                                        <Skeleton className="h-8 w-36" />
+                                    ) : (
+                                        currentRewardFormatted
+                                    )}
                                 </span>
                             </div>
 
@@ -309,7 +332,7 @@ const DepositRewardDialog = ({
                                         <span>
                                             {isLoadingRewardBalance
                                                 ? "Loading..."
-                                                : `${rewardBalanceFormatted ?? "0"} ${tokenOutDisplay?.symbol ?? ""}`}
+                                                : `${rewardBalanceFormatted ?? "0"} ${rewardTokenDisplay?.symbol ?? ""}`}
                                         </span>
                                     </span>
                                 </div>
@@ -324,7 +347,7 @@ const DepositRewardDialog = ({
                                         className="h-full flex-1 px-10 py-2 text-base"
                                     />
                                     <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
-                                        {(!pool || isLoadingTokenOut) ? (
+                                        {!pool || isLoadingTokenOut ? (
                                             <>
                                                 <Skeleton className="size-5 rounded-full" />
                                                 <Skeleton className="h-5 w-12" />
@@ -332,15 +355,19 @@ const DepositRewardDialog = ({
                                         ) : (
                                             <>
                                                 <TokenImage
-                                                    src={tokenOutDisplay?.imageUri}
-                                                    alt={tokenOutDisplay?.symbol}
+                                                    src={rewardTokenDisplay?.imageUri}
+                                                    alt={rewardTokenDisplay?.symbol}
                                                     classNames={{
                                                         common: "size-5",
                                                         img: "size-5",
                                                         placeholder: "size-5",
                                                     }}
                                                 />
-                                                <span className="">{tokenOutDisplay?.symbol ?? pool.rewardTokenSymbol ?? ""}</span>
+                                                <span className="">
+                                                    {rewardTokenDisplay?.symbol ??
+                                                        pool.rewardTokenSymbol ??
+                                                        ""}
+                                                </span>
                                             </>
                                         )}
                                     </div>

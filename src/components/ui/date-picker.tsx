@@ -29,8 +29,8 @@ export function DatePicker({
 
     // Internal state for hour and minute
     const [internalDate, setInternalDate] = React.useState<Date | undefined>(value);
-    const [hour, setHour] = React.useState<string>(value ? String(value.getHours()).padStart(2, "0") : "00");
-    const [minute, setMinute] = React.useState<string>(value ? String(value.getMinutes()).padStart(2, "0") : "00");
+    const [hour, setHour] = React.useState<string>(value && value instanceof Date ? String(value.getHours()).padStart(2, "0") : "00");
+    const [minute, setMinute] = React.useState<string>(value && value instanceof Date ? String(value.getMinutes()).padStart(2, "0") : "00");
 
     // Only sync from value if value is different from internal state
     React.useEffect(() => {

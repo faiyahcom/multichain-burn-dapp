@@ -1,6 +1,7 @@
 import BN from "bn.js";
 import { formatUnits } from "ethers";
 import Decimal from "decimal.js";
+import numbro from "numbro";
 
 export function toBaseUnits(amount: string, decimals: number): BN {
   const [whole, fraction = ""] = amount.split(".");
@@ -31,3 +32,46 @@ export function sciToFormatted(value: string, decimals: number): string {
     return "0";
   }
 }
+
+export const safeDecimalParse = <
+  T extends string | null | undefined | number = null,
+>({
+  value,
+  throwValue = null as T,
+}: {
+  value: string;
+  throwValue?: T;
+}): Decimal | T => {
+  try {
+    return new Decimal(value);
+  } catch (error) {
+    return throwValue as T;
+  }
+};
+
+export const shortenNumber = ({
+  number,
+  customFormat,
+}: {
+  number: number;
+  customFormat?: numbro.Format;
+}) => {
+  if (typeof number !== "number") return number;
+
+  if (number < 10000) return number.toLocaleString("de-DE");
+
+  return (
+    numbro(number)
+      .format({
+        average: true,
+        mantissa: 2,
+        trimMantissa: true,
+        ...customFormat,
+      })
+      // This is a hack to fix numbro's formatting to match the design:
+      // "." as thousands separator, "," as decimal separator
+      .replace(/,/g, "#") // temp placeholder
+      .replace(/\./g, ",") // . → ,
+      .replace(/#/g, ".") // , → .
+  );
+};

@@ -3,9 +3,11 @@ import InfoTooltip from "@/components/common/info-tooltip";
 import NoData from "@/components/common/no-data";
 import TokenImage from "@/components/common/token-image";
 import { Spinner } from "@/components/ui/spinner";
+import { chainIdToNetworkConfig } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { Link } from "@tanstack/react-router";
 
 interface Props {
@@ -52,6 +54,28 @@ const CardItem: React.FC<PairItemType> = ({
   tokenInDecimals,
   tokenOutDecimals,
 }) => {
+  const network = chainIdToNetworkConfig(chainId);
+
+  const tokenOutDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: tokenOut,
+    tokenSymbol: tokenOutSymbol,
+    tokenName: tokenOutSymbol,
+    customName: tokenOutSymbolCustom ?? undefined,
+    customSymbol: tokenOutSymbolCustom ?? undefined,
+    imageUri: tokenOutImageUri ?? undefined,
+  });
+
+  const tokenInDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: tokenIn,
+    tokenSymbol: tokenInSymbol,
+    tokenName: tokenInSymbol,
+    customName: tokenInSymbolCustom ?? undefined,
+    customSymbol: tokenInSymbolCustom ?? undefined,
+    imageUri: tokenInImageUri ?? undefined,
+  });
+
   return (
     <div
       className={cn(
@@ -70,23 +94,22 @@ const CardItem: React.FC<PairItemType> = ({
             {/* Client wants the order to be token out / token in, refers to MB-415 */}
             <div className="flex items-center gap-px">
               <TokenImage
-                src={tokenOutImageUri}
-                alt={tokenOutSymbol}
+                src={tokenOutDisplay.imageUri}
+                alt={tokenOutDisplay.symbol}
                 classNames={{
                   common: "size-5.75",
                 }}
               />
               <TokenImage
-                src={tokenInImageUri}
-                alt={tokenInSymbol}
+                src={tokenInDisplay.imageUri}
+                alt={tokenInDisplay.symbol}
                 classNames={{
                   common: "size-5.75",
                 }}
               />
             </div>
             <p className="text-xl font-semibold">
-              {tokenOutSymbolCustom ?? tokenOutSymbol}/
-              {tokenInSymbolCustom ?? tokenInSymbol}
+              {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
             </p>
           </div>
           <div className="absolute inset-0 z-0 h-full w-full bg-primary-foreground/50 backdrop-blur-[15px]" />
@@ -149,8 +172,11 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
         />
       </div>
       <div className="flex min-w-0 items-center gap-0.5 text-xl font-normal text-mb-card-value-blue">
-        <p className="min-w-0 truncate" title={value.toLocaleString("de-DE")}>
-          {value.toLocaleString("de-DE")}
+        <p
+          className="min-w-0 truncate uppercase"
+          title={value.toLocaleString("de-DE")}
+        >
+          {shortenNumber({ number: value })}
         </p>
         <p>{unit}</p>
       </div>

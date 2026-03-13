@@ -4,9 +4,23 @@ import {
   sepolia,
   solanaDevnet,
   bscTestnet,
-  xphereTestnet,
+  xphereTestnet as _xphereTestnet,
   type AppKitNetwork,
 } from "@reown/appkit/networks";
+
+/**
+ * The default xphereTestnet from @reown/appkit ships with `http://testnet.x-phere.com`
+ * which is HTTP-only and redirects on CORS preflight → blocked by browsers.
+ * Override with Ankr's public HTTPS endpoint.
+ */
+export const xphereTestnet = {
+  ..._xphereTestnet,
+  rpcUrls: {
+    default: {
+      http: ["https://rpc.ankr.com/xphere_testnet"],
+    },
+  },
+} as unknown as typeof _xphereTestnet;
 
 export type NetworkId =
   | "ethereumTestnet"
@@ -67,8 +81,8 @@ export const NETWORK_CONFIGS: readonly NetworkConfig[] = [
     backendChainId: String(xphereTestnet.id),
     iconSrc: "/network/xphere.png",
     color: "#ba0023",
-    shortLabel: "XPH",
-    scanUrl: "https://explorer.xphere.io",
+    shortLabel: "XPT",
+    scanUrl: "https://xpt.tamsa.io",
   },
   {
     id: "solanaDevnet",
@@ -102,3 +116,24 @@ export const getDecimalsTokenNativeByChainId = (
 };
 
 export const evmAppkitNetworks = [sepolia, bscTestnet, xphereTestnet];
+
+/**
+ * CORS-safe RPC overrides keyed by numeric chain ID.
+ * Some network definitions in @reown/appkit ship with HTTP-only RPCs
+ * that redirect on preflight and break browser-based dApps.
+ */
+const RPC_OVERRIDES: Record<number, string> = {
+  [xphereTestnet.id]: "https://rpc.ankr.com/xphere_testnet",
+};
+
+/**
+ * Returns a CORS-safe RPC URL for the given backend chainId string.
+ * Checks RPC_OVERRIDES first, then falls back to the network's default RPC.
+ */
+export const getRpcUrl = (chainId: string): string | undefined => {
+  const numericId = Number(chainId);
+  if (RPC_OVERRIDES[numericId]) return RPC_OVERRIDES[numericId];
+
+  const cfg = chainIdToNetworkConfig(chainId);
+  return (cfg?.appKitNetwork as any)?.rpcUrls?.default?.http?.[0];
+};

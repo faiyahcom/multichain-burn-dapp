@@ -22,23 +22,20 @@ export interface WhitelistToken {
 export interface ListTokensRequest {
   page?: number;
   limit?: number;
-  active?: 0 | 1;
-  isDropped?: 0 | 1; // soft delete
+  active?: BooleanString;
+  isDropped?: BooleanString; // soft delete
   chainIds?: string; // comma separated
   search?: string;
 }
 
 export interface ListTokensResponse extends PaginationResponse {
   whitelistTokens: WhitelistToken[];
+  totalDisable: number;
+  totalEnable: number;
 }
 
 export interface CreateWhitelistTokenResponse {
   imageUri?: string;
-}
-
-export interface WhitelistTokenSummaryResponse {
-  totalDisable: number;
-  totalEnable: number;
 }
 
 export interface ForceUpdateWhitelistTokenStatusRequest {
@@ -83,14 +80,6 @@ export const whitelistService = {
       },
     );
 
-    return response;
-  },
-
-  getWhitelistTokenSummary: async () => {
-    const response = await apiClient.get<WhitelistTokenSummaryResponse>(
-      `${WHITELIST_API_ROUTES.WHITELIST_TOKEN_SUMMARY}`,
-      {},
-    );
     return response;
   },
 

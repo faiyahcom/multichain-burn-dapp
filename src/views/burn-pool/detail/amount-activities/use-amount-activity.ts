@@ -22,6 +22,7 @@ import { useDepositBurnSolFn } from "./hooks/useDepositBurnSolFn";
 import { userService } from "@/services/userService";
 import { useEditPoolEvmFn } from "../hooks/useEditPoolEvmFn";
 import { useEditPoolSolFn } from "../hooks/useEditPoolSolFn";
+import { useNavigate } from "@tanstack/react-router";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { user } = useAuthStore();
@@ -29,6 +30,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const namespace = caipAddress?.split(":")[0];
     const isSolana = namespace === "solana";
     const queryClient = useQueryClient();
+    const navigate = useNavigate();
 
     // ── EVM hooks ──────────────────────────────────────────────
     const { cancelBurnPool } = useCancelBurnPoolEvmFn();
@@ -178,25 +180,31 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
 
     const handleClaim = async () => {
         if (!pool?.address) return;
-        const proof = await userService.getPoolMerkleProof(pool.address);
-        if (!proof) {
-            toast.error("You are not eligible to claim reward");
-            return;
-        }
-        if (isSolana && poolDetail) {
-            await claimBurnSol({
-                poolAddress: pool.address,
-                poolDetail,
-                merkleProof: proof.merkleProof,
-                proofIndex: proof.proofIndex,
+        try {
+            const proof = await userService.getPoolMerkleProof(pool.address);
+            if (!proof) {
+                toast.error("You are not eligible to claim reward");
+                return;
+            }
+            if (isSolana && poolDetail) {
+                await claimBurnSol({
+                    poolAddress: pool.address,
+                    poolDetail,
+                    merkleProof: proof.merkleProof,
+                    proofIndex: proof.proofIndex,
+                });
+            } else {
+                await claimBurnReward({
+                    poolAddress: pool.address,
+                    merkleProof: proof.merkleProof,
+                });
+            }
+            invalidatePoolQueries(pool.address);
+        } catch (error) {
+            toast.error("Claim reward failed", {
+                description: error?.data?.message || undefined,
             });
-        } else {
-            await claimBurnReward({
-                poolAddress: pool.address,
-                merkleProof: proof.merkleProof,
-            });
         }
-        invalidatePoolQueries(pool.address);
     };
 
     const handleCancelApprovalRequest = async () => {

@@ -4,27 +4,45 @@ import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
+import { appKit } from "@/config/appkit";
 
 const useWalletConnectionHandler = () => {
-    const { user, logout } = useAuthStore();
+    const { user, logout, _hasHydrated } = useAuthStore();
     const { isConnected, caipAddress } = useAppKitAccount();
-    const { setSelectedNetworkId } = useSystemStore();
+    const { selectedNetworkId, setSelectedNetworkId } = useSystemStore();
     const { authenticateEvm, authenticateSolana } = useWalletAuth();
 
-    // Guard against concurrent authentication flows.
-    // When the wallet changes, logout() synchronously sets user=null, which
-    // re-fires this effect before the first authenticate() call finishes —
-    // producing a second sign-message popup. The ref prevents that re-entry.
     const isAuthenticating = useRef(false);
+    const wasConnected = useRef(false);
+    const prevChainKey = useRef<string | null>(null);
+
+    console.log("selectedNetworkId", selectedNetworkId);
 
     useEffect(() => {
-        if (!isConnected || !caipAddress) return;
+        if (!_hasHydrated) return;
+
+        if (!isConnected || !caipAddress) {
+            prevChainKey.current = null;
+            if (wasConnected.current && user) logout();
+            return;
+        }
+
+        wasConnected.current = true;
 
         const [namespace, chainRef, address] = caipAddress.split(":");
+        const currentChainKey = `${namespace}:${chainRef}`;
+        const prev = prevChainKey.current;
+        prevChainKey.current = currentChainKey;
 
-        const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
-        if (systemNetwork) {
-            setSelectedNetworkId(systemNetwork);
+        const isInitialConnect = prev === null;
+        const chainSwitched = !isInitialConnect && prev !== currentChainKey;
+
+        // Always sync selectedNetworkId to whatever chain the wallet reports.
+        if (namespace === "solana") {
+            setSelectedNetworkId("solanaDevnet");
+        } else if (isInitialConnect || chainSwitched) {
+            const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
+            if (systemNetwork) setSelectedNetworkId(systemNetwork);
         }
 
         const walletChanged = user?.address && user.address !== address;
@@ -40,10 +58,16 @@ const useWalletConnectionHandler = () => {
             const login = async () => {
                 isAuthenticating.current = true;
                 try {
+                    let result;
                     if (namespace === "eip155") {
-                        await authenticateEvm(address);
+                        result = await authenticateEvm(address);
                     } else if (namespace === "solana") {
-                        await authenticateSolana(address);
+                        result = await authenticateSolana(address);
+                    }
+                    if (result && !result.success) {
+                        // User rejected signature or auth failed — disconnect
+                        // so the wallet doesn't stay in a connected+unauthenticated limbo.
+                        appKit.disconnect();
                     }
                 } finally {
                     isAuthenticating.current = false;
@@ -51,7 +75,16 @@ const useWalletConnectionHandler = () => {
             };
             login();
         }
-    }, [isConnected, caipAddress, user]);
-}
+    }, [
+        _hasHydrated,
+        isConnected,
+        caipAddress,
+        user,
+        logout,
+        setSelectedNetworkId,
+        authenticateEvm,
+        authenticateSolana,
+    ]);
+};
 
-export default useWalletConnectionHandler
+export default useWalletConnectionHandler;

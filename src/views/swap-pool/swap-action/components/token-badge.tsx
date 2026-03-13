@@ -12,7 +12,7 @@ const TokenBadge = ({ isLoading, imageUri, name, symbol }: Props) => {
     if (isLoading) return <Skeleton className="h-8 w-32 rounded" />;
 
     return (
-        <div className="flex h-fit w-32 items-center justify-between bg-mb-popover px-4 py-1.5">
+        <div className="flex h-fit w-32 items-center justify-between bg-mb-popover px-4 py-1.5 gap-1">
             <TokenImage
                 src={imageUri}
                 alt={name}
@@ -22,7 +22,7 @@ const TokenBadge = ({ isLoading, imageUri, name, symbol }: Props) => {
                     placeholder: "size-6",
                 }}
             />
-            <div className="text-xl">{symbol}</div>
+            <div className="text-xl min-w-0 truncate" title={symbol}>{symbol}</div>
         </div>
     );
 };

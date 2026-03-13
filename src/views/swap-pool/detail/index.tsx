@@ -19,6 +19,7 @@ const SwapPoolDetail = ({ address }: Props) => {
     const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
+        refetchInterval: 2_500, // Poll every 2.5s to update countdown and status
     });
 
     const status = poolDetail?.pool.status;
