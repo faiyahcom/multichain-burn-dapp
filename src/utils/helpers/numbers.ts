@@ -56,11 +56,15 @@ export const shortenNumber = ({
   number: number;
   customFormat?: numbro.Format;
 }) => {
+  if (typeof number !== "number") return number;
+
+  if (number < 10000) return number.toLocaleString("de-DE");
+
   return (
     numbro(number)
       .format({
         average: true,
-        mantissa: 6,
+        mantissa: 2,
         trimMantissa: true,
         ...customFormat,
       })
