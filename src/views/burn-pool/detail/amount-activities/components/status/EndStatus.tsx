@@ -89,7 +89,7 @@ const EndStatus = ({ poolDetail }: Props) => {
             />
             <ActionBtn
                 letter="C"
-                text="Claim"
+                text={canClaim ? "Claim" : "Claimed"}
                 isLoading={isLoading}
                 disabled={!canClaim}
                 onClick={handleClaimWithLoading}
