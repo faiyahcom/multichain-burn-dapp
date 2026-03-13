@@ -129,7 +129,7 @@ const TokenAllocationChips: React.FC<{
                     {/* Header section */}
                     <div className="px-8 pt-8 pb-4 text-center">
                         <DialogTitle className="text-2xl font-bold text-foreground">
-                            Token transfered{userName ? ` \u2013 ${userName}` : ""}
+                            Token transfered{userName ? ` – ${userName}` : ""}
                         </DialogTitle>
                         <DialogDescription className="mt-1 text-sm text-secondary-text">
                             Detailed breakdown of all token transfered for this user
@@ -179,43 +179,17 @@ const TokenAllocationChips: React.FC<{
     );
 };
 
-/** Shows distinct network icons from the user's token allocations */
-/** Shows network icons for each chain the user is registered on (whitelistChainId) */
-const UserNetworkIcons: React.FC<{ user: WhitelistUser }> = ({ user }) => {
-    const networks = useMemo(() => {
-        // Prefer whitelistChainId (explicit registration chains)
-        const chainIds =
-            user.whitelistChainId?.length > 0
-                ? user.whitelistChainId
-                : user.tokenAllocations.map((a) => a.chainId);
-
-        const seen = new Set<string>();
-        return chainIds
-            .map((id) => chainIdToNetworkConfig(id))
-            .filter((n): n is typeof NETWORK_CONFIGS[number] => {
-                if (!n || seen.has(n.id)) return false;
-                seen.add(n.id);
-                return true;
-            });
-    }, [user]);
-
-    if (networks.length === 0) return <span className="text-secondary-text text-xs">—</span>;
-
-    return (
-        <div className="flex flex-col gap-1">
-            {networks.map((n) => (
-                <div key={n.id} className="flex items-center gap-1.5">
-                    <NetworkImgIcon
-                        src={n.iconSrc}
-                        alt={n.label}
-                        className="size-5 shrink-0"
-                    />
-                    <span className="text-sm font-medium whitespace-nowrap">{n.label}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
+/** Flat row data: one per (user × chainId) */
+interface UserChainRow {
+    user: WhitelistUser;
+    chainId: string;
+    /** Token allocations filtered for this specific chainId */
+    chainAllocations: TokenAllocation[];
+    /** Index of this chain within the user's chain list (0 = first) */
+    chainIndex: number;
+    /** Is this the very first user in the table? */
+    isFirstUser: boolean;
+}
 
 interface Props {
     data?: WhitelistUser[];
@@ -227,7 +201,15 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const queryClient = useQueryClient();
     const { disableWhitelistUser: disableEvm } = useDisableWhitelistUserEvmFn();
     const { disableWhitelistUser: disableSolana } = useDisableWhitelistUserSolanaFn();
-    const [disablingAddress, setDisablingAddress] = useState<string | null>(null);
+
+    /**
+     * Track in-progress toggles per "address::chainId" key so multiple chains
+     * of the same user can be toggled independently.
+     */
+    const [disablingKeys, setDisablingKeys] = useState<Set<string>>(new Set());
+
+    const makeKey = (address: string, chainId: string) => `${address}::${chainId}`;
+
     const { caipAddress } = useAppKitAccount();
     const { openSwitchNetworkModal } = useSystemStore();
     const [namespace, chainRef] = caipAddress?.split(":") ?? [];
@@ -250,10 +232,17 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
         });
     }, [queryClient, filter]);
 
+    /**
+     * Toggle whitelist status for a specific user + chainId combination.
+     * Routes to EVM or Solana handler based on the chain.
+     */
     const handleToggleUser = useCallback(
-        async (user: WhitelistUser) => {
+        async (user: WhitelistUser, chainId: string) => {
             const addr = user.address.trim();
-            const whitelist = !user.enabled; // toggle: if currently enabled → disable, else → enable
+            const whitelist = !user.enabled; // toggle: currently enabled → disable, else → enable
+            const key = makeKey(addr, chainId);
+
+            const networkCfg = chainIdToNetworkConfig(chainId);
 
             if (isEvmAddress(addr)) {
                 if (namespace !== "eip155") {
@@ -261,23 +250,33 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     return;
                 }
                 // If on a different EVM chain, prompt to switch
-                const userNetworkId = mapChainToSystemNetwork("eip155", user.whitelistChainId?.find((id) => id !== "-1") ?? "");
+                const userNetworkId = networkCfg
+                    ? mapChainToSystemNetwork("eip155", networkCfg.appKitNetwork.id.toString())
+                    : null;
                 if (userNetworkId && currentNetworkId !== userNetworkId) {
                     openSwitchNetworkModal(currentNetworkId, userNetworkId);
                     return;
                 }
-                setDisablingAddress(user.address);
+                setDisablingKeys((prev) => new Set(prev).add(key));
                 const ok = await disableEvm({ userAddress: addr, whitelist });
-                setDisablingAddress(null);
+                setDisablingKeys((prev) => {
+                    const next = new Set(prev);
+                    next.delete(key);
+                    return next;
+                });
                 if (ok) refetchUsers();
             } else if (isSolanaAddress(addr)) {
                 if (namespace !== "solana") {
                     toast.error("Please connect your Solana wallet to manage this user");
                     return;
                 }
-                setDisablingAddress(user.address);
+                setDisablingKeys((prev) => new Set(prev).add(key));
                 const ok = await disableSolana({ userAddress: addr, whitelist });
-                setDisablingAddress(null);
+                setDisablingKeys((prev) => {
+                    const next = new Set(prev);
+                    next.delete(key);
+                    return next;
+                });
                 if (ok) refetchUsers();
             } else {
                 toast.error("Unknown address format", {
@@ -306,6 +305,33 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const users = data ?? apiData?.users ?? [];
     const [editingUser, setEditingUser] = useState<WhitelistUser | null>(null);
 
+    /**
+     * Expand each user into one row per whitelistChainId.
+     * If a user has no chainId registered, show a single fallback row.
+     */
+    const rows = useMemo<UserChainRow[]>(() => {
+        const result: UserChainRow[] = [];
+        users.forEach((user, userIndex) => {
+            const chains =
+                user.whitelistChainId?.length > 0 ? user.whitelistChainId : [""];
+
+            chains.forEach((chainId, chainIndex) => {
+                const chainAllocations = chainId
+                    ? user.tokenAllocations.filter((a) => a.chainId === chainId)
+                    : user.tokenAllocations;
+
+                result.push({
+                    user,
+                    chainId,
+                    chainAllocations,
+                    chainIndex,
+                    isFirstUser: userIndex === 0,
+                });
+            });
+        });
+        return result;
+    }, [users]);
+
     return (
         <div className="pb-10 pl-3.75 space-y-10">
             <Table className="table-auto">
@@ -315,7 +341,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                         <TableHead>Status</TableHead>
                         <TableHead>Address</TableHead>
                         <TableHead className="text-center">Network</TableHead>
-                        <TableHead>Description</TableHead>
+                        <TableHead>Token Allocations</TableHead>
                         <TableHead>Added</TableHead>
                         <TableHead>Action</TableHead>
                     </TableRow>
@@ -338,22 +364,24 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     )}
 
                     {!isLoading &&
-                        users.map((user, index) => {
-                            const isFirst = index === 0;
+                        rows.map((row, rowIndex) => {
+                            const { user, chainId, chainAllocations, isFirstUser, chainIndex } = row;
                             const status: UserStatus = user.enabled ? "enabled" : "disabled";
-                            const isDisabling = disablingAddress === user.address;
+                            const key = makeKey(user.address, chainId);
+                            const isDisabling = disablingKeys.has(key);
+                            const networkCfg = chainId ? chainIdToNetworkConfig(chainId) : undefined;
 
                             return (
                                 <TableRow
-                                    key={user.address}
+                                    key={`${user.address}-${chainId}-${rowIndex}`}
                                     className={cn({
-                                        "border-l-2 border-l-primary": isFirst,
+                                        "border-l-2 border-l-primary": isFirstUser && chainIndex === 0,
                                     })}
                                 >
                                     {/* User name + email */}
                                     <TableCell>
                                         <div className="flex flex-col text-left pl-2">
-                                            <p className={cn("text-base font-semibold", { "text-primary": isFirst })}>
+                                            <p className={cn("text-base font-semibold", { "text-primary": isFirstUser && chainIndex === 0 })}>
                                                 {user.name}
                                             </p>
                                             <p className="text-11px font-normal text-secondary-text">
@@ -382,17 +410,28 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         />
                                     </TableCell>
 
-                                    {/* Network icons from whitelistChainId */}
+                                    {/* Network icon for this specific chain */}
                                     <TableCell className="text-center">
-                                        <div className="flex justify-center">
-                                            <UserNetworkIcons user={user} />
-                                        </div>
+                                        {networkCfg ? (
+                                            <div className="flex items-center justify-center gap-1.5">
+                                                <NetworkImgIcon
+                                                    src={networkCfg.iconSrc}
+                                                    alt={networkCfg.label}
+                                                    className="size-5 shrink-0"
+                                                />
+                                                <span className="text-sm font-medium whitespace-nowrap">
+                                                    {networkCfg.label}
+                                                </span>
+                                            </div>
+                                        ) : (
+                                            <span className="text-secondary-text text-xs">—</span>
+                                        )}
                                     </TableCell>
 
-                                    {/* Description — token allocations */}
+                                    {/* Token allocations filtered to this chainId */}
                                     <TableCell>
                                         <TokenAllocationChips
-                                            allocations={user.tokenAllocations}
+                                            allocations={chainAllocations}
                                             userName={user.name}
                                         />
                                     </TableCell>
@@ -408,7 +447,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         </p>
                                     </TableCell>
 
-                                    {/* Action: pencil edit + disable toggle */}
+                                    {/* Action: edit + per-chain toggle */}
                                     <TableCell>
                                         <div className="flex items-center justify-center gap-4.5">
                                             <button
@@ -421,7 +460,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                                 active={user.enabled}
                                                 isLoading={isDisabling}
                                                 disabled={isDisabling}
-                                                onClick={() => handleToggleUser(user)}
+                                                onClick={() => handleToggleUser(user, chainId)}
                                             />
                                         </div>
                                     </TableCell>
