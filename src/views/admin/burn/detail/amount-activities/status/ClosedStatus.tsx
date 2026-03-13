@@ -5,7 +5,7 @@ import TransferTokensDialog from "../TransferTokensDialog";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { useBatchTransferSolFn } from "../hooks/useBatchTransferSolFn";
 import { useBatchTransferEvmFn } from "../hooks/useBatchTransferEvmFn";
-import { useOnChainVaultBalance } from "../hooks/useOnChainVaultBalance";
+import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
 import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
 import { useMemo } from "react";
@@ -16,9 +16,10 @@ import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    vaultBalance?: VaultBalance;
 };
 
-const ClosedStatus = ({ poolDetail }: Props) => {
+const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
     const {
         pool,
         transferDialogOpen,
@@ -41,17 +42,9 @@ const ClosedStatus = ({ poolDetail }: Props) => {
         ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
         : (pool?.rewardTokenSymbol ?? "");
 
-    // Use actual on-chain vault balance instead of potentially stale backend data
-    const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
-        poolAddress: pool?.address,
-        chainId: pool?.chainId,
-        rewardToken: pool?.rewardToken,
-        tokenIn: pool?.tokenIn,
-        rewardTokenDecimals: pool?.rewardTokenDecimals,
-        tokenInDecimals: pool?.tokenInDecimals,
-        assetTypeReward: pool?.assetTypeReward,
-        assetTypeIn: pool?.assetTypeIn,
-    });
+    const onChainReward = vaultBalance?.rewardBalance;
+    const onChainDeposit = vaultBalance?.depositBalance;
+    const refetchVaultBalance = vaultBalance?.refetch;
 
     const formattedAvailableBackend =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
@@ -68,11 +61,6 @@ const ClosedStatus = ({ poolDetail }: Props) => {
     const formattedDepositAvailable = onChainDeposit !== undefined
         ? onChainDeposit
         : formattedDepositAvailableBackend;
-
-    const formattedTotalDeposited =
-        poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
-            ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
-            : undefined;
 
     const formattedCurrentRewardAmountBackend =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
@@ -100,20 +88,21 @@ const ClosedStatus = ({ poolDetail }: Props) => {
             });
         }
         invalidatePoolQueries(pool.address);
+        refetchVaultBalance?.();
     };
 
     return (
         <PoolChainGuard chainId={pool?.chainId}>
             <StatRow
-                label="Total Deposited"
-                value={formattedTotalDeposited !== undefined
-                    ? `${formattedTotalDeposited} ${tokenInSymbolDisplay}`
+                label="Burn Remaining"
+                value={formattedDepositAvailable !== undefined
+                    ? `${formattedDepositAvailable} ${tokenInSymbolDisplay}`
                     : <Skeleton className="h-5 w-28" />}
                 className="font-medium text-active"
                 valueClassName="text-2xl font-bold"
             />
             <StatRow
-                label="Remaining Reward"
+                label="Reward Remaining"
                 value={formattedCurrentRewardAmount !== undefined
                     ? `${formattedCurrentRewardAmount} ${rewardTokenSymbolDisplay}`
                     : <Skeleton className="h-5 w-28" />}

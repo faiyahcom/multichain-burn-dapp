@@ -9,19 +9,33 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import ScanLink from "@/components/common/scan-link";
+import { useOnChainVaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
 
 type Props = {
     address: string;
 };
 
 const AdminBurnPoolDetail = ({ address }: Props) => {
-    const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
+    const { data: poolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
     });
 
-    const status = poolDetail?.pool.status;
+    const pool = poolDetail?.pool;
+    const status = pool?.status;
     const safeStatus: BurnPoolStatus = status ?? "on_going";
+
+    // Shared on-chain vault balance — used by both RewardAmount and ClosedStatus
+    const vaultBalance = useOnChainVaultBalance({
+        poolAddress: pool?.address,
+        chainId: pool?.chainId,
+        rewardToken: pool?.rewardToken,
+        tokenIn: pool?.tokenIn,
+        rewardTokenDecimals: pool?.rewardTokenDecimals,
+        tokenInDecimals: pool?.tokenInDecimals,
+        assetTypeReward: pool?.assetTypeReward,
+        assetTypeIn: pool?.assetTypeIn,
+    });
 
     const renderExtraContent = () => {
         if (!status) return null;
@@ -96,15 +110,15 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
                     />
                     <div className="flex flex-1">{renderExtraContent()}</div>
                 </div>
-                <ScanLink address={poolDetail?.pool.address ?? ""} chainId={poolDetail?.pool.chainId} />
+                <ScanLink address={pool?.address ?? ""} chainId={pool?.chainId} />
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">
                     <PoolOverview poolDetail={poolDetail} />
-                    <RewardAmount poolDetail={poolDetail} />
+                    <RewardAmount poolDetail={poolDetail} vaultBalance={vaultBalance} />
                 </div>
                 <div className="col-span-1">
-                    <AmountAndActivity poolDetail={poolDetail} />
+                    <AmountAndActivity poolDetail={poolDetail} vaultBalance={vaultBalance} />
                 </div>
             </div>
             <PoolHistory poolDetail={poolDetail} />

@@ -30,7 +30,7 @@ export const wagmiAdapter = new WagmiAdapter({
   networks,
   ssr: false,
   transports: {
-    [xphereTestnet.id]: http("https://testnet.x-phere.com"),
+    [xphereTestnet.id]: http("https://rpc.ankr.com/xphere_testnet"),
   },
 });
 

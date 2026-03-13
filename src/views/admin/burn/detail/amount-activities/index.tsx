@@ -7,12 +7,14 @@ import CanceledStatus from "./status/CanceledStatus";
 import OnGoingStatus from "./status/OnGoingStatus";
 // import EndStatus from "./status/EndStatus";
 import ClosedStatus from "./status/ClosedStatus";
+import type { VaultBalance } from "./hooks/useOnChainVaultBalance";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    vaultBalance?: VaultBalance;
 };
 
-const AmountAndActivity = ({ poolDetail }: Props) => {
+const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
     const status = poolDetail?.pool?.status;
 
     const renderContent = () => {
@@ -36,10 +38,10 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                 return <OnGoingStatus poolDetail={poolDetail} />;
 
             case "closed":
-                return <ClosedStatus poolDetail={poolDetail} />;
+                return <ClosedStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />;
 
             // case "ended":
-            //     return <EndStatus poolDetail={poolDetail} />;
+            //     return <EndStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />;
 
             default:
                 return null;

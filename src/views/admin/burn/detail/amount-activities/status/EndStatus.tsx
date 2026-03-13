@@ -43,7 +43,7 @@ const EndStatus = ({ poolDetail }: Props) => {
         : (pool?.rewardTokenSymbol ?? "");
 
     // Use actual on-chain vault balance instead of potentially stale backend data
-    const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
+    const { rewardBalance: onChainReward, depositBalance: onChainDeposit, refetch: refetchVaultBalance } = useOnChainVaultBalance({
         poolAddress: pool?.address,
         chainId: pool?.chainId,
         rewardToken: pool?.rewardToken,
@@ -88,6 +88,7 @@ const EndStatus = ({ poolDetail }: Props) => {
             });
         }
         invalidatePoolQueries(pool.address);
+        refetchVaultBalance();
     };
 
     return (
