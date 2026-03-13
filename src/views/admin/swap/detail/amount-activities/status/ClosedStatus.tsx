@@ -44,7 +44,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
         : (pool?.rewardTokenSymbol ?? "");
 
     // Use actual on-chain vault balance instead of potentially stale backend data
-    const { rewardBalance: onChainReward, depositBalance: onChainDeposit } = useOnChainVaultBalance({
+    const { rewardBalance: onChainReward, depositBalance: onChainDeposit, refetch: refetchVaultBalance } = useOnChainVaultBalance({
         poolAddress: pool?.address,
         chainId: pool?.chainId,
         rewardToken: pool?.rewardToken,
@@ -100,18 +100,19 @@ const ClosedStatus = ({ poolDetail }: Props) => {
             });
         }
         invalidatePoolQueries(pool.address);
+        refetchVaultBalance();
     };
 
     return (
         <PoolChainGuard chainId={pool?.chainId}>
             {/* <StatRow
-                label="Total Deposited"
+                label="Burn Remaining"
                 value={`${formattedTotalDeposited} ${pool?.tokenInSymbol ?? ""}`}
                 className="font-medium text-active"
                 valueClassName="text-2xl font-bold"
             /> */}
             <StatRow
-                label="Remaining Reward"
+                label="Reward Remaining"
                 value={formattedCurrentRewardAmount !== undefined
                     ? `${formattedCurrentRewardAmount} ${rewardTokenSymbolDisplay}`
                     : <Skeleton className="h-5 w-28" />}

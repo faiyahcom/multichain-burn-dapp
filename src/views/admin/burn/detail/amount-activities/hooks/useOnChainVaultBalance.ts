@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { ethers } from "ethers";
 import { useAppKitConnection } from "@reown/appkit-adapter-solana/react";
@@ -11,7 +11,7 @@ import { MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgr
 import {
     SOLANA_BACKEND_CHAIN_ID,
     NETWORK_CONFIGS,
-    chainIdToNetworkConfig,
+    getRpcUrl,
 } from "@/config/networks";
 import { ZERO_ADDRESS } from "@/config/constant";
 
@@ -111,6 +111,8 @@ export function useOnChainVaultBalance(params: {
 
     const [rewardBalance, setRewardBalance] = useState<string | undefined>();
     const [depositBalance, setDepositBalance] = useState<string | undefined>();
+    const [refetchKey, setRefetchKey] = useState(0);
+    const refetch = useCallback(() => setRefetchKey((k) => k + 1), []);
 
     useEffect(() => {
         if (!poolAddress || !chainId) return;
@@ -152,9 +154,7 @@ export function useOnChainVaultBalance(params: {
                     }
                 } else {
                     // ── EVM ───────────────────────────────────────────────────
-                    const networkConfig = chainIdToNetworkConfig(chainId);
-                    const rpcUrl =
-                        (networkConfig?.appKitNetwork as any)?.rpcUrls?.default?.http?.[0];
+                    const rpcUrl = getRpcUrl(chainId);
 
                     if (!rpcUrl) {
                         console.warn("[useOnChainVaultBalance] No RPC URL for chainId:", chainId);
@@ -200,7 +200,10 @@ export function useOnChainVaultBalance(params: {
         tokenInDecimals,
         assetTypeReward,
         assetTypeIn,
+        refetchKey,
     ]);
 
-    return { rewardBalance, depositBalance, isSolana };
+    return { rewardBalance, depositBalance, isSolana, refetch };
 }
+
+export type VaultBalance = ReturnType<typeof useOnChainVaultBalance>;
