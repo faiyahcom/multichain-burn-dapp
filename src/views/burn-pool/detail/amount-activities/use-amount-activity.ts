@@ -214,7 +214,6 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         } else {
             await cancelRequestApproveEvm({ poolAddress: pool.address });
         }
-        navigate({ to: `/admin/master-pool-management` });
         invalidatePoolQueries(pool.address);
     };
 
