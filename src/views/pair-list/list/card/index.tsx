@@ -6,7 +6,7 @@ import { Spinner } from "@/components/ui/spinner";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import type { PairItemType } from "@/types/pair";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { Link } from "@tanstack/react-router";
 
@@ -172,8 +172,11 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
         />
       </div>
       <div className="flex min-w-0 items-center gap-0.5 text-xl font-normal text-mb-card-value-blue">
-        <p className="min-w-0 truncate" title={value.toLocaleString("de-DE")}>
-          {value.toLocaleString("de-DE")}
+        <p
+          className="min-w-0 truncate uppercase"
+          title={value.toLocaleString("de-DE")}
+        >
+          {shortenNumber({ number: value })}
         </p>
         <p>{unit}</p>
       </div>

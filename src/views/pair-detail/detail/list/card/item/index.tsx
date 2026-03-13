@@ -32,6 +32,7 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="Volume"
           value={
             <MetricNumber
+              isShorten
               number={sciToFormatted(data?.volume ?? 0, data?.tokenInDecimals)}
               unit={data?.tokenInSymbolCustom ?? data?.tokenInSymbol}
               classNames={{
@@ -44,6 +45,7 @@ const PairDetailDetailListCardItem: React.FC<Props> = ({ data }) => {
           title="TVL"
           value={
             <MetricNumber
+              isShorten
               number={sciToFormatted(data?.tvl ?? 0, data?.tokenOutDecimals)}
               unit={data?.tokenOutSymbolCustom ?? data?.tokenOutSymbol}
               classNames={{

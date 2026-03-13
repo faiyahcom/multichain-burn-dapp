@@ -3,7 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
 
 const PairDetailStatistics = () => {
@@ -35,6 +35,7 @@ const PairDetailStatistics = () => {
         title="Volume"
         value={
           <MetricNumber
+            isShorten
             number={sciToFormatted(
               pairDetailStats?.pair.volume ?? "0",
               pairDetailStats?.pair.tokenInDecimals ?? 0,
@@ -54,6 +55,7 @@ const PairDetailStatistics = () => {
         title="TVL"
         value={
           <MetricNumber
+            isShorten
             number={sciToFormatted(
               pairDetailStats?.pair.tvl ?? "0",
               pairDetailStats?.pair.tokenOutDecimals ?? 0,
@@ -71,12 +73,29 @@ const PairDetailStatistics = () => {
       <PairDetailStatisticsCard
         isLoading={isPairDetailStatsPending}
         title="Total Pools"
-        value={`${totalPools} Pool${totalPools > 1 ? "s" : ""}`}
+        value={
+          <>
+            <span
+              className="uppercase"
+              title={`${totalPools} Pool${totalPools > 1 ? "s" : ""}`}
+            >
+              {shortenNumber({ number: totalPools })}
+            </span>{" "}
+            Pool{totalPools > 1 ? "s" : ""}
+          </>
+        }
       />
       <PairDetailStatisticsCard
         isLoading={isPairDetailStatsPending}
         title="Total Participants"
-        value={`${totalParticipants}`}
+        value={
+          <span
+            className="uppercase"
+            title={totalParticipants.toLocaleString("de-DE")}
+          >
+            {shortenNumber({ number: totalParticipants })}
+          </span>
+        }
       />
     </div>
   );

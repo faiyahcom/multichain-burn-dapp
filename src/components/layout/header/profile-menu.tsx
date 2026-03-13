@@ -9,23 +9,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/stores/authStore";
 import { truncateString } from "@/utils/helpers/string";
-import {
-  useAppKitAccount,
-  useDisconnect,
-  useWalletInfo,
-} from "@reown/appkit/react";
+import { useDisconnect, useWalletInfo } from "@reown/appkit/react";
 import { LogOutIcon } from "lucide-react";
 
 type Props = {};
 
 const ProfileMenu = ({}: Props) => {
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
-  const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
-  const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
-
-  const address = solanaAddress || evmAddress || "";
 
   const handleLogout = async () => {
     await disconnect();
@@ -47,8 +39,8 @@ const ProfileMenu = ({}: Props) => {
             {walletInfo?.name ?? "Profile"}
           </p>
           <CopyableText
-            content={address}
-            displayText={truncateString({ str: address })}
+            content={user?.address}
+            displayText={truncateString({ str: user?.address })}
           />
         </div>
       </div>

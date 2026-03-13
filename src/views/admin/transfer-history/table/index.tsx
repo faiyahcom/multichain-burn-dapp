@@ -16,7 +16,7 @@ import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 import {
   formatTimestampSecondsToDate,
   truncateString,
@@ -137,8 +137,17 @@ const AdminTransferHistoryTable = () => {
               </TableCell>
 
               {/* Amount — amountOut formatted */}
-              <TableCell className="font-medium">
-                {sciToFormatted(item.amountOut, item.tokenOutDecimals ?? 0)}
+              <TableCell
+                className="font-medium uppercase"
+                title={Number(
+                  sciToFormatted(item.amountOut, item.tokenOutDecimals ?? 0),
+                ).toLocaleString("de-DE")}
+              >
+                {shortenNumber({
+                  number: Number(
+                    sciToFormatted(item.amountOut, item.tokenOutDecimals ?? 0),
+                  ),
+                })}
               </TableCell>
 
               {/* Date — timestamp (milliseconds → date) */}

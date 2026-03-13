@@ -120,12 +120,14 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
                     pool.tokenInDecimals,
                   )}
                   unit={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                  isShorten
                 />
               </TableCell>
               <TableCell>
                 <MetricNumber
                   number={sciToFormatted(pool.tvl ?? 0, pool.tokenOutDecimals)}
                   unit={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                  isShorten
                 />
               </TableCell>
               <TableCell>

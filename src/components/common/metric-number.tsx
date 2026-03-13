@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import Decimal from "decimal.js";
-import numbro from "numbro";
 
 interface Props {
   number?: number | string;
@@ -46,17 +46,9 @@ const MetricNumber: React.FC<Props> = ({
     >
       <p className="min-w-0 truncate uppercase" title={display}>
         {isShorten
-          ? numbro(d.toNumber())
-              .format({
-                average: true,
-                mantissa: 6,
-                trimMantissa: true,
-              })
-              // This is a hack to fix numbro's formatting to match the design:
-              // "." as thousands separator, "," as decimal separator
-              .replace(/,/g, "#") // temp placeholder
-              .replace(/\./g, ",") // . → ,
-              .replace(/#/g, ".") // , → .
+          ? shortenNumber({
+              number: d.toNumber(),
+            })
           : display}
       </p>
       {unit && <p className="shrink-0">{unit}</p>}
