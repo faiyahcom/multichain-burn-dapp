@@ -31,13 +31,16 @@ import { useGetWhitelistUsers } from "@/services/queries/queries";
 import type { TokenAllocation, WhitelistUser } from "@/services/whitelistUserService";
 import { useState, useMemo, useCallback } from "react";
 import AdminWhitelistUserDialogEdit from "../dialog/edit";
-import { NETWORK_CONFIGS, chainIdToNetworkConfig } from "@/config/networks";
+import {
+    NETWORK_CONFIGS,
+    SOLANA_BACKEND_CHAIN_ID,
+    chainIdToNetworkConfig,
+} from "@/config/networks";
 import { useDisableWhitelistUserEvmFn } from "./useDisableWhitelistUserEvmFn";
 import { useDisableWhitelistUserSolanaFn } from "./useDisableWhitelistUserSolanaFn";
-import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
-import { toast } from "@/components/common/custom-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
+
 
 const MAX_VISIBLE_TOKENS = 3;
 
@@ -58,10 +61,7 @@ const formatTokenAmount = (amount: string, decimals: number): string => {
 
         if (frac === 0n) return whole.toLocaleString();
 
-        // Pad frac to full decimal width (e.g. "1000" → "000001000" for 9 decimals)
         const fracStr = frac.toString().padStart(decimals, "0");
-
-        // Find the first non-zero digit and show up to 6 significant digits from there
         const firstNonZero = fracStr.search(/[1-9]/);
         if (firstNonZero === -1) return whole.toLocaleString();
 
@@ -85,7 +85,6 @@ const TokenAllocationChips: React.FC<{
     const visible = allocations.slice(0, MAX_VISIBLE_TOKENS);
     const hidden = allocations.length - MAX_VISIBLE_TOKENS;
 
-    // Derive distinct networks for the dialog header
     const networks = (() => {
         const seen = new Set<string>();
         return allocations
@@ -123,17 +122,15 @@ const TokenAllocationChips: React.FC<{
             {/* Full token list dialog */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogContent className="sm:max-w-150 p-0 overflow-hidden">
-                    {/* Header section */}
                     <div className="px-8 pt-8 pb-4 text-center">
                         <DialogTitle className="text-2xl font-bold text-foreground">
-                            Token transfered{userName ? ` \u2013 ${userName}` : ""}
+                            Token transfered{userName ? ` – ${userName}` : ""}
                         </DialogTitle>
                         <DialogDescription className="mt-1 text-sm text-secondary-text">
                             Detailed breakdown of all token transfered for this user
                         </DialogDescription>
                     </div>
 
-                    {/* Network badge */}
                     {networks.length > 0 && (
                         <div className="px-6 pb-2 flex items-center gap-1.5 text-sm text-secondary-text">
                             <span>All token balances on</span>
@@ -146,7 +143,6 @@ const TokenAllocationChips: React.FC<{
                         </div>
                     )}
 
-                    {/* Table with margin and white row separators */}
                     <div className="mx-4 mb-6 border overflow-hidden">
                         <Table>
                             <TableHeader>
@@ -176,47 +172,12 @@ const TokenAllocationChips: React.FC<{
     );
 };
 
-/** Shows distinct network icons from the user's token allocations */
-/** Shows network icons for each chain the user is registered on (whitelistChainId) */
-const UserNetworkIcons: React.FC<{ user: WhitelistUser }> = ({ user }) => {
-    const networks = useMemo(() => {
-        // Prefer whitelistChainId (explicit registration chains)
-        const chainIds =
-            user.whitelistChainId?.length > 0
-                ? user.whitelistChainId
-                : user.tokenAllocations.map((a) => a.chainId);
-
-        const seen = new Set<string>();
-        return chainIds
-            .map((id) => chainIdToNetworkConfig(id))
-            .filter((n): n is typeof NETWORK_CONFIGS[number] => {
-                if (!n || seen.has(n.id)) return false;
-                seen.add(n.id);
-                return true;
-            });
-    }, [user]);
-
-    if (networks.length === 0) return <span className="text-secondary-text text-xs">—</span>;
-
-    return (
-        <div className="flex flex-col gap-1">
-            {networks.map((n) => (
-                <div key={n.id} className="flex items-center gap-1.5">
-                    <NetworkImgIcon
-                        src={n.iconSrc}
-                        alt={n.label}
-                        className="size-5 shrink-0"
-                    />
-                    <span className="text-sm font-medium whitespace-nowrap">{n.label}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
-
 interface Props {
     data?: WhitelistUser[];
 }
+
+/** Key used to track which specific (user, chain) toggle is in-flight */
+const makeDisablingKey = (address: string, chainId: string) => `${address}::${chainId}`;
 
 const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const { filter, setFilter } = useAdminWhitelistUserSearchFilterStore();
@@ -224,7 +185,9 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const queryClient = useQueryClient();
     const { disableWhitelistUser: disableEvm } = useDisableWhitelistUserEvmFn();
     const { disableWhitelistUser: disableSolana } = useDisableWhitelistUserSolanaFn();
-    const [disablingAddress, setDisablingAddress] = useState<string | null>(null);
+
+    /** Tracks which (address + chainId) toggle is currently in-flight */
+    const [disablingKey, setDisablingKey] = useState<string | null>(null);
 
     const refetchUsers = useCallback(async () => {
         await new Promise((res) => setTimeout(res, 500));
@@ -242,31 +205,31 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
         });
     }, [queryClient, filter]);
 
-    const handleToggleUser = useCallback(
-        async (user: WhitelistUser) => {
+    /**
+     * Toggle whitelist for a specific user on a specific chain.
+     * Dispatches to Solana or EVM handler based on the chainId.
+     */
+    const handleToggleChain = useCallback(
+        async (user: WhitelistUser, chainId: string) => {
             const addr = user.address.trim();
-            const whitelist = !user.enabled; // toggle: if currently enabled → disable, else → enable
+            const whitelist = !user.enabled;
+            const key = makeDisablingKey(addr, chainId);
 
-            if (isEvmAddress(addr)) {
-                setDisablingAddress(user.address);
-                const ok = await disableEvm({ userAddress: addr, whitelist });
-                setDisablingAddress(null);
-                if (ok) refetchUsers();
-            } else if (isSolanaAddress(addr)) {
-                setDisablingAddress(user.address);
-                const ok = await disableSolana({ userAddress: addr, whitelist });
-                setDisablingAddress(null);
-                if (ok) refetchUsers();
+            setDisablingKey(key);
+
+            let ok = false;
+            if (chainId === SOLANA_BACKEND_CHAIN_ID) {
+                ok = await disableSolana({ userAddress: addr, whitelist });
             } else {
-                toast.error("Unknown address format", {
-                    description: `Cannot determine network for: ${addr.slice(0, 20)}…`,
-                });
+                ok = await disableEvm({ userAddress: addr, whitelist });
             }
+
+            setDisablingKey(null);
+            if (ok) refetchUsers();
         },
         [disableEvm, disableSolana, refetchUsers],
     );
 
-    // Map single NetworkId → numeric chainId for the API (-1 for Solana)
     const chainIds = useMemo(() => {
         if (!filter.network) return undefined;
         const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
@@ -316,95 +279,127 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     )}
 
                     {!isLoading &&
-                        users.map((user, index) => {
-                            const isFirst = index === 0;
+                        users.flatMap((user, userIdx) => {
+                            const isFirstUser = userIdx === 0;
                             const status: UserStatus = user.enabled ? "enabled" : "disabled";
-                            const isDisabling = disablingAddress === user.address;
 
-                            return (
-                                <TableRow
-                                    key={user.address}
-                                    className={cn({
-                                        "border-l-2 border-l-primary": isFirst,
-                                    })}
-                                >
-                                    {/* User name + email */}
-                                    <TableCell>
-                                        <div className="flex flex-col text-left pl-2">
-                                            <p className={cn("text-base font-semibold", { "text-primary": isFirst })}>
-                                                {user.name}
-                                            </p>
-                                            <p className="text-11px font-normal text-secondary-text">
-                                                {user.email}
-                                            </p>
-                                        </div>
-                                    </TableCell>
+                            // Each chain becomes a fully independent row
+                            const chainRows =
+                                user.whitelistChainId?.length > 0
+                                    ? user.whitelistChainId
+                                    : [""];
 
-                                    {/* Status badge */}
-                                    <TableCell>
-                                        <AnimateIconButton
-                                            iconLetter={userStatusLetters[status]}
-                                            textVariant="text-self-center"
-                                            text={userStatusLabels[status]}
-                                            color={userStatusColors[status]}
-                                            hasGroupHover
-                                            classNames={{ btn: "min-w-27 mx-auto" }}
-                                        />
-                                    </TableCell>
+                            return chainRows.map((chainId, chainIdx) => {
+                                const network = chainId ? getNetworkByChainId(chainId) : null;
+                                const chainAllocations = chainId
+                                    ? user.tokenAllocations.filter((a) => a.chainId === chainId)
+                                    : user.tokenAllocations;
 
-                                    {/* Address */}
-                                    <TableCell>
-                                        <CopyableText
-                                            content={user.address}
-                                            displayText={truncateString({ str: user.address })}
-                                        />
-                                    </TableCell>
+                                const rowKey = `${user.address}-${chainId || chainIdx}`;
+                                const currentDisablingKey = makeDisablingKey(user.address, chainId);
+                                const isDisabling = disablingKey === currentDisablingKey;
 
-                                    {/* Network icons from whitelistChainId */}
-                                    <TableCell className="text-center">
-                                        <div className="flex justify-center">
-                                            <UserNetworkIcons user={user} />
-                                        </div>
-                                    </TableCell>
+                                // Mark the very first row of the first user
+                                const isHighlighted = isFirstUser && chainIdx === 0;
 
-                                    {/* Description — token allocations */}
-                                    <TableCell>
-                                        <TokenAllocationChips
-                                            allocations={user.tokenAllocations}
-                                            userName={user.name}
-                                        />
-                                    </TableCell>
+                                return (
+                                    <TableRow
+                                        key={rowKey}
+                                        className={cn({
+                                            "border-l-2 border-l-primary": isHighlighted,
+                                        })}
+                                    >
+                                        {/* User name + email — repeated on every chain row */}
+                                        <TableCell>
+                                            <div className="flex flex-col text-left pl-2">
+                                                <p className={cn("text-base font-semibold", { "text-primary": isHighlighted })}>
+                                                    {user.name}
+                                                </p>
+                                                <p className="text-11px font-normal text-secondary-text">
+                                                    {user.email}
+                                                </p>
+                                            </div>
+                                        </TableCell>
 
-                                    {/* Added date */}
-                                    <TableCell>
-                                        <p className="text-sm whitespace-nowrap">
-                                            {new Date(user.createdAt).toLocaleDateString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric",
-                                            })}
-                                        </p>
-                                    </TableCell>
-
-                                    {/* Action: pencil edit + disable toggle */}
-                                    <TableCell>
-                                        <div className="flex items-center justify-center gap-4.5">
-                                            <button
-                                                className="text-secondary-text hover:text-foreground transition-colors"
-                                                onClick={() => setEditingUser(user)}
-                                            >
-                                                <PencilIcon className="size-4" />
-                                            </button>
-                                            <BlueSwitch
-                                                active={user.enabled}
-                                                isLoading={isDisabling}
-                                                disabled={isDisabling}
-                                                onClick={() => handleToggleUser(user)}
+                                        {/* Status badge */}
+                                        <TableCell>
+                                            <AnimateIconButton
+                                                iconLetter={userStatusLetters[status]}
+                                                textVariant="text-self-center"
+                                                text={userStatusLabels[status]}
+                                                color={userStatusColors[status]}
+                                                hasGroupHover
+                                                classNames={{ btn: "min-w-27 mx-auto" }}
                                             />
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            );
+                                        </TableCell>
+
+                                        {/* Address */}
+                                        <TableCell>
+                                            <CopyableText
+                                                content={user.address}
+                                                displayText={truncateString({ str: user.address })}
+                                            />
+                                        </TableCell>
+
+                                        {/* Network — specific to this chain row */}
+                                        <TableCell className="text-center">
+                                            <div className="flex justify-center">
+                                                {network ? (
+                                                    <div className="flex items-center gap-1.5">
+                                                        <NetworkImgIcon
+                                                            src={network.iconSrc}
+                                                            alt={network.label}
+                                                            className="size-5 shrink-0"
+                                                        />
+                                                        <span className="text-sm font-medium whitespace-nowrap">
+                                                            {network.label}
+                                                        </span>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-secondary-text text-xs">—</span>
+                                                )}
+                                            </div>
+                                        </TableCell>
+
+                                        {/* Token allocations — filtered for this chain */}
+                                        <TableCell>
+                                            <TokenAllocationChips
+                                                allocations={chainAllocations}
+                                                userName={user.name}
+                                            />
+                                        </TableCell>
+
+                                        {/* Added date */}
+                                        <TableCell>
+                                            <p className="text-sm whitespace-nowrap">
+                                                {new Date(user.createdAt).toLocaleDateString("en-US", {
+                                                    month: "short",
+                                                    day: "numeric",
+                                                    year: "numeric",
+                                                })}
+                                            </p>
+                                        </TableCell>
+
+                                        {/* Action — per chain: pencil edit + chain-specific toggle */}
+                                        <TableCell>
+                                            <div className="flex items-center justify-center gap-4.5">
+                                                <button
+                                                    className="text-secondary-text hover:text-foreground transition-colors"
+                                                    onClick={() => setEditingUser(user)}
+                                                >
+                                                    <PencilIcon className="size-4" />
+                                                </button>
+                                                <BlueSwitch
+                                                    active={user.enabled}
+                                                    isLoading={isDisabling}
+                                                    disabled={disablingKey !== null}
+                                                    onClick={() => handleToggleChain(user, chainId)}
+                                                />
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                );
+                            });
                         })}
                 </TableBody>
             </Table>
