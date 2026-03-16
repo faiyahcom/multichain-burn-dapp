@@ -13,6 +13,7 @@ export interface EditPoolSolParams {
     poolDetail: PoolDetailResponse;
     startTime: number;
     endTime: number;
+    name: string;
 }
 
 export const useEditPoolSolFn = () => {
@@ -21,7 +22,7 @@ export const useEditPoolSolFn = () => {
     const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
     const editPool = useCallback(
-        async ({ poolAddress, poolDetail, startTime, endTime }: EditPoolSolParams) => {
+        async ({ poolAddress, poolDetail, startTime, endTime, name }: EditPoolSolParams) => {
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
                 if (!connection || !provider) throw new Error("Solana connection or provider is not available");
@@ -43,7 +44,7 @@ export const useEditPoolSolFn = () => {
                         timeStart: new BN(startTime),
                         timeEnd: new BN(endTime),
                         targetAddress: new PublicKey(poolDetail.pool.targetAddress),
-                        name: poolDetail.pool.name,
+                        name: name,
                     })
                     .accounts({
                         pool: poolPDA,

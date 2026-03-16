@@ -229,6 +229,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
                 poolDetail,
                 startTime: values.startTime,
                 endTime: values.endTime,
+                name: values.name,
             });
         } else {
             await editPoolEvm({
