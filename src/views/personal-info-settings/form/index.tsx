@@ -29,7 +29,7 @@ const personalInfoSettingsFormSchema = z.object({
         .max(5 * 1024 * 1024, { error: "Image size should be less than 5MB" }),
     ])
     .optional(),
-  nickname: z.string().optional(),
+  nickname: z.string().trim().optional(),
   address: z.string(),
 });
 
