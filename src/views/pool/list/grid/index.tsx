@@ -1,6 +1,7 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CenterSpinner from "@/components/common/center-spinner";
 import NoData from "@/components/common/no-data";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import type {
   PoolItemType,
@@ -77,23 +78,30 @@ const PoolListGrid: React.FC<Props> = ({ data, isLoading, poolType }) => {
               swapPoolShowStatusAndRatio={false}
               customActionBtn={
                 isBurnPool ? undefined : (
-                  <AnimateIconButton
-                    variant="letter-icon"
-                    textVariant="text-container-center"
-                    iconLetter="S"
-                    hasGroupHover
-                    color="#6E37FF"
-                    text="Swap"
+                  <PoolChainGuard
+                    chainId={item.chainId}
                     classNames={{
                       btn: "rounded-t-none after:rounded-t-none w-full after:text-primary-foreground border-x-transparent border-b-transparent",
                     }}
-                    btnProps={{
-                      onClick: (e) => {
-                        e.stopPropagation();
-                        setSwapPoolAddress(item.address);
-                      },
-                    }}
-                  />
+                  >
+                    <AnimateIconButton
+                      variant="letter-icon"
+                      textVariant="text-container-center"
+                      iconLetter="S"
+                      hasGroupHover
+                      color="#6E37FF"
+                      text="Swap"
+                      classNames={{
+                        btn: "rounded-t-none after:rounded-t-none w-full after:text-primary-foreground border-x-transparent border-b-transparent",
+                      }}
+                      btnProps={{
+                        onClick: (e) => {
+                          e.stopPropagation();
+                          setSwapPoolAddress(item.address);
+                        },
+                      }}
+                    />
+                  </PoolChainGuard>
                 )
               }
               classNames={{
