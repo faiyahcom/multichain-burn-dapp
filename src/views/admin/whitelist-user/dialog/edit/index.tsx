@@ -36,12 +36,14 @@ interface Props {
     user: WhitelistUser;
     open: boolean;
     onOpenChange: (open: boolean) => void;
+    onSuccess?: () => void;
 }
 
 const AdminWhitelistUserDialogEdit: React.FC<Props> = ({
     user,
     open,
     onOpenChange,
+    onSuccess,
 }) => {
     const [isLoading, setIsLoading] = useState(false);
 
@@ -73,6 +75,7 @@ const AdminWhitelistUserDialogEdit: React.FC<Props> = ({
                 email: data.email?.trim() || undefined,
             });
             toast.success("User info updated successfully!");
+            onSuccess?.();
             handleOpenChange(false);
         } catch (error) {
             toast.error(getErrorMessage({ error }));
