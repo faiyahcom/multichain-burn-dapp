@@ -6,7 +6,7 @@ import {
   type PoolType,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
-import type { SortBy, SortOrder } from "@/types/common";
+import type { ListLayout, SortBy, SortOrder } from "@/types/common";
 import { create } from "zustand";
 
 type PoolListSearchFilterType = {
@@ -16,6 +16,7 @@ type PoolListSearchFilterType = {
   status?: (BurnPoolStatus | SwapPoolStatus)[];
   sortBy?: SortBy;
   sortOrder?: SortOrder;
+  listLayout?: ListLayout;
 };
 
 type PoolListSearchFilterState = {
@@ -32,6 +33,7 @@ export const useBurnPoolListSearchFilterStore =
       status: [...userViewBurnPoolStatuses],
       sortBy: "tvl",
       sortOrder: "desc",
+      listLayout: "list",
     },
     setFilter: (filter) =>
       set((state) => ({
@@ -48,6 +50,7 @@ export const useSwapPoolListSearchFilterStore =
       status: [...userViewSwapPoolStatuses],
       sortBy: "timestamp",
       sortOrder: "desc",
+      listLayout: "list",
     },
     setFilter: (filter) =>
       set((state) => ({

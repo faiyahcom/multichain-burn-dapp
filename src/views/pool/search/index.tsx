@@ -1,3 +1,4 @@
+import LayoutPicker from "@/components/common/layout-picker";
 import LetterIcon from "@/components/common/letter-icon";
 import MultipleSelect from "@/components/common/multiple-select";
 import NetworkMultipleSelect from "@/components/common/network-multiple-select";
@@ -70,6 +71,10 @@ const PoolListSearch: React.FC<Props> = ({ poolType }) => {
         setSortBy={(sortBy) => setFilter({ sortBy })}
         setSortOrder={(sortOrder) => setFilter({ sortOrder })}
         defaultSortBy={poolType === 0 ? "tvl" : "timestamp"}
+      />
+      <LayoutPicker
+        layout={filter.listLayout}
+        setLayout={(layout) => setFilter({ listLayout: layout })}
       />
     </div>
   );

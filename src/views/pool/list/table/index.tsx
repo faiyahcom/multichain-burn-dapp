@@ -3,11 +3,11 @@ import CopyableText from "@/components/common/copyable-text";
 import InfoTooltip from "@/components/common/info-tooltip";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
-import CustomPagination from "@/components/common/pagination";
 import RatioDisplay from "@/components/common/ratio-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
-import TokenImage from "@/components/common/token-image";
+import TokenDisplay from "@/components/common/token-display";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import {
   Table,
   TableBody,
@@ -16,68 +16,35 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { chainIdToNetworkConfig, networkIdToChainId } from "@/config/networks";
-import { poolService } from "@/services/poolService";
+import { chainIdToNetworkConfig } from "@/config/networks";
 import { poolQueryKeys } from "@/services/queries/queryKey";
-import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
 import {
   getPoolStatusColor,
   getPoolStatusLabel,
-  userHiddenBurnPoolStatuses,
-  userHiddenSwapPoolStatuses,
+  type PoolItemType,
   type PoolType,
 } from "@/types/admin/master-pool-management";
-import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { sciToFormatted } from "@/utils/helpers/numbers";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
 import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
-import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 interface Props {
   poolType: PoolType;
+  data?: PoolItemType[];
+  isLoading?: boolean;
 }
 
-const PoolListTable: React.FC<Props> = ({ poolType }) => {
+const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
   const isBurnPool = poolType === 0;
-  const { filter, setFilter } = usePoolListSearchFilterStore(poolType);
-  const limit = 10;
   const queryClient = useQueryClient();
   const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
-
-  const { data: burnPoolList, isPending: isBurnPoolListPending } = useQuery({
-    queryKey: poolQueryKeys.list({
-      type: poolType,
-      ...filter,
-    }),
-    queryFn: async () => {
-      return poolService.getPoolList({
-        page: filter.page,
-        limit: limit,
-        chainIds: convertArrayToStringParam({
-          array: filter.network?.map((network) => networkIdToChainId(network)),
-        }),
-        excludeStatuses: convertArrayToStringParam({
-          array: [
-            ...(isBurnPool
-              ? userHiddenBurnPoolStatuses
-              : userHiddenSwapPoolStatuses),
-          ],
-        }),
-        includeStatuses: convertArrayToStringParam({ array: filter.status }),
-        kind: poolType.toString(),
-        search: filter.text || undefined,
-        sortBy: filter.sortBy,
-        sortDirection: filter.sortOrder,
-      });
-    },
-  });
 
   const columns = [
     {
@@ -124,7 +91,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
   ];
 
   return (
-    <div className="space-y-9.5 pb-10 pl-13.25">
+    <>
       <Table>
         <TableHeader>
           <TableRow>
@@ -137,16 +104,13 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableSpinner
-            colSpan={columns.length}
-            isLoading={isBurnPoolListPending}
-          />
+          <TableSpinner colSpan={columns.length} isLoading={isLoading} />
           <TableNoData
             colSpan={columns.length}
-            data={burnPoolList?.pools}
-            isLoading={isBurnPoolListPending}
+            data={data}
+            isLoading={isLoading}
           />
-          {burnPoolList?.pools.map((pool) => {
+          {data?.map((pool) => {
             const timeStart = formatTimestampSecondsToDate({
               timestamp: pool.timeStart,
               notFound: "",
@@ -180,6 +144,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
 
             return (
               <TableRow key={pool.address}>
+                {/* Pool */}
                 <TableCell className="pl-7.25 text-left">
                   <Link
                     to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
@@ -202,6 +167,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                   {isBurnPool ? (
                     timeStart &&
                     timeEnd && (
+                      // Time
                       <div className="flex flex-col items-center justify-center gap-0.5 2xl:flex-row">
                         <span>{timeStart}</span>
                         <span className="hidden 2xl:block">-</span>
@@ -209,6 +175,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                       </div>
                     )
                   ) : (
+                    // Ratio
                     <RatioDisplay
                       inValue={pool.rewardDenominator}
                       outValue={pool.rewardNumerator}
@@ -219,37 +186,30 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                     />
                   )}
                 </TableCell>
+                {/* Burn + Reward */}
                 {isBurnPool && (
                   <>
                     <TableCell>
-                      <div className="flex items-center justify-center gap-1">
-                        <TokenImage
-                          src={tokenInDisplay.imageUri}
-                          alt={tokenInDisplay.symbol}
-                          classNames={{
-                            common: "size-4.25",
-                          }}
-                        />
-                        <span>{tokenInDisplay.symbol}</span>
-                      </div>
+                      <TokenDisplay
+                        symbol={tokenInDisplay.symbol}
+                        imageUri={tokenInDisplay.imageUri}
+                        className="size-4.25"
+                      />
                     </TableCell>
                     <TableCell>
-                      <div className="flex items-center justify-center gap-1">
-                        <TokenImage
-                          src={tokenOutDisplay.imageUri}
-                          alt={tokenOutDisplay.symbol}
-                          classNames={{
-                            common: "size-4.25",
-                          }}
-                        />
-                        <span>{tokenOutDisplay.symbol}</span>
-                      </div>
+                      <TokenDisplay
+                        symbol={tokenOutDisplay.symbol}
+                        imageUri={tokenOutDisplay.imageUri}
+                        className="size-4.25"
+                      />
                     </TableCell>
                   </>
                 )}
+                {/* Network */}
                 <TableCell>
                   <NetworkDisplay chainId={pool.chainId} />
                 </TableCell>
+                {/* TVL */}
                 <TableCell>
                   <MetricNumber
                     number={sciToFormatted(
@@ -261,6 +221,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                   />
                 </TableCell>
                 {isBurnPool ? (
+                  // Burn Status
                   <>
                     <TableCell>
                       {/* TODO: might need to change later */}
@@ -281,6 +242,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
                     </TableCell>
                   </>
                 ) : (
+                  // Swap Action
                   <TableCell>
                     <div className="mx-auto block max-w-max">
                       <PoolChainGuard chainId={pool.chainId}>
@@ -325,14 +287,7 @@ const PoolListTable: React.FC<Props> = ({ poolType }) => {
           });
         }}
       />
-
-      <CustomPagination
-        currentPage={filter.page}
-        totalCount={burnPoolList?.total || 0}
-        pageSize={limit}
-        onPageChange={(page) => setFilter({ page })}
-      />
-    </div>
+    </>
   );
 };
 
