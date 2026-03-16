@@ -1,10 +1,19 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import { toast } from "@/components/common/custom-toast";
 import SingleImageUpload from "@/components/common/single-image-upload";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import {
+  authService,
+  type UpdatePersonalInfoRequest,
+} from "@/services/authService";
+import { authQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import z from "zod";
 
@@ -29,23 +38,77 @@ type PersonalInfoSettingsFormValues = z.infer<
 >;
 
 const PersonalInfoSettingsForm = () => {
-  const { user } = useAuthStore();
+  const { user, _hasHydrated } = useAuthStore();
+  const queryClient = useQueryClient();
+
+  const { data: userApiData, isPending: isGetCurrentUserPending } = useQuery({
+    queryKey: authQueryKeys.me({
+      address: user?.address,
+    }),
+    queryFn: async () => {
+      return authService.getCurrentUser();
+    },
+    enabled: !!user?.address,
+    staleTime: Infinity,
+  });
 
   const { control, handleSubmit, setValue } =
     useForm<PersonalInfoSettingsFormValues>({
       defaultValues: {
-        avatar: undefined,
-        nickname: "",
+        avatar: userApiData?.avatar ?? undefined,
+        nickname: userApiData?.name ?? "",
         address: user?.address,
       },
       resolver: zodResolver(personalInfoSettingsFormSchema),
     });
 
+  const {
+    mutate: updatePersonalInfoMutation,
+    isPending: isUpdatePersonalInfoPending,
+  } = useMutation({
+    mutationFn: async (data: UpdatePersonalInfoRequest) => {
+      return authService.updatePersonalInfo(data);
+    },
+    onSuccess: () => {
+      toast.success("Personal info updated successfully!");
+      queryClient.invalidateQueries({
+        queryKey: authQueryKeys.me({
+          address: user?.address,
+        }),
+      });
+    },
+    onError: (error) => {
+      const message = getErrorMessage({ error });
+      toast.error(message);
+    },
+  });
+
   const onSubmit = async (data: PersonalInfoSettingsFormValues) => {
-    console.log(data);
+    updatePersonalInfoMutation({
+      avatar: data.avatar instanceof File ? data.avatar : undefined,
+      name: data.nickname,
+    });
   };
 
+  useEffect(() => {
+    if (_hasHydrated && user && user.address) {
+      setValue("address", user.address);
+    }
+  }, [_hasHydrated, user, setValue]);
+
+  useEffect(() => {
+    if (userApiData) {
+      if (userApiData.avatar) {
+        setValue("avatar", userApiData.avatar);
+      }
+      if (userApiData.name) {
+        setValue("nickname", userApiData.name);
+      }
+    }
+  }, [userApiData, setValue]);
+
   const labelClassName = "text-2xl font-medium";
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Controller
@@ -70,6 +133,7 @@ const PersonalInfoSettingsForm = () => {
               classNames={{
                 container: "ml-3.25",
               }}
+              isLoading={isGetCurrentUserPending}
             />
             {fieldState.invalid && <FieldError errors={[fieldState.error]} />}
           </Field>
@@ -131,7 +195,10 @@ const PersonalInfoSettingsForm = () => {
         }}
         btnProps={{
           type: "submit",
+          disabled: isGetCurrentUserPending,
         }}
+        isLoading={isUpdatePersonalInfoPending}
+        isLoadingText="Saving..."
       />
     </form>
   );
