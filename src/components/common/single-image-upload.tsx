@@ -12,6 +12,7 @@ interface Props {
   classNames?: {
     container?: string;
   };
+  isLoading?: boolean;
 }
 
 const SingleImageUpload: React.FC<Props> = ({
@@ -21,6 +22,7 @@ const SingleImageUpload: React.FC<Props> = ({
   alt = "image",
   id,
   classNames,
+  isLoading,
 }) => {
   const reactId = useId();
   const finalId = id || reactId;
@@ -74,12 +76,13 @@ const SingleImageUpload: React.FC<Props> = ({
           classNames={{
             common: "size-21.25",
           }}
+          isLoading={isLoading}
         />
         <label
           htmlFor={finalId}
           className={cn(
             "absolute inset-0 z-10 flex items-center justify-center rounded-full bg-foreground/50",
-            "opacity-0 transition-opacity group-hover:opacity-100",
+            "opacity-0 transition-opacity duration-300 group-hover:opacity-100",
             "cursor-pointer",
           )}
         >

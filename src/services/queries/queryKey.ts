@@ -50,3 +50,7 @@ export const transferHistoryQueryKeys = {
     ["transfer-history", "list", params] as const,
   analysis: () => ["transfer-history", "analysis"] as const,
 };
+
+export const authQueryKeys = {
+  me: (params?: Record<string, unknown>) => ["auth", "me", params] as const,
+};
