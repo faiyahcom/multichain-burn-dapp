@@ -58,6 +58,7 @@ export default function EditPoolScreen({
           poolDetail: poolDetail!,
           startTime: Math.floor(startTime.getTime() / 1000),
           endTime: Math.floor(endTime.getTime() / 1000),
+          name: pool.name,
         });
       } else {
         await editPoolEvm({
