@@ -68,11 +68,11 @@ const PoolListGrid: React.FC<Props> = ({ data, isLoading, poolType }) => {
             container: "col-span-1 md:col-span-2 2xl:col-span-3",
           }}
         />
-        {data?.map((item, index) => {
+        {data?.map((item) => {
           return (
             <PairDetailDetailListCardItem
               data={item}
-              key={index}
+              key={item.address}
               displayValues={displayLines}
               swapPoolShowStatusAndRatio={false}
               customActionBtn={
