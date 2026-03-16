@@ -44,3 +44,5 @@ export { default as IconToastError } from "./icons/toast-error.svg?react";
 export { default as IconToastInfo } from "./icons/toast-info.svg?react";
 export { default as IconToastSuccess } from "./icons/toast-success.svg?react";
 export { default as IconToastWarning } from "./icons/toast-warning.svg?react";
+
+export { default as IconWhiteCamera } from "./icons/white-camera.svg?react";
