@@ -416,13 +416,14 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
             )}
 
             {editingUser && (
-                <AdminWhitelistUserDialogEdit
-                    user={editingUser}
-                    open={!!editingUser}
-                    onOpenChange={(open) => {
-                        if (!open) setEditingUser(null);
-                    }}
-                />
+            <AdminWhitelistUserDialogEdit
+                user={editingUser}
+                open={!!editingUser}
+                onOpenChange={(open) => {
+                    if (!open) setEditingUser(null);
+                }}
+                onSuccess={refetchUsers}
+            />
             )}
         </div>
     );
