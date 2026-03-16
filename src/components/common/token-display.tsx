@@ -6,6 +6,10 @@ interface ITokenDisplay {
   imageUri?: string;
   symbol: string;
   className?: string;
+  classNames?: {
+    container?: string;
+    img?: string;
+  };
 }
 
 function TokenDisplay({
@@ -13,9 +17,15 @@ function TokenDisplay({
   customSymbol,
   imageUri,
   className,
+  classNames,
 }: ITokenDisplay) {
   return (
-    <div className="flex items-center justify-center gap-1">
+    <div
+      className={cn(
+        "flex items-center justify-center gap-1",
+        classNames?.container,
+      )}
+    >
       <TokenImage
         src={imageUri}
         alt={customSymbol ?? symbol}
@@ -23,6 +33,7 @@ function TokenDisplay({
           common: cn(
             "size-4.75 shrink-0 rounded-full object-cover",
             className,
+            classNames?.img,
           ),
         }}
       />
