@@ -14,45 +14,77 @@ import {
   MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_BURN_ADDRESS,
   MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_SWAP_ADDRESS,
   MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_SWAP_ADDRESS,
+  MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_BURN_ADDRESS,
+  MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_BURN_ADDRESS,
+  MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_SWAP_ADDRESS,
+  MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_SWAP_ADDRESS,
 } from "@/web3";
 
 export const getContractSwapFactory = (signer: Signer) => {
-  const isXphere =
-    useSystemStore.getState().selectedNetworkId === "xphereTestnet";
-  const address = isXphere
-    ? MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_SWAP_ADDRESS
-    : MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS;
+  const networkId = useSystemStore.getState().selectedNetworkId;
+  let address: string;
+  switch (networkId) {
+    case "xphereTestnet":
+      address = MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_SWAP_ADDRESS;
+      break;
+    case "binanceTestnet":
+      address = MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_SWAP_ADDRESS;
+      break;
+    default:
+      address = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_SWAP_ADDRESS;
+  }
   console.log("[getContractSwapFactory] address:", address);
   return new ethers.Contract(address, MULTICHAIN_BURN_ABI_SWAP_FACTORY, signer);
 };
 
 export const getContractSwapRouter = (signer: Signer) => {
-  const isXphere =
-    useSystemStore.getState().selectedNetworkId === "xphereTestnet";
-  const address = isXphere
-    ? MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_SWAP_ADDRESS
-    : MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_SWAP_ADDRESS;
+  const networkId = useSystemStore.getState().selectedNetworkId;
+  let address: string;
+  switch (networkId) {
+    case "xphereTestnet":
+      address = MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_SWAP_ADDRESS;
+      break;
+    case "binanceTestnet":
+      address = MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_SWAP_ADDRESS;
+      break;
+    default:
+      address = MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_SWAP_ADDRESS;
+  }
   console.log("[getContractSwapRouter] address:", address);
   return new ethers.Contract(address, MULTICHAIN_BURN_ABI_SWAP_ROUTER, signer);
 };
 
 export const getContractBurnFactory = (signer: Signer) => {
-  const isXphere =
-    useSystemStore.getState().selectedNetworkId === "xphereTestnet";
-  const rawAddress = isXphere
-    ? MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_BURN_ADDRESS
-    : MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS;
+  const networkId = useSystemStore.getState().selectedNetworkId;
+  let rawAddress: string;
+  switch (networkId) {
+    case "xphereTestnet":
+      rawAddress = MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_BURN_ADDRESS;
+      break;
+    case "binanceTestnet":
+      rawAddress = MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_BURN_ADDRESS;
+      break;
+    default:
+      rawAddress = MULTICHAIN_BURN_PROGRAM_EVM_FACTORY_BURN_ADDRESS;
+  }
   const address = ethers.getAddress(rawAddress.toLowerCase());
   console.log("[getContractBurnFactory] address:", address);
   return new ethers.Contract(address, MULTICHAIN_BURN_ABI_BURN_FACTORY, signer);
 };
 
 export const getContractBurnRouter = (signer: Signer) => {
-  const isXphere =
-    useSystemStore.getState().selectedNetworkId === "xphereTestnet";
-  const address = isXphere
-    ? MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_BURN_ADDRESS
-    : MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_BURN_ADDRESS;
+  const networkId = useSystemStore.getState().selectedNetworkId;
+  let address: string;
+  switch (networkId) {
+    case "xphereTestnet":
+      address = MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_BURN_ADDRESS;
+      break;
+    case "binanceTestnet":
+      address = MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_BURN_ADDRESS;
+      break;
+    default:
+      address = MULTICHAIN_BURN_PROGRAM_EVM_ROUTER_BURN_ADDRESS;
+  }
   console.log("[getContractBurnRouter] address:", address);
   return new ethers.Contract(address, MULTICHAIN_BURN_ABI_BURN_ROUTER, signer);
 };
