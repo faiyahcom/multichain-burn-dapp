@@ -1,5 +1,8 @@
 export { default as IconUpload } from "./icons/upload.svg?react";
 
+export { default as IconRevenueFeeStats } from "./icons/menu/revenue-fee-stats.svg?react";
+export { default as IconFeeSettingsGear } from "./icons/menu/fee-setting-gear.svg?react";
+
 export { default as IconS } from "./icons/s.svg?react";
 
 export { default as IconActivityHistory } from "./icons/activity-history.svg?react";

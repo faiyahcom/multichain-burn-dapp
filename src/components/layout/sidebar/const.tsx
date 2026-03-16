@@ -1,11 +1,13 @@
 import {
   IconActivityHistory,
   IconBurnPool,
+  IconFeeSettingsGear,
   IconMyCreatedPools,
   IconMyDashboard,
   IconMyParticipatedPools,
   IconPairList,
   IconPersonalInfoSettings,
+  IconRevenueFeeStats,
   IconSettings,
   IconSupport,
   IconSwap,
@@ -138,5 +140,17 @@ export const navItems: NavItem[] = [
     label: "Master Pool Management",
     section: navSection.admin,
     to: "/admin/master-pool-management",
+  },
+  {
+    label: "Revenue & Fee Stats",
+    icon: IconRevenueFeeStats,
+    section: navSection.admin,
+    to: "/admin/revenue-fee-stats",
+  },
+  {
+    label: "Fee Settings Management",
+    icon: IconFeeSettingsGear,
+    section: navSection.admin,
+    to: "/admin/fee-settings-management",
   },
 ];
