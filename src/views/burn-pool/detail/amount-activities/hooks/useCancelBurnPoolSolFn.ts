@@ -153,6 +153,8 @@ export const useCancelBurnPoolSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to cancel pool", {
                     description: getErrorMessage({ error }),
                 });

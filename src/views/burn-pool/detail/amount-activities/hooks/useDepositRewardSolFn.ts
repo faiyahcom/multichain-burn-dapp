@@ -165,6 +165,8 @@ export const useDepositRewardSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to deposit reward", {
                     description: getErrorMessage({ error }),
                 });

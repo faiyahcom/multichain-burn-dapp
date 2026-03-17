@@ -287,6 +287,7 @@ export const useBatchTransferSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to transfer tokens", {
                     description: getErrorMessage({ error }),
                 });

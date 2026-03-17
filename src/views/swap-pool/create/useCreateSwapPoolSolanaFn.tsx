@@ -267,6 +267,7 @@ export const useCreateSwapPoolSolanaFn = () => {
 
                 return poolPDA.toBase58();
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to create pool", {
                     description: getErrorMessage({ error }),
                 });

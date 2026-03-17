@@ -76,6 +76,7 @@ export const useCreateWhitelistUserSolanaFn = () => {
 
                 return true;
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to whitelist user on Solana", {
                     description: getErrorMessage({ error }),
                 });

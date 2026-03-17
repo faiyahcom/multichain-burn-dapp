@@ -204,6 +204,8 @@ export const useClaimBurnSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to claim reward", {
                     description: getErrorMessage({ error }),
                 });

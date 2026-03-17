@@ -63,6 +63,7 @@ export const useEditPoolSolFn = () => {
                 toast.success("Pool updated successfully!", { description: `Tx: ${signature}` });
                 return signature;
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to update pool", { description: getErrorMessage({ error }) });
                 throw error;
             }

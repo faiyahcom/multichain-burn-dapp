@@ -262,6 +262,8 @@ export const useDepositBurnSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to deposit", {
                     description: getErrorMessage({ error }),
                 });
