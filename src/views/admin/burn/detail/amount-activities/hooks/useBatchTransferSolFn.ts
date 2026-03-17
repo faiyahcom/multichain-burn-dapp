@@ -161,27 +161,32 @@ export const useBatchTransferSolFn = () => {
                 }, new BN(0));
 
                 if (vaultBalance.isZero() || trackedBalance.isZero()) {
-                    throw new Error(
-                        `The pool's ${mode} vault is empty ` +
+                    console.log(`The pool's ${mode} vault is empty ` +
                         `(vault: ${(vaultBalance.toNumber() / 10 ** decimals).toFixed(4)}, ` +
                         `tracked: ${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}). ` +
-                        `No tokens available to transfer.`
-                    );
-                }
-
-                if (totalRawRequested.gt(vaultBalance)) {
-                    const availableHuman = (vaultBalance.toNumber() / 10 ** decimals).toFixed(4);
+                        `No tokens available to transfer.`)
                     throw new Error(
-                        `Total requested exceeds actual ${mode} vault balance ` +
-                        `(available: ${availableHuman} tokens). Please reduce the amounts.`
+                        "The pool's deposit vault is empty. No tokens available to transfer."
                     );
                 }
 
                 if (totalRawRequested.gt(trackedBalance)) {
+                    const availableHuman = (trackedBalance.toNumber() / 10 ** decimals).toFixed(4);
+                    console.log(`Total requested exceeds actual ${mode} vault balance ` +
+                        `(available: ${availableHuman} tokens). Please reduce the amounts.`)
                     throw new Error(
-                        `Total requested exceeds the pool's tracked ${mode} balance ` +
+                        `Total requested exceeds vault balance.`
+                    );
+                }
+
+                if (totalRawRequested.gt(trackedBalance)) {
+                    console.log(`Total requested exceeds the pool's tracked ${mode} balance ` +
                         `(${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}). ` +
                         `The on-chain contract will reject this transfer.`
+                    );
+
+                    throw new Error(
+                        `Total requested exceeds vault balance.`
                     );
                 }
 
