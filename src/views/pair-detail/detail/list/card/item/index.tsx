@@ -169,7 +169,7 @@ const BurnPoolInfo = ({ data }: { data?: PoolItemType }) => {
             color={getPoolStatusColor(data.status)}
             text={getPoolStatusLabel(data.status)}
             classNames={{
-              btn: "w-full max-w-29 ml-auto",
+              btn: "w-full max-w-32 ml-auto",
             }}
           />
         )}

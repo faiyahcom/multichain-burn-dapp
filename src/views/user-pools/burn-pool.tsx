@@ -1,11 +1,12 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import LetterIcon from "@/components/common/letter-icon";
+import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
+import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
+import TokenDisplay from "@/components/common/token-display";
 import {
   Table,
   TableBody,
@@ -15,12 +16,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { NETWORK_CONFIGS, networkIdToChainId } from "@/config/networks";
+import { poolService } from "@/services/poolService";
+import { poolQueryKeys, userQueryKeys } from "@/services/queries/queryKey";
 import {
   userService,
   type GetParticipatedPoolsByUserParams,
 } from "@/services/userService";
-import { poolService } from "@/services/poolService";
-import { userQueryKeys, poolQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import {
   getPoolStatusColor,
@@ -29,19 +30,17 @@ import {
   type PoolListRequest,
 } from "@/types/admin/master-pool-management";
 import type { SortOrder } from "@/types/common";
-import type { UserPoolSortBy } from "./menu";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
-import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import type { SortOption, UserPoolSortBy } from "./menu";
 import UserPoolsMenu from "./menu";
-import type { SortOption } from "./menu";
-import TokenDisplay from "@/components/common/token-display";
-import { sciToFormatted } from "@/utils/helpers/numbers";
-import TableNoData from "@/components/common/table-no-data";
-import MetricNumber from "@/components/common/metric-number";
 
 export const BURN_CLAIMABLE_STATUSES = [
   "pending",
@@ -103,6 +102,7 @@ interface Props {
 }
 
 function UserBurnPools({ mode = "participated", title }: Props) {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const isOwner = mode === "owner";
   const allStatuses = isOwner ? OWNER_BURN_STATUSES : BURN_CLAIMABLE_STATUSES;
@@ -217,18 +217,23 @@ function UserBurnPools({ mode = "participated", title }: Props) {
                 timestamp: item.timeEnd,
                 notFound: "",
               });
+              const href = `/burn/detail/${item.address}`;
 
               return (
-                <TableRow key={item.address}>
+                <TableRow
+                  key={item.address}
+                  onClick={() => {
+                    navigate({
+                      to: href,
+                    });
+                  }}
+                  className="cursor-pointer"
+                  title={href}
+                >
                   <TableCell className="pl-11.25 text-left">
-                    <Link
-                      to="/burn/detail/$address"
-                      params={{ address: item.address }}
-                      className="block max-w-full truncate"
-                      title={item.name}
-                    >
+                    <p className="max-w-full truncate" title={item.name}>
                       {item.name}
-                    </Link>
+                    </p>
                     <CopyableText
                       content={item.address}
                       displayText={truncateString({ str: item.address })}

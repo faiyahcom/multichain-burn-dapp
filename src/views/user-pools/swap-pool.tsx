@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import LetterIcon from "@/components/common/letter-icon";
+import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
+import RatioDisplay from "@/components/common/ratio-display";
 import TableSpinner from "@/components/common/table-spinner";
 import {
   Table,
@@ -15,32 +15,31 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { NETWORK_CONFIGS, networkIdToChainId } from "@/config/networks";
+import { poolService } from "@/services/poolService";
+import { poolQueryKeys, userQueryKeys } from "@/services/queries/queryKey";
 import {
   userService,
   type GetParticipatedPoolsByUserParams,
   type ParticipatedUserPool,
 } from "@/services/userService";
-import { poolService } from "@/services/poolService";
-import { userQueryKeys, poolQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import {
   getPoolStatusColor,
   getPoolStatusLabel,
   swapPoolStatusColors,
   swapPoolStatusLabels,
-  type SwapPoolStatus,
   type PoolListRequest,
+  type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
 import type { SortOrder } from "@/types/common";
-import type { UserPoolSortBy } from "./menu";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
-import { truncateString } from "@/utils/helpers/string";
-import { Link } from "@tanstack/react-router";
-import UserPoolsMenu from "./menu";
-import type { SortOption } from "./menu";
 import { sciToFormatted } from "@/utils/helpers/numbers";
-import RatioDisplay from "@/components/common/ratio-display";
-import MetricNumber from "@/components/common/metric-number";
+import { truncateString } from "@/utils/helpers/string";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
+import type { SortOption, UserPoolSortBy } from "./menu";
+import UserPoolsMenu from "./menu";
 
 const SWAP_POOL_STATUSES = ["on_going", "ended", "canceled", "closed"] as const;
 export type SwapPoolParticipatedStatus = (typeof SWAP_POOL_STATUSES)[number];
@@ -77,6 +76,7 @@ interface Props {
 }
 
 function UserSwapPools({ mode = "participated", title }: Props) {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [selectedStatuses, setSelectedStatuses] = useState<string[]>([
     ...SWAP_POOL_STATUSES,
@@ -175,18 +175,23 @@ function UserSwapPools({ mode = "participated", title }: Props) {
           {!isPending &&
             data?.pools?.map((item) => {
               const participated = item as ParticipatedUserPool;
+              const href = `/swap/detail/${item.address}`;
 
               return (
-                <TableRow key={item.address}>
+                <TableRow
+                  key={item.address}
+                  onClick={() => {
+                    navigate({
+                      to: href,
+                    });
+                  }}
+                  className="cursor-pointer"
+                  title={href}
+                >
                   <TableCell className="pl-11.25 text-left">
-                    <Link
-                      to="/swap/detail/$address"
-                      params={{ address: item.address }}
-                      className="block max-w-full truncate"
-                      title={item.name}
-                    >
+                    <p className="max-w-full truncate" title={item.name}>
                       {item.name}
-                    </Link>
+                    </p>
                     <CopyableText
                       content={item.address}
                       displayText={truncateString({ str: item.address })}
