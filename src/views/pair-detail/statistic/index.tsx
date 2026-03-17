@@ -91,7 +91,7 @@ const PairDetailStatistics = () => {
         value={
           <span
             className="uppercase"
-            title={totalParticipants.toLocaleString("de-DE")}
+            title={totalParticipants.toLocaleString("en-US")}
           >
             {shortenNumber({ number: totalParticipants })}
           </span>
