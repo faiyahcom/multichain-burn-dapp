@@ -173,7 +173,10 @@ function UserClaimablePool() {
                         textVariant="text-container-center"
                         hasGroupHover
                         text="Claim"
-                        classNames={{ btn: "min-w-28 mx-auto" }}
+                        classNames={{
+                          btn: "min-w-28 mx-auto after:text-primary-foreground",
+                        }}
+                        color="#6E37FF"
                       />
                     </Link>
                   </TableCell>
