@@ -82,6 +82,8 @@ export const useCancelRequestApproveSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to cancel approval request", {
                     description: getErrorMessage({ error }),
                 });

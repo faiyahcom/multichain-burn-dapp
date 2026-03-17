@@ -76,6 +76,8 @@ export const useDisableWhitelistTokenSolanaFn = () => {
 
         return true;
       } catch (error: any) {
+        console.log(error);
+
         toast.error("Failed to disable whitelist token", {
           description: getErrorMessage({ error }),
         });

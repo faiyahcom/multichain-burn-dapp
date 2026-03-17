@@ -56,6 +56,7 @@ export const useAdminApprovePoolSolFn = () => {
 
                 return tx;
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to approve pool", {
                     description: getErrorMessage({ error }),
                 });

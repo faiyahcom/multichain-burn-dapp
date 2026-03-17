@@ -175,6 +175,8 @@ export const useCreateBurnPoolSolFn = () => {
 
                 return poolPDA.toBase58();
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Create pool failed", {
                     description: getErrorMessage({ error }),
                 });

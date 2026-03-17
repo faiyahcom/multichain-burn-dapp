@@ -56,6 +56,7 @@ export const useAdminRejectPoolSolFn = () => {
 
                 return tx;
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to reject pool", {
                     description: getErrorMessage({ error }),
                 });

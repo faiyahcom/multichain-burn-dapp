@@ -78,6 +78,8 @@ export const useUpdateFeeConfigSolFn = () => {
 
                 return tx as string;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to update fee config", {
                     description: getErrorMessage({ error }),
                 });
