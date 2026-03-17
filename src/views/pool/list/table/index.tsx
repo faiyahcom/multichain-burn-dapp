@@ -32,7 +32,7 @@ import {
 } from "@/utils/helpers/string";
 import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 interface Props {
@@ -42,6 +42,7 @@ interface Props {
 }
 
 const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
+  const navigate = useNavigate();
   const isBurnPool = poolType === 0;
   const queryClient = useQueryClient();
   const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
@@ -142,17 +143,24 @@ const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
               imageUri: pool.tokenInImageUri ?? undefined,
             });
 
+            const href = `/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`;
+
             return (
-              <TableRow key={pool.address}>
+              <TableRow
+                key={pool.address}
+                onClick={() => {
+                  navigate({
+                    to: href,
+                  });
+                }}
+                className="cursor-pointer"
+                title={href}
+              >
                 {/* Pool */}
                 <TableCell className="pl-7.25 text-left">
-                  <Link
-                    to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
-                    className="block max-w-full truncate"
-                    title={pool.name}
-                  >
+                  <p className="max-w-full truncate" title={pool.name}>
                     {pool.name}
-                  </Link>
+                  </p>
                   <CopyableText
                     content={pool.address}
                     displayText={truncateString({
