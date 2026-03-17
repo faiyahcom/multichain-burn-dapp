@@ -58,20 +58,12 @@ export const shortenNumber = ({
 }) => {
   if (typeof number !== "number") return number;
 
-  if (number < 10000) return number.toLocaleString("de-DE");
+  if (number < 10000) return number.toLocaleString("en-US");
 
-  return (
-    numbro(number)
-      .format({
-        average: true,
-        mantissa: 2,
-        trimMantissa: true,
-        ...customFormat,
-      })
-      // This is a hack to fix numbro's formatting to match the design:
-      // "." as thousands separator, "," as decimal separator
-      .replace(/,/g, "#") // temp placeholder
-      .replace(/\./g, ",") // . → ,
-      .replace(/#/g, ".") // , → .
-  );
+  return numbro(number).format({
+    average: true,
+    mantissa: 2,
+    trimMantissa: true,
+    ...customFormat,
+  });
 };
