@@ -8,6 +8,7 @@ export const API_ROUTES = {
     GET_PARTICIPATED_POOLS: "/users/pools",
     GET_POOL_MERKLE_PROOF: (poolAddress: string) =>
       `/users/pools/${poolAddress}/proof`,
+    UPDATE_PROFILE: "/users/profile",
   },
   POOLS: {
     LIST: "/pools",

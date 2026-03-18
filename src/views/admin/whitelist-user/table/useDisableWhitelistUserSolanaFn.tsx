@@ -65,6 +65,8 @@ export const useDisableWhitelistUserSolanaFn = () => {
                 });
                 return true;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error(whitelist ? "Failed to enable user" : "Failed to remove user from whitelist", {
                     description: getErrorMessage({ error }),
                 });

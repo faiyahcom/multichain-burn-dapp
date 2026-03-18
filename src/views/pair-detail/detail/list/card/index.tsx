@@ -1,7 +1,7 @@
-import { Spinner } from "@/components/ui/spinner";
+import CenterSpinner from "@/components/common/center-spinner";
+import NoData from "@/components/common/no-data";
 import type { PoolItemType } from "@/types/admin/master-pool-management";
 import PairDetailDetailListCardItem from "./item";
-import NoData from "@/components/common/no-data";
 
 interface Props {
   data?: PoolItemType[];
@@ -14,11 +14,7 @@ const PairDetailDetailListCardLayout: React.FC<Props> = ({
 }) => {
   return (
     <>
-      {isLoading && (
-        <div className="flex items-center justify-center py-1">
-          <Spinner />
-        </div>
-      )}
+      <CenterSpinner isLoading={isLoading} />
       <div className="grid grid-cols-1 gap-x-4.5 gap-y-5.25 md:grid-cols-2 2xl:grid-cols-3">
         <NoData
           isLoading={isLoading}

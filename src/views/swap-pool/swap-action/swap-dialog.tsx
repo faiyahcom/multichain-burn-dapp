@@ -124,6 +124,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         formatted: burnBalanceFormatted,
         symbol: burnBalanceSymbol,
         isLoading: isLoadingBurnBalance,
+        refetch: refetchBurnBalance,
     } = useTokenBalance({
         tokenAddress: poolDetail?.pool.tokenIn,
         decimals: poolDetail?.pool.tokenInDecimals,
@@ -134,6 +135,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         formatted: rewardBalanceFormatted,
         symbol: rewardBalanceSymbol,
         isLoading: isLoadingRewardBalance,
+        refetch: refetchRewardBalance,
     } = useTokenBalance({
         tokenAddress: poolDetail?.pool.rewardToken,
         decimals: poolDetail?.pool.rewardTokenDecimals,
@@ -144,15 +146,24 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null)
             return;
         try {
+            const decimals = poolDetail.pool.tokenInDecimals;
             const balanceBN = new BN(
-                parseUnits(burnBalanceFormatted, poolDetail.pool.tokenInDecimals).toString(),
+                parseUnits(burnBalanceFormatted, decimals).toString(),
             );
             if (balanceBN.isZero()) return;
-            const amountBN =
+            let amountBN =
                 percent === 100 ? balanceBN : balanceBN.muln(percent).divn(100);
+            if (maxBurnLeft && maxBurnLeft !== "0") {
+                const maxBurnRawBN = new BN(
+                    parseUnits(maxBurnLeft, decimals).toString(),
+                );
+                if (amountBN.gt(maxBurnRawBN)) {
+                    amountBN = maxBurnRawBN;
+                }
+            }
             const formatted = formatUnits(
                 BigInt(amountBN.toString()),
-                poolDetail.pool.tokenInDecimals,
+                decimals,
             );
             setValue("burnAmount", formatted, { shouldValidate: true });
         } catch {
@@ -254,6 +265,8 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                     tokenInAddress: poolDetail.pool.tokenIn,
                 });
             }
+            refetchBurnBalance();
+            refetchRewardBalance();
             reset();
             onOpenChange(false);
             onSuccess();

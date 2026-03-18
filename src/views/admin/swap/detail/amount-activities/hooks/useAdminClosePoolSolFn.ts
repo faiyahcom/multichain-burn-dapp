@@ -154,6 +154,8 @@ export const useAdminClosePoolSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to close pool", {
                     description: getErrorMessage({ error }),
                 });

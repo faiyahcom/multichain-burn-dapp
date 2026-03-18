@@ -94,6 +94,7 @@ const DepositRewardDialog = ({
     const {
         formatted: rewardBalanceFormatted,
         isLoading: isLoadingRewardBalance,
+        refetch: refetchRewardBalance,
     } = useTokenBalance({
         tokenAddress: pool?.rewardToken,
         decimals: pool?.rewardTokenDecimals,
@@ -183,6 +184,7 @@ const DepositRewardDialog = ({
 
     const onSubmit = async (data: DepositFormValues) => {
         await onConfirm(data.amount);
+        refetchRewardBalance();
         reset();
     };
 

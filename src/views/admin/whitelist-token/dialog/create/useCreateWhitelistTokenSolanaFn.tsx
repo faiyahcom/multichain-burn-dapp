@@ -76,6 +76,8 @@ export const useCreateWhitelistTokenSolanaFn = () => {
 
         return true;
       } catch (error: any) {
+        console.log(error);
+
         toast.error("Failed to create whitelist token", {
           description: getErrorMessage({ error }),
         });

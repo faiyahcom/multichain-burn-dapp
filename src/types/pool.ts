@@ -124,9 +124,11 @@ export const activityKind = {
     4: "Pool Canceled",
     5: "Pool Closed",
     8: "Pool Updated",
+    9: "Pool Ended",
 
-    // Reward
+    // Maker action
     10: "Reward Deposited",
+    11: "Cancel Approve Request",
 
     // Admin action
     20: "Admin Refund",

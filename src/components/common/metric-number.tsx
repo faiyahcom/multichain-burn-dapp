@@ -32,10 +32,10 @@ const MetricNumber: React.FC<Props> = ({
   const abs = d.abs();
   const [intPart, decPart] = abs.toFixed().split(".");
 
-  const intFormatted = BigInt(intPart).toLocaleString("de-DE");
+  const intFormatted = BigInt(intPart).toLocaleString("en-US");
   const display =
     (isNegative ? "-" : "") +
-    (decPart ? `${intFormatted},${decPart}` : intFormatted);
+    (decPart ? `${intFormatted}.${decPart}` : intFormatted);
 
   return (
     <div

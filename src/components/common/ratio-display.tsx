@@ -1,11 +1,15 @@
 import { safeDecimalParse } from "@/utils/helpers/numbers";
 import MetricNumber from "./metric-number";
+import { cn } from "@/lib/utils";
 
 interface Props {
   inValue: string;
   outValue: string;
   inSymbol: string;
   outSymbol: string;
+  classNames?: {
+    container?: string;
+  };
 }
 
 const RatioDisplay: React.FC<Props> = ({
@@ -13,6 +17,7 @@ const RatioDisplay: React.FC<Props> = ({
   outValue,
   inSymbol,
   outSymbol,
+  classNames,
 }) => {
   const inValueDecimal = safeDecimalParse({ value: inValue });
   const outValueDecimal = safeDecimalParse({ value: outValue });
@@ -28,7 +33,12 @@ const RatioDisplay: React.FC<Props> = ({
   const displayOutValue = outValueDecimal.div(inValueDecimal).toFixed(6);
 
   return (
-    <div className="flex max-w-full flex-wrap items-center justify-center gap-0.5">
+    <div
+      className={cn(
+        "flex max-w-full flex-wrap items-center justify-center gap-0.5",
+        classNames?.container,
+      )}
+    >
       <MetricNumber
         number={1}
         unit={inSymbol}

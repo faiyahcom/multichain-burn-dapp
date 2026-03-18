@@ -38,6 +38,7 @@ const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
                 return <OnGoingStatus poolDetail={poolDetail} />;
 
             case "closed":
+            case "ended":
                 return <ClosedStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />;
 
             // case "ended":

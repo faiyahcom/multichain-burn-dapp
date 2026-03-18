@@ -71,6 +71,7 @@ const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder }) => {
           id={id}
           hidden
           onChange={handleOnChange}
+          accept="image/*"
         />
       </>
     );
@@ -85,7 +86,14 @@ const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder }) => {
         <IconUpload2 />
         <span className="text-15px font-normal">{placeholder}</span>
       </label>
-      <input type="file" name="file" id={id} hidden onChange={handleOnChange} />
+      <input
+        type="file"
+        name="file"
+        id={id}
+        hidden
+        onChange={handleOnChange}
+        accept="image/*"
+      />
     </>
   );
 };
