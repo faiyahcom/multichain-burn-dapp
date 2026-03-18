@@ -4,6 +4,7 @@ import LetterIcon from "@/components/common/letter-icon";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
+import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import TokenDisplay from "@/components/common/token-display";
@@ -32,10 +33,7 @@ import {
 import type { SortOrder } from "@/types/common";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { sciToFormatted } from "@/utils/helpers/numbers";
-import {
-  formatTimestampSecondsToDate,
-  truncateString,
-} from "@/utils/helpers/string";
+import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
@@ -209,14 +207,6 @@ function UserBurnPools({ mode = "participated", title }: Props) {
           />
           {!isPending &&
             data?.pools?.map((item) => {
-              const timeStart = formatTimestampSecondsToDate({
-                timestamp: item.timeStart,
-                notFound: "",
-              });
-              const timeEnd = formatTimestampSecondsToDate({
-                timestamp: item.timeEnd,
-                notFound: "",
-              });
               const href = `/burn/detail/${item.address}`;
 
               return (
@@ -231,7 +221,10 @@ function UserBurnPools({ mode = "participated", title }: Props) {
                   title={href}
                 >
                   <TableCell className="pl-11.25 text-left">
-                    <p className="max-w-full truncate" title={item.name}>
+                    <p
+                      className="max-w-40 truncate 2xl:max-w-full"
+                      title={item.name}
+                    >
                       {item.name}
                     </p>
                     <CopyableText
@@ -241,11 +234,14 @@ function UserBurnPools({ mode = "participated", title }: Props) {
                     />
                   </TableCell>
                   <TableCell>
-                    {timeStart && timeEnd && (
-                      <>
-                        {timeStart} - {timeEnd}
-                      </>
-                    )}
+                    <StartEndDateDisplay
+                      startDate={item.timeStart}
+                      endDate={item.timeEnd}
+                      classNames={{
+                        container: "2xl:flex-row",
+                        dash: "2xl:block",
+                      }}
+                    />
                   </TableCell>
                   <TableCell>
                     <TokenDisplay

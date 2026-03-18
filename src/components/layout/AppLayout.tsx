@@ -13,10 +13,10 @@ export function AppLayout({ children }: AppLayoutProps) {
       <MainHeader />
       <SwitchNetworkModal />
 
-      <div className="flex flex-1">
+      <div className="flex w-full overflow-x-hidden">
         <Sidebar />
 
-        <main className="min-h-[calc(100dvh-var(--spacing)*24)] flex-1 rounded-tl-xl bg-white pt-6.75 pr-0.75 pl-5.25">
+        <main className="min-h-[calc(100%-var(--spacing)*24)] w-[calc(100%-var(--spacing)*70)] rounded-tl-xl bg-white pt-6.75 pr-0.75 pl-5.25">
           <div className="h-full w-full rounded-t-xl bg-mb-gray">
             {children}
           </div>
