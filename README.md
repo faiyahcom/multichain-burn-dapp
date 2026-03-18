@@ -2,6 +2,19 @@
 - main: for development
 - beta: for beta testing (with mapped domain)
 - prod: for production (with mapped domain)
+- main-admin: for admin development
+- beta-admin: for admin beta testing (with mapped domain)
+- prod-admin: for admin production (with mapped domain)
+
+The PR flow:
+```mermaid
+graph LR;
+  main-->beta;
+  main-->main-admin;
+  main-admin-->beta-admin;
+  beta-->prod;
+  beta-admin-->prod-admin;
+```
 
 # React + TypeScript + Vite
 
