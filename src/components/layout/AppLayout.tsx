@@ -13,7 +13,7 @@ export function AppLayout({ children }: AppLayoutProps) {
       <MainHeader />
       <SwitchNetworkModal />
 
-      <div className="flex w-full overflow-x-hidden">
+      <div className="flex flex-1 w-full overflow-x-hidden">
         <Sidebar />
 
         <main className="min-h-[calc(100%-var(--spacing)*24)] w-[calc(100%-var(--spacing)*70)] rounded-tl-xl bg-white pt-6.75 pr-0.75 pl-5.25">
