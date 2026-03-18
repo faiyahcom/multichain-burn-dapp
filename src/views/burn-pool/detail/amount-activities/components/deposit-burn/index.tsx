@@ -81,7 +81,7 @@ const DepositBurnDialog = ({
 
     const amountStr = watch("amount");
 
-    const { formatted: burnBalanceFormatted, isLoading: isLoadingBurnBalance } =
+    const { formatted: burnBalanceFormatted, isLoading: isLoadingBurnBalance, refetch: refetchBurnBalance } =
         useTokenBalance({
             tokenAddress: pool?.tokenIn,
             decimals: pool?.tokenInDecimals,
@@ -181,6 +181,7 @@ const DepositBurnDialog = ({
 
     const onSubmit = async (data: DepositFormValues) => {
         await onConfirm(data.amount);
+        refetchBurnBalance();
         reset();
     };
 

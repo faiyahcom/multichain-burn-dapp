@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useAppKitConnection } from "@reown/appkit-adapter-solana/react";
 import { useSystemStore } from "@/stores/systemStore";
@@ -59,7 +59,7 @@ export function useTokenBalance({
     isEvmNative;
 
   // ERC20 balance
-  const { data: evmRawBalance, isLoading: isLoadingEvmErc20 } =
+  const { data: evmRawBalance, isLoading: isLoadingEvmErc20, refetch: refetchEvmErc20 } =
     useReadContract({
       address: tokenAddress as Address | undefined,
       abi: [
@@ -83,7 +83,7 @@ export function useTokenBalance({
     });
 
   // Native balance (ETH, BNB, etc.)
-  const { data: evmNativeBalance, isLoading: isLoadingEvmNative } =
+  const { data: evmNativeBalance, isLoading: isLoadingEvmNative, refetch: refetchEvmNative } =
     useBalance({
       address: evmAddress as Address | undefined,
       query: {
@@ -130,6 +130,11 @@ export function useTokenBalance({
 
   const [solanaFormatted, setSolanaFormatted] = useState<string>("0");
   const [isLoadingSolana, setIsLoadingSolana] = useState<boolean>(false);
+  const [solanaRefetchCounter, setSolanaRefetchCounter] = useState(0);
+
+  const solanaRefetch = useCallback(() => {
+    setSolanaRefetchCounter((c) => c + 1);
+  }, []);
 
   useEffect(() => {
     if (
@@ -205,6 +210,7 @@ export function useTokenBalance({
     tokenAddress,
     connection,
     isSolanaNative,
+    solanaRefetchCounter,
   ]);
 
   /* ==============================
@@ -217,6 +223,7 @@ export function useTokenBalance({
       formatted: solanaFormatted,
       symbol,
       isLoading: isLoadingSolana,
+      refetch: solanaRefetch,
     };
   }
 
@@ -229,5 +236,6 @@ export function useTokenBalance({
     isLoading: isEvmNative
       ? isLoadingEvmNative
       : isLoadingEvmErc20,
+    refetch: isEvmNative ? refetchEvmNative : refetchEvmErc20,
   };
 }

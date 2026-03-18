@@ -124,6 +124,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         formatted: burnBalanceFormatted,
         symbol: burnBalanceSymbol,
         isLoading: isLoadingBurnBalance,
+        refetch: refetchBurnBalance,
     } = useTokenBalance({
         tokenAddress: poolDetail?.pool.tokenIn,
         decimals: poolDetail?.pool.tokenInDecimals,
@@ -134,6 +135,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         formatted: rewardBalanceFormatted,
         symbol: rewardBalanceSymbol,
         isLoading: isLoadingRewardBalance,
+        refetch: refetchRewardBalance,
     } = useTokenBalance({
         tokenAddress: poolDetail?.pool.rewardToken,
         decimals: poolDetail?.pool.rewardTokenDecimals,
@@ -254,6 +256,8 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                     tokenInAddress: poolDetail.pool.tokenIn,
                 });
             }
+            refetchBurnBalance();
+            refetchRewardBalance();
             reset();
             onOpenChange(false);
             onSuccess();
