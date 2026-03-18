@@ -73,6 +73,7 @@ function UserClaimablePool() {
     search: searchText || undefined,
     sortBy: sortBy as GetParticipatedPoolsByUserParams["sortBy"],
     sortDirection: sortOrder,
+    onlyUnClaimed: "true",
   };
 
   const { data, isPending } = useQuery({
