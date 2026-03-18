@@ -34,51 +34,51 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
-        if (poolDetail?.pool.status === "ended") {
-            return [
-                [
-                    { label: "Ratio", value: "Dynamic" },
-                    {
-                        label: "Burn Token",
-                        // value: `${poolDetail.pool.tokenInSymbol}`,
-                        value: (
-                            <div className="flex items-center gap-2">
-                                <TokenImage
-                                    src={burnTokenDisplay.imageUri}
-                                    alt={burnTokenDisplay.name}
-                                    classNames={{
-                                        common: "size-6",
-                                        img: "size-6",
-                                        placeholder: "size-6",
-                                    }}
-                                />
-                                <span>{burnTokenDisplay.symbol}</span>
-                            </div>
-                        ),
-                    },
-                ],
-                [
-                    { label: "Burn Method", value: "Burn" },
-                    {
-                        label: "Reward Token",
-                        value: (
-                            <div className="flex items-center gap-2">
-                                <TokenImage
-                                    src={rewardTokenDisplay.imageUri}
-                                    alt={rewardTokenDisplay.name}
-                                    classNames={{
-                                        common: "size-6",
-                                        img: "size-6",
-                                        placeholder: "size-6",
-                                    }}
-                                />
-                                <span>{rewardTokenDisplay.symbol}</span>
-                            </div>
-                        ),
-                    },
-                ],
-            ];
-        }
+        // if (poolDetail?.pool.status === "ended") {
+        //     return [
+        //         [
+        //             { label: "Ratio", value: "Dynamic" },
+        //             {
+        //                 label: "Burn Token",
+        //                 // value: `${poolDetail.pool.tokenInSymbol}`,
+        //                 value: (
+        //                     <div className="flex items-center gap-2">
+        //                         <TokenImage
+        //                             src={burnTokenDisplay.imageUri}
+        //                             alt={burnTokenDisplay.name}
+        //                             classNames={{
+        //                                 common: "size-6",
+        //                                 img: "size-6",
+        //                                 placeholder: "size-6",
+        //                             }}
+        //                         />
+        //                         <span>{burnTokenDisplay.symbol}</span>
+        //                     </div>
+        //                 ),
+        //             },
+        //         ],
+        //         [
+        //             { label: "Burn Method", value: "Burn" },
+        //             {
+        //                 label: "Reward Token",
+        //                 value: (
+        //                     <div className="flex items-center gap-2">
+        //                         <TokenImage
+        //                             src={rewardTokenDisplay.imageUri}
+        //                             alt={rewardTokenDisplay.name}
+        //                             classNames={{
+        //                                 common: "size-6",
+        //                                 img: "size-6",
+        //                                 placeholder: "size-6",
+        //                             }}
+        //                         />
+        //                         <span>{rewardTokenDisplay.symbol}</span>
+        //                     </div>
+        //                 ),
+        //             },
+        //         ],
+        //     ];
+        // }
 
         return [
             [
