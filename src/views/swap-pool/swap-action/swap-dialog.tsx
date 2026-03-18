@@ -146,15 +146,24 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null)
             return;
         try {
+            const decimals = poolDetail.pool.tokenInDecimals;
             const balanceBN = new BN(
-                parseUnits(burnBalanceFormatted, poolDetail.pool.tokenInDecimals).toString(),
+                parseUnits(burnBalanceFormatted, decimals).toString(),
             );
             if (balanceBN.isZero()) return;
-            const amountBN =
+            let amountBN =
                 percent === 100 ? balanceBN : balanceBN.muln(percent).divn(100);
+            if (maxBurnLeft && maxBurnLeft !== "0") {
+                const maxBurnRawBN = new BN(
+                    parseUnits(maxBurnLeft, decimals).toString(),
+                );
+                if (amountBN.gt(maxBurnRawBN)) {
+                    amountBN = maxBurnRawBN;
+                }
+            }
             const formatted = formatUnits(
                 BigInt(amountBN.toString()),
-                poolDetail.pool.tokenInDecimals,
+                decimals,
             );
             setValue("burnAmount", formatted, { shouldValidate: true });
         } catch {
