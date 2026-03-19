@@ -10,9 +10,9 @@ import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
 import { useMemo } from "react";
 import { chainIdToNetworkConfig } from "@/config/networks";
-import { AssetTypeEnum } from "@/web3/helpers";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -35,12 +35,26 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
         () => pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined,
         [pool?.chainId],
     );
-    const tokenInSymbolDisplay = pool?.assetTypeIn === AssetTypeEnum.NATIVE
-        ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.tokenInSymbol ?? "")
-        : (pool?.tokenInSymbol ?? "");
-    const rewardTokenSymbolDisplay = pool?.assetTypeReward === AssetTypeEnum.NATIVE
-        ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
-        : (pool?.rewardTokenSymbol ?? "");
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network: networkConfig,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network: networkConfig,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
+    const tokenInSymbolDisplay = burnTokenDisplay.symbol;
+    const rewardTokenSymbolDisplay = rewardTokenDisplay.symbol;
 
     const onChainReward = vaultBalance?.rewardBalance;
     const onChainDeposit = vaultBalance?.depositBalance;
