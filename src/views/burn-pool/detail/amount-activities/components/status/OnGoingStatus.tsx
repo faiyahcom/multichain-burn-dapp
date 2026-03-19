@@ -53,7 +53,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
             Number(poolDetail.pool.rewardAmount) /
             Math.pow(10, poolDetail.pool.rewardTokenDecimals);
         const yourCurrentDeposited =
-            Number(poolDetail.userAmount.deposited) /
+            Number(poolDetail?.userAmount?.deposited) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
             return `0 ${rewardSymbol}`;

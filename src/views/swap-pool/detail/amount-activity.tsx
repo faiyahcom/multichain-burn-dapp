@@ -30,13 +30,13 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     const queryClient = useQueryClient();
     const formattedBurned = poolDetail
         ? formatAmount(
-            poolDetail.userAmount.deposited,
+            poolDetail?.userAmount?.deposited || "0",
             poolDetail.pool.tokenInDecimals,
         )
         : "-";
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.userAmount.claimed,
+            poolDetail?.userAmount?.claimed || "0",
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";
@@ -143,7 +143,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     )}
                 </span>
             </div>
-            {Number(poolDetail?.userAmount.claimed || "0") > 0 && (
+            {Number(poolDetail?.userAmount?.claimed || "0") > 0 && (
                 <div className="mx-6 inline-flex items-start gap-1">
                     <IconTick className="inline size-3.5 translate-y-0.5" />
                     <span className="text-sm text-greyed">

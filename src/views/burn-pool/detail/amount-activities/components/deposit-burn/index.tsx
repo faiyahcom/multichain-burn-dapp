@@ -95,7 +95,7 @@ const DepositBurnDialog = ({
         )
         : "-";
 
-    const yourCurrentDepositedAmount = poolDetail?.userAmount.deposited;
+    const yourCurrentDepositedAmount = poolDetail?.userAmount?.deposited ;
     const formattedCurrentDepositedAmount = yourCurrentDepositedAmount
         ? formatAmount(yourCurrentDepositedAmount, poolDetail.pool.tokenInDecimals)
         : "0";
@@ -171,7 +171,7 @@ const DepositBurnDialog = ({
             Number(poolDetail.pool.rewardAmount) /
             Math.pow(10, poolDetail.pool.rewardTokenDecimals);
         const yourCurrentDeposited =
-            Number(poolDetail.userAmount.deposited) /
+            Number(poolDetail?.userAmount?.deposited) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         const reward =
             ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
