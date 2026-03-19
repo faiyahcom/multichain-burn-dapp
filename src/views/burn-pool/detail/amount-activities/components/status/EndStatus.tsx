@@ -1,10 +1,11 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { useOnChainVaultBalance } from "@/views/admin/burn/detail/amount-activities/hooks/useOnChainVaultBalance";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -47,24 +48,22 @@ const EndStatus = ({ poolDetail }: Props) => {
         imageUri: poolDetail?.tokenOut.imageUri,
     });
 
-    const estmatedReward = useMemo(() => {
-        if (!poolDetail) return "-";
-        const rewardSymbol =
-            rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
-        const totalDeposited =
-            Number(poolDetail.depositedAmount) /
-            Math.pow(10, poolDetail.pool.tokenInDecimals);
-        const rewardPool =
-            Number(poolDetail.pool.rewardAmount) /
-            Math.pow(10, poolDetail.pool.rewardTokenDecimals);
-        const yourCurrentDeposited =
-            Number(poolDetail?.userAmount?.deposited) /
-            Math.pow(10, poolDetail.pool.tokenInDecimals);
-        if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
-            return `0 ${rewardSymbol}`;
-        const reward = (yourCurrentDeposited / totalDeposited) * rewardPool;
-        return `${reward} ${rewardSymbol}`;
-    }, [poolDetail, rewardTokenDisplay]);
+    const { rewardBalance } = useOnChainVaultBalance({
+        poolAddress: poolDetail?.pool.address,
+        chainId: poolDetail?.pool.chainId,
+        rewardToken: poolDetail?.pool.rewardToken,
+        tokenIn: poolDetail?.pool.tokenIn,
+        rewardTokenDecimals: poolDetail?.pool.rewardTokenDecimals,
+        tokenInDecimals: poolDetail?.pool.tokenInDecimals,
+        assetTypeReward: poolDetail?.pool.assetTypeReward,
+        assetTypeIn: poolDetail?.pool.assetTypeIn,
+    });
+
+    const rewardSymbol =
+        rewardTokenDisplay?.symbol ?? poolDetail?.pool.rewardTokenSymbol ?? "";
+    const estmatedReward = rewardBalance !== undefined
+        ? `${rewardBalance} ${rewardSymbol}`
+        : "-";
 
     return (
         <PoolChainGuard chainId={poolDetail?.pool.chainId}>
