@@ -200,76 +200,93 @@ export const useBatchTransferSolFn = () => {
                     const rawAmount = toRawAmount(recipient.amountStr, decimals);
                     const receiverPubkey = new PublicKey(recipient.address);
 
-                    // Receiver's reward ATA
-                    const receiverRewardAta = await getAssociatedTokenAddress(
-                        rewardMint,
-                        receiverPubkey,
-                        false,
-                        rewardTokenProgram,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
+                    if (isNativeToken) {
+                        // Native SOL: use retreiveRewardNative — no token accounts needed
+                        const ix = await program.methods
+                            .retreiveRewardNative(rawAmount)
+                            .accounts({
+                                admin: adminPubkey,
+                                factory: factoryPDA,
+                                pool: poolPDA,
+                                receiverAddress: receiverPubkey,
+                                systemProgram: SystemProgram.programId,
+                            } as any)
+                            .instruction();
 
-                    // Receiver's deposit ATA
-                    const receiverDepositAta = await getAssociatedTokenAddress(
-                        depositMint,
-                        receiverPubkey,
-                        false,
-                        depositTokenProgram,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
-
-                    // Create reward ATA for receiver if needed
-                    const rewardAtaInfo = await connection.getAccountInfo(receiverRewardAta);
-                    if (!rewardAtaInfo) {
-                        tx.add(
-                            createAssociatedTokenAccountInstruction(
-                                adminPubkey,
-                                receiverRewardAta,
-                                receiverPubkey,
-                                rewardMint,
-                                rewardTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
+                        tx.add(ix);
+                    } else {
+                        // SPL / Token-2022: use retreiveReward with full token accounts
+                        // Receiver's reward ATA
+                        const receiverRewardAta = await getAssociatedTokenAddress(
+                            rewardMint,
+                            receiverPubkey,
+                            false,
+                            rewardTokenProgram,
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
                         );
-                    }
 
-                    // Create deposit ATA for receiver if needed
-                    const depositAtaInfo = await connection.getAccountInfo(receiverDepositAta);
-                    if (!depositAtaInfo) {
-                        tx.add(
-                            createAssociatedTokenAccountInstruction(
-                                adminPubkey,
-                                receiverDepositAta,
-                                receiverPubkey,
-                                depositMint,
-                                depositTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
+                        // Receiver's deposit ATA
+                        const receiverDepositAta = await getAssociatedTokenAddress(
+                            depositMint,
+                            receiverPubkey,
+                            false,
+                            depositTokenProgram,
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
                         );
+
+                        // Create reward ATA for receiver if needed
+                        const rewardAtaInfo = await connection.getAccountInfo(receiverRewardAta);
+                        if (!rewardAtaInfo) {
+                            tx.add(
+                                createAssociatedTokenAccountInstruction(
+                                    adminPubkey,
+                                    receiverRewardAta,
+                                    receiverPubkey,
+                                    rewardMint,
+                                    rewardTokenProgram,
+                                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                                ),
+                            );
+                        }
+
+                        // Create deposit ATA for receiver if needed
+                        const depositAtaInfo = await connection.getAccountInfo(receiverDepositAta);
+                        if (!depositAtaInfo) {
+                            tx.add(
+                                createAssociatedTokenAccountInstruction(
+                                    adminPubkey,
+                                    receiverDepositAta,
+                                    receiverPubkey,
+                                    depositMint,
+                                    depositTokenProgram,
+                                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                                ),
+                            );
+                        }
+
+                        // retreiveReward(tokenMint, amount) — works for both reward & deposit tokens
+                        const ix = await program.methods
+                            .retreiveReward(tokenMint, rawAmount)
+                            .accounts({
+                                admin: adminPubkey,
+                                factory: factoryPDA,
+                                pool: poolPDA,
+                                rewardMint: rewardMint,
+                                depositMint: depositMint,
+                                rewardVault: rewardVaultPDA,
+                                depositVault: depositVaultPDA,
+                                receiverAddress: receiverPubkey,
+                                receiverRewardTokenAta: receiverRewardAta,
+                                receiverDepositTokenAta: receiverDepositAta,
+                                rewardTokenProgram: rewardTokenProgram,
+                                depositTokenProgram: depositTokenProgram,
+                                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                                systemProgram: SystemProgram.programId,
+                            } as any)
+                            .instruction();
+
+                        tx.add(ix);
                     }
-
-                    // retreiveReward(tokenMint, amount) — works for both reward & deposit tokens
-                    const ix = await program.methods
-                        .retreiveReward(tokenMint, rawAmount)
-                        .accounts({
-                            admin: adminPubkey,
-                            factory: factoryPDA,
-                            pool: poolPDA,
-                            rewardMint: rewardMint,
-                            depositMint: depositMint,
-                            rewardVault: rewardVaultPDA,
-                            depositVault: depositVaultPDA,
-                            receiverAddress: receiverPubkey,
-                            receiverRewardTokenAta: receiverRewardAta,
-                            receiverDepositTokenAta: receiverDepositAta,
-                            rewardTokenProgram: rewardTokenProgram,
-                            depositTokenProgram: depositTokenProgram,
-                            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-                            systemProgram: SystemProgram.programId,
-                        } as any)
-                        .instruction();
-
-                    tx.add(ix);
                 }
 
                 if (tx.instructions.length === 0) {
