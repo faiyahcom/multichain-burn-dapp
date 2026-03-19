@@ -13,7 +13,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useMemo } from "react";
 import { formatUnits, parseUnits } from "viem";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import { Input } from "@/components/ui/input";
 import { IconWallet } from "@/assets/react";
 import TokenImage from "@/components/common/token-image";
@@ -152,9 +152,7 @@ const DepositBurnDialog = ({
         const raw =
             Number(poolDetail.depositedAmount) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
-        return `${raw.toLocaleString(undefined, {
-            maximumFractionDigits: poolDetail.pool.tokenInDecimals,
-        })} ${burnTokenDisplay?.symbol ?? poolDetail.pool.tokenInSymbol}`;
+        return `${shortenNumber({ number: raw })} ${burnTokenDisplay?.symbol ?? poolDetail.pool.tokenInSymbol}`;
     }, [poolDetail, burnTokenDisplay]);
 
     const estmatedReward = useMemo(() => {
@@ -177,11 +175,7 @@ const DepositBurnDialog = ({
         const reward =
             ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
             rewardPool;
-        const formatted = reward.toLocaleString(undefined, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: Math.min(decimals, 4),
-        });
-        return `${formatted} ${rewardSymbol}`;
+        return `${shortenNumber({ number: reward })} ${rewardSymbol}`;
     }, [poolDetail, rewardTokenDisplay, ratio, amountStr]);
 
     const onSubmit = async (data: DepositFormValues) => {

@@ -15,7 +15,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useMemo } from "react";
 import BN from "bn.js";
 import { formatUnits } from "viem";
-import { toBaseUnits } from "@/utils/helpers/numbers";
+import { toBaseUnits, shortenNumber } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
@@ -156,9 +156,7 @@ const DepositRewardDialog = ({
         if (!pool) return "-";
         const raw =
             Number(pool.currentRewardAmount) / Math.pow(10, pool.rewardTokenDecimals);
-        return `${raw.toLocaleString(undefined, {
-            maximumFractionDigits: pool.rewardTokenDecimals,
-        })} ${rewardTokenDisplay?.symbol ?? pool.rewardTokenSymbol}`;
+        return `${shortenNumber({ number: raw })} ${rewardTokenDisplay?.symbol ?? pool.rewardTokenSymbol}`;
     }, [pool, rewardTokenDisplay]);
 
     const duration = useMemo(() => {
