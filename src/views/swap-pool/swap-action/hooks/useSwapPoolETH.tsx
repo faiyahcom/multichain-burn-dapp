@@ -35,6 +35,7 @@ export const useSwapPoolETH = () => {
       );
 
       const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
       const routerContract = getContractSwapRouter(signer);
       const parsedAmount = ethers.parseUnits(amountIn, decimals);
 
@@ -45,6 +46,13 @@ export const useSwapPoolETH = () => {
 
       if (!isNative) {
         const tokenContract = getERC20Contract(tokenInAddress, signer);
+        const tokenBalance = await tokenContract.balanceOf(userAddress);
+
+        if (tokenBalance < parsedAmount) {
+          throw new Error(
+            `Insufficient token balance. Required: ${ethers.formatUnits(parsedAmount, decimals)}, Available: ${ethers.formatUnits(tokenBalance, decimals)}`,
+          );
+        }
 
         const approveTx = await tokenContract.approve(
           poolAddress,

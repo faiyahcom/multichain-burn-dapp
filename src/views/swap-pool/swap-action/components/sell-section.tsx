@@ -18,6 +18,7 @@ type Props = {
     poolDetail?: PoolDetailResponse;
     maxBurnLeft: string;
     isExceedingMax: boolean;
+    insufficientBalanceMessage?: string;
 };
 
 const SellSection = ({
@@ -30,6 +31,7 @@ const SellSection = ({
     balanceText,
     maxBurnLeft,
     isExceedingMax,
+    insufficientBalanceMessage,
 }: Props) => {
     return (
         <div className="relative mb-10 flex w-full flex-col rounded-xl bg-mb-gray p-5">
@@ -52,7 +54,11 @@ const SellSection = ({
             <div className="my-4 flex items-center justify-between">
                 <input
                     className="bg-transparent px-0 text-40px font-medium text-black outline-none"
-                    aria-invalid={!!errors.burnAmount}
+                    aria-invalid={
+                        !!errors.burnAmount ||
+                        isExceedingMax ||
+                        !!insufficientBalanceMessage
+                    }
                     {...register("burnAmount")}
                 />
                 <TokenBadge isLoading={isLoadingWhitelistTokens} {...tokenDisplay} />
@@ -61,6 +67,11 @@ const SellSection = ({
             {errors.burnAmount && (
                 <div className="mt-1 text-right text-xs text-destructive">
                     {errors.burnAmount.message}
+                </div>
+            )}
+            {insufficientBalanceMessage && (
+                <div className="mt-1 text-right text-xs text-destructive">
+                    {insufficientBalanceMessage}
                 </div>
             )}
             {isExceedingMax && (

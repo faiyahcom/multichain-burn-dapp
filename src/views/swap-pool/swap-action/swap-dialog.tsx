@@ -30,6 +30,7 @@ import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
 import { safeDecimalParse } from "@/utils/helpers/numbers";
+import { useDebounceValue } from "usehooks-ts";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -47,6 +48,8 @@ const swapFormSchema = z.object({
 });
 
 export type SwapFormValues = z.infer<typeof swapFormSchema>;
+
+const SELL_INPUT_DEBOUNCE_MS = 250;
 
 const formatBalanceDisplay = (value?: string) => {
     if (!value) return "0";
@@ -96,6 +99,13 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     });
 
     const burnAmount = watch("burnAmount");
+    const [debouncedBurnAmount] = useDebounceValue(
+        burnAmount,
+        SELL_INPUT_DEBOUNCE_MS,
+    );
+    const derivedBurnAmount = burnAmount ? debouncedBurnAmount : burnAmount;
+    const isSellAmountDebouncing =
+        !!burnAmount && burnAmount !== derivedBurnAmount;
 
     const network = poolDetail?.pool.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
@@ -196,13 +206,37 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     }, [poolDetail]);
 
     const isExceedingMax =
-        !!burnAmount &&
-        Number(burnAmount) > 0 &&
+        !!derivedBurnAmount &&
+        Number(derivedBurnAmount) > 0 &&
         Number(maxBurnLeft) > 0 &&
-        Number(burnAmount) > Number(maxBurnLeft);
+        Number(derivedBurnAmount) > Number(maxBurnLeft);
+
+    const insufficientBalanceMessage = useMemo(() => {
+        if (!derivedBurnAmount || !burnBalanceFormatted || isLoadingBurnBalance) {
+            return undefined;
+        }
+
+        const burnAmountDecimal = safeDecimalParse({ value: derivedBurnAmount });
+        const burnBalanceDecimal = safeDecimalParse({ value: burnBalanceFormatted });
+
+        if (!burnAmountDecimal || !burnBalanceDecimal) return undefined;
+        if (burnAmountDecimal.lte(0) || burnAmountDecimal.lte(burnBalanceDecimal)) {
+            return undefined;
+        }
+
+        return `Amount exceeds wallet balance (${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""})`;
+    }, [
+        derivedBurnAmount,
+        burnBalanceFormatted,
+        burnBalanceSymbol,
+        burnTokenDisplay.symbol,
+        isLoadingBurnBalance,
+    ]);
+
+    const isInsufficientBalance = !!insufficientBalanceMessage;
 
     const formattedEstimatedRewardAmount = useMemo(() => {
-        if (!burnAmount || !poolDetail) return "0";
+        if (!derivedBurnAmount || !poolDetail) return "0";
 
         try {
             const {
@@ -214,7 +248,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
             } = poolDetail.pool;
 
             const amountInBN = new BN(
-                parseUnits(burnAmount || "0", tokenInDecimals).toString(),
+                parseUnits(derivedBurnAmount || "0", tokenInDecimals).toString(),
             );
 
             if (amountInBN.isZero()) return "0";
@@ -246,7 +280,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         } catch {
             return "0";
         }
-    }, [burnAmount, poolDetail]);
+    }, [derivedBurnAmount, poolDetail]);
 
     const onSubmit = async (data: SwapFormValues) => {
         try {
@@ -270,7 +304,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
             reset();
             onOpenChange(false);
             onSuccess();
-        } catch (error: any) {
+        } catch (error: unknown) {
             toast.error("Swap failed", {
                 description: getErrorMessage({ error }),
             });
@@ -300,6 +334,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             poolDetail={poolDetail}
                             maxBurnLeft={maxBurnLeft}
                             isExceedingMax={isExceedingMax}
+                            insufficientBalanceMessage={insufficientBalanceMessage}
                         />
 
                         <BuySection
@@ -325,7 +360,11 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             isLoadingText="Swapping..."
                             btnProps={{
                                 type: "submit",
-                                disabled: isSubmitting || isExceedingMax,
+                                disabled:
+                                    isSubmitting ||
+                                    isSellAmountDebouncing ||
+                                    isExceedingMax ||
+                                    isInsufficientBalance,
                             }}
                         />
 
