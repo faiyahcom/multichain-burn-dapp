@@ -156,43 +156,11 @@ const TokenAllocationChips: React.FC<{
     );
 };
 
-/** Shows distinct network icons from the user's token allocations */
-/** Shows network icons for each chain the user is registered on (whitelistChainId) */
-const UserNetworkIcons: React.FC<{ user: WhitelistUser }> = ({ user }) => {
-    const networks = useMemo(() => {
-        // Prefer whitelistChainId (explicit registration chains)
-        const chainIds =
-            user.whitelistChainId?.length > 0
-                ? user.whitelistChainId
-                : user.tokenAllocations.map((a) => a.chainId);
-
-        const seen = new Set<string>();
-        return chainIds
-            .map((id) => chainIdToNetworkConfig(id))
-            .filter((n): n is typeof NETWORK_CONFIGS[number] => {
-                if (!n || seen.has(n.id)) return false;
-                seen.add(n.id);
-                return true;
-            });
-    }, [user]);
-
-    if (networks.length === 0) return <span className="text-secondary-text text-xs">—</span>;
-
-    return (
-        <div className="flex flex-col gap-1">
-            {networks.map((n) => (
-                <div key={n.id} className="flex items-center gap-1.5">
-                    <NetworkImgIcon
-                        src={n.iconSrc}
-                        alt={n.label}
-                        className="size-5 shrink-0"
-                    />
-                    <span className="text-sm font-medium whitespace-nowrap">{n.label}</span>
-                </div>
-            ))}
-        </div>
-    );
-};
+/** One expanded row = one user × one chain from whitelistChainId */
+interface ExpandedRow {
+    user: WhitelistUser;
+    chainId: string;
+}
 
 interface Props {
     data?: WhitelistUser[];
@@ -204,7 +172,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const queryClient = useQueryClient();
     const { disableWhitelistUser: disableEvm } = useDisableWhitelistUserEvmFn();
     const { disableWhitelistUser: disableSolana } = useDisableWhitelistUserSolanaFn();
-    const [disablingAddress, setDisablingAddress] = useState<string | null>(null);
+    const [disablingKey, setDisablingKey] = useState<string | null>(null);
     const { caipAddress } = useAppKitAccount();
     const { openSwitchNetworkModal } = useSystemStore();
     const [namespace, chainRef] = caipAddress?.split(":") ?? [];
@@ -227,26 +195,28 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
         });
     }, [queryClient, filter]);
 
-    const handleToggleUser = useCallback(
-        async (user: WhitelistUser) => {
+    const handleToggleRow = useCallback(
+        async (user: WhitelistUser, chainId: string) => {
             const addr = user.address.trim();
-            const whitelist = !user.enabled; // toggle: if currently enabled → disable, else → enable
+            const isEnabled = user.enableChainId?.includes(chainId);
+            const whitelist = !isEnabled; // toggle
+            const rowKey = `${addr}-${chainId}`;
 
             if (isEvmAddress(addr)) {
-                // If on a different EVM chain, prompt to switch
-                const userNetworkId = mapChainToSystemNetwork("eip155", user.whitelistChainId?.find((id) => id !== "-1") ?? "");
-                if (userNetworkId && currentNetworkId !== userNetworkId) {
-                    openSwitchNetworkModal(currentNetworkId, userNetworkId);
+                // Determine which network this chainId belongs to
+                const targetNetworkId = mapChainToSystemNetwork("eip155", chainId);
+                if (targetNetworkId && currentNetworkId !== targetNetworkId) {
+                    openSwitchNetworkModal(currentNetworkId, targetNetworkId);
                     return;
                 }
-                setDisablingAddress(user.address);
+                setDisablingKey(rowKey);
                 const ok = await disableEvm({ userAddress: addr, whitelist });
-                setDisablingAddress(null);
+                setDisablingKey(null);
                 if (ok) refetchUsers();
             } else if (isSolanaAddress(addr)) {
-                setDisablingAddress(user.address);
+                setDisablingKey(rowKey);
                 const ok = await disableSolana({ userAddress: addr, whitelist });
-                setDisablingAddress(null);
+                setDisablingKey(null);
                 if (ok) refetchUsers();
             } else {
                 toast.error("Unknown address format", {
@@ -273,6 +243,18 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     });
 
     const users = data ?? apiData?.users ?? [];
+
+    // Expand each user into one row per chain in whitelistChainId
+    const expandedRows: ExpandedRow[] = useMemo(() => {
+        return users.flatMap((user) => {
+            if (!user.whitelistChainId || user.whitelistChainId.length === 0) {
+                // fallback: show a single row with empty chainId
+                return [{ user, chainId: "" }];
+            }
+            return user.whitelistChainId.map((chainId) => ({ user, chainId }));
+        });
+    }, [users]);
+
     const [editingUser, setEditingUser] = useState<WhitelistUser | null>(null);
 
     return (
@@ -307,14 +289,17 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     )}
 
                     {!isLoading &&
-                        users.map((user, index) => {
+                        expandedRows.map(({ user, chainId }, index) => {
                             const isFirst = index === 0;
-                            const status: UserStatus = user.enabled ? "enabled" : "disabled";
-                            const isDisabling = disablingAddress === user.address;
+                            const isEnabledOnChain = user.enableChainId?.includes(chainId);
+                            const status: UserStatus = isEnabledOnChain ? "enabled" : "disabled";
+                            const rowKey = `${user.address}-${chainId}`;
+                            const isDisabling = disablingKey === rowKey;
+                            const networkCfg = chainId ? chainIdToNetworkConfig(chainId) : undefined;
 
                             return (
                                 <TableRow
-                                    key={user.address}
+                                    key={rowKey}
                                     className={cn({
                                         "border-l-2 border-l-primary": isFirst,
                                     })}
@@ -351,17 +336,32 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                         />
                                     </TableCell>
 
-                                    {/* Network icons from whitelistChainId */}
+                                    {/* Network — single chain per row */}
                                     <TableCell className="text-center">
                                         <div className="flex justify-center">
-                                            <UserNetworkIcons user={user} />
+                                            {networkCfg ? (
+                                                <div className="flex items-center gap-1.5">
+                                                    <NetworkImgIcon
+                                                        src={networkCfg.iconSrc}
+                                                        alt={networkCfg.label}
+                                                        className="size-5 shrink-0"
+                                                    />
+                                                    <span className="text-sm font-medium whitespace-nowrap">
+                                                        {networkCfg.label}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-secondary-text text-xs">—</span>
+                                            )}
                                         </div>
                                     </TableCell>
 
-                                    {/* Description — token allocations */}
+                                    {/* Description — token allocations filtered by this row's chain */}
                                     <TableCell>
                                         <TokenAllocationChips
-                                            allocations={user.tokenAllocations}
+                                            allocations={user.tokenAllocations.filter(
+                                                (a) => a.chainId === chainId
+                                            )}
                                             userName={user.name}
                                         />
                                     </TableCell>
@@ -387,10 +387,10 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                                 <PencilIcon className="size-4" />
                                             </button>
                                             <BlueSwitch
-                                                active={user.enabled}
+                                                active={!!isEnabledOnChain}
                                                 isLoading={isDisabling}
                                                 disabled={isDisabling}
-                                                onClick={() => handleToggleUser(user)}
+                                                onClick={() => handleToggleRow(user, chainId)}
                                             />
                                         </div>
                                     </TableCell>
@@ -400,13 +400,13 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 </TableBody>
             </Table>
 
-            {!isLoading && users.length > 0 && (
+            {!isLoading && expandedRows.length > 0 && (
                 <p className="text-sm text-secondary-text pl-4">
-                    Showing {users.length} of {apiData?.total ?? users.length} users
+                    Showing {expandedRows.length} rows ({users.length} users)
                 </p>
             )}
 
-            {!isLoading && users.length > 50 && (
+            {!isLoading && expandedRows.length > 50 && (
                 <CustomPagination
                     currentPage={filter.page}
                     totalCount={apiData?.total ?? 0}

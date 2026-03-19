@@ -5,6 +5,7 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
 import { appKit } from "@/config/appkit";
+import { useQueryClient } from "@tanstack/react-query";
 
 const useWalletConnectionHandler = () => {
     const { user, logout, _hasHydrated } = useAuthStore();
@@ -15,6 +16,8 @@ const useWalletConnectionHandler = () => {
     const isAuthenticating = useRef(false);
     const wasConnected = useRef(false);
     const prevChainKey = useRef<string | null>(null);
+
+    const queryClient = useQueryClient();
 
     console.log("selectedNetworkId", selectedNetworkId);
 
@@ -71,6 +74,7 @@ const useWalletConnectionHandler = () => {
                     }
                 } finally {
                     isAuthenticating.current = false;
+                    queryClient.invalidateQueries();
                 }
             };
             login();

@@ -52,7 +52,7 @@ const whitelistTokenSchema = z.object({
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
-      error: "Invalid image",
+      error: "Only png, jpeg (jpg), and svg files are allowed",
     })
     .max(5 * 1024 * 1024, { error: "Image size should be less than 5MB" })
     .optional(),

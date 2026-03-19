@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { BorshAccountsCoder, type Idl } from "@coral-xyz/anchor";
+import idl from "@/web3/contracts/multichain_burn_sc_sol.json";
 import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -44,6 +46,8 @@ export interface BatchTransferSolParams {
     poolDetail: PoolDetailResponse;
     mode: TokenMode;
     recipients: BatchRecipient[];
+    /** Called after a successful on-chain transfer with the tx signature. */
+    onSuccess?: (signature: string) => void;
 }
 
 // ── Helper: precise string → raw BN (avoids float drift) ─────────────────────
@@ -91,6 +95,7 @@ export const useBatchTransferSolFn = () => {
             poolDetail,
             mode,
             recipients,
+            onSuccess,
         }: BatchTransferSolParams) => {
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
@@ -144,15 +149,25 @@ export const useBatchTransferSolFn = () => {
                     decimals = tokenMintInfo.decimals;
                 }
 
-                // ── Pre-flight: check vault balance & pool tracked balance ──────
-                const vaultPDA = mode === "reward" ? rewardVaultPDA : depositVaultPDA;
-                const vaultBalance = await queryVaultBalance(connection, vaultPDA, isNativeToken);
-
-                // Also fetch the pool's tracked balance for comparison
-                // @ts-ignore
-                const poolAccount = await program.account.poolAccount.fetch(poolPDA);
+                // Fetch the pool's tracked balance using BorshAccountsCoder
+                // (same approach as useOnChainVaultBalance — avoids Anchor v0.30 fetch issues)
+                const accountsCoder = new BorshAccountsCoder(idl as Idl);
+                const poolAccountInfo = await connection.getAccountInfo(poolPDA);
+                if (!poolAccountInfo?.data) {
+                    throw new Error("Pool account not found on-chain");
+                }
+                const poolAccountData = accountsCoder.decode(
+                    "PoolAccount",
+                    poolAccountInfo.data,
+                );
                 const trackedBalance: InstanceType<typeof BN> =
-                    mode === "reward" ? poolAccount.rewardBalance : poolAccount.totalDeposited;
+                    mode === "reward"
+                        ? new BN(poolAccountData.reward_balance.toString())
+                        : new BN(poolAccountData.total_deposited.toString());
+                console.log(`[batchTransferSol] Pool tracked ${mode} balance:`,
+                    trackedBalance.toString(),
+                    `(${(trackedBalance.toNumber() / 10 ** decimals).toFixed(6)})`
+                );
 
                 const totalRawRequested = recipients.reduce((sum, r) => {
                     const parsed = parseFloat(r.amountStr);
@@ -160,9 +175,9 @@ export const useBatchTransferSolFn = () => {
                     return sum.add(toRawAmount(r.amountStr, decimals));
                 }, new BN(0));
 
-                if (vaultBalance.isZero() || trackedBalance.isZero()) {
+                if (trackedBalance.isZero()) {
                     console.log(`The pool's ${mode} vault is empty ` +
-                        `(vault: ${(vaultBalance.toNumber() / 10 ** decimals).toFixed(4)}, ` +
+                        `(vault: ${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}, ` +
                         `tracked: ${(trackedBalance.toNumber() / 10 ** decimals).toFixed(4)}). ` +
                         `No tokens available to transfer.`)
                     throw new Error(
@@ -200,76 +215,93 @@ export const useBatchTransferSolFn = () => {
                     const rawAmount = toRawAmount(recipient.amountStr, decimals);
                     const receiverPubkey = new PublicKey(recipient.address);
 
-                    // Receiver's reward ATA
-                    const receiverRewardAta = await getAssociatedTokenAddress(
-                        rewardMint,
-                        receiverPubkey,
-                        false,
-                        rewardTokenProgram,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
+                    if (isNativeToken) {
+                        // Native SOL: use retreiveRewardNative — no token accounts needed
+                        const ix = await program.methods
+                            .retreiveRewardNative(rawAmount)
+                            .accounts({
+                                admin: adminPubkey,
+                                factory: factoryPDA,
+                                pool: poolPDA,
+                                receiverAddress: receiverPubkey,
+                                systemProgram: SystemProgram.programId,
+                            } as any)
+                            .instruction();
 
-                    // Receiver's deposit ATA
-                    const receiverDepositAta = await getAssociatedTokenAddress(
-                        depositMint,
-                        receiverPubkey,
-                        false,
-                        depositTokenProgram,
-                        ASSOCIATED_TOKEN_PROGRAM_ID,
-                    );
-
-                    // Create reward ATA for receiver if needed
-                    const rewardAtaInfo = await connection.getAccountInfo(receiverRewardAta);
-                    if (!rewardAtaInfo) {
-                        tx.add(
-                            createAssociatedTokenAccountInstruction(
-                                adminPubkey,
-                                receiverRewardAta,
-                                receiverPubkey,
-                                rewardMint,
-                                rewardTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
+                        tx.add(ix);
+                    } else {
+                        // SPL / Token-2022: use retreiveReward with full token accounts
+                        // Receiver's reward ATA
+                        const receiverRewardAta = await getAssociatedTokenAddress(
+                            rewardMint,
+                            receiverPubkey,
+                            false,
+                            rewardTokenProgram,
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
                         );
-                    }
 
-                    // Create deposit ATA for receiver if needed
-                    const depositAtaInfo = await connection.getAccountInfo(receiverDepositAta);
-                    if (!depositAtaInfo) {
-                        tx.add(
-                            createAssociatedTokenAccountInstruction(
-                                adminPubkey,
-                                receiverDepositAta,
-                                receiverPubkey,
-                                depositMint,
-                                depositTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
+                        // Receiver's deposit ATA
+                        const receiverDepositAta = await getAssociatedTokenAddress(
+                            depositMint,
+                            receiverPubkey,
+                            false,
+                            depositTokenProgram,
+                            ASSOCIATED_TOKEN_PROGRAM_ID,
                         );
+
+                        // Create reward ATA for receiver if needed
+                        const rewardAtaInfo = await connection.getAccountInfo(receiverRewardAta);
+                        if (!rewardAtaInfo) {
+                            tx.add(
+                                createAssociatedTokenAccountInstruction(
+                                    adminPubkey,
+                                    receiverRewardAta,
+                                    receiverPubkey,
+                                    rewardMint,
+                                    rewardTokenProgram,
+                                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                                ),
+                            );
+                        }
+
+                        // Create deposit ATA for receiver if needed
+                        const depositAtaInfo = await connection.getAccountInfo(receiverDepositAta);
+                        if (!depositAtaInfo) {
+                            tx.add(
+                                createAssociatedTokenAccountInstruction(
+                                    adminPubkey,
+                                    receiverDepositAta,
+                                    receiverPubkey,
+                                    depositMint,
+                                    depositTokenProgram,
+                                    ASSOCIATED_TOKEN_PROGRAM_ID,
+                                ),
+                            );
+                        }
+
+                        // retreiveReward(tokenMint, amount) — works for both reward & deposit tokens
+                        const ix = await program.methods
+                            .retreiveReward(tokenMint, rawAmount)
+                            .accounts({
+                                admin: adminPubkey,
+                                factory: factoryPDA,
+                                pool: poolPDA,
+                                rewardMint: rewardMint,
+                                depositMint: depositMint,
+                                rewardVault: rewardVaultPDA,
+                                depositVault: depositVaultPDA,
+                                receiverAddress: receiverPubkey,
+                                receiverRewardTokenAta: receiverRewardAta,
+                                receiverDepositTokenAta: receiverDepositAta,
+                                rewardTokenProgram: rewardTokenProgram,
+                                depositTokenProgram: depositTokenProgram,
+                                associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+                                systemProgram: SystemProgram.programId,
+                            } as any)
+                            .instruction();
+
+                        tx.add(ix);
                     }
-
-                    // retreiveReward(tokenMint, amount) — works for both reward & deposit tokens
-                    const ix = await program.methods
-                        .retreiveReward(tokenMint, rawAmount)
-                        .accounts({
-                            admin: adminPubkey,
-                            factory: factoryPDA,
-                            pool: poolPDA,
-                            rewardMint: rewardMint,
-                            depositMint: depositMint,
-                            rewardVault: rewardVaultPDA,
-                            depositVault: depositVaultPDA,
-                            receiverAddress: receiverPubkey,
-                            receiverRewardTokenAta: receiverRewardAta,
-                            receiverDepositTokenAta: receiverDepositAta,
-                            rewardTokenProgram: rewardTokenProgram,
-                            depositTokenProgram: depositTokenProgram,
-                            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-                            systemProgram: SystemProgram.programId,
-                        } as any)
-                        .instruction();
-
-                    tx.add(ix);
                 }
 
                 if (tx.instructions.length === 0) {
@@ -289,6 +321,8 @@ export const useBatchTransferSolFn = () => {
                     `${mode === "reward" ? "Reward" : "Deposit"} tokens sent to ${recipients.length} recipient${recipients.length > 1 ? "s" : ""}!`,
                     { description: `Tx: ${signature}` },
                 );
+
+                onSuccess?.(signature);
 
                 return signature;
             } catch (error: any) {

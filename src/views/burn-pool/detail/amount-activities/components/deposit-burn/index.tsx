@@ -161,6 +161,7 @@ const DepositBurnDialog = ({
         if (!poolDetail) return "-";
         const rewardSymbol =
             rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+        const decimals = poolDetail.pool.rewardTokenDecimals;
         if (!amountStr) return `0 ${rewardSymbol}`;
         const amount = Number(amountStr);
         if (isNaN(amount) || amount <= 0) return `0 ${rewardSymbol}`;
@@ -169,14 +170,18 @@ const DepositBurnDialog = ({
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         const rewardPool =
             Number(poolDetail.pool.rewardAmount) /
-            Math.pow(10, poolDetail.pool.rewardTokenDecimals);
+            Math.pow(10, decimals);
         const yourCurrentDeposited =
             Number(poolDetail?.userAmount?.deposited) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         const reward =
             ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
             rewardPool;
-        return `${reward} ${rewardSymbol}`;
+        const formatted = reward.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: Math.min(decimals, 4),
+        });
+        return `${formatted} ${rewardSymbol}`;
     }, [poolDetail, rewardTokenDisplay, ratio, amountStr]);
 
     const onSubmit = async (data: DepositFormValues) => {
