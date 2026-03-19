@@ -49,7 +49,7 @@ const swapFormSchema = z.object({
 
 export type SwapFormValues = z.infer<typeof swapFormSchema>;
 
-const SELL_INPUT_DEBOUNCE_MS = 250;
+const SELL_INPUT_DEBOUNCE_MS = 500;
 
 const formatBalanceDisplay = (value?: string) => {
     if (!value) return "0";
