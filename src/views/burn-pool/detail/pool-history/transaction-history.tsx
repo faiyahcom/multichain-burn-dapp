@@ -16,12 +16,6 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-// const TX_KIND_LABELS: Record<number, string> = {
-//     0: "Swap",
-//     1: "Deposit",
-//     2: "Withdraw",
-// };
-
 function getExplorerTxUrl(chainId: string, hash: string): string {
     const network = chainIdToNetworkConfig(chainId);
     const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
@@ -51,13 +45,19 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
+    const excludeKinds = [2].join(",");
     const { data: poolTxns, isLoading } = useQuery({
-        queryKey: poolQueryKeys.txns(poolDetail?.pool.address || "", page),
+        queryKey: poolQueryKeys.txns(
+            poolDetail?.pool.address || "",
+            page,
+            excludeKinds,
+        ),
         queryFn: () =>
             poolService.getPoolTxns(
                 page,
                 DEFAULT_PAGE_SIZE,
                 poolDetail?.pool.address || "",
+                excludeKinds,
             ),
         enabled: !!poolDetail?.pool.address,
         refetchInterval: 2_500, // Poll every 2.5s to update transactions
@@ -139,8 +139,14 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 </TableHeader>
                 <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
                     {txns.map((tx) => {
-                        const hasAmountIn = tx.amountIn != null && tx.amountIn.toString() !== "0" && tx.tokenInDecimals != null;
-                        const hasAmountOut = tx.amountOut != null && tx.amountOut.toString() !== "0" && tx.tokenOutDecimals != null;
+                        const hasAmountIn =
+                            tx.amountIn != null &&
+                            tx.amountIn.toString() !== "0" &&
+                            tx.tokenInDecimals != null;
+                        const hasAmountOut =
+                            tx.amountOut != null &&
+                            tx.amountOut.toString() !== "0" &&
+                            tx.tokenOutDecimals != null;
                         const amount = hasAmountIn
                             ? formatAmount(tx.amountIn, tx.tokenInDecimals)
                             : hasAmountOut
