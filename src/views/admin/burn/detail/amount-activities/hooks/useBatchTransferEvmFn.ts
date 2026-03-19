@@ -5,10 +5,13 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     getContractBurnFactory,
     getContractSwapFactory,
+    getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import type { PoolDetailResponse } from "@/types/pool";
 import type { BatchRecipient, TokenMode } from "./useBatchTransferSolFn";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { BN } from "bn.js";
+import { bigint } from "zod";
 
 export interface BatchTransferEvmParams {
     poolAddress: string;
@@ -61,6 +64,20 @@ export const useBatchTransferEvmFn = () => {
                 });
 
                 let receipt: ethers.TransactionReceipt | null;
+
+                let balance = BigInt(0);
+                if (tokenAddress === "0x0000000000000000000000000000000000000000") {
+                    // check native
+                    balance = await provider.getBalance(poolAddress);
+                } else {
+                    // check erc20
+                    const erc20 = getERC20Contract(tokenAddress, signer);
+                    balance = await erc20.balanceOf(poolAddress);
+                }
+
+                if (balance < amounts[0]) {
+                    throw new Error("Total requested exceeds vault balance");
+                }
 
                 if (isSwapPool) {
                     // ── Swap pool: adminWithdrawBatchSwapPool(pool, tos[], amounts[]) ──
