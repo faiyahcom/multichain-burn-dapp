@@ -29,7 +29,7 @@ function formatBalance(rawAmount: string, decimals: number): string {
     const num = Number(rawAmount) / 10 ** decimals;
     return num.toLocaleString(undefined, {
         minimumFractionDigits: 0,
-        maximumFractionDigits: Math.min(decimals, 4),
+        maximumFractionDigits: Math.min(decimals, 6),
     });
 }
 
