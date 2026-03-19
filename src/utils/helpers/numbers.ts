@@ -58,7 +58,11 @@ export const shortenNumber = ({
 }) => {
   if (typeof number !== "number") return number;
 
-  if (number < 10000) return number.toLocaleString("en-US");
+  if (number < 10000)
+    return number.toLocaleString("en-US", {
+      maximumFractionDigits: 6,
+      minimumFractionDigits: 0,
+    });
 
   return numbro(number).format({
     average: true,
