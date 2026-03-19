@@ -23,8 +23,8 @@
 ## The PR flow:
 ```mermaid
 graph LR;
-  (checkout) -->|dev testing and proof| main;
-  (checkout) -->|verified| main-to-beta;
+  ["&lt;checkout branch&gt;"] -->|dev testing and proof| main;
+  ["&lt;checkout branch&gt;"] -->|verified| main-to-beta;
   main-to-beta -->|requested| beta;
 ```
 Same for admin branches, with the exception that PRs directly from main to main-admin are allowed, no middle branch is needed.
