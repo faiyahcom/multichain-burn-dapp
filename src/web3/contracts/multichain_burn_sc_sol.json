@@ -2495,6 +2495,81 @@
       ]
     },
     {
+      "name": "retreive_reward_native",
+      "discriminator": [
+        242,
+        100,
+        149,
+        234,
+        21,
+        107,
+        36,
+        154
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "factory",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiver_address",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "set_merkle_root",
       "discriminator": [
         43,
@@ -3319,6 +3394,11 @@
       "code": 6033,
       "name": "RewardTooSmall",
       "msg": "Reward amount too small (rounds to zero)"
+    },
+    {
+      "code": 6034,
+      "name": "ExceedBalance",
+      "msg": "Exceed balance"
     }
   ],
   "types": [
@@ -4130,6 +4210,22 @@
           {
             "name": "new_fee",
             "type": "u64"
+          },
+          {
+            "name": "old_creation_fee",
+            "type": "u64"
+          },
+          {
+            "name": "new_creation_fee",
+            "type": "u64"
+          },
+          {
+            "name": "old_treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_treasury",
+            "type": "pubkey"
           },
           {
             "name": "timestamp",
