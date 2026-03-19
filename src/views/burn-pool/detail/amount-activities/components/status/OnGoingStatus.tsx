@@ -46,19 +46,24 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
         if (!poolDetail) return "-";
         const rewardSymbol =
             rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+        const decimals = poolDetail.pool.rewardTokenDecimals;
         const totalDeposited =
             Number(poolDetail.depositedAmount) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         const rewardPool =
-            Number(poolDetail.pool.rewardAmount) /
-            Math.pow(10, poolDetail.pool.rewardTokenDecimals);
+            Number(poolDetail.pool.currentRewardAmount) /
+            Math.pow(10, decimals);
         const yourCurrentDeposited =
             Number(poolDetail?.userAmount?.deposited) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
             return `0 ${rewardSymbol}`;
         const reward = (yourCurrentDeposited / totalDeposited) * rewardPool;
-        return `${reward} ${rewardSymbol}`;
+        const formatted = reward.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: Math.min(decimals, 4),
+        });
+        return `${formatted} ${rewardSymbol}`;
     }, [poolDetail, rewardTokenDisplay]);
 
     return (

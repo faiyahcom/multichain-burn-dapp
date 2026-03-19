@@ -18,6 +18,8 @@ export interface BatchTransferEvmParams {
     poolDetail: PoolDetailResponse;
     mode: TokenMode;
     recipients: BatchRecipient[];
+    /** Called after a successful on-chain transfer with the tx hash. */
+    onSuccess?: (txHash: string) => void;
 }
 
 export const useBatchTransferEvmFn = () => {
@@ -25,7 +27,7 @@ export const useBatchTransferEvmFn = () => {
     const { walletProvider } = useAppKitProvider("eip155");
 
     const batchTransferEvm = useCallback(
-        async ({ poolAddress, poolDetail, mode, recipients }: BatchTransferEvmParams) => {
+        async ({ poolAddress, poolDetail, mode, recipients, onSuccess }: BatchTransferEvmParams) => {
             try {
                 if (!isConnected || !walletProvider) {
                     throw new Error("Wallet not connected");
@@ -95,6 +97,8 @@ export const useBatchTransferEvmFn = () => {
                     `${mode === "reward" ? "Reward" : "Deposit"} tokens sent to ${validRecipients.length} recipient${validRecipients.length > 1 ? "s" : ""}!`,
                     { description: `Tx: ${receipt?.hash}` },
                 );
+
+                if (receipt?.hash) onSuccess?.(receipt.hash);
 
                 return receipt?.hash;
             } catch (error: any) {

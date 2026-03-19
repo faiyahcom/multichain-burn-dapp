@@ -12,6 +12,7 @@ import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { txnKind, type PoolDetailResponse } from "@/types/pool";
 import { formatAmount } from "@/utils/helpers/numbers";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -61,6 +62,40 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
         enabled: !!poolDetail?.pool.address,
         refetchInterval: 2_500, // Poll every 2.5s to update transactions
     });
+
+    // Resolve custom token symbols from pool detail
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
+
+    // Map a transaction's raw token address to the pool's custom display symbol
+    const resolveTokenSymbol = (txTokenAddress: string, fallbackSymbol: string) => {
+        if (txTokenAddress?.toLowerCase() === poolDetail?.pool.tokenIn?.toLowerCase()) {
+            return burnTokenDisplay.symbol;
+        }
+        if (txTokenAddress?.toLowerCase() === poolDetail?.pool.rewardToken?.toLowerCase()) {
+            return rewardTokenDisplay.symbol;
+        }
+        return fallbackSymbol;
+    };
 
     const txns = poolTxns?.txns ?? [];
 
@@ -112,9 +147,9 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                 ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
                                 : "—";
                         const token = hasAmountIn
-                            ? tx.tokenInSymbol
+                            ? resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)
                             : hasAmountOut
-                                ? tx.tokenOutSymbol
+                                ? resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)
                                 : "—";
                         const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
