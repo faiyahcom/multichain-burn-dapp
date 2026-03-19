@@ -28,8 +28,9 @@ const personalInfoSettingsFormSchema = z.object({
         })
         .max(5 * 1024 * 1024, { error: "Image size should be less than 5MB" }),
     ])
-    .optional(),
-  nickname: z.string().trim().optional(),
+    .optional()
+    .nullable(),
+  nickname: z.string().trim().optional().nullable(),
   address: z.string(),
 });
 
@@ -98,12 +99,8 @@ const PersonalInfoSettingsForm = () => {
 
   useEffect(() => {
     if (userApiData) {
-      if (userApiData.avatar) {
-        setValue("avatar", userApiData.avatar);
-      }
-      if (userApiData.name) {
-        setValue("nickname", userApiData.name);
-      }
+      setValue("avatar", userApiData.avatar);
+      setValue("nickname", userApiData.name);
     }
   }, [userApiData, setValue]);
 
@@ -150,6 +147,7 @@ const PersonalInfoSettingsForm = () => {
             </FieldLabel>
             <Input
               {...field}
+              value={field.value ?? ""}
               id={field.name}
               aria-invalid={fieldState.invalid}
               placeholder="Nickname"

@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { IconWhiteCamera } from "@/assets/react";
 
 interface Props {
-  img?: string | File;
+  img?: string | File | null;
   onChange?: (img?: string | File) => void;
   placeholderSrc?: string;
   alt?: string;
