@@ -64,7 +64,7 @@ const EndStatus = ({ poolDetail }: Props) => {
     if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
       return `0 ${rewardSymbol}`;
     const reward = (yourCurrentDeposited / totalDeposited) * rewardPool;
-    return `${shortenNumber({ number: reward })?.toUpperCase()} ${rewardSymbol}`;
+    return `${shortenNumber({ number: reward })?.toUpperCase() ?? reward} ${rewardSymbol}`;
   }, [poolDetail, rewardTokenDisplay]);
 
   return (
