@@ -29,7 +29,7 @@ import { parseUnits } from "ethers";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
-import { safeDecimalParse } from "@/utils/helpers/numbers";
+import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
 import { useDebounceValue } from "usehooks-ts";
 
 const swapFormSchema = z.object({
@@ -55,10 +55,7 @@ const formatBalanceDisplay = (value?: string) => {
     if (!value) return "0";
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) return value;
-    return numericValue.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 3,
-    });
+    return String(shortenNumber({ number: numericValue }));
 };
 
 type Props = {
@@ -273,10 +270,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
             const formatted = formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
             const num = Number(formatted);
             if (!Number.isFinite(num)) return formatted;
-            return num.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 6,
-            });
+            return String(shortenNumber({ number: num }));
         } catch {
             return "0";
         }

@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import { useGetWhitelistUsers } from "@/services/queries/queries";
 import { chainIdToNetworkConfig, SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import type { WhitelistUser } from "@/services/whitelistUserService";
@@ -245,7 +246,7 @@ const TransferTokensDialog = ({
                 const parsed = parseFloat((current ?? "0").replace(/,/g, ""));
                 if (isNaN(parsed)) return current;
                 const updated = Math.max(0, parsed - totalSent);
-                return updated.toFixed(4);
+                return updated.toFixed(6);
             };
             if (mode === "reward") {
                 setLocalRewardAmount(subtractFrom(localRewardAmount));
@@ -448,7 +449,7 @@ const TransferTokensDialog = ({
                                 {selectedEntries.length} recipient{selectedEntries.length > 1 ? "s" : ""} selected
                             </span>
                             <span className="text-xs font-semibold text-primary">
-                                {totalAmount.toFixed(2)} {selectedTokenSymbol} total
+                                {shortenNumber({ number: totalAmount })} {selectedTokenSymbol} total
                             </span>
                         </div>
                         <div className="flex flex-wrap gap-1.5">
