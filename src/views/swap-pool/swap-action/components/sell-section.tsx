@@ -2,6 +2,7 @@ import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import { IconArrowDownWithStem } from "@/assets/react";
 import TokenBadge from "./token-badge";
 import type { PoolDetailResponse } from "@/types/pool";
+import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 
 
 type SwapFormValues = { burnAmount: string };
@@ -60,6 +61,8 @@ const SellSection = ({
                         !!insufficientBalanceMessage
                     }
                     {...register("burnAmount")}
+                    type="number"
+                    step={DEFAULT_INPUT_NUMBER_STEP}
                 />
                 <TokenBadge isLoading={isLoadingWhitelistTokens} {...tokenDisplay} />
             </div>
