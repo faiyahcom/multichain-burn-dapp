@@ -9,8 +9,6 @@
 ## Middle branches (for verified PRs)
 - main-to-beta: for verified PRs from main to beta
 - main-admin-to-beta-admin: for verified PRs from main-admin to beta-admin
-- beta-to-prod: for verified PRs from beta to prod
-- beta-admin-to-prod-admin: for verified PRs from beta-admin to prod-admin
 
 ## Workflow
 - Checkout from middle branch (this ensures that all PRs code is verified)
@@ -19,13 +17,16 @@
 - If the task is verified, merge the PR to the middle branch (e.g. main-to-beta, main-admin-to-beta-admin)
 - When requested, create a PR from the middle branch to the beta branch (e.g. beta, beta-admin)
 
-
 ## The PR flow:
 ```mermaid
 graph LR;
   checkout["&lt;checkout branch&gt;"] -->|dev testing and proof| main;
   checkout["&lt;checkout branch&gt;"] -->|verified| main-to-beta;
   main-to-beta -->|requested| beta;
+  main -->|for same underlying logic| main-admin;
+  checkout-admin["&lt;admin checkout branch&gt;"] -->|dev testing and proof| main-admin;
+  checkout-admin["&lt;admin checkout branch&gt;"] -->|verified| main-admin-to-beta-admin;
+  main-admin-to-beta-admin -->|requested| beta-admin;
 ```
 Same for admin branches, with the exception that PRs directly from main to main-admin are allowed, no middle branch is needed.
 
