@@ -147,7 +147,7 @@ export interface PoolActivitiesResponse {
         log_ix: number;
         timestamp: string;
         actor: string;
-        kind: (typeof activityKind)[keyof typeof activityKind];
+        kind: keyof typeof activityKind;
         poolAddress: string;
     }[];
 }

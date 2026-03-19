@@ -5,16 +5,21 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     getContractBurnFactory,
     getContractSwapFactory,
+    getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import type { PoolDetailResponse } from "@/types/pool";
 import type { BatchRecipient, TokenMode } from "./useBatchTransferSolFn";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { BN } from "bn.js";
+import { bigint } from "zod";
 
 export interface BatchTransferEvmParams {
     poolAddress: string;
     poolDetail: PoolDetailResponse;
     mode: TokenMode;
     recipients: BatchRecipient[];
+    /** Called after a successful on-chain transfer with the tx hash. */
+    onSuccess?: (txHash: string) => void;
 }
 
 export const useBatchTransferEvmFn = () => {
@@ -22,7 +27,7 @@ export const useBatchTransferEvmFn = () => {
     const { walletProvider } = useAppKitProvider("eip155");
 
     const batchTransferEvm = useCallback(
-        async ({ poolAddress, poolDetail, mode, recipients }: BatchTransferEvmParams) => {
+        async ({ poolAddress, poolDetail, mode, recipients, onSuccess }: BatchTransferEvmParams) => {
             try {
                 if (!isConnected || !walletProvider) {
                     throw new Error("Wallet not connected");
@@ -62,6 +67,20 @@ export const useBatchTransferEvmFn = () => {
 
                 let receipt: ethers.TransactionReceipt | null;
 
+                let balance = BigInt(0);
+                if (tokenAddress === "0x0000000000000000000000000000000000000000") {
+                    // check native
+                    balance = await provider.getBalance(poolAddress);
+                } else {
+                    // check erc20
+                    const erc20 = getERC20Contract(tokenAddress, signer);
+                    balance = await erc20.balanceOf(poolAddress);
+                }
+
+                if (balance < amounts[0]) {
+                    throw new Error("Total requested exceeds vault balance");
+                }
+
                 if (isSwapPool) {
                     // ── Swap pool: adminWithdrawBatchSwapPool(pool, tos[], amounts[]) ──
                     const contract = getContractSwapFactory(signer);
@@ -78,6 +97,8 @@ export const useBatchTransferEvmFn = () => {
                     `${mode === "reward" ? "Reward" : "Deposit"} tokens sent to ${validRecipients.length} recipient${validRecipients.length > 1 ? "s" : ""}!`,
                     { description: `Tx: ${receipt?.hash}` },
                 );
+
+                if (receipt?.hash) onSuccess?.(receipt.hash);
 
                 return receipt?.hash;
             } catch (error: any) {

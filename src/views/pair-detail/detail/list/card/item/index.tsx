@@ -195,7 +195,7 @@ const SwapPoolInfo = ({
   return (
     <div className="space-y-2 pr-2 pl-2.25">
       <div className="flex items-center justify-between gap-2.75">
-        <PillText text="Swap Pool" className="w-1/2" />
+        <PillText text={data?.name} className="w-1/2" />
         {data?.status && showStatusAndRatio && (
           <AnimateIconButton
             variant="letter-icon"

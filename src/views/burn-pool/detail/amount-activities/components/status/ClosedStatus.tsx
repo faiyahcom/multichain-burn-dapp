@@ -15,6 +15,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
         if (!poolDetail) return "-";
         if (!poolDetail?.userAmount)
             return `0 ${poolDetail.pool.rewardTokenSymbol}`;
+        const decimals = poolDetail.pool.rewardTokenDecimals;
         const amount =
             Number(poolDetail.userAmount) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
@@ -23,8 +24,12 @@ const ClosedStatus = ({ poolDetail }: Props) => {
         const reward =
             (amount / (Number(poolDetail.depositedAmount) || 1)) *
             (Number(poolDetail.pool.rewardAmount) /
-                Math.pow(10, poolDetail.pool.rewardTokenDecimals));
-        return `${reward} ${poolDetail.pool.rewardTokenSymbol}`;
+                Math.pow(10, decimals));
+        const formatted = reward.toLocaleString(undefined, {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: Math.min(decimals, 4),
+        });
+        return `${formatted} ${poolDetail.pool.rewardTokenSymbol}`;
     }, [poolDetail]);
 
     return (

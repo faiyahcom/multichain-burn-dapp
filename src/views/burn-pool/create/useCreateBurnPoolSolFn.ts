@@ -112,7 +112,7 @@ export const useCreateBurnPoolSolFn = () => {
                         projectOwner: walletPublicKey,
                         timeStart,
                         timeEnd,
-                        targetAddress: walletPublicKey,
+                        targetAddress: new PublicKey("1nc1nerator11111111111111111111111111111111"),
                         name: params.poolName,
                         ratioBps: new BN(0),
                         ratioDenominator: new BN(10000),
