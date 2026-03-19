@@ -2,6 +2,8 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import type { BurnPoolStatus, PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -25,8 +27,30 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const status = (poolDetail?.pool.status ?? "on_going") as BurnPoolStatus;
     const isSimple = SIMPLE_STATUSES.includes(status);
 
-    const rewardSymbol = poolDetail?.pool.rewardTokenSymbol ?? "";
-    const burnSymbol = poolDetail?.pool.tokenInSymbol ?? "";
+    const network = poolDetail?.pool.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+    const burnTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn.symbol,
+        tokenName: poolDetail?.tokenIn.name,
+        customName: poolDetail?.tokenIn.customName,
+        customSymbol: poolDetail?.tokenIn.customSymbol,
+        imageUri: poolDetail?.tokenIn.imageUri,
+    });
+    const rewardTokenDisplayObj = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut.symbol,
+        tokenName: poolDetail?.tokenOut.name,
+        customName: poolDetail?.tokenOut.customName,
+        customSymbol: poolDetail?.tokenOut.customSymbol,
+        imageUri: poolDetail?.tokenOut.imageUri,
+    });
+
+    const rewardSymbol = rewardTokenDisplayObj.symbol;
+    const burnSymbol = burnTokenDisplay.symbol;
     const rewardDec = poolDetail?.pool.rewardTokenDecimals ?? 0;
     const burnDec = poolDetail?.pool.tokenInDecimals ?? 0;
 
