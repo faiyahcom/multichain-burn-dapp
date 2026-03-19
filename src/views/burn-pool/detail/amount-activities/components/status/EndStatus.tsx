@@ -14,7 +14,7 @@ const EndStatus = ({ poolDetail }: Props) => {
     const { formattedReward, formattedBurned, handleClaim } =
         useAmountActivity(poolDetail);
     const [isLoading, setIsLoading] = useState(false);
-    const canClaim = poolDetail?.userAmount.canClaim ?? false;
+    const canClaim = poolDetail?.userAmount?.canClaim ?? false;
 
     const handleClaimWithLoading = async () => {
         setIsLoading(true);
@@ -58,7 +58,7 @@ const EndStatus = ({ poolDetail }: Props) => {
             Number(poolDetail.pool.rewardAmount) /
             Math.pow(10, poolDetail.pool.rewardTokenDecimals);
         const yourCurrentDeposited =
-            Number(poolDetail.userAmount.deposited) /
+            Number(poolDetail?.userAmount?.deposited) /
             Math.pow(10, poolDetail.pool.tokenInDecimals);
         if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
             return `0 ${rewardSymbol}`;

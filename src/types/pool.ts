@@ -36,7 +36,7 @@ interface TokenInfo {
 }
 
 export interface PoolDetailResponse {
-    userAmount: {
+    userAmount?: {
         address: string;
         deposited: string;
         claimed: string;
