@@ -23,11 +23,6 @@ graph LR;
   checkout["&lt;checkout branch&gt;"] -->|dev testing and proof| main;
   checkout["&lt;checkout branch&gt;"] -->|verified| main-to-beta;
   main-to-beta -->|requested| beta;
-  checkout["&lt;checkout branch&gt;"] -->|dev testing and proof| main-admin;
-  checkout["&lt;checkout branch&gt;"] -->|verified| main-admin-to-beta-admin;
-  checkout-admin["&lt;admin checkout branch&gt;"] -->|dev testing and proof| main-admin;
-  checkout-admin["&lt;admin checkout branch&gt;"] -->|verified| main-admin-to-beta-admin;
-  main-admin-to-beta-admin -->|requested| beta-admin;
 ```
 Same for admin branches, with the exception that PRs directly from main to main-admin are allowed, no middle branch is needed.
 
