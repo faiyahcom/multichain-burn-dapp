@@ -90,6 +90,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 poolDetail: poolDetail!,
                 mode,
                 recipients,
+                onSuccess: () => refetchVaultBalance(),
             });
         } else {
             await batchTransferEvm({
@@ -97,6 +98,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 poolDetail: poolDetail!,
                 mode,
                 recipients,
+                onSuccess: () => refetchVaultBalance(),
             });
         }
         invalidatePoolQueries(pool.address);
