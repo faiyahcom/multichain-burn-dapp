@@ -224,12 +224,12 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
             return undefined;
         }
 
-        return `Amount exceeds wallet balance (${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""})`;
+        return `Amount exceeds wallet balance (${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""})`;
     }, [
         derivedBurnAmount,
         burnBalanceFormatted,
         burnBalanceSymbol,
-        burnTokenDisplay.symbol,
+        burnTokenDisplay?.symbol,
         isLoadingBurnBalance,
     ]);
 
@@ -330,7 +330,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             errors={errors}
                             onSelectPercent={handleSelectPercent}
                             isLoadingBalance={isLoadingBurnBalance}
-                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""}`}
+                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""}`}
                             poolDetail={poolDetail}
                             maxBurnLeft={maxBurnLeft}
                             isExceedingMax={isExceedingMax}
@@ -342,7 +342,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             isLoadingWhitelistTokens={!poolDetail}
                             estimatedAmount={formattedEstimatedRewardAmount}
                             isLoadingBalance={isLoadingRewardBalance}
-                            balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardBalanceSymbol ?? rewardTokenDisplay.symbol ?? ""}`}
+                            balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardTokenDisplay?.symbol ?? ""}`}
                         />
 
                         <AnimateIconButton
