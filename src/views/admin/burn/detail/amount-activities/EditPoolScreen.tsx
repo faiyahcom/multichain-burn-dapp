@@ -148,7 +148,7 @@ export default function EditPoolScreen({
               <DatePicker
                 value={startTime}
                 onChange={(d) => d && setStartTime(d)}
-                disabled={(d) => d < today || (endTime ? d > endTime : false)}
+                disabled={(d) => d < today}
               />
             </div>
             <div className="space-y-1">
