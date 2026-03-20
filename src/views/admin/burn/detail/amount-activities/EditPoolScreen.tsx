@@ -43,7 +43,8 @@ export default function EditPoolScreen({
   }, [poolDetail]);
 
   const pool = poolDetail?.pool;
-  const safeStatus: BurnPoolStatus = (pool?.status as BurnPoolStatus) ?? "draft";
+  const safeStatus: BurnPoolStatus =
+    (pool?.status as BurnPoolStatus) ?? "draft";
 
   const formatScheduleTime = (ts: string) =>
     format(new Date(Number(ts) * 1000), "MMM dd, yyyy, HH:mm") + " UTC";
@@ -77,17 +78,15 @@ export default function EditPoolScreen({
     }
   };
 
-  if (isLoadingPoolDetail || !pool) return <div className="p-8">Loading...</div>;
+  if (isLoadingPoolDetail || !pool)
+    return <div className="p-8">Loading...</div>;
 
   const today = new Date(new Date().setHours(0, 0, 0, 0));
   const isSaveDisabled =
-    saving ||
-    !startTime ||
-    !endTime ||
-    startTime >= endTime;
+    saving || !startTime || !endTime || startTime >= endTime;
 
   return (
-    <div className="pt-9.5 pl-14 pr-14">
+    <div className="pt-9.5 pr-14 pl-14">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div className="space-y-1">
@@ -124,11 +123,15 @@ export default function EditPoolScreen({
           <div className="space-y-3">
             <div className="grid grid-cols-2">
               <span className="text-xl text-greyed">Start Time:</span>
-              <span className="text-xl text-black">{formatScheduleTime(pool.timeStart)}</span>
+              <span className="text-xl text-black">
+                {formatScheduleTime(pool.timeStart)}
+              </span>
             </div>
             <div className="grid grid-cols-2">
               <span className="text-xl text-greyed">End Time:</span>
-              <span className="text-xl text-black">{formatScheduleTime(pool.timeEnd)}</span>
+              <span className="text-xl text-black">
+                {formatScheduleTime(pool.timeEnd)}
+              </span>
             </div>
           </div>
         </div>
@@ -145,7 +148,7 @@ export default function EditPoolScreen({
               <DatePicker
                 value={startTime}
                 onChange={(d) => d && setStartTime(d)}
-                disabled={(d) => d < today}
+                disabled={(d) => d < today || (endTime ? d > endTime : false)}
               />
             </div>
             <div className="space-y-1">
@@ -153,7 +156,9 @@ export default function EditPoolScreen({
               <DatePicker
                 value={endTime}
                 onChange={(d) => d && setEndTime(d)}
-                disabled={(d) => d < today}
+                disabled={(d) =>
+                  d < today || (startTime ? d < startTime : false)
+                }
               />
             </div>
           </div>
@@ -181,7 +186,8 @@ export default function EditPoolScreen({
           btnProps={{
             type: "button",
             disabled: saving,
-            onClick: () => navigate({ to: `/admin/burn/detail/${pool.address}` }),
+            onClick: () =>
+              navigate({ to: `/admin/burn/detail/${pool.address}` }),
           }}
         />
         <AnimateIconButton
@@ -207,4 +213,3 @@ export default function EditPoolScreen({
     </div>
   );
 }
-
