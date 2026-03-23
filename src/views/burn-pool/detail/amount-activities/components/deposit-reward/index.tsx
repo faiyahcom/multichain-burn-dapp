@@ -118,7 +118,7 @@ const DepositRewardDialog = ({
     setValue,
     reset,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm<DepositFormValues>({
     defaultValues: { amount: "" },
     resolver: zodResolver(depositFormSchema),
@@ -480,7 +480,7 @@ const DepositRewardDialog = ({
                 isLoadingText="Depositing..."
                 btnProps={{
                   type: "submit",
-                  disabled: isSubmitting || !!insufficientBalanceMessage,
+                  disabled: !isValid || !!insufficientBalanceMessage,
                 }}
               />
             </div>

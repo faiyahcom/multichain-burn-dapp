@@ -114,7 +114,7 @@ const DepositBurnDialog = ({
     setValue,
     reset,
     watch,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
   } = useForm<DepositFormValues>({
     defaultValues: { amount: "" },
     resolver: zodResolver(depositFormSchema),
@@ -462,7 +462,7 @@ const DepositBurnDialog = ({
                 btnProps={{
                   type: "button",
                   onClick: handleCancel,
-                  disabled: isSubmitting || !!insufficientBalanceMessage,
+                  disabled: isSubmitting,
                 }}
               />
               <AnimateIconButton
@@ -480,6 +480,7 @@ const DepositBurnDialog = ({
                 isLoadingText="Depositing..."
                 btnProps={{
                   type: "submit",
+                  disabled: !isValid || !!insufficientBalanceMessage,
                 }}
               />
             </div>
