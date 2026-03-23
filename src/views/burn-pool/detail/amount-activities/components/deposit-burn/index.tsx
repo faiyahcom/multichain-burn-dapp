@@ -149,7 +149,9 @@ const DepositBurnDialog = ({
       // Keep max decimal part 6 digits
       const [integer, decimal] = formatted.split(".");
       const newFormattedAmount =
-        decimal.length > 0 ? `${integer}.${decimal.slice(0, 6)}` : integer;
+        decimal && decimal.length > 0
+          ? `${integer}.${decimal.slice(0, 6)}`
+          : integer;
 
       setValue("amount", newFormattedAmount, { shouldValidate: true });
     } catch {
