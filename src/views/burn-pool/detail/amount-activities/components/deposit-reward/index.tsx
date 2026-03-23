@@ -173,7 +173,9 @@ const DepositRewardDialog = ({
         BigInt(amountBN.toString()),
         pool.rewardTokenDecimals,
       );
-      setValue("amount", formatted, { shouldValidate: true });
+      const newAmount = Number(formatted);
+      const newFormattedAmount = Number(newAmount.toFixed(6)).toString();
+      setValue("amount", newFormattedAmount, { shouldValidate: true });
     } catch {
       return;
     }
