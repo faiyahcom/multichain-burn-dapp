@@ -49,3 +49,7 @@ export { default as IconToastSuccess } from "./icons/toast-success.svg?react";
 export { default as IconToastWarning } from "./icons/toast-warning.svg?react";
 
 export { default as IconWhiteCamera } from "./icons/white-camera.svg?react";
+
+export { default as IconBurnCategory } from "./icons/categories/burn.svg?react";
+export { default as IconPairCategory } from "./icons/categories/pair.svg?react";
+export { default as IconSwapCategory } from "./icons/categories/swap.svg?react";

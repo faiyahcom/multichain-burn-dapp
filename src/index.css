@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
+/* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"); */
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 
 /* Optional: import Poppins from Google Fonts (or include your own @font-face) */
@@ -35,10 +36,9 @@
   /* 3px */
 
   /* Font */
-  --font-poppins:
-    "Poppins", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+  --font-inter:
+    "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
-  --font-sans: var(--font-poppins);
 
   /* Text sizes (Tailwind text-*) */
   --text-tiny: 0.625rem;
@@ -125,7 +125,6 @@
   --radius-3xl: calc(var(--radius) + 12px);
   --radius-4xl: calc(var(--radius) + 16px);
 
-  --tracking-2-percent: 0.02em;
   --color-mb-gray: var(--mb-gray);
   --color-mb-popover: var(--mb-popover);
   --color-mb-check-blue: var(--mb-check-blue);
@@ -146,13 +145,37 @@
   --color-mb-gray-b5b7ca: var(--mb-gray-b5b7ca);
   --color-mb-gray-69: var(--mb-gray-69);
   --color-mb-btn-loading: var(--mb-btn-loading);
+
+  /* NEW DESIGN */
+  /* Section card glows */
+  --color-pair-border: var(--pair-border);
+  --color-burn-border: var(--burn-border);
+  --color-swap-border: var(--swap-border);
+  --shadow-pair-glow: 0 0 6px 20px var(--pair-shadow);
+  --shadow-burn-glow: 0 0 20px 5px var(--burn-shadow);
+  --shadow-swap-glow: 0 0 20px 5px var(--swap-border);
+
+  --tracking-2-percent: -0.02em;
+  /* END */
 }
 
 /* Light mode design tokens (default) */
 :root {
   /* Your base palette */
-  --background: #e7f1f6;
-  --foreground: #000000;
+
+  /* NEW DESIGN */
+  --background: #0f1320;
+  --foreground: #ffffff;
+
+  --pair-border: #8970ff;
+  --pair-shadow: rgba(0, 0, 0, 0.25);
+
+  --burn-border: #ff8800;
+  --burn-shadow: #e85f00;
+
+  --swap-border: #0285ff;
+  /* END */
+
   --sub-bg: #ffffff;
 
   --active: #6e37ff;
@@ -315,8 +338,11 @@
 
 @layer base {
   body {
-    @apply bg-background text-foreground;
-    font-family: var(--font-poppins);
+    @apply text-foreground;
+    font-family: var(--font-inter);
+    line-height: 1;
+    letter-spacing: var(--tracking-2-percent);
+    background: linear-gradient(133.54deg, #1D1E3B 9.12%, #0D111A 36.64%, #010101 100%);
   }
 
   * {
@@ -337,3 +363,53 @@
 @utility popover-shadow {
   box-shadow: 0px 4px 4px 0px #00000040;
 }
+
+@utility animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* NEW DESIGN */
+/**
+ * card-swap-glow
+ * Combines the swap-card linear gradient, 9px inner border, and blue glow.
+ * Usage: <div class="card-swap-glow">
+ */
+@utility card-pair-glow {
+  background: linear-gradient(180deg,
+      rgba(42, 31, 82, 0) 0%,
+      rgba(42, 31, 82, 0) 35.1%,
+      rgba(94, 70, 184, 0) 79.81%,
+      #5e46b8 100%);
+  box-shadow:
+    inset 0 0 0 9px var(--pair-border),
+    0 0 6px 20px var(--pair-shadow);
+}
+
+@utility card-burn-glow {
+  background: linear-gradient(168.92deg,
+      rgba(141, 58, 0, 0) -0.14%,
+      rgba(141, 58, 0, 0) 21.08%,
+      rgba(141, 58, 0, 0.3) 61.5%,
+      #ff6800 91.81%);
+  box-shadow:
+    inset 0 0 0 9px var(--burn-border),
+    0 0 20px 5px var(--burn-shadow);
+}
+
+@utility card-swap-glow {
+  background: linear-gradient(168.92deg,
+      rgba(0, 93, 180, 0) -0.14%,
+      rgba(0, 93, 180, 0) 21.08%,
+      rgba(0, 93, 180, 0.3) 61.5%,
+      #0285ff 91.81%);
+  box-shadow:
+    inset 0 0 0 9px var(--swap-border),
+    0 0 20px 5px var(--swap-border);
+}
+
+/* END */
