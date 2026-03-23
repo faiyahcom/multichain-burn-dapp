@@ -1,6 +1,7 @@
 import { useAuthStore } from "@/stores/authStore";
 import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { networkIdToChainId } from "@/config/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
@@ -37,6 +38,9 @@ const useWalletConnectionHandler = () => {
         const prev = prevChainKey.current;
         prevChainKey.current = currentChainKey;
 
+        const networkId = mapChainToSystemNetwork(namespace, chainRef);
+        const backendChainId = networkId ? networkIdToChainId(networkId) : undefined;
+
         const isInitialConnect = prev === null;
         const chainSwitched = !isInitialConnect && prev !== currentChainKey;
 
@@ -48,7 +52,9 @@ const useWalletConnectionHandler = () => {
             if (systemNetwork) setSelectedNetworkId(systemNetwork);
         }
 
-        const walletChanged = user?.address && user.address !== address;
+        const walletChanged = user?.address && (
+            user.address !== address || user.chainId !== backendChainId
+        );
 
         if (walletChanged) {
             logout();
@@ -63,9 +69,9 @@ const useWalletConnectionHandler = () => {
                 try {
                     let result;
                     if (namespace === "eip155") {
-                        result = await authenticateEvm(address);
+                        result = await authenticateEvm(address, backendChainId);
                     } else if (namespace === "solana") {
-                        result = await authenticateSolana(address);
+                        result = await authenticateSolana(address, backendChainId);
                     }
                     if (result && !result.success) {
                         // User rejected signature or auth failed — disconnect

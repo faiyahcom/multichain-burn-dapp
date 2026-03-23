@@ -5,6 +5,7 @@ import bs58 from 'bs58'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { getErrorMessage } from '@/utils/helpers/error-message'
+import { useSystemStore } from '@/stores/systemStore'
 
 type WalletType = 'evm' | 'solana'
 
@@ -51,7 +52,7 @@ export function useWalletAuth() {
   })
 
   const authenticate = useCallback(
-    async (walletType: WalletType, address: string) => {
+    async (walletType: WalletType, address: string, chainId?: string) => {
       try {
         setIsAuthenticating(true)
         setLoading(true)
@@ -59,6 +60,7 @@ export function useWalletAuth() {
 
         const response = await authService.requestSigningMessage({
           address,
+          chainId,
         })
 
         // Extract message from response
@@ -92,12 +94,14 @@ export function useWalletAuth() {
           address,
           message,
           signature,
+          chainId,
         })
         console.log('Authentication successful, token received')
 
         const tempToken = token
+        console.log('Temporary token:', tempToken)
         login({
-          user: { id: '', address }, // Temporary, will be updated below
+          user: { id: '', address, chainId }, // Temporary, will be updated below
           accessToken: tempToken,
         })
 
@@ -105,7 +109,7 @@ export function useWalletAuth() {
         console.log('User info received:', userInfo)
 
         login({
-          user: { id: userInfo.id, address: userInfo.address || address, role: userInfo.role },
+          user: { id: userInfo.id, address: userInfo.address || address, role: userInfo.role, chainId },
           accessToken: tempToken,
         })
 
@@ -127,23 +131,23 @@ export function useWalletAuth() {
   )
 
   const authenticateEvm = useCallback(
-    async (address?: string) => {
+    async (address?: string, chainId?: string) => {
       const targetAddress = address || evmAddress
       if (!targetAddress) {
         throw new Error('EVM wallet not connected')
       }
-      return authenticate('evm', targetAddress)
+      return authenticate('evm', targetAddress, chainId)
     },
     [evmAddress, authenticate],
   )
 
   const authenticateSolana = useCallback(
-    async (address?: string) => {
+    async (address?: string, chainId?: string) => {
       const targetAddress = address || solanaAddress
       if (!targetAddress) {
         throw new Error('Solana wallet not connected')
       }
-      return authenticate('solana', targetAddress)
+      return authenticate('solana', targetAddress, chainId)
     },
     [solanaAddress, authenticate],
   )
