@@ -12,14 +12,17 @@ import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
-import type { PoolDetailResponse } from "@/types/pool";
-import { formatAmount } from "@/utils/helpers/numbers";
-import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
-import { z } from "zod";
+import { formatAmount, shortenNumber, safeDecimalParse } from "@/utils/helpers/numbers";
+import { Input } from "@/components/ui/input";
+import { IconWallet } from "@/assets/react";
+import TokenImage from "@/components/common/token-image";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { AssetTypeEnum } from "@/web3/helpers";
+import { Skeleton } from "@/components/ui/skeleton";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 
 const createDepositFormSchema = ({
   maxAmount,
@@ -28,23 +31,20 @@ const createDepositFormSchema = ({
 }) => {
   return z.object({
     amount: z
-      .string()
-      .min(1, { error: "Amount is required" })
-      .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
-        error: "Amount must be a positive number",
-      })
-      .refine(
-        (value) => {
-          if (maxAmount === undefined) return true;
-          return Number(value) <= Number(maxAmount);
-        },
-        { error: `Amount must not exceed ${maxAmount}` },
-      ),
-  });
-};
+        .string()
+        .min(0, { message: "Amount is required" })
+        .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
+            message: "Amount must be a positive number",
+        })
+        .refine((value) => {
+            const decimal = safeDecimalParse({ value });
+            return decimal && decimal.decimalPlaces() <= 6;
+        }, {
+            message: "Amount must have 6 decimals or less",
+        }),
+});
 
-// type DepositFormValues = z.infer<typeof depositFormSchema>;
-type DepositFormValues = z.infer<ReturnType<typeof createDepositFormSchema>>;
+type DepositFormValues = z.infer<typeof depositFormSchema>;
 
 type Props = {
   open: boolean;
@@ -167,41 +167,45 @@ const DepositBurnDialog = ({
     return `${num}:${den}`;
   }, [pool]);
 
-  const currentBurnFormatted = useMemo(() => {
-    if (!poolDetail) return "-";
-    const raw =
-      Number(poolDetail.depositedAmount) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
-    return `${raw.toLocaleString(undefined, {
-      maximumFractionDigits: poolDetail.pool.tokenInDecimals,
-    })} ${burnTokenDisplay?.symbol ?? poolDetail.pool.tokenInSymbol}`;
-  }, [poolDetail, burnTokenDisplay]);
+    const currentBurnFormatted = useMemo(() => {
+        if (!poolDetail) return "-";
+        const raw =
+            Number(poolDetail.depositedAmount) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        return `${shortenNumber({ number: raw })} ${burnTokenDisplay?.symbol ?? poolDetail.pool.tokenInSymbol}`;
+    }, [poolDetail, burnTokenDisplay]);
 
-  const estmatedReward = useMemo(() => {
-    if (!poolDetail) return "-";
-    const rewardSymbol =
-      rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
-    const decimals = poolDetail.pool.rewardTokenDecimals;
-    if (!amountStr) return `0 ${rewardSymbol}`;
-    const amount = Number(amountStr);
-    if (isNaN(amount) || amount <= 0) return `0 ${rewardSymbol}`;
-    const totalDeposited =
-      Number(poolDetail.depositedAmount) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
-    const rewardPool =
-      Number(poolDetail.pool.rewardAmount) / Math.pow(10, decimals);
-    const yourCurrentDeposited =
-      Number(poolDetail?.userAmount?.deposited) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
-    const reward =
-      ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
-      rewardPool;
-    const formatted = reward.toLocaleString(undefined, {
-      minimumFractionDigits: 0,
-      maximumFractionDigits: Math.min(decimals, 4),
-    });
-    return `${formatted} ${rewardSymbol}`;
-  }, [poolDetail, rewardTokenDisplay, ratio, amountStr]);
+    const estmatedReward = useMemo(() => {
+        if (!poolDetail) return "-";
+        const rewardSymbol =
+            rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+        const decimals = poolDetail.pool.rewardTokenDecimals;
+        if (!amountStr) return `0 ${rewardSymbol}`;
+        const amount = Number(amountStr);
+        if (isNaN(amount) || amount <= 0) return `0 ${rewardSymbol}`;
+        const totalDeposited =
+            Number(poolDetail.depositedAmount) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        const rewardPool =
+            Number(poolDetail.pool.rewardAmount) /
+            Math.pow(10, decimals);
+        const yourCurrentDeposited =
+            Number(poolDetail?.userAmount?.deposited) /
+            Math.pow(10, poolDetail.pool.tokenInDecimals);
+        const reward =
+            ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
+            rewardPool;
+        return `${shortenNumber({ number: reward })} ${rewardSymbol}`;
+    }, [poolDetail, rewardTokenDisplay, ratio, amountStr]);
+
+    const insufficientBalanceMessage = useMemo(() => {
+        if (!amountStr || !burnBalanceFormatted || isLoadingBurnBalance) return undefined;
+        const amountDecimal = safeDecimalParse({ value: amountStr });
+        const balanceDecimal = safeDecimalParse({ value: burnBalanceFormatted });
+        if (!amountDecimal || !balanceDecimal) return undefined;
+        if (amountDecimal.lte(0) || amountDecimal.lte(balanceDecimal)) return undefined;
+        return `Amount exceeds wallet balance (${burnBalanceFormatted} ${burnTokenDisplay?.symbol ?? pool?.tokenInSymbol ?? ""})`;
+    }, [amountStr, burnBalanceFormatted, isLoadingBurnBalance, burnTokenDisplay, pool]);
 
   const onSubmit = async (data: DepositFormValues) => {
     await onConfirm(data.amount);
@@ -343,43 +347,49 @@ const DepositBurnDialog = ({
                   </span>
                 </div>
 
-                <div
-                  className={`relative flex items-center ${errors.amount ? "ring-1 ring-destructive" : ""}`}
-                >
-                  <Input
-                    {...register("amount")}
-                    placeholder="Enter amount"
-                    className="h-full flex-1 px-10 py-2 text-base"
-                    type="number"
-                  />
-                  <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
-                    {!pool ? (
-                      <>
-                        <Skeleton className="size-5 rounded-full" />
-                        <Skeleton className="h-5 w-12" />
-                      </>
-                    ) : (
-                      <>
-                        <TokenImage
-                          src={burnTokenDisplay?.imageUri}
-                          alt={burnTokenDisplay?.symbol}
-                          classNames={{
-                            common: "size-5",
-                            img: "size-5",
-                            placeholder: "size-5",
-                          }}
-                        />
-                        <span>{burnTokenDisplay?.symbol ?? ""}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
+                                <div
+                                    className={`relative flex items-center ${errors.amount ? "ring-1 ring-destructive" : ""}`}
+                                >
+                                    <Input
+                                        {...register("amount")}
+                                        type="number"
+                                        step={DEFAULT_INPUT_NUMBER_STEP}
+                                        placeholder="Enter amount"
+                                        className="h-full flex-1 px-10 py-2 text-base"
+                                    />
+                                    <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
+                                        {!pool ? (
+                                            <>
+                                                <Skeleton className="size-5 rounded-full" />
+                                                <Skeleton className="h-5 w-12" />
+                                            </>
+                                        ) : (
+                                            <>
+                                                <TokenImage
+                                                    src={burnTokenDisplay?.imageUri}
+                                                    alt={burnTokenDisplay?.symbol}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
+                                                />
+                                                <span>{burnTokenDisplay?.symbol ?? ""}</span>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
 
-                {errors.amount && (
-                  <p className="text-xs text-destructive">
-                    {errors.amount.message}
-                  </p>
-                )}
+                                {errors.amount && (
+                                    <p className="text-xs text-destructive">
+                                        {errors.amount.message}
+                                    </p>
+                                )}
+                                {insufficientBalanceMessage && (
+                                    <p className="text-xs text-destructive">
+                                        {insufficientBalanceMessage}
+                                    </p>
+                                )}
 
                 <div className="flex gap-2">
                   {[25, 50, 100].map((percent) => (
@@ -415,48 +425,48 @@ const DepositBurnDialog = ({
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-2">
-              <AnimateIconButton
-                iconLetter="C"
-                text="Cancel"
-                variant="letter-icon"
-                textVariant="text-container-center"
-                classNames={{
-                  btn: "w-60 text-center after:text-2xl after:text-primary-foreground after:bg-[#FF8E97]",
-                  text: "text-2xl font-medium",
-                  icon: "size-7.5 text-2xl",
-                }}
-                color="#FF8E97"
-                btnProps={{
-                  type: "button",
-                  onClick: handleCancel,
-                  disabled: isSubmitting,
-                }}
-              />
-              <AnimateIconButton
-                iconLetter="D"
-                text="Deposit"
-                variant="letter-icon"
-                textVariant="text-container-center"
-                classNames={{
-                  btn: "w-60 text-center after:text-2xl after:bg-[#966EFF] after:text-primary-foreground border border-active",
-                  text: "text-2xl font-medium",
-                  icon: "size-7.5 text-2xl",
-                }}
-                color="#966EFF"
-                isLoading={isSubmitting}
-                isLoadingText="Depositing..."
-                btnProps={{
-                  type: "submit",
-                }}
-              />
-            </div>
-          </form>
-        </DialogContent>
-      </DialogPortal>
-    </Dialog>
-  );
+                        {/* Action Buttons */}
+                        <div className="flex justify-end gap-3 pt-2">
+                            <AnimateIconButton
+                                iconLetter="C"
+                                text="Cancel"
+                                variant="letter-icon"
+                                textVariant="text-container-center"
+                                classNames={{
+                                    btn: "w-60 text-center after:text-2xl after:text-primary-foreground after:bg-[#FF8E97]",
+                                    text: "text-2xl font-medium",
+                                    icon: "size-7.5 text-2xl",
+                                }}
+                                color="#FF8E97"
+                                btnProps={{
+                                    type: "button",
+                                    onClick: handleCancel,
+                                    disabled: isSubmitting || !!insufficientBalanceMessage,
+                                }}
+                            />
+                            <AnimateIconButton
+                                iconLetter="D"
+                                text="Deposit"
+                                variant="letter-icon"
+                                textVariant="text-container-center"
+                                classNames={{
+                                    btn: "w-60 text-center after:text-2xl after:bg-[#966EFF] after:text-primary-foreground border border-active",
+                                    text: "text-2xl font-medium",
+                                    icon: "size-7.5 text-2xl",
+                                }}
+                                color="#966EFF"
+                                isLoading={isSubmitting}
+                                isLoadingText="Depositing..."
+                                btnProps={{
+                                    type: "submit",
+                                }}
+                            />
+                        </div>
+                    </form>
+                </DialogContent>
+            </DialogPortal>
+        </Dialog>
+    );
 };
 
 export default DepositBurnDialog;

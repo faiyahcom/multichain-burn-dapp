@@ -13,10 +13,7 @@ export function formatAmount(amount: string, decimals: number): string {
   if (!amount) return "0";
   const amt = Number(amount);
   if (isNaN(amt)) return amount;
-  return (amt / Math.pow(10, decimals)).toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: Math.min(decimals, 4),
-  });
+  return String(shortenNumber({ number: amt / Math.pow(10, decimals) }));
 }
 
 export function sciToFormatted(value: string, decimals: number): string {

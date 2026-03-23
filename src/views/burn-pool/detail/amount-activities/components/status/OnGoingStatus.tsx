@@ -5,6 +5,7 @@ import { useAmountActivity } from "../../use-amount-activity";
 import DepositBurnDialog from "../deposit-burn";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { useMemo } from "react";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
@@ -59,11 +60,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
         if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
             return `0 ${rewardSymbol}`;
         const reward = (yourCurrentDeposited / totalDeposited) * rewardPool;
-        const formatted = reward.toLocaleString(undefined, {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: Math.min(decimals, 4),
-        });
-        return `${formatted} ${rewardSymbol}`;
+        return `${shortenNumber({ number: reward })} ${rewardSymbol}`;
     }, [poolDetail, rewardTokenDisplay]);
 
     return (
