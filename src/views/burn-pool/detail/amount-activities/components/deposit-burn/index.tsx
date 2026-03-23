@@ -34,7 +34,7 @@ const createDepositFormSchema = ({
   return z.object({
     amount: z
       .string()
-      .min(0, { error: "Amount is required" })
+      .min(1, { error: "Amount is required" })
       .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
         error: "Amount must be a positive number",
       })
