@@ -2,6 +2,29 @@
 - main: for development
 - beta: for beta testing (with mapped domain)
 - prod: for production (with mapped domain)
+- main-admin: for admin development
+- beta-admin: for admin beta testing (with mapped domain)
+- prod-admin: for admin production (with mapped domain)
+
+## Middle branches (for verified PRs)
+- main-to-beta: for verified PRs from main to beta
+- main-admin-to-beta-admin: for verified PRs from main-admin to beta-admin
+
+## Workflow
+- Checkout from middle branch (this ensures that all PRs code is verified)
+- Name the checkout branch with the task code (e.g. fix/mb-123)
+- For dev testing and proofs, PR the new branch to the development branch (e.g. main, main-admin)
+- If the task is verified, merge the PR to the middle branch (e.g. main-to-beta, main-admin-to-beta-admin)
+- When requested, create a PR from the middle branch to the beta branch (e.g. beta, beta-admin)
+
+## The PR flow:
+```mermaid
+graph LR;
+  checkout["&lt;checkout branch&gt;"] -->|dev testing and proof| main;
+  checkout["&lt;checkout branch&gt;"] -->|verified| main-to-beta;
+  main-to-beta -->|requested| beta;
+```
+Same for admin branches, with the exception that PRs directly from main to main-admin are allowed, no middle branch is needed.
 
 # React + TypeScript + Vite
 

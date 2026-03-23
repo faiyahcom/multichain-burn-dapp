@@ -3,6 +3,7 @@ import { StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import { IconExclaimation } from "@/assets/react";
 import { useMemo } from "react";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -24,7 +25,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
             (amount / (Number(poolDetail.depositedAmount) || 1)) *
             (Number(poolDetail.pool.rewardAmount) /
                 Math.pow(10, poolDetail.pool.rewardTokenDecimals));
-        return `${reward} ${poolDetail.pool.rewardTokenSymbol}`;
+        return `${shortenNumber({ number: reward })} ${poolDetail.pool.rewardTokenSymbol}`;
     }, [poolDetail]);
 
     return (

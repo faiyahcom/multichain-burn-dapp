@@ -23,7 +23,7 @@ import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
   data?: PoolItemType[];
@@ -34,6 +34,7 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
   data,
   isLoading,
 }) => {
+  const navigate = useNavigate();
   const { filter } = usePairDetailSearchFilterStore();
   const isBurnPool = filter.type === 0;
 
@@ -73,16 +74,23 @@ const PairDetailDetailListListLayout: React.FC<Props> = ({
             notFound: "",
           });
 
+          const href = `/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`;
+
           return (
-            <TableRow key={pool.address}>
+            <TableRow
+              key={pool.address}
+              onClick={() =>
+                navigate({
+                  to: href,
+                })
+              }
+              className="cursor-pointer"
+              title={href}
+            >
               <TableCell className="pl-6.75 text-left">
-                <Link
-                  to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
-                  className="block max-w-full truncate"
-                  title={pool.name}
-                >
+                <p className="max-w-full truncate" title={pool.name}>
                   {pool.name}
-                </Link>
+                </p>
                 <CopyableText
                   content={pool.address}
                   displayText={truncateString({

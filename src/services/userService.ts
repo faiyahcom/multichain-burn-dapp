@@ -1,7 +1,11 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
 import type { AllPoolStatus } from "@/types/admin/master-pool-management";
-import type { PaginationResponse, SortOrder } from "@/types/common";
+import type {
+  BooleanString,
+  PaginationResponse,
+  SortOrder,
+} from "@/types/common";
 
 const USERS_API_ROUTES = API_ROUTES.USERS;
 
@@ -16,6 +20,7 @@ export interface GetParticipatedPoolsByUserParams {
   sortDirection?: SortOrder; // default to desc
   tokenIn?: string;
   tokenReward?: string;
+  onlyUnClaimed?: BooleanString;
 }
 
 export interface ParticipatedUserPool {

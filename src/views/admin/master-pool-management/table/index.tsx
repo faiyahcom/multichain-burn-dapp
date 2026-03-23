@@ -2,6 +2,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
 import CustomPagination from "@/components/common/pagination";
+import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
@@ -23,10 +24,7 @@ import {
   type PoolType,
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
-import {
-  formatTimestampSecondsToDate,
-  truncateString,
-} from "@/utils/helpers/string";
+import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
@@ -71,14 +69,8 @@ const AdminMasterPoolManagementTable = () => {
             isLoading={isPendingPools}
           />
           {pools?.pools?.map((item) => {
-            const timeStart = formatTimestampSecondsToDate({
-              timestamp: item.timeStart,
-              notFound: "",
-            });
-            const timeEnd = formatTimestampSecondsToDate({
-              timestamp: item.timeEnd,
-              notFound: "",
-            });
+            const isBurnPool = item.kind === 0;
+
             return (
               <TableRow key={item.address}>
                 <TableCell className="pl-11.25 text-left">
@@ -111,10 +103,15 @@ const AdminMasterPoolManagementTable = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {timeStart && timeEnd && (
-                    <>
-                      {timeStart} - {timeEnd}
-                    </>
+                  {isBurnPool && (
+                    <StartEndDateDisplay
+                      startDate={item.timeStart}
+                      endDate={item.timeEnd}
+                      classNames={{
+                        container: "2xl:flex-row",
+                        dash: "2xl:block",
+                      }}
+                    />
                   )}
                 </TableCell>
                 <TableCell>

@@ -4,6 +4,7 @@ import InfoTooltip from "@/components/common/info-tooltip";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import RatioDisplay from "@/components/common/ratio-display";
+import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import TokenDisplay from "@/components/common/token-display";
@@ -26,13 +27,10 @@ import {
 } from "@/types/admin/master-pool-management";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import {
-  formatTimestampSecondsToDate,
-  truncateString,
-} from "@/utils/helpers/string";
+import { truncateString } from "@/utils/helpers/string";
 import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 interface Props {
@@ -42,6 +40,7 @@ interface Props {
 }
 
 const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
+  const navigate = useNavigate();
   const isBurnPool = poolType === 0;
   const queryClient = useQueryClient();
   const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
@@ -111,15 +110,6 @@ const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
             isLoading={isLoading}
           />
           {data?.map((pool) => {
-            const timeStart = formatTimestampSecondsToDate({
-              timestamp: pool.timeStart,
-              notFound: "",
-            });
-            const timeEnd = formatTimestampSecondsToDate({
-              timestamp: pool.timeEnd,
-              notFound: "",
-            });
-
             const network = chainIdToNetworkConfig(pool.chainId);
 
             const tokenOutDisplay = resolvePoolTokenDisplay({
@@ -142,17 +132,27 @@ const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
               imageUri: pool.tokenInImageUri ?? undefined,
             });
 
+            const href = `/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`;
+
             return (
-              <TableRow key={pool.address}>
+              <TableRow
+                key={pool.address}
+                onClick={() => {
+                  navigate({
+                    to: href,
+                  });
+                }}
+                className="cursor-pointer"
+                title={href}
+              >
                 {/* Pool */}
                 <TableCell className="pl-7.25 text-left">
-                  <Link
-                    to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
-                    className="block max-w-full truncate"
+                  <p
+                    className="max-w-40 truncate 2xl:max-w-full"
                     title={pool.name}
                   >
                     {pool.name}
-                  </Link>
+                  </p>
                   <CopyableText
                     content={pool.address}
                     displayText={truncateString({
@@ -165,15 +165,14 @@ const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
                 </TableCell>
                 <TableCell>
                   {isBurnPool ? (
-                    timeStart &&
-                    timeEnd && (
-                      // Time
-                      <div className="flex flex-col items-center justify-center gap-0.5 2xl:flex-row">
-                        <span>{timeStart}</span>
-                        <span className="hidden 2xl:block">-</span>
-                        <span>{timeEnd}</span>
-                      </div>
-                    )
+                    <StartEndDateDisplay
+                      startDate={pool.timeStart}
+                      endDate={pool.timeEnd}
+                      classNames={{
+                        container: "2xl:flex-row",
+                        dash: "2xl:block",
+                      }}
+                    />
                   ) : (
                     // Ratio
                     <RatioDisplay

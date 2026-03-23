@@ -29,7 +29,7 @@ export interface UserResponse {
 }
 
 export interface UpdatePersonalInfoRequest {
-  name?: string;
+  name?: string | null;
   avatar?: File;
 }
 

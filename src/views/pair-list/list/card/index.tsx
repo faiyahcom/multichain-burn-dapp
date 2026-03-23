@@ -174,7 +174,7 @@ const CardInfoRow: React.FC<CardInfoRowProps> = ({
       <div className="flex min-w-0 items-center gap-0.5 text-xl font-normal text-mb-card-value-blue">
         <p
           className="min-w-0 truncate uppercase"
-          title={value.toLocaleString("de-DE")}
+          title={value.toLocaleString("en-US")}
         >
           {shortenNumber({ number: value })}
         </p>

@@ -141,7 +141,7 @@ const AdminTransferHistoryTable = () => {
                 className="font-medium uppercase"
                 title={Number(
                   sciToFormatted(item.amountOut, item.tokenOutDecimals ?? 0),
-                ).toLocaleString("de-DE")}
+                ).toLocaleString("en-US")}
               >
                 {shortenNumber({
                   number: Number(

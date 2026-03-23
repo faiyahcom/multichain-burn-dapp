@@ -67,7 +67,7 @@ export const StatRow = ({
     className?: string;
     valueClassName?: string;
 }) => (
-    <div className={`flex items-center justify-between ${className}`}>
+    <div className={`flex items-center justify-between gap-0.5 ${className}`}>
         <span className="text-sm">{label}</span>
         <span className={valueClassName}>{value}</span>
     </div>

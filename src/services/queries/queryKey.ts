@@ -1,10 +1,10 @@
 export const poolQueryKeys = {
   all: ["pools"] as const,
   detail: (address: string) => ["pools", "detail", address] as const,
-  txns: (address: string, page?: number) =>
-    ["pools", "txns", address, page] as const,
-  activities: (address: string, page?: number) =>
-    ["pools", "activities", address, page] as const,
+  txns: (address: string, page?: number, excludeKinds?: string) =>
+    ["pools", "txns", address, page, excludeKinds] as const,
+  activities: (address: string, page?: number, excludeKinds?: string) =>
+    ["pools", "activities", address, page, excludeKinds] as const,
   list: (params?: Record<string, unknown>) =>
     ["pools", "list", params] as const,
 };

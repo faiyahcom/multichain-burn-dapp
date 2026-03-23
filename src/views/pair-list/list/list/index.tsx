@@ -17,7 +17,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PairItemType } from "@/types/pair";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
   data?: PairItemType[];
@@ -25,6 +25,7 @@ interface Props {
 }
 
 const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
+  const navigate = useNavigate();
   return (
     <div className="w-full pt-6 pb-7 pl-27.5">
       <Table className="table-auto">
@@ -69,16 +70,30 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
               imageUri: item.tokenInImageUri ?? undefined,
             });
 
+            const href = `/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`;
+
             return (
-              <TableRow key={index}>
+              <TableRow
+                key={index}
+                title={href}
+                className="cursor-pointer"
+                onClick={() => {
+                  navigate({
+                    to: href,
+                  });
+                }}
+              >
                 <TableCell
-                  style={{
-                    "--max-w": "300px",
-                  } as React.CSSProperties}
-                className="w-(--max-w) min-w-0">
-                  <div className="flex items-center gap-3.25 pl-15.75 min-w-0">
+                  style={
+                    {
+                      "--max-w": "300px",
+                    } as React.CSSProperties
+                  }
+                  className="w-(--max-w) min-w-0"
+                >
+                  <div className="flex min-w-0 items-center gap-3.25 pl-15.75">
                     {/* Client wants the order to be token out / token in, refers to MB-415 */}
-                    <div className="flex items-center gap-px min-w-0">
+                    <div className="flex min-w-0 items-center gap-px">
                       <TokenImage
                         src={tokenOutDisplay.imageUri}
                         alt={tokenOutDisplay.symbol}
@@ -96,7 +111,7 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                     </div>
                     {/* max-w - 51px - 63px - 13px = max-w - 127px (31.75) */}
                     <span
-                      className="min-w-0 truncate max-w-[calc(var(--max-w)-var(--spacing)*31.75)]"
+                      className="max-w-[calc(var(--max-w)-var(--spacing)*31.75)] min-w-0 truncate"
                       title={`${tokenOutDisplay.symbol}/${tokenInDisplay.symbol}`}
                     >
                       {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
@@ -121,13 +136,12 @@ const PairListListListLayout: React.FC<Props> = ({ data, isLoading }) => {
                   <NetworkDisplay chainId={item.chainId} />
                 </TableCell>
                 <TableCell className="pr-10">
-                  <Link
-                    to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
-                    className="block h-full w-full text-left"
-                  >
-                    <ArrowIcon direction="right" />
-                  </Link>
+                  <ArrowIcon direction="right" />
                 </TableCell>
+                {/* <Link
+                  to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
+                  className="absolute inset-0 h-full w-full"
+                /> */}
               </TableRow>
             );
           })}

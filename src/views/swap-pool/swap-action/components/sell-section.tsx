@@ -1,7 +1,9 @@
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import { IconArrowDownWithStem } from "@/assets/react";
 import TokenBadge from "./token-badge";
 import type { PoolDetailResponse } from "@/types/pool";
+import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 
 
 type SwapFormValues = { burnAmount: string };
@@ -18,6 +20,7 @@ type Props = {
     poolDetail?: PoolDetailResponse;
     maxBurnLeft: string;
     isExceedingMax: boolean;
+    insufficientBalanceMessage?: string;
 };
 
 const SellSection = ({
@@ -30,6 +33,7 @@ const SellSection = ({
     balanceText,
     maxBurnLeft,
     isExceedingMax,
+    insufficientBalanceMessage,
 }: Props) => {
     return (
         <div className="relative mb-10 flex w-full flex-col rounded-xl bg-mb-gray p-5">
@@ -52,8 +56,14 @@ const SellSection = ({
             <div className="my-4 flex items-center justify-between">
                 <input
                     className="bg-transparent px-0 text-40px font-medium text-black outline-none"
-                    aria-invalid={!!errors.burnAmount}
+                    aria-invalid={
+                        !!errors.burnAmount ||
+                        isExceedingMax ||
+                        !!insufficientBalanceMessage
+                    }
                     {...register("burnAmount")}
+                    type="number"
+                    step={DEFAULT_INPUT_NUMBER_STEP}
                 />
                 <TokenBadge isLoading={isLoadingWhitelistTokens} {...tokenDisplay} />
             </div>
@@ -63,15 +73,20 @@ const SellSection = ({
                     {errors.burnAmount.message}
                 </div>
             )}
+            {insufficientBalanceMessage && (
+                <div className="mt-1 text-right text-xs text-destructive">
+                    {insufficientBalanceMessage}
+                </div>
+            )}
             {isExceedingMax && (
                 <div className="mt-1 text-right text-xs text-destructive">
-                    Amount exceeds pool limit ({Number(maxBurnLeft).toLocaleString(undefined, { maximumFractionDigits: 4 })} {tokenDisplay.symbol ?? ""})
+                    Amount exceeds pool limit ({shortenNumber({ number: Number(maxBurnLeft) })} {tokenDisplay.symbol ?? ""})
                 </div>
             )}
 
             <div className="mt-3 h-0.5 w-full bg-[linear-gradient(90deg,#FFFFFF_0%,#EAF3F7_19.71%,#EAF3F7_80.77%,#FFFFFF_100%)]" />
             <div className="mt-1 flex w-full justify-between text-xl">
-                <p className="text-sm">Max swapable: {Number(maxBurnLeft).toLocaleString(undefined, { maximumFractionDigits: 4 })} {tokenDisplay.symbol ?? ""} (Pool limit)</p>
+                <p className="text-sm">Max swapable: {shortenNumber({ number: Number(maxBurnLeft) })} {tokenDisplay.symbol ?? ""} (Pool limit)</p>
                 <p>{isLoadingBalance ? "Checking balance..." : balanceText}</p>
             </div>
 
