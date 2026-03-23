@@ -113,6 +113,7 @@ export const txnKind = {
     3: "Maker Deposit Reward",
     4: "Taker Claim Reward",
     5: "Refund to Maker",
+    6: "Burn Success"
 } as const;
 
 export const activityKind = {
@@ -136,6 +137,9 @@ export const activityKind = {
     // User actions
     30: "Taker Deposit", //taker deposit to pool
     31: "Taker Claim", //taker claim reward from burn pool
+
+    // Operator actions
+    40: "Burn Success"
 } as const;
 
 export interface PoolActivitiesResponse {
