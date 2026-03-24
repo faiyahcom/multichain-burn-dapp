@@ -282,59 +282,82 @@
 
 /* Dark mode design tokens (tweak these later as you like) */
 .dark {
-  --background: oklch(0.145 0 0);
-  /* near-slate-950 */
-  --foreground: oklch(0.985 0 0);
-  /* near-slate-50 */
-  --sub-bg: #020617;
+  /* Your base palette */
 
-  --active: #8b5cff;
-  /* slightly softer active */
-  --inactive: #1e293b;
+  /* NEW DESIGN */
+  --background: #0f1320;
+  --foreground: #ffffff;
 
-  --sub-text: #cbd5f5;
-  --secondary-text: #94a3b8;
+  --pair-border: #8970ff;
+  --pair-shadow: rgba(0, 0, 0, 0.25);
 
-  --success: #34d399;
-  --error: #fb7185;
+  --burn-border: #ff8800;
+  --burn-shadow: #e85f00;
+
+  --swap-border: #0285ff;
+  /* END */
+
+  --sub-bg: #ffffff;
+
+  --active: #6e37ff;
+  --inactive: #dee4f6;
+
+  --sub-text: #4e4e4e;
+  --secondary-text: #7989ba;
+
+  --success: #00ff2f;
+  --error: #ff5562;
   --greyed: #696969;
+  --admin-warning: #ffe8d0;
 
-  --status-close: #38bdf8;
-  --status-end: #6366f1;
-  --status-cancel: #f472b6;
-  --status-ongoing: #22c55e;
+  --status-close: #8eeaff;
+  --status-end: #a5b7ff;
+  --status-cancel: #f698ff;
+  --status-ongoing: #7af4cb;
 
-  --progress: #facc15;
-  --progress-bg: #1f2937;
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --progress: #ffbb37;
+  --progress-bg: #dde1fa;
+
+  /* Shadcn-compatible tokens mapped to your colors */
+  --radius: 0.75rem;
+  --card: var(--sub-bg);
+  --card-foreground: var(--foreground);
+  --popover: var(--sub-bg);
+  --popover-foreground: var(--foreground);
+
+  --primary: var(--active);
+  --primary-foreground: #ffffff;
+
+  --secondary: var(--inactive);
+  --secondary-foreground: var(--sub-text);
+
+  --muted: var(--inactive);
+  --muted-foreground: var(--secondary-text);
+
+  --accent: var(--background);
+  --accent-foreground: var(--foreground);
+
+  --destructive: var(--error);
+
+  --border: var(--progress-bg);
+  --input: var(--sub-bg);
+  --ring: var(--active);
+
+  /* Charts and sidebar derive from your palette */
+  --chart-1: var(--active);
+  --chart-2: var(--success);
+  --chart-3: var(--status-close);
+  --chart-4: var(--status-end);
+  --chart-5: var(--progress);
+
+  --sidebar: var(--sub-bg);
+  --sidebar-foreground: var(--sub-text);
+  --sidebar-primary: var(--active);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--background);
+  --sidebar-accent-foreground: var(--foreground);
+  --sidebar-border: var(--progress-bg);
+  --sidebar-ring: var(--active);
 
   --mb-gray: #fafbfc;
   --mb-popover: #e9f2f7;
@@ -351,6 +374,8 @@
   --md-required-red: #ff0000;
   --mb-cancel-gray: #f2f5f9;
   --mb-submit-border: #7452ff;
+  --mb-summary-form: #eaeafa;
+  --mb-summary-token-card: #ccd6f6;
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
   --mb-btn-loading: #c2cdf5;
