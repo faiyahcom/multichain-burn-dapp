@@ -46,7 +46,12 @@ const AdminMasterPoolManagementTable = () => {
           array: filter.network?.map((network) => networkIdToChainId(network)),
         }),
         kind:
-          filter.type && !isNaN(Number(filter.type)) ? filter.type : undefined,
+          filter.type === "partner"
+            ? "0"
+            : filter.type && !isNaN(Number(filter.type))
+              ? filter.type
+              : undefined,
+        isPartner: filter.type === "partner" ? "true" : undefined,
         search: filter.text || undefined,
       });
     },
