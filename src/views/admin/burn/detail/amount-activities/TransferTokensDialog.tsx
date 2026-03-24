@@ -151,7 +151,7 @@ const TransferTokensDialog = ({
 
     // enabled users only, filtered by search
     const users = useMemo(() => {
-        const enabled = (data?.users ?? []).filter((u) => u.enableChainId.includes(chainIdNum.toString()));
+        const enabled = (data?.users ?? []).filter((u) => u.enable);
         const q = search.trim().toLowerCase();
         if (!q) return enabled;
         return enabled.filter(
