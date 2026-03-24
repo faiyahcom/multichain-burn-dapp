@@ -1,6 +1,7 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
+import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import CustomPagination from "@/components/common/pagination";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TableNoData from "@/components/common/table-no-data";
@@ -25,11 +26,12 @@ import {
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { truncateString } from "@/utils/helpers/string";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
+  const queryClient = useQueryClient();
   const limit = 20;
 
   const { data: pools, isPending: isPendingPools } = useQuery({
@@ -50,7 +52,7 @@ const AdminMasterPoolManagementTable = () => {
     },
   });
 
-  const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Status"];
+  const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Partner Burn", "Status"];
   return (
     <div className="space-y-10 pb-10 pl-14">
       <Table>
@@ -116,6 +118,20 @@ const AdminMasterPoolManagementTable = () => {
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
+                </TableCell>
+                <TableCell className="text-center">
+                  {isBurnPool && (
+                    <PartnerBurnSwitch
+                      address={item.address}
+                      isPartner={item.isPartner}
+                      onSuccess={() =>
+                        queryClient.invalidateQueries({
+                          queryKey: poolQueryKeys.list(filter),
+                        })
+                      }
+                      classNames={{ btn: "mx-auto" }}
+                    />
+                  )}
                 </TableCell>
                 <TableCell>
                   <AnimateIconButton

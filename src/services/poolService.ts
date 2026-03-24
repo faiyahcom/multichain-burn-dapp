@@ -55,5 +55,14 @@ export const poolService = {
       },
     );
     return response;
-  }
+  },
+  togglePartnerPool: async (address: string, isPartner: boolean) => {
+    const response = await apiClient.patch(
+      `${POOLS_API_ROUTES.TOGGLE_PARTNER_POOL(address)}`,
+      {
+        isPartner,
+      },
+    );
+    return response;
+  },
 };

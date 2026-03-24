@@ -107,6 +107,7 @@ export type PoolItemType = {
   timeEnd: string; // timestamp seconds, if none then it is "0"
   rewardNumerator: string;
   rewardDenominator: string;
+  isPartner: boolean;
 };
 
 export type PoolListRequest = PaginationRequest & {
