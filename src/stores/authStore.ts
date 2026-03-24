@@ -5,7 +5,7 @@ export type AuthUser = {
   id: string
   address?: string
   chainId?: string
-  role?: "normal" | "admin"
+  role?: "normal" | "admin" | "super_admin"
 }
 
 type AuthState = {

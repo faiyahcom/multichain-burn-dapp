@@ -8,7 +8,7 @@ import { useAuthStore } from "@/stores/authStore";
 
 export function Sidebar() {
     const { user } = useAuthStore();
-    const isAdmin = user?.role === "admin";
+    const isAdmin = user?.role === "admin" || user?.role === "super_admin";
     const { pathname, searchStr } = useLocation({
         select: (location) => ({
             pathname: location.pathname,

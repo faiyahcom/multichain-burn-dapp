@@ -5,7 +5,6 @@ import bs58 from 'bs58'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { getErrorMessage } from '@/utils/helpers/error-message'
-import { useSystemStore } from '@/stores/systemStore'
 
 type WalletType = 'evm' | 'solana'
 

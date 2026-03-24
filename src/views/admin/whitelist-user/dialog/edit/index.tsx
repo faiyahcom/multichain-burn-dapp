@@ -71,6 +71,7 @@ const AdminWhitelistUserDialogEdit: React.FC<Props> = ({
         try {
             await whitelistUserService.updateUserInfo({
                 walletAddress: user.address,
+                chainId: user.chainId,
                 name: data.name?.trim() || undefined,
                 email: data.email?.trim() || undefined,
             });
