@@ -27,7 +27,7 @@ export const API_ROUTES = {
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
-    UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
+    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },
