@@ -73,6 +73,8 @@
   /* 40px */
   --text-13px: 0.813rem;
   /* 13px */
+  --text-28px: 1.75rem;
+  /* 28px */
 
   /* Core semantic colors */
   --color-background: var(--background);
@@ -157,9 +159,9 @@
   --color-pair-border: var(--pair-border);
   --color-burn-border: var(--burn-border);
   --color-swap-border: var(--swap-border);
-  --shadow-pair-glow: 0 0 6px 20px var(--pair-shadow);
-  --shadow-burn-glow: 0 0 20px 5px var(--burn-shadow);
-  --shadow-swap-glow: 0 0 20px 5px var(--swap-border);
+  --shadow-pair-glow: 0 0 20px 5px var(--pair-shadow);
+  --shadow-burn-glow: 0 0 10px 5px var(--burn-shadow);
+  --shadow-swap-glow: 0 0 20px 5px var(--swap-shadow);
 
   --tracking-2-percent: -0.02em;
 
@@ -181,12 +183,13 @@
   --foreground: #ffffff;
 
   --pair-border: #8970ff;
-  --pair-shadow: rgba(0, 0, 0, 0.25);
+  --pair-shadow: rgba(137, 112, 255, 0.25);
 
   --burn-border: #ff8800;
   --burn-shadow: #e85f00;
 
   --swap-border: #0285ff;
+  --swap-shadow: rgba(2, 133, 255, 0.878431);
   /* END */
 
   --sub-bg: #ffffff;
@@ -482,30 +485,30 @@
 @utility card-pair-bg {
   background: linear-gradient(
     180deg,
-    rgba(42, 31, 82, 0) 0%,
-    rgba(42, 31, 82, 0) 35.1%,
-    rgba(94, 70, 184, 0) 79.81%,
-    #5e46b8 100%
+    rgba(46, 0, 148, 0.33) 0%,
+    rgba(46, 0, 148, 0) 25.48%,
+    rgba(46, 0, 148, 0) 75.96%,
+    rgba(59, 8, 173, 0.33) 100%
   );
 }
 
 @utility card-burn-bg {
   background: linear-gradient(
-    168.92deg,
-    rgba(141, 58, 0, 0) -0.14%,
-    rgba(141, 58, 0, 0) 21.08%,
-    rgba(141, 58, 0, 0.3) 61.5%,
-    #ff6800 91.81%
+    180deg,
+    rgba(255, 102, 0, 0.33) 0%,
+    rgba(255, 102, 0, 0) 31.25%,
+    rgba(255, 102, 0, 0) 65.38%,
+    rgba(255, 102, 0, 0.33) 100%
   );
 }
 
 @utility card-swap-bg {
   background: linear-gradient(
-    168.92deg,
-    rgba(0, 93, 180, 0) -0.14%,
-    rgba(0, 93, 180, 0) 21.08%,
-    rgba(0, 93, 180, 0.3) 61.5%,
-    #0285ff 91.81%
+    180deg,
+    rgba(2, 133, 255, 0.33) 0%,
+    rgba(2, 133, 255, 0) 31.25%,
+    rgba(2, 133, 255, 0) 65.38%,
+    rgba(2, 133, 255, 0.33) 100%
   );
 }
 

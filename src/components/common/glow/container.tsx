@@ -86,3 +86,34 @@ export const getVariantBgClassName = ({
 
   return cn(variantClassName, custom);
 };
+
+const GlowContainer = ({
+  variant,
+  className,
+  children,
+  hasBorder = true,
+  hasShadow = true,
+  hasBg = true,
+}: {
+  variant: ContainerVariant;
+  className?: string;
+  children?: React.ReactNode;
+  hasBorder?: boolean;
+  hasShadow?: boolean;
+  hasBg?: boolean;
+}) => {
+  return (
+    <div
+      className={cn(
+        hasBorder && getVariantBorderClassName({ variant }),
+        hasShadow && getVariantShadowClassName({ variant }),
+        hasBg && getVariantBgClassName({ variant }),
+        className,
+      )}
+    >
+      {children}
+    </div>
+  );
+};
+
+export default GlowContainer;

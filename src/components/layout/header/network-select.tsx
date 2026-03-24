@@ -50,7 +50,7 @@ export default function NetworkSelect() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 rounded-lg text-sm font-medium text-foreground max-md:p-0"
+          className="flex items-center gap-2 rounded-lg bg-mb-dark-profile-btn text-sm font-medium text-foreground max-md:p-0"
           title={selectedNetwork?.label ?? selectedNetworkId}
         >
           <NetworkIcon networkId={selectedNetworkId} />
