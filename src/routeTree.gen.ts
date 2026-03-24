@@ -28,6 +28,7 @@ import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whi
 import { Route as AdminTransferHistoryIndexRouteImport } from './routes/admin/transfer-history/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as AdminFeeSettingsManagementIndexRouteImport } from './routes/admin/fee-settings-management/index'
+import { Route as AdminAdminManagementIndexRouteImport } from './routes/admin/admin-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
@@ -136,6 +137,12 @@ const AdminFeeSettingsManagementIndexRoute =
     path: '/admin/fee-settings-management/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminAdminManagementIndexRoute =
+  AdminAdminManagementIndexRouteImport.update({
+    id: '/admin/admin-management/',
+    path: '/admin/admin-management/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
   id: '/swap/detail/$address',
   path: '/swap/detail/$address',
@@ -183,6 +190,7 @@ export interface FileRoutesByFullPath {
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
+  '/admin/admin-management': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
@@ -210,6 +218,7 @@ export interface FileRoutesByTo {
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
+  '/admin/admin-management': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
@@ -238,6 +247,7 @@ export interface FileRoutesById {
   '/swap/': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
+  '/admin/admin-management/': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management/': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
   '/admin/transfer-history/': typeof AdminTransferHistoryIndexRoute
@@ -267,6 +277,7 @@ export interface FileRouteTypes {
     | '/swap'
     | '/burn/detail/$address'
     | '/swap/detail/$address'
+    | '/admin/admin-management'
     | '/admin/fee-settings-management'
     | '/admin/master-pool-management'
     | '/admin/transfer-history'
@@ -294,6 +305,7 @@ export interface FileRouteTypes {
     | '/swap'
     | '/burn/detail/$address'
     | '/swap/detail/$address'
+    | '/admin/admin-management'
     | '/admin/fee-settings-management'
     | '/admin/master-pool-management'
     | '/admin/transfer-history'
@@ -321,6 +333,7 @@ export interface FileRouteTypes {
     | '/swap/'
     | '/burn/detail/$address'
     | '/swap/detail/$address'
+    | '/admin/admin-management/'
     | '/admin/fee-settings-management/'
     | '/admin/master-pool-management/'
     | '/admin/transfer-history/'
@@ -349,6 +362,7 @@ export interface RootRouteChildren {
   SwapIndexRoute: typeof SwapIndexRoute
   BurnDetailAddressRoute: typeof BurnDetailAddressRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
+  AdminAdminManagementIndexRoute: typeof AdminAdminManagementIndexRoute
   AdminFeeSettingsManagementIndexRoute: typeof AdminFeeSettingsManagementIndexRoute
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
   AdminTransferHistoryIndexRoute: typeof AdminTransferHistoryIndexRoute
@@ -497,6 +511,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminFeeSettingsManagementIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/admin-management/': {
+      id: '/admin/admin-management/'
+      path: '/admin/admin-management'
+      fullPath: '/admin/admin-management'
+      preLoaderRoute: typeof AdminAdminManagementIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/swap/detail/$address': {
       id: '/swap/detail/$address'
       path: '/swap/detail/$address'
@@ -557,6 +578,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapIndexRoute: SwapIndexRoute,
   BurnDetailAddressRoute: BurnDetailAddressRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
+  AdminAdminManagementIndexRoute: AdminAdminManagementIndexRoute,
   AdminFeeSettingsManagementIndexRoute: AdminFeeSettingsManagementIndexRoute,
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
   AdminTransferHistoryIndexRoute: AdminTransferHistoryIndexRoute,
