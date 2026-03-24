@@ -4,6 +4,7 @@ const USERS_API_ROUTES = API_ROUTES.USERS;
 
 export interface RequestSigningMessageParams {
   address: string;
+  chainId?: string;
 }
 
 export interface RequestSigningMessageResponse {
@@ -14,6 +15,7 @@ export interface SignInParams {
   address: string;
   message: string;
   signature: string;
+  chainId?: string;
 }
 
 export interface SignInResponse {
