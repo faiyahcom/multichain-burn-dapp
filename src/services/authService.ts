@@ -15,7 +15,7 @@ export interface SignInParams {
   address: string;
   message: string;
   signature: string;
-  chainId: string;
+  chainId?: string;
 }
 
 export interface SignInResponse {
