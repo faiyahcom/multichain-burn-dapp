@@ -2,7 +2,10 @@ import { IconTokenList } from "@/assets/react";
 import GlowContainer, { type ContainerVariant } from "./container";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
-import { whitelistService } from "@/services/whitelistService";
+import {
+  whitelistService,
+  type WhitelistToken,
+} from "@/services/whitelistService";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import TokenImage from "../token-image";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -12,9 +15,10 @@ import { useEffect, useRef } from "react";
 
 interface Props {
   variant: ContainerVariant;
+  onTokenClick?: (token: WhitelistToken) => void;
 }
 
-const TokenListGlow: React.FC<Props> = ({ variant }) => {
+const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
   const buttonClassName =
     "flex size-10 shrink-0 items-center justify-center rounded-full bg-[#3C404F]/40 xl:size-15";
   const limit = 20;
@@ -101,7 +105,7 @@ const TokenListGlow: React.FC<Props> = ({ variant }) => {
             100% - spacing * (6.25 * 2 + 3 * 2) = 100% - spacing * 18.5
         */}
         <div
-          className="flex w-[calc(100%-var(--spacing)*18.5)] snap-x snap-mandatory items-center gap-3 overflow-y-auto xl:w-[calc(100%-var(--spacing)*29.5)] xl:gap-6"
+          className="flex w-[calc(100%-var(--spacing)*18.5)] snap-x snap-mandatory items-center gap-3 overflow-x-auto xl:w-[calc(100%-var(--spacing)*29.5)] xl:gap-6"
           style={{
             scrollbarWidth: "none",
           }}
@@ -123,6 +127,7 @@ const TokenListGlow: React.FC<Props> = ({ variant }) => {
                   key={token.address}
                   title={token.address}
                   className="shrink-0 snap-start"
+                  onClick={() => onTokenClick?.(token)}
                 >
                   <TokenImage
                     src={tokenDisplay.imageUri}
