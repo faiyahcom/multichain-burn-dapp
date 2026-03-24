@@ -8,12 +8,10 @@ type AppLayoutProps = {
 
 export function AppLayout({ children }: AppLayoutProps) {
   return (
-    <div className="flex min-h-dvh flex-col text-foreground">
+    <div className="mx-auto min-h-dvh max-w-360 text-foreground p-5 lg:p-10 space-y-7.5 lg:space-y-15">
       <MainHeader />
       <SwitchNetworkModal />
-      <main className="flex flex-1 flex-col">
-        {children}
-      </main>
+      <main className="">{children}</main>
     </div>
   );
 }
