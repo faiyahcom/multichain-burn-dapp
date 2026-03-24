@@ -1,4 +1,3 @@
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import {
   adminManagementRoles,
   type AdminManagementRole,
@@ -7,7 +6,6 @@ import { create } from "zustand";
 
 type AdminManagementSearchFilterType = {
   roles: AdminManagementRole[];
-  network: NetworkId[];
   text: string;
   page: number;
 };
@@ -21,7 +19,6 @@ export const useAdminManagementSearchFilterStore =
   create<AdminManagementSearchFilterState>((set) => ({
     filter: {
       roles: [...adminManagementRoles],
-      network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
       page: 1,
     },

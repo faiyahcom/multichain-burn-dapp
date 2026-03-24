@@ -1,6 +1,4 @@
-import type { NetworkId } from "@/config/networks";
-
-export const adminManagementRoles = ["superAdmin", "subAdmin"] as const;
+export const adminManagementRoles = ["super_admin", "admin"] as const;
 
 export type AdminManagementRole = (typeof adminManagementRoles)[number];
 
@@ -13,13 +11,12 @@ export interface AdminManagementAdmin {
   walletAddress: string;
   role: AdminManagementRole;
   enabled: boolean;
-  networkIds: NetworkId[];
   createdAt: string;
 }
 
 export const adminManagementRoleLabels: Record<AdminManagementRole, string> = {
-  superAdmin: "Super admin",
-  subAdmin: "Sub admin",
+  super_admin: "Super admin",
+  admin: "Admin",
 };
 
 export const adminManagementStatusLabels: Record<

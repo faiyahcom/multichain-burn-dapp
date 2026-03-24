@@ -48,7 +48,7 @@ const AdminManagementDialogCreate = () => {
         onOpenChange={setOpen}
         title="Add new Admin"
         description="Grant dashboard access and assign an administrator role."
-        defaultValues={{ role: "superAdmin" }}
+        defaultValues={{ role: "super_admin" }}
         isLoading={isPending}
         onSubmit={async (values) => {
           await createAdmin(values);

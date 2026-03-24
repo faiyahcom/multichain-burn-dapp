@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
 import { useAdminManagementSearchFilterStore } from "@/stores/admin/admin-management/search-filter-store";
+import { useAuthStore } from "@/stores/authStore";
 import {
   adminManagementRoleLabels,
   adminManagementStatusColors,
@@ -36,6 +37,8 @@ import AdminManagementDialogEdit from "../dialog/edit";
 const PAGE_SIZE = 5;
 
 const AdminManagementTable = () => {
+  const accessToken = useAuthStore((state) => state.accessToken);
+  const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const { filter, setFilter } = useAdminManagementSearchFilterStore();
   const queryClient = useQueryClient();
   const [editingAdmin, setEditingAdmin] = useState<AdminManagementAdmin | null>(
@@ -48,13 +51,13 @@ const AdminManagementTable = () => {
 
   const { data, isPending } = useQuery({
     queryKey: adminManagementQueryKeys.list(filter),
+    enabled: hasHydrated && !!accessToken,
     queryFn: () =>
       adminManagementService.getListAdmins({
         page: filter.page,
         limit: PAGE_SIZE,
         search: filter.text || undefined,
         roles: filter.roles,
-        networkIds: filter.network,
       }),
   });
 
@@ -182,7 +185,7 @@ const AdminManagementTable = () => {
                   <TableCell>
                     <span
                       className={cn("text-sm font-semibold", {
-                        "text-active": admin.role === "superAdmin",
+                        "text-active": admin.role === "super_admin",
                       })}
                     >
                       {adminManagementRoleLabels[admin.role]}
@@ -195,11 +198,16 @@ const AdminManagementTable = () => {
                         "text-primary": isFeaturedRow,
                       })}
                     >
-                      {new Date(admin.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {admin.createdAt
+                        ? new Date(admin.createdAt).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            },
+                          )
+                        : "N/A"}
                     </p>
                   </TableCell>
 

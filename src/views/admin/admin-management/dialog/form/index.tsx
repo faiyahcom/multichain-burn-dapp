@@ -19,7 +19,7 @@ import {
   adminManagementRoleLabels,
   adminManagementRoles,
 } from "@/types/admin/admin-management";
-import { isEvmAddress, isSolanaAddress } from "@/utils/helpers/address";
+import { adminManagementService } from "@/services/adminManagementService";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
@@ -37,7 +37,7 @@ const adminManagementFormSchema = z.object({
     .trim()
     .min(1, { error: "Wallet address is required" })
     .refine(
-      (value) => isEvmAddress(value) || isSolanaAddress(value),
+      (value) => adminManagementService.isSupportedWalletAddress(value),
       "Must be a valid EVM or Solana wallet address",
     ),
   role: z.enum(adminManagementRoles),
@@ -65,7 +65,7 @@ const resolveDefaultValues = (
   name: defaultValues?.name ?? "",
   email: defaultValues?.email ?? "",
   walletAddress: defaultValues?.walletAddress ?? "",
-  role: defaultValues?.role ?? "superAdmin",
+  role: defaultValues?.role ?? "super_admin",
 });
 
 const AdminManagementDialogForm: React.FC<Props> = ({
@@ -106,7 +106,9 @@ const AdminManagementDialogForm: React.FC<Props> = ({
       >
         <DialogHeader className="gap-1">
           <DialogTitle>{title}</DialogTitle>
-          {description ? <DialogDescription>{description}</DialogDescription> : null}
+          {description ? (
+            <DialogDescription>{description}</DialogDescription>
+          ) : null}
         </DialogHeader>
 
         <form

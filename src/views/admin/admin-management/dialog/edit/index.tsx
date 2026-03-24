@@ -27,7 +27,6 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     mutationFn: (values: AdminManagementFormValues) =>
       adminManagementService.updateAdmin({
         id: admin.id,
-        networkIds: admin.networkIds,
         ...values,
       }),
     onSuccess: async () => {

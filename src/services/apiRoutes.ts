@@ -31,6 +31,9 @@ export const API_ROUTES = {
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },
+  ADMINS: {
+    LIST: "/admins/",
+  },
   PAIRS: {
     LIST: "/pairs",
     STATS: (chainId: string) => `/pairs/stats/${chainId}`,
