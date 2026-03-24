@@ -89,9 +89,9 @@ const AdminWhitelistUserDialogCreate = () => {
         await new Promise((res) => setTimeout(res, 500));
         const chainIds = filter.network
             ? (() => {
-                  const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
-                  return cfg ? [Number(cfg.backendChainId)] : undefined;
-              })()
+                const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
+                return cfg ? [Number(cfg.backendChainId)] : undefined;
+            })()
             : undefined;
         queryClient.invalidateQueries({
             queryKey: whitelistUserQueryKeys.listUsers({
@@ -104,10 +104,16 @@ const AdminWhitelistUserDialogCreate = () => {
 
     const handleOpenChange = useCallback(
         (next: boolean) => {
-            if (!next) reset();
+            if (!next)
+                reset({
+                    networkId: currentNetworkId ?? "ethereumTestnet",
+                    walletAddress: "",
+                    name: "",
+                    email: "",
+                });
             setOpen(next);
         },
-        [reset],
+        [reset, currentNetworkId],
     );
 
     const onSubmit = async (data: WhitelistUserFormValues) => {
@@ -137,8 +143,10 @@ const AdminWhitelistUserDialogCreate = () => {
         const hasInfo = !!data.name?.trim() || !!data.email?.trim();
         if (hasInfo) {
             try {
+                const networkCfg = NETWORK_CONFIGS.find((n) => n.id === data.networkId);
                 await whitelistUserService.updateUserInfo({
                     walletAddress: data.walletAddress.trim(),
+                    chainId: networkCfg?.backendChainId ?? "",
                     name: data.name?.trim() || undefined,
                     email: data.email?.trim() || undefined,
                 });

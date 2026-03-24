@@ -16,10 +16,20 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const ActivitiesHistory = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
+    const excludeKinds = [20].join(",");
     const { data: poolActivities, isLoading } = useQuery({
-        queryKey: poolQueryKeys.activities(poolDetail?.pool.address || "", page),
+        queryKey: poolQueryKeys.activities(
+            poolDetail?.pool.address || "",
+            page,
+            excludeKinds,
+        ),
         queryFn: () =>
-            poolService.getPoolActivities(page, DEFAULT_PAGE_SIZE, poolDetail?.pool.address || ""),
+            poolService.getPoolActivities(
+                page,
+                DEFAULT_PAGE_SIZE,
+                poolDetail?.pool.address || "",
+                excludeKinds,
+            ),
         enabled: !!poolDetail?.pool.address,
         refetchInterval: 2_500, // Poll every 2.5s to update activities
     });

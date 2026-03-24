@@ -90,7 +90,7 @@ const AdminWhitelistTokenDialogCreate = () => {
         name: "",
         symbol: "",
         address: "",
-        networkId: "ethereumTestnet",
+        networkId: currentNetworkId ?? undefined,
         image: undefined,
         description: "",
         homepageLink: "",
@@ -98,7 +98,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       },
       resolver: zodResolver(whitelistTokenSchema),
     });
-    
+
   // Sync form field whenever the wallet switches network
   useEffect(() => {
     if (currentNetworkId) setValue("networkId", currentNetworkId);

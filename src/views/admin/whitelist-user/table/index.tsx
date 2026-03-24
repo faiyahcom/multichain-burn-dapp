@@ -156,7 +156,7 @@ const TokenAllocationChips: React.FC<{
     );
 };
 
-/** One expanded row = one user × one chain from whitelistChainId */
+/** One row per user (each user now has a single chainId) */
 interface ExpandedRow {
     user: WhitelistUser;
     chainId: string;
@@ -198,8 +198,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const handleToggleRow = useCallback(
         async (user: WhitelistUser, chainId: string) => {
             const addr = user.address.trim();
-            const isEnabled = user.enableChainId?.includes(chainId);
-            const whitelist = !isEnabled; // toggle
+            const whitelist = !user.enable; // toggle
             const rowKey = `${addr}-${chainId}`;
 
             if (isEvmAddress(addr)) {
@@ -244,15 +243,9 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
 
     const users = data ?? apiData?.users ?? [];
 
-    // Expand each user into one row per chain in whitelistChainId
+    // Each user now has a single chainId from the API
     const expandedRows: ExpandedRow[] = useMemo(() => {
-        return users.flatMap((user) => {
-            if (!user.whitelistChainId || user.whitelistChainId.length === 0) {
-                // fallback: show a single row with empty chainId
-                return [{ user, chainId: "" }];
-            }
-            return user.whitelistChainId.map((chainId) => ({ user, chainId }));
-        });
+        return users.map((user) => ({ user, chainId: user.chainId ?? "" }));
     }, [users]);
 
     const [editingUser, setEditingUser] = useState<WhitelistUser | null>(null);
@@ -291,7 +284,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     {!isLoading &&
                         expandedRows.map(({ user, chainId }, index) => {
                             const isFirst = index === 0;
-                            const isEnabledOnChain = user.enableChainId?.includes(chainId);
+                            const isEnabledOnChain = user.enable;
                             const status: UserStatus = isEnabledOnChain ? "enabled" : "disabled";
                             const rowKey = `${user.address}-${chainId}`;
                             const isDisabling = disablingKey === rowKey;
