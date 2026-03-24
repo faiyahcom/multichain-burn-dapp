@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils";
 
 const ContainerVariants = ["pair", "burn", "swap"] as const;
 
-type ContainerVariant = (typeof ContainerVariants)[number];
+export type ContainerVariant = (typeof ContainerVariants)[number];
 
 export const getVariantBorderClassName = ({
   variant,
