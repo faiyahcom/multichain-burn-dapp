@@ -34,6 +34,8 @@
   /* 2px */
   --radius-3px: calc(var(--radius) - 9px);
   /* 3px */
+  --radius-21px: calc(var(--radius) + 9px);
+  /* 21px */
 
   /* Font */
   --font-inter:

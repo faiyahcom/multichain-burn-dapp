@@ -54,7 +54,7 @@ const ProfileMenu = ({}: Props) => {
               src={avatar}
               alt={name}
               classNames={{
-                common: "size-11.75",
+                common: "size-12",
               }}
               isLoading={isGetCurrentUserPending}
               key={userApiDataUpdatedAt}
@@ -79,13 +79,8 @@ const ProfileMenu = ({}: Props) => {
           </div>
         </div>
 
-        {/* <DropdownMenuTrigger asChild>
-          <button className="flex h-6.25 w-7.5 items-center justify-center rounded-5px bg-background">
-            <ArrowIcon direction="down" />
-          </button>
-        </DropdownMenuTrigger> */}
-        <DropdownMenuContent align="end" className="min-w-44 rounded-lg p-1">
-          <DropdownMenuItem onClick={handleLogout}>
+        <DropdownMenuContent align="center" side="bottom" sideOffset={40} className="min-w-44 rounded-lg p-1 bg-mb-dark-profile-btn border-transparent">
+          <DropdownMenuItem onClick={handleLogout} className="bg-mb-dark-profile-btn">
             <LogOutIcon className="size-4" />
             <span>Logout</span>
           </DropdownMenuItem>
