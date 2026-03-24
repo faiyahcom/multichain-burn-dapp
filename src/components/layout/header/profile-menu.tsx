@@ -1,4 +1,3 @@
-import { ArrowIcon } from "@/components/common/arrow-icon";
 import CopyableText from "@/components/common/copyable-text";
 import TokenImage from "@/components/common/token-image";
 import {
@@ -46,10 +45,10 @@ const ProfileMenu = ({}: Props) => {
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-md-plus bg-mb-dark-profile-btn p-3">
+    <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn p-3">
       <DropdownMenu>
         <div className="flex items-center gap-3 text-left">
-          <DropdownMenuTrigger>
+          <DropdownMenuTrigger className="shrink-0">
             <TokenImage
               src={avatar}
               alt={name}
@@ -79,8 +78,16 @@ const ProfileMenu = ({}: Props) => {
           </div>
         </div>
 
-        <DropdownMenuContent align="center" side="bottom" sideOffset={40} className="min-w-44 rounded-lg p-1 bg-mb-dark-profile-btn border-transparent">
-          <DropdownMenuItem onClick={handleLogout} className="bg-mb-dark-profile-btn">
+        <DropdownMenuContent
+          align="center"
+          side="bottom"
+          sideOffset={40}
+          className="min-w-44 rounded-lg border-transparent bg-mb-dark-profile-btn p-1"
+        >
+          <DropdownMenuItem
+            onClick={handleLogout}
+            className="cursor-pointer bg-mb-dark-profile-btn"
+          >
             <LogOutIcon className="size-4" />
             <span>Logout</span>
           </DropdownMenuItem>
