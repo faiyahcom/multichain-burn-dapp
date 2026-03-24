@@ -20,13 +20,13 @@ export const NAV_ITEMS: NavItemType[] = [
   {
     title: "Burn",
     href: "/burn",
-    // Start with /burn
-    activeRegexMatch: /^\/burn/,
+    // Exactly /burn or start with /burn/
+    activeRegexMatch: /^\/burn(\/|$)/,
   },
   {
     title: "Swap",
     href: "/swap",
-    // Start with /swap
-    activeRegexMatch: /^\/swap/,
+    // Exactly /swap or start with /swap/
+    activeRegexMatch: /^\/swap(\/|$)/,
   },
 ];
