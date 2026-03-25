@@ -54,3 +54,7 @@ export const transferHistoryQueryKeys = {
 export const authQueryKeys = {
   me: (params?: Record<string, unknown>) => ["auth", "me", params] as const,
 };
+
+export const dashboardQueryKeys = {
+  statsSticker: () => ["dashboard", "stats-sticker"] as const,
+};

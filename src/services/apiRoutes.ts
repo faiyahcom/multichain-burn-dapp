@@ -39,4 +39,7 @@ export const API_ROUTES = {
     LIST: "/transfers",
     ANALYSIS: "/transfers/analysis",
   },
+  GENERAL: {
+    STATS_STICKER: "/general/stats-sticker",
+  }
 } as const;

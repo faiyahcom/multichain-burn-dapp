@@ -55,3 +55,8 @@ export { default as IconPairCategory } from "./icons/categories/pair.svg?react";
 export { default as IconSwapCategory } from "./icons/categories/swap.svg?react";
 
 export { default as IconTokenList } from "./icons/token-list-icon.svg?react";
+
+export { default as IconParticipant } from "./icons/glow/participant.svg?react";
+export { default as IconStack } from "./icons/glow/stack.svg?react";
+export { default as IconStackY } from "./icons/glow/stack-y.svg?react";
+export { default as IconStats } from "./icons/glow/stats.svg?react";

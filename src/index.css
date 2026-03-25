@@ -1,5 +1,6 @@
 /* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"); */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.cdnfonts.com/css/ds-digital");
 @import "tailwindcss";
 
 /* Optional: import Poppins from Google Fonts (or include your own @font-face) */
@@ -171,6 +172,7 @@
   --color-mb-btn-swap: var(--mb-btn-swap);
   --color-mb-btn-burn: var(--mb-btn-burn);
   --color-mb-btn-pair: var(--mb-btn-pair);
+  --color-banner-text: var(--banner-text);
   /* END */
 }
 
@@ -281,6 +283,8 @@
   --mb-btn-swap: #0779e9;
   --mb-btn-burn: #fb781d;
   --mb-btn-pair: #7407e9;
+
+  --banner-text: #D41317;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -390,6 +394,8 @@
   --mb-btn-swap: #0779e9;
   --mb-btn-burn: #fb781d;
   --mb-btn-pair: #7407e9;
+
+  --banner-text: #D41317;
 }
 
 @layer base {
@@ -423,6 +429,18 @@
 
 @utility popover-shadow {
   box-shadow: 0px 4px 4px 0px #00000040;
+}
+
+@utility text-burn-glow {
+  text-shadow: 0 0 8px #fb781d;
+}
+
+@utility text-swap-glow {
+  text-shadow: 0 0 8px #0779e9;
+}
+
+@utility font-ds-digital {
+  font-family: "DS-Digital", monospace;
 }
 
 @utility animate-marquee {
