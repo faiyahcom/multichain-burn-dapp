@@ -4,6 +4,7 @@ import ConfirmDialog from "@/components/common/confirm-dialog";
 import CopyableText from "@/components/common/copyable-text";
 import CustomPagination from "@/components/common/pagination";
 import NetworkDisplay from "@/components/common/network-display";
+import { networkIdToChainId, type NetworkId } from "@/config/networks";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
@@ -28,6 +29,7 @@ import {
   type AdminManagementAdmin,
   type AdminManagementStatus,
 } from "@/types/admin/admin-management";
+import { isEvmAddress } from "@/utils/helpers/address";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -38,7 +40,28 @@ import AdminManagementDialogEdit from "../dialog/edit";
 import { useToggleAdminRoleEvmFn } from "./useToggleAdminRoleEvmFn";
 import { useToggleAdminRoleSolanaFn } from "./useToggleAdminRoleSolanaFn";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
+const SELF_ADMIN_ACTION_ERROR =
+  "You can't modify your own admin access on this chain.";
+const ADMIN_NETWORK_ERROR = "Cannot determine network for this admin.";
+
+const areWalletAddressesEqual = (left?: string, right?: string) => {
+  if (!left || !right) {
+    return false;
+  }
+
+  const normalizedLeft = left.trim();
+  const normalizedRight = right.trim();
+
+  if (isEvmAddress(normalizedLeft) && isEvmAddress(normalizedRight)) {
+    return normalizedLeft.toLowerCase() === normalizedRight.toLowerCase();
+  }
+
+  return normalizedLeft === normalizedRight;
+};
+
+const getAdminTargetNetworkId = (admin: AdminManagementAdmin) =>
+  admin.networkIds[0] ?? null;
 
 const AdminNetworksCell: React.FC<{
   networkIds: AdminManagementAdmin["networkIds"];
@@ -56,7 +79,30 @@ const AdminNetworksCell: React.FC<{
   );
 };
 
+const ActionIconButton: React.FC<{
+  disabled?: boolean;
+  destructive?: boolean;
+  title?: string;
+  onClick: () => void;
+  children: React.ReactNode;
+}> = ({ disabled, destructive, title, onClick, children }) => (
+  <button
+    type="button"
+    disabled={disabled}
+    title={title}
+    className={cn("text-secondary-text transition-colors", {
+      "hover:text-foreground": !destructive,
+      "hover:text-destructive": destructive,
+      "cursor-not-allowed opacity-50 hover:text-secondary-text": disabled,
+    })}
+    onClick={onClick}
+  >
+    {children}
+  </button>
+);
+
 const AdminManagementTable = () => {
+  const user = useAuthStore((state) => state.user);
   const accessToken = useAuthStore((state) => state.accessToken);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
@@ -109,11 +155,56 @@ const AdminManagementTable = () => {
     },
   });
 
-  const handleToggleAdminStatus = async (admin: AdminManagementAdmin) => {
-    const targetNetworkId = admin.networkIds[0] ?? null;
+  const isSelfAdminRecord = (admin: AdminManagementAdmin) => {
+    const targetNetworkId = getAdminTargetNetworkId(admin);
+    const targetChainId = targetNetworkId
+      ? networkIdToChainId(targetNetworkId)
+      : undefined;
+
+    return Boolean(
+      user?.address &&
+        user.chainId &&
+        targetChainId &&
+        areWalletAddressesEqual(user.address, admin.walletAddress) &&
+        user.chainId === targetChainId,
+    );
+  };
+
+  const validateAdminAction = (admin: AdminManagementAdmin): NetworkId | null => {
+    if (isSelfAdminRecord(admin)) {
+      toast.error(SELF_ADMIN_ACTION_ERROR);
+      return null;
+    }
+
+    const targetNetworkId = getAdminTargetNetworkId(admin);
 
     if (!targetNetworkId) {
-      toast.error("Cannot determine network for this admin.");
+      toast.error(ADMIN_NETWORK_ERROR);
+      return null;
+    }
+
+    return targetNetworkId;
+  };
+
+  const toggleAdminRoleOnChain = async ({
+    walletAddress,
+    role,
+    enabled,
+    networkId,
+  }: {
+    walletAddress: string;
+    role: AdminManagementAdmin["role"];
+    enabled: boolean;
+    networkId: NetworkId;
+  }) =>
+    networkId === "solanaDevnet"
+      ? toggleAdminRoleSolana({ walletAddress, enabled, role })
+      : toggleAdminRoleEvm({ walletAddress, enabled, role });
+
+  const handleToggleAdminStatus = async (admin: AdminManagementAdmin) => {
+    const targetNetworkId = validateAdminAction(admin);
+
+    if (!targetNetworkId) {
       return;
     }
 
@@ -125,18 +216,12 @@ const AdminManagementTable = () => {
     setStatusUpdatingId(admin.id);
     try {
       const nextEnabled = !admin.enabled;
-      const isUpdated =
-        targetNetworkId === "solanaDevnet"
-          ? await toggleAdminRoleSolana({
-              walletAddress: admin.walletAddress,
-              enabled: nextEnabled,
-              role: admin.role,
-            })
-          : await toggleAdminRoleEvm({
-              walletAddress: admin.walletAddress,
-              enabled: nextEnabled,
-              role: admin.role,
-            });
+      const isUpdated = await toggleAdminRoleOnChain({
+        walletAddress: admin.walletAddress,
+        role: admin.role,
+        enabled: nextEnabled,
+        networkId: targetNetworkId,
+      });
 
       if (isUpdated) {
         await adminManagementService.updateAdmin({
@@ -162,10 +247,9 @@ const AdminManagementTable = () => {
       return;
     }
 
-    const targetNetworkId = deleteTarget.networkIds[0] ?? null;
+    const targetNetworkId = validateAdminAction(deleteTarget);
 
     if (!targetNetworkId) {
-      toast.error("Cannot determine network for this admin.");
       return;
     }
 
@@ -176,18 +260,12 @@ const AdminManagementTable = () => {
 
     setIsDeletingOnChain(true);
     try {
-      const isUpdated =
-        targetNetworkId === "solanaDevnet"
-          ? await toggleAdminRoleSolana({
-              walletAddress: deleteTarget.walletAddress,
-              enabled: false,
-              role: deleteTarget.role,
-            })
-          : await toggleAdminRoleEvm({
-              walletAddress: deleteTarget.walletAddress,
-              enabled: false,
-              role: deleteTarget.role,
-            });
+      const isUpdated = await toggleAdminRoleOnChain({
+        walletAddress: deleteTarget.walletAddress,
+        role: deleteTarget.role,
+        enabled: false,
+        networkId: targetNetworkId,
+      });
 
       if (!isUpdated) {
         return;
@@ -232,6 +310,10 @@ const AdminManagementTable = () => {
                 : "disabled";
               const isFeaturedRow = index === 0;
               const isStatusLoading = statusUpdatingId === admin.id;
+              const isSelfActionDisabled = isSelfAdminRecord(admin);
+              const disabledActionTitle = isSelfActionDisabled
+                ? SELF_ADMIN_ACTION_ERROR
+                : undefined;
 
               return (
                 <TableRow
@@ -312,24 +394,27 @@ const AdminManagementTable = () => {
 
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
-                      <button
-                        className="text-secondary-text transition-colors hover:text-foreground"
+                      <ActionIconButton
+                        disabled={isSelfActionDisabled}
+                        title={disabledActionTitle}
                         onClick={() => setEditingAdmin(admin)}
                       >
                         <PencilIcon className="size-4" />
-                      </button>
+                      </ActionIconButton>
                       <BlueSwitch
                         active={admin.enabled}
                         isLoading={isStatusLoading}
-                        disabled={isStatusLoading}
+                        disabled={isStatusLoading || isSelfActionDisabled}
                         onClick={() => handleToggleAdminStatus(admin)}
                       />
-                      <button
-                        className="text-secondary-text transition-colors hover:text-destructive"
+                      <ActionIconButton
+                        disabled={isSelfActionDisabled}
+                        destructive
+                        title={disabledActionTitle}
                         onClick={() => setDeleteTarget(admin)}
                       >
                         <Trash2Icon className="size-4" />
-                      </button>
+                      </ActionIconButton>
                     </div>
                   </TableCell>
                 </TableRow>
