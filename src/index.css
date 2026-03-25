@@ -80,6 +80,8 @@
   /* 13px */
   --text-28px: 1.75rem;
   /* 28px */
+  --text-22px: 1.375rem;
+  /* 22px */
 
   /* Core semantic colors */
   --color-background: var(--background);
@@ -177,6 +179,7 @@
   --color-mb-btn-burn: var(--mb-btn-burn);
   --color-mb-btn-pair: var(--mb-btn-pair);
   --color-banner-text: var(--banner-text);
+  --color-mb-dark-popover-item: var(--mb-dark-popover-item);
   /* END */
 }
 
@@ -289,6 +292,7 @@
   --mb-btn-pair: #7407e9;
 
   --banner-text: #d41317;
+  --mb-dark-popover-item: #10121F;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -400,6 +404,7 @@
   --mb-btn-pair: #7407e9;
 
   --banner-text: #d41317;
+  --mb-dark-popover-item: #10121F;
 }
 
 @layer base {
