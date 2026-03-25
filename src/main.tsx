@@ -16,7 +16,7 @@ if (!rootElement.innerHTML) {
     <StrictMode>
       <QueryProvider>
         <AppkitProvider>
-          <ThemeProvider defaultTheme="system" storageKey="xfaiyah-ui-theme">
+          <ThemeProvider defaultTheme="light" storageKey="xfaiyah-ui-theme">
             <AppRouterProvider />
           </ThemeProvider>
         </AppkitProvider>
