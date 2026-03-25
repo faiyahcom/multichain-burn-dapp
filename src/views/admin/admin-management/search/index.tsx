@@ -38,9 +38,6 @@ const AdminManagementSearch = () => {
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold">Admin Management</h1>
-          <p className="text-base text-secondary-text">
-            Manage admin access, roles, and active permissions across networks.
-          </p>
         </div>
         <AdminManagementDialogCreate />
       </div>

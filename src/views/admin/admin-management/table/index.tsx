@@ -52,19 +52,7 @@ const AdminNetworksCell: React.FC<{
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
       {networkIds.map((networkId) => (
-        <span
-          key={networkId}
-          className="inline-flex items-center rounded-full bg-inactive px-2.5 py-1 text-xs font-medium text-foreground"
-        >
-          <NetworkDisplay
-            networkId={networkId}
-            classNames={{
-              container: "inline-flex items-center",
-              img: "mr-1.25 size-4",
-              label: "text-xs whitespace-nowrap",
-            }}
-          />
-        </span>
+        <NetworkDisplay key={networkId} networkId={networkId} />
       ))}
     </div>
   );
@@ -90,9 +78,7 @@ const AdminManagementTable = () => {
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
   const [namespace, chainRef] = caipAddress?.split(":") ?? [];
   const currentNetworkId =
-    namespace && chainRef
-      ? mapChainToSystemNetwork(namespace, chainRef)
-      : null;
+    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { data, isPending } = useQuery({
     queryKey: adminManagementQueryKeys.list(filter),
