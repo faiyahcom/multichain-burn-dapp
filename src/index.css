@@ -1,5 +1,6 @@
 /* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"); */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
 @import url("https://fonts.cdnfonts.com/css/ds-digital");
 @import "tailwindcss";
 
@@ -45,6 +46,9 @@
   /* Font */
   --font-inter:
     "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-orbitron:
+    "Orbitron", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 
   /* Text sizes (Tailwind text-*) */
@@ -284,7 +288,7 @@
   --mb-btn-burn: #fb781d;
   --mb-btn-pair: #7407e9;
 
-  --banner-text: #D41317;
+  --banner-text: #d41317;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -395,13 +399,13 @@
   --mb-btn-burn: #fb781d;
   --mb-btn-pair: #7407e9;
 
-  --banner-text: #D41317;
+  --banner-text: #d41317;
 }
 
 @layer base {
   body {
     @apply text-foreground;
-    font-family: var(--font-inter);
+    font-family: var(--font-orbitron);
     line-height: 1;
     letter-spacing: var(--tracking-2-percent);
     background: linear-gradient(
@@ -528,6 +532,36 @@
     rgba(2, 133, 255, 0) 31.25%,
     rgba(2, 133, 255, 0) 65.38%,
     rgba(2, 133, 255, 0.33) 100%
+  );
+}
+
+@utility card-pair-bold-bottom-bg {
+  background: linear-gradient(
+    168.92deg,
+    rgba(141, 58, 0, 0) -0.14%,
+    rgba(141, 58, 0, 0) 21.08%,
+    rgba(35, 0, 141, 0.3) 61.5%,
+    #9100ff 91.81%
+  );
+}
+
+@utility card-burn-bold-bottom-bg {
+  background: linear-gradient(
+    168.92deg,
+    rgba(141, 58, 0, 0) -0.14%,
+    rgba(141, 58, 0, 0) 21.08%,
+    rgba(141, 58, 0, 0.3) 61.5%,
+    #ff6800 91.81%
+  );
+}
+
+@utility card-swap-bold-bottom-bg {
+  background: linear-gradient(
+    168.92deg,
+    rgba(0, 93, 180, 0) -0.14%,
+    rgba(0, 93, 180, 0) 21.08%,
+    rgba(0, 93, 180, 0.3) 61.5%,
+    #0285ff 91.81%
   );
 }
 

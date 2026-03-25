@@ -81,7 +81,7 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
       className="flex items-center gap-6 px-2.5 py-3.25 xl:gap-12 xl:px-5 xl:py-6.25"
     >
       <div className="flex w-27 items-center gap-1.75 xl:w-35 xl:gap-3.25">
-        <IconTokenList />
+        <IconTokenList className="shrink-0" />
         <div className="text-center text-md font-medium xl:text-2xl">
           <p>TOKENS</p>
           <p>LIST</p>
