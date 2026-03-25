@@ -32,6 +32,11 @@ export const API_ROUTES = {
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },
+  ADMINS: {
+    LIST: "/admins",
+    UPSERT_USER: "/admins/user",
+    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
+  },
   PAIRS: {
     LIST: "/pairs",
     STATS: (chainId: string) => `/pairs/stats/${chainId}`,

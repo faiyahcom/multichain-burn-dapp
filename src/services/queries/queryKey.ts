@@ -38,6 +38,12 @@ export const whitelistUserQueryKeys = {
     ["whitelist-users", "history", params] as const,
 };
 
+export const adminManagementQueryKeys = {
+  all: ["admin-management"] as const,
+  list: (params?: Record<string, unknown>) =>
+    [...adminManagementQueryKeys.all, "list", params] as const,
+};
+
 export const pairQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["pairs", "list", params] as const,

@@ -12,10 +12,32 @@ type AdminTransferHistoryFilterType = {
   dateTo?: Date;
 };
 
+type AdminTransferHistoryFilterErrors = {
+  amountOutRange?: string;
+};
+
 type AdminTransferHistoryFilterState = {
   filter: AdminTransferHistoryFilterType;
   setFilter: (filter: Partial<AdminTransferHistoryFilterType>) => void;
+  isValid: boolean;
+  errors: AdminTransferHistoryFilterErrors;
 };
+
+function validateFilter(
+  filter: AdminTransferHistoryFilterType,
+): AdminTransferHistoryFilterErrors {
+  const errors: AdminTransferHistoryFilterErrors = {};
+
+  const min = parseFloat(filter.amountOutMin);
+  const max = parseFloat(filter.amountOutMax);
+  if (!isNaN(min) && !isNaN(max) && min > max) {
+    errors.amountOutRange = "Min amount cannot be greater than max amount";
+  }
+
+  // add more checks here as needed
+
+  return errors;
+}
 
 export const useAdminTransferHistoryFilterStore =
   create<AdminTransferHistoryFilterState>((set) => ({
@@ -29,12 +51,20 @@ export const useAdminTransferHistoryFilterStore =
       dateFrom: undefined,
       dateTo: undefined,
     },
+    errors: {},
+    isValid: true,
     setFilter: (partial) =>
-      set((state) => ({
-        filter: {
+      set((state) => {
+        const newFilter = {
           ...state.filter,
           ...partial,
           page: partial.page ?? 1,
-        },
-      })),
+        };
+        const errors = validateFilter(newFilter);
+        return {
+          filter: newFilter,
+          errors,
+          isValid: Object.keys(errors).length === 0,
+        };
+      }),
   }));
