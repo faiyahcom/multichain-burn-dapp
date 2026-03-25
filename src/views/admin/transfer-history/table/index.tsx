@@ -21,10 +21,10 @@ import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 const AdminTransferHistoryTable = () => {
-  const { filter, setFilter } = useAdminTransferHistoryFilterStore();
+  const { filter, setFilter, isValid } = useAdminTransferHistoryFilterStore();
   const limit = 10;
 
   const { data: transfers, isPending: isPendingTransfers } = useQuery({
@@ -46,6 +46,8 @@ const AdminTransferHistoryTable = () => {
           filter.amountOutMax !== "" ? filter.amountOutMax : undefined,
       });
     },
+    enabled: isValid,
+    placeholderData: keepPreviousData,
   });
 
   const columns = [
