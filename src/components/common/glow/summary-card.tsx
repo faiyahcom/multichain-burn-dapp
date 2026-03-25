@@ -38,7 +38,7 @@ const GlowSummaryCard: React.FC<Props> = ({
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 z-0 bg-center bg-no-repeat opacity-30"
+        className="pointer-events-none absolute inset-0 z-0 bg-cover bg-center bg-no-repeat opacity-30"
         style={{ backgroundImage: `url(${CARD_VARIANT_BG_IMG[variant]})` }}
       />
       <GlowContainer
