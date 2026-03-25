@@ -16,7 +16,7 @@ export const HeaderNav = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   return (
-    <nav className="hidden items-center gap-7.5 lg:flex xl:gap-15">
+    <nav className="hidden items-center gap-4 lg:flex xl:gap-8.25">
       {NAV_ITEMS.map((item, index) => {
         const isActive =
           item.activeRegexMatch && currentPath.match(item.activeRegexMatch);
