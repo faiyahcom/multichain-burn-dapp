@@ -29,7 +29,7 @@ import {
   type AdminManagementAdmin,
   type AdminManagementStatus,
 } from "@/types/admin/admin-management";
-import { isEvmAddress } from "@/utils/helpers/address";
+import { areWalletAddressesEqual } from "@/utils/helpers/address";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -44,21 +44,6 @@ const PAGE_SIZE = 10;
 const SELF_ADMIN_ACTION_ERROR =
   "You can't modify your own admin access on this chain.";
 const ADMIN_NETWORK_ERROR = "Cannot determine network for this admin.";
-
-const areWalletAddressesEqual = (left?: string, right?: string) => {
-  if (!left || !right) {
-    return false;
-  }
-
-  const normalizedLeft = left.trim();
-  const normalizedRight = right.trim();
-
-  if (isEvmAddress(normalizedLeft) && isEvmAddress(normalizedRight)) {
-    return normalizedLeft.toLowerCase() === normalizedRight.toLowerCase();
-  }
-
-  return normalizedLeft === normalizedRight;
-};
 
 const getAdminTargetNetworkId = (admin: AdminManagementAdmin) =>
   admin.networkIds[0] ?? null;

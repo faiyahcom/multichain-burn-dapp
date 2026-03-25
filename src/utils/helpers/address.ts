@@ -23,3 +23,18 @@ export const isEvmAddress = (address: string): boolean => {
 export const isSupportedWalletAddress = (address: string) => {
   return isEvmAddress(address) || isSolanaAddress(address);
 };
+
+export const areWalletAddressesEqual = (left?: string, right?: string) => {
+  if (!left || !right) {
+    return false;
+  }
+
+  const normalizedLeft = left.trim();
+  const normalizedRight = right.trim();
+
+  if (isEvmAddress(normalizedLeft) && isEvmAddress(normalizedRight)) {
+    return normalizedLeft.toLowerCase() === normalizedRight.toLowerCase();
+  }
+
+  return normalizedLeft === normalizedRight;
+};
