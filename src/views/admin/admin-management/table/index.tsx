@@ -29,9 +29,7 @@ import {
   type AdminManagementStatus,
 } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { truncateString } from "@/utils/helpers/string";
-import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
@@ -61,8 +59,10 @@ const AdminNetworksCell: React.FC<{
 const AdminManagementTable = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
-  const { caipAddress } = useAppKitAccount();
-  const { openSwitchNetworkModal } = useSystemStore();
+  const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const openSwitchNetworkModal = useSystemStore(
+    (state) => state.openSwitchNetworkModal,
+  );
   const { filter, setFilter } = useAdminManagementSearchFilterStore();
   const queryClient = useQueryClient();
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
@@ -76,9 +76,6 @@ const AdminManagementTable = () => {
   );
   const [isDeletingOnChain, setIsDeletingOnChain] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
-  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
-  const currentNetworkId =
-    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { data, isPending } = useQuery({
     queryKey: adminManagementQueryKeys.list(filter),

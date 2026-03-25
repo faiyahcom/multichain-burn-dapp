@@ -10,7 +10,6 @@ import type {
   AdminManagementAdmin,
   AdminManagementRole,
 } from "@/types/admin/admin-management";
-import { adminManagementRoles } from "@/types/admin/admin-management";
 import type { PaginationResponse } from "@/types/common";
 import { isEvmAddress, isSolanaAddress } from "@/utils/helpers/address";
 
@@ -139,18 +138,12 @@ export const adminManagementService = {
   getListAdmins: async (
     params?: ListAdminManagementRequest,
   ): Promise<ListAdminManagementResponse> => {
-    const selectedRoles = params?.roles ?? [...adminManagementRoles];
+    const selectedRoles = params?.roles;
     const selectedChainId = buildAdminChainIdQuery(params?.networkIds);
-
-    if (selectedRoles.length === 0) {
-      return {
-        page: params?.page ?? 1,
-        total: 0,
-        totalEnable: 0,
-        totalDisable: 0,
-        admins: [],
-      };
-    }
+    const roleQuery =
+      selectedRoles && selectedRoles.length > 0
+        ? selectedRoles.join(",")
+        : undefined;
 
     const response = await apiClient.get<AdminManagementApiListResponse>(
       ADMINS_API_ROUTES.LIST,
@@ -159,7 +152,7 @@ export const adminManagementService = {
           page: params?.page ?? 1,
           limit: params?.limit ?? 20,
           search: params?.search || undefined,
-          role: selectedRoles.join(","),
+          role: roleQuery,
           chainId: selectedChainId,
         },
       },
@@ -169,7 +162,8 @@ export const adminManagementService = {
       .map(mapAdminApiItem)
       .filter(
         ({ apiRole }) =>
-          apiRole !== "normal" && selectedRoles.includes(apiRole),
+          apiRole !== "normal" &&
+          (!selectedRoles?.length || selectedRoles.includes(apiRole)),
       )
       .map(({ admin }) => admin);
 

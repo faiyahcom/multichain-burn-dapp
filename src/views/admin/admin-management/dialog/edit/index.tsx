@@ -4,13 +4,11 @@ import { adminManagementQueryKeys } from "@/services/queries/queryKey";
 import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
-import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToggleAdminRoleEvmFn } from "../../table/useToggleAdminRoleEvmFn";
 import { useToggleAdminRoleSolanaFn } from "../../table/useToggleAdminRoleSolanaFn";
-import AdminManagementDialogForm from "../form";
+import AdminManagementDialogForm, { type AdminManagementFormValues } from "../form";
 
 interface Props {
   admin: AdminManagementAdmin;
@@ -25,14 +23,13 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
 }) => {
   const queryClient = useQueryClient();
   const [isCallingSc, setIsCallingSc] = useState(false);
-  const { caipAddress } = useAppKitAccount();
-  const { openSwitchNetworkModal } = useSystemStore();
+  const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const openSwitchNetworkModal = useSystemStore(
+    (state) => state.openSwitchNetworkModal,
+  );
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
   const { toggleAdminRole: toggleAdminRoleSolana } =
     useToggleAdminRoleSolanaFn();
-  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
-  const currentNetworkId =
-    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
   const targetNetworkId =
     admin.networkIds.length === 1
       ? admin.networkIds[0]
@@ -55,6 +52,68 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     },
   });
 
+  const handleSubmit = async (values: AdminManagementFormValues) => {
+    if (!targetNetworkId) {
+      toast.error("Cannot determine network for this admin.");
+      return;
+    }
+
+    if (currentNetworkId !== targetNetworkId) {
+      openSwitchNetworkModal(currentNetworkId, targetNetworkId);
+      return;
+    }
+
+    const roleChanged = values.role !== admin.role;
+
+    setIsCallingSc(true);
+    try {
+      if (roleChanged && admin.enabled) {
+        const enableNextRole =
+          targetNetworkId === "solanaDevnet"
+            ? await toggleAdminRoleSolana({
+                walletAddress: admin.walletAddress,
+                enabled: true,
+                role: values.role,
+              })
+            : await toggleAdminRoleEvm({
+                walletAddress: admin.walletAddress,
+                enabled: true,
+                role: values.role,
+              });
+
+        if (!enableNextRole) {
+          return;
+        }
+
+        const disablePreviousRole =
+          targetNetworkId === "solanaDevnet"
+            ? await toggleAdminRoleSolana({
+                walletAddress: admin.walletAddress,
+                enabled: false,
+                role: admin.role,
+              })
+            : await toggleAdminRoleEvm({
+                walletAddress: admin.walletAddress,
+                enabled: false,
+                role: admin.role,
+              });
+
+        if (!disablePreviousRole) {
+          return;
+        }
+      }
+
+      await updateAdmin({
+        ...values,
+        id: admin.id,
+        networkId: targetNetworkId,
+        enabled: admin.enabled,
+      });
+    } finally {
+      setIsCallingSc(false);
+    }
+  };
+
   return (
     <AdminManagementDialogForm
       open={open}
@@ -71,67 +130,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       lockWalletAddress
       lockNetworkId
       isLoading={isPending || isCallingSc}
-      onSubmit={async (values) => {
-        if (!targetNetworkId) {
-          toast.error("Cannot determine network for this admin.");
-          return;
-        }
-
-        if (currentNetworkId !== targetNetworkId) {
-          openSwitchNetworkModal(currentNetworkId, targetNetworkId);
-          return;
-        }
-
-        const roleChanged = values.role !== admin.role;
-
-        setIsCallingSc(true);
-        try {
-          if (roleChanged && admin.enabled) {
-            const enableNextRole =
-              targetNetworkId === "solanaDevnet"
-                ? await toggleAdminRoleSolana({
-                    walletAddress: admin.walletAddress,
-                    enabled: true,
-                    role: values.role,
-                  })
-                : await toggleAdminRoleEvm({
-                    walletAddress: admin.walletAddress,
-                    enabled: true,
-                    role: values.role,
-                  });
-
-            if (!enableNextRole) {
-              return;
-            }
-
-            const disablePreviousRole =
-              targetNetworkId === "solanaDevnet"
-                ? await toggleAdminRoleSolana({
-                    walletAddress: admin.walletAddress,
-                    enabled: false,
-                    role: admin.role,
-                  })
-                : await toggleAdminRoleEvm({
-                    walletAddress: admin.walletAddress,
-                    enabled: false,
-                    role: admin.role,
-                  });
-
-            if (!disablePreviousRole) {
-              return;
-            }
-          }
-
-          await updateAdmin({
-            ...values,
-            id: admin.id,
-            networkId: targetNetworkId,
-            enabled: admin.enabled,
-          });
-        } finally {
-          setIsCallingSc(false);
-        }
-      }}
+      onSubmit={handleSubmit}
     />
   );
 };

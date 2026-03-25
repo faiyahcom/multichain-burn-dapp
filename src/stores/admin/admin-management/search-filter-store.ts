@@ -10,6 +10,28 @@ const allAdminManagementNetworkIds = NETWORK_CONFIGS.map(
   (network) => network.id,
 );
 
+const resolveRolesFilter = (
+  nextRoles: AdminManagementRole[] | undefined,
+  currentRoles: AdminManagementRole[],
+) => {
+  if (nextRoles === undefined) {
+    return currentRoles;
+  }
+
+  return nextRoles.length > 0 ? nextRoles : allAdminManagementRoles;
+};
+
+const resolveNetworkFilter = (
+  nextNetwork: NetworkId[] | undefined,
+  currentNetwork: NetworkId[],
+) => {
+  if (nextNetwork === undefined) {
+    return currentNetwork;
+  }
+
+  return nextNetwork.length > 0 ? nextNetwork : allAdminManagementNetworkIds;
+};
+
 type AdminManagementSearchFilterType = {
   roles: AdminManagementRole[];
   network: NetworkId[];
@@ -32,18 +54,8 @@ export const useAdminManagementSearchFilterStore =
     },
     setFilter: (filter) =>
       set((state) => {
-        const roles =
-          filter.roles === undefined
-            ? state.filter.roles
-            : filter.roles.length > 0
-              ? filter.roles
-              : allAdminManagementRoles;
-        const network =
-          filter.network === undefined
-            ? state.filter.network
-            : filter.network.length > 0
-              ? filter.network
-              : allAdminManagementNetworkIds;
+        const roles = resolveRolesFilter(filter.roles, state.filter.roles);
+        const network = resolveNetworkFilter(filter.network, state.filter.network);
 
         return {
           filter: {

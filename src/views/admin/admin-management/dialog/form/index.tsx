@@ -19,13 +19,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import {
   adminManagementRoleLabels,
   adminManagementRoles,
 } from "@/types/admin/admin-management";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useAppKitAccount } from "@reown/appkit/react";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { z } from "zod";
@@ -95,11 +93,10 @@ const AdminManagementDialogForm: React.FC<Props> = ({
   lockNetworkId,
   onSubmit,
 }) => {
-  const { caipAddress } = useAppKitAccount();
-  const { openSwitchNetworkModal } = useSystemStore();
-  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
-  const currentNetworkId =
-    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
+  const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const openSwitchNetworkModal = useSystemStore(
+    (state) => state.openSwitchNetworkModal,
+  );
   const { control, handleSubmit, reset, setValue } =
     useForm<AdminManagementFormValues>({
       defaultValues: resolveDefaultValues(defaultValues),

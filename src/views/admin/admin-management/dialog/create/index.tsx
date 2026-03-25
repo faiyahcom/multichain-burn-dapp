@@ -4,8 +4,6 @@ import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
 import { useSystemStore } from "@/stores/systemStore";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
-import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
@@ -17,14 +15,13 @@ const AdminManagementDialogCreate = () => {
   const [open, setOpen] = useState(false);
   const [isCallingSc, setIsCallingSc] = useState(false);
   const queryClient = useQueryClient();
-  const { caipAddress } = useAppKitAccount();
-  const { openSwitchNetworkModal } = useSystemStore();
+  const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const openSwitchNetworkModal = useSystemStore(
+    (state) => state.openSwitchNetworkModal,
+  );
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
   const { toggleAdminRole: toggleAdminRoleSolana } =
     useToggleAdminRoleSolanaFn();
-  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
-  const currentNetworkId =
-    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { mutateAsync: createAdmin, isPending } = useMutation({
     mutationFn: adminManagementService.createAdmin,
@@ -56,7 +53,6 @@ const AdminManagementDialogCreate = () => {
         open={open}
         onOpenChange={setOpen}
         title="Add new Admin"
-        description="Grant dashboard access and assign an administrator role."
         defaultValues={{
           role: "super_admin",
           networkId: currentNetworkId ?? "ethereumTestnet",
@@ -64,11 +60,6 @@ const AdminManagementDialogCreate = () => {
         isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
           const targetNetworkId = values.networkId;
-
-          if (!currentNetworkId) {
-            toast.error("Connect the correct wallet network before saving.");
-            return;
-          }
 
           if (currentNetworkId !== targetNetworkId) {
             openSwitchNetworkModal(currentNetworkId, targetNetworkId);
