@@ -3,6 +3,7 @@ import BlueSwitch from "@/components/common/blue-switch";
 import ConfirmDialog from "@/components/common/confirm-dialog";
 import CopyableText from "@/components/common/copyable-text";
 import CustomPagination from "@/components/common/pagination";
+import NetworkDisplay from "@/components/common/network-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
@@ -18,6 +19,7 @@ import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
 import { useAdminManagementSearchFilterStore } from "@/stores/admin/admin-management/search-filter-store";
 import { useAuthStore } from "@/stores/authStore";
+import { useSystemStore } from "@/stores/systemStore";
 import {
   adminManagementRoleLabels,
   adminManagementStatusColors,
@@ -27,27 +29,70 @@ import {
   type AdminManagementStatus,
 } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { truncateString } from "@/utils/helpers/string";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Trash2Icon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "@/components/common/custom-toast";
 import AdminManagementDialogEdit from "../dialog/edit";
+import { useToggleAdminRoleEvmFn } from "./useToggleAdminRoleEvmFn";
+import { useToggleAdminRoleSolanaFn } from "./useToggleAdminRoleSolanaFn";
 
 const PAGE_SIZE = 5;
+
+const AdminNetworksCell: React.FC<{
+  networkIds: AdminManagementAdmin["networkIds"];
+}> = ({ networkIds }) => {
+  if (!networkIds.length) {
+    return <span className="text-xs text-secondary-text">-</span>;
+  }
+
+  return (
+    <div className="flex flex-wrap items-center justify-center gap-2">
+      {networkIds.map((networkId) => (
+        <span
+          key={networkId}
+          className="inline-flex items-center rounded-full bg-inactive px-2.5 py-1 text-xs font-medium text-foreground"
+        >
+          <NetworkDisplay
+            networkId={networkId}
+            classNames={{
+              container: "inline-flex items-center",
+              img: "mr-1.25 size-4",
+              label: "text-xs whitespace-nowrap",
+            }}
+          />
+        </span>
+      ))}
+    </div>
+  );
+};
 
 const AdminManagementTable = () => {
   const accessToken = useAuthStore((state) => state.accessToken);
   const hasHydrated = useAuthStore((state) => state._hasHydrated);
+  const { caipAddress } = useAppKitAccount();
+  const { openSwitchNetworkModal } = useSystemStore();
   const { filter, setFilter } = useAdminManagementSearchFilterStore();
   const queryClient = useQueryClient();
+  const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
+  const { toggleAdminRole: toggleAdminRoleSolana } =
+    useToggleAdminRoleSolanaFn();
   const [editingAdmin, setEditingAdmin] = useState<AdminManagementAdmin | null>(
     null,
   );
   const [deleteTarget, setDeleteTarget] = useState<AdminManagementAdmin | null>(
     null,
   );
+  const [isDeletingOnChain, setIsDeletingOnChain] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
+  const currentNetworkId =
+    namespace && chainRef
+      ? mapChainToSystemNetwork(namespace, chainRef)
+      : null;
 
   const { data, isPending } = useQuery({
     queryKey: adminManagementQueryKeys.list(filter),
@@ -58,37 +103,22 @@ const AdminManagementTable = () => {
         limit: PAGE_SIZE,
         search: filter.text || undefined,
         roles: filter.roles,
+        networkIds: filter.network,
       }),
   });
 
-  const { mutateAsync: updateStatus } = useMutation({
-    mutationFn: ({
-      id,
-      enabled,
-    }: Pick<AdminManagementAdmin, "id" | "enabled">) =>
-      adminManagementService.updateAdminStatus({ id, enabled }),
-    onSuccess: async (_, variables) => {
-      toast.success(
-        `Admin ${variables.enabled ? "enabled" : "disabled"} successfully!`,
-      );
-      await queryClient.invalidateQueries({
-        queryKey: adminManagementQueryKeys.list(filter),
-        exact: false,
-      });
-    },
-    onError: (error) => {
-      toast.error(getErrorMessage({ error }));
-    },
-  });
+  const refetchAdminManagementList = async () => {
+    await queryClient.invalidateQueries({
+      queryKey: adminManagementQueryKeys.all,
+      exact: false,
+    });
+  };
 
-  const { mutate: deleteAdmin, isPending: isDeletePending } = useMutation({
-    mutationFn: (id: string) => adminManagementService.deleteAdmin(id),
+  const { mutateAsync: deleteAdmin, isPending: isDeletePending } = useMutation({
+    mutationFn: adminManagementService.deleteAdmin,
     onSuccess: async () => {
       toast.success("Admin deleted successfully!");
-      await queryClient.invalidateQueries({
-        queryKey: adminManagementQueryKeys.list(filter),
-        exact: false,
-      });
+      await refetchAdminManagementList();
       setDeleteTarget(null);
     },
     onError: (error) => {
@@ -96,15 +126,112 @@ const AdminManagementTable = () => {
     },
   });
 
+  const resolveTargetNetworkId = (admin: AdminManagementAdmin) => {
+    if (admin.networkIds.length === 0) {
+      return null;
+    }
+
+    if (admin.networkIds.length === 1) {
+      return admin.networkIds[0];
+    }
+
+    if (currentNetworkId && admin.networkIds.includes(currentNetworkId)) {
+      return currentNetworkId;
+    }
+
+    return admin.networkIds[0];
+  };
+
   const handleToggleAdminStatus = async (admin: AdminManagementAdmin) => {
+    const targetNetworkId = resolveTargetNetworkId(admin);
+
+    if (!targetNetworkId) {
+      toast.error("Cannot determine network for this admin.");
+      return;
+    }
+
+    if (currentNetworkId !== targetNetworkId) {
+      openSwitchNetworkModal(currentNetworkId, targetNetworkId);
+      return;
+    }
+
     setStatusUpdatingId(admin.id);
     try {
-      await updateStatus({
-        id: admin.id,
-        enabled: !admin.enabled,
-      });
+      const nextEnabled = !admin.enabled;
+      const isUpdated =
+        targetNetworkId === "solanaDevnet"
+          ? await toggleAdminRoleSolana({
+              walletAddress: admin.walletAddress,
+              enabled: nextEnabled,
+              role: admin.role,
+            })
+          : await toggleAdminRoleEvm({
+              walletAddress: admin.walletAddress,
+              enabled: nextEnabled,
+              role: admin.role,
+            });
+
+      if (isUpdated) {
+        await adminManagementService.updateAdmin({
+          id: admin.id,
+          name: admin.name,
+          email: admin.email,
+          walletAddress: admin.walletAddress,
+          role: admin.role,
+          networkId: targetNetworkId,
+          enabled: nextEnabled,
+        });
+        await refetchAdminManagementList();
+      }
+    } catch (error) {
+      toast.error(getErrorMessage({ error }));
     } finally {
       setStatusUpdatingId(null);
+    }
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!deleteTarget) {
+      return;
+    }
+
+    const targetNetworkId = resolveTargetNetworkId(deleteTarget);
+
+    if (!targetNetworkId) {
+      toast.error("Cannot determine network for this admin.");
+      return;
+    }
+
+    if (currentNetworkId !== targetNetworkId) {
+      openSwitchNetworkModal(currentNetworkId, targetNetworkId);
+      return;
+    }
+
+    setIsDeletingOnChain(true);
+    try {
+      const isUpdated =
+        targetNetworkId === "solanaDevnet"
+          ? await toggleAdminRoleSolana({
+              walletAddress: deleteTarget.walletAddress,
+              enabled: false,
+              role: deleteTarget.role,
+            })
+          : await toggleAdminRoleEvm({
+              walletAddress: deleteTarget.walletAddress,
+              enabled: false,
+              role: deleteTarget.role,
+            });
+
+      if (!isUpdated) {
+        return;
+      }
+
+      await deleteAdmin({
+        walletAddress: deleteTarget.walletAddress,
+        networkId: targetNetworkId,
+      });
+    } finally {
+      setIsDeletingOnChain(false);
     }
   };
 
@@ -117,15 +244,16 @@ const AdminManagementTable = () => {
               <TableHead>User</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Address</TableHead>
+              <TableHead>Network</TableHead>
               <TableHead>Role</TableHead>
               <TableHead>Added</TableHead>
               <TableHead>Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableSpinner isLoading={isPending} colSpan={6} />
+            <TableSpinner isLoading={isPending} colSpan={7} />
             <TableNoData
-              colSpan={6}
+              colSpan={7}
               data={data?.admins}
               isLoading={isPending}
               text="No admins found"
@@ -180,6 +308,10 @@ const AdminManagementTable = () => {
                         str: admin.walletAddress,
                       })}
                     />
+                  </TableCell>
+
+                  <TableCell>
+                    <AdminNetworksCell networkIds={admin.networkIds} />
                   </TableCell>
 
                   <TableCell>
@@ -274,15 +406,11 @@ const AdminManagementTable = () => {
           }
         }}
         title="Delete Admin"
-        description="Are you sure you want to remove this admin from the management list?"
+        description="This will revoke the admin role onchain first, then remove the admin from the management list."
         buttonConfirmText="Delete"
-        isLoading={isDeletePending}
+        isLoading={isDeletingOnChain || isDeletePending}
         onCancel={() => setDeleteTarget(null)}
-        onConfirm={() => {
-          if (deleteTarget) {
-            deleteAdmin(deleteTarget.id);
-          }
-        }}
+        onConfirm={handleDeleteConfirm}
       />
     </>
   );

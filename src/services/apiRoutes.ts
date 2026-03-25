@@ -33,6 +33,8 @@ export const API_ROUTES = {
   },
   ADMINS: {
     LIST: "/admins/",
+    UPSERT_USER: "/admins/user",
+    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
   },
   PAIRS: {
     LIST: "/pairs",

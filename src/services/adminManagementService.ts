@@ -1,8 +1,14 @@
+import {
+  NETWORK_CONFIGS,
+  networkIdToChainId,
+  type NetworkId,
+} from "@/config/networks";
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
 import type {
   AdminManagementAdmin,
   AdminManagementRole,
+  AdminManagementStatus,
 } from "@/types/admin/admin-management";
 import type { PaginationResponse } from "@/types/common";
 import { isEvmAddress, isSolanaAddress } from "@/utils/helpers/address";
@@ -14,6 +20,7 @@ export interface ListAdminManagementRequest {
   limit?: number;
   search?: string;
   roles?: AdminManagementRole[];
+  networkIds?: NetworkId[];
 }
 
 export interface ListAdminManagementResponse extends PaginationResponse {
@@ -27,25 +34,49 @@ export interface UpsertAdminManagementRequest {
   email: string;
   walletAddress: string;
   role: AdminManagementRole;
+  networkId: NetworkId;
+  enabled: boolean;
 }
 
 export interface UpdateAdminManagementRequest extends UpsertAdminManagementRequest {
   id: string;
 }
 
-type AdminManagementApiRole = AdminManagementRole | "superAdmin" | "subAdmin";
+export interface DeleteAdminManagementRequest {
+  walletAddress: string;
+  networkId: NetworkId;
+}
+
+type AdminManagementApiRole =
+  | AdminManagementRole
+  | "normal"
+  | "superAdmin"
+  | "subAdmin";
+type AdminManagementApiRoleStatus =
+  | AdminManagementStatus
+  | "active"
+  | "inactive";
+type NormalizedAdminApiRole = AdminManagementRole | "normal";
 
 type AdminManagementApiItem = {
   id?: string | number;
   name?: string | null;
   fullName?: string | null;
+  fullname?: string | null;
   email?: string | null;
   walletAddress?: string | null;
+  wallet_address?: string | null;
   address?: string | null;
   role?: AdminManagementApiRole | null;
+  roleStatus?: AdminManagementApiRoleStatus | boolean | number | null;
+  role_status?: AdminManagementApiRoleStatus | boolean | number | null;
   enabled?: boolean | null;
   enable?: boolean | null;
   isActive?: boolean | null;
+  networkId?: NetworkId | null;
+  networkIds?: NetworkId[] | null;
+  chainId?: string | number | null;
+  chainIds?: Array<string | number> | null;
   createdAt?: string | null;
   created_at?: string | null;
 };
@@ -66,30 +97,141 @@ type AdminManagementApiListResponse =
 
 const normalizeAdminRole = (
   role: AdminManagementApiRole | null | undefined,
-): AdminManagementRole => {
+): NormalizedAdminApiRole => {
   if (role === "super_admin" || role === "superAdmin") {
     return "super_admin";
+  }
+
+  if (role === "normal") {
+    return "normal";
   }
 
   return "admin";
 };
 
+const normalizeAdminStatus = (
+  roleStatus: AdminManagementApiItem["role_status"],
+): AdminManagementStatus | undefined => {
+  if (typeof roleStatus === "boolean") {
+    return roleStatus ? "enabled" : "disabled";
+  }
+
+  if (typeof roleStatus === "number") {
+    return roleStatus > 0 ? "enabled" : "disabled";
+  }
+
+  if (roleStatus === "enabled" || roleStatus === "active") {
+    return "enabled";
+  }
+
+  if (roleStatus === "disabled" || roleStatus === "inactive") {
+    return "disabled";
+  }
+
+  return undefined;
+};
+
+const toKnownNetworkId = (
+  networkId: string | null | undefined,
+): NetworkId | undefined => {
+  if (!networkId) return undefined;
+
+  return NETWORK_CONFIGS.find((network) => network.id === networkId)?.id;
+};
+
+const chainIdToNetworkId = (
+  chainId: string | number | null | undefined,
+): NetworkId | undefined => {
+  if (chainId === null || chainId === undefined) return undefined;
+
+  return NETWORK_CONFIGS.find(
+    (network) => network.backendChainId === String(chainId),
+  )?.id;
+};
+
+const normalizeAdminNetworks = (item: AdminManagementApiItem): NetworkId[] => {
+  const networkIds = new Set<NetworkId>();
+
+  const directNetworkId = toKnownNetworkId(item.networkId);
+  if (directNetworkId) {
+    networkIds.add(directNetworkId);
+  }
+
+  item.networkIds?.forEach((networkId) => {
+    const normalizedNetworkId = toKnownNetworkId(networkId);
+    if (normalizedNetworkId) {
+      networkIds.add(normalizedNetworkId);
+    }
+  });
+
+  const directChainNetworkId = chainIdToNetworkId(item.chainId);
+  if (directChainNetworkId) {
+    networkIds.add(directChainNetworkId);
+  }
+
+  item.chainIds?.forEach((chainId) => {
+    const normalizedNetworkId = chainIdToNetworkId(chainId);
+    if (normalizedNetworkId) {
+      networkIds.add(normalizedNetworkId);
+    }
+  });
+
+  return [...networkIds];
+};
+
 const normalizeAdminItem = (
   item: AdminManagementApiItem,
-): AdminManagementAdmin => ({
-  id: String(item.id ?? item.walletAddress ?? item.address ?? item.email ?? ""),
-  name: item.name ?? item.fullName ?? "",
-  email: item.email ?? "",
-  walletAddress: item.walletAddress ?? item.address ?? "",
-  role: normalizeAdminRole(item.role),
-  enabled: item.enabled ?? item.enable ?? item.isActive ?? true,
-  createdAt: item.createdAt ?? item.created_at ?? "",
-});
+): { admin: AdminManagementAdmin; apiRole: NormalizedAdminApiRole } => {
+  const normalizedRole = normalizeAdminRole(item.role);
+  const normalizedStatus = normalizeAdminStatus(item.role_status);
+  const normalizedRoleStatus = normalizeAdminStatus(item.roleStatus);
 
-const getUnsupportedMutationError = () =>
-  new Error(
-    "Admin management write APIs are not available in backend yet. Current OpenAPI only exposes GET /admins/.",
-  );
+  return {
+    apiRole: normalizedRole,
+    admin: {
+      id: String(
+        item.id ??
+          item.walletAddress ??
+          item.wallet_address ??
+          item.address ??
+          item.email ??
+          "",
+      ),
+      name: item.name ?? item.fullName ?? item.fullname ?? "",
+      email: item.email ?? "",
+      walletAddress: item.walletAddress ?? item.wallet_address ?? item.address ?? "",
+      role: normalizedRole === "super_admin" ? "super_admin" : "admin",
+      enabled:
+        normalizedStatus !== undefined
+          ? normalizedStatus === "enabled"
+          : normalizedRoleStatus !== undefined
+            ? normalizedRoleStatus === "enabled"
+            : (item.enabled ??
+              item.enable ??
+              item.isActive ??
+              normalizedRole !== "normal"),
+      createdAt: item.createdAt ?? item.created_at ?? "",
+      networkIds: normalizeAdminNetworks(item),
+    },
+  };
+};
+
+const buildUpsertAdminPayload = (request: UpsertAdminManagementRequest) => {
+  const chainId = networkIdToChainId(request.networkId);
+
+  if (!chainId) {
+    throw new Error("Unsupported network for admin management");
+  }
+
+  return {
+    chainId: Number(chainId),
+    wallet_address: request.walletAddress.trim(),
+    fullname: request.name.trim() || null,
+    email: request.email.trim(),
+    role: request.role,
+    role_status: request.enabled,
+  };
+};
 
 export const adminManagementService = {
   getListAdmins: async (
@@ -105,64 +247,97 @@ export const adminManagementService = {
           limit: params?.limit || 20,
           search: params?.search || undefined,
           role,
+          networkIds: params?.networkIds?.length ? params.networkIds : undefined,
+          chainIds: params?.networkIds?.length
+            ? params.networkIds
+                .map((networkId) => networkIdToChainId(networkId))
+                .filter((chainId): chainId is string => !!chainId)
+            : undefined,
         },
+        paramsSerializer: { indexes: null },
       },
     );
 
     const adminsRaw = Array.isArray(response)
       ? response
       : (response.admins ?? response.data ?? response.items ?? []);
-    const admins = adminsRaw.map(normalizeAdminItem);
+    const admins = adminsRaw
+      .map(normalizeAdminItem)
+      .filter(({ apiRole }) =>
+        params?.roles?.length
+          ? apiRole !== "normal" && params.roles.includes(apiRole)
+          : apiRole !== "normal",
+      )
+      .map(({ admin }) => admin);
+    const filteredAdmins =
+      params?.networkIds && params.networkIds.length > 0
+        ? admins.filter(
+            (admin) =>
+              admin.networkIds.length === 0 ||
+              admin.networkIds.some((networkId) =>
+                params.networkIds?.includes(networkId),
+              ),
+          )
+        : admins;
 
     return {
       page: Array.isArray(response)
         ? (params?.page ?? 1)
         : (response.page ?? params?.page ?? 1),
-      total: Array.isArray(response)
-        ? admins.length
-        : (response.total ?? admins.length),
+      total:
+        Array.isArray(response) || (params?.roles && params.roles.length !== 1)
+          ? filteredAdmins.length
+          : (response.total ?? filteredAdmins.length),
       totalEnable: Array.isArray(response)
-        ? admins.filter((admin) => admin.enabled).length
+        ? filteredAdmins.filter((admin) => admin.enabled).length
         : (response.totalEnable ??
           response.countEnable ??
-          admins.filter((admin) => admin.enabled).length),
+          filteredAdmins.filter((admin) => admin.enabled).length),
       totalDisable: Array.isArray(response)
-        ? admins.filter((admin) => !admin.enabled).length
+        ? filteredAdmins.filter((admin) => !admin.enabled).length
         : (response.totalDisable ??
           response.countDisable ??
-          admins.filter((admin) => !admin.enabled).length),
-      admins,
+          filteredAdmins.filter((admin) => !admin.enabled).length),
+      admins: filteredAdmins,
     };
   },
 
   createAdmin: async (
     request: UpsertAdminManagementRequest,
   ): Promise<AdminManagementAdmin> => {
-    void request;
-    // TODO: wire POST /admins once backend exposes a write endpoint.
-    throw getUnsupportedMutationError();
+    const response = await apiClient.post<AdminManagementApiItem>(
+      ADMINS_API_ROUTES.UPSERT_USER,
+      buildUpsertAdminPayload(request),
+    );
+
+    return normalizeAdminItem(response).admin;
   },
 
   updateAdmin: async (
     request: UpdateAdminManagementRequest,
   ): Promise<AdminManagementAdmin> => {
-    void request;
-    // TODO: wire PATCH /admins/:id once backend exposes a write endpoint.
-    throw getUnsupportedMutationError();
+    const response = await apiClient.post<AdminManagementApiItem>(
+      ADMINS_API_ROUTES.UPSERT_USER,
+      buildUpsertAdminPayload(request),
+    );
+
+    return normalizeAdminItem(response).admin;
   },
 
-  updateAdminStatus: async (
-    request: Pick<AdminManagementAdmin, "id" | "enabled">,
-  ): Promise<AdminManagementAdmin> => {
-    void request;
-    // TODO: wire a dedicated status toggle endpoint once backend exposes it.
-    throw getUnsupportedMutationError();
-  },
 
-  deleteAdmin: async (id: string): Promise<void> => {
-    void id;
-    // TODO: wire DELETE /admins/:id once backend exposes a write endpoint.
-    throw getUnsupportedMutationError();
+  deleteAdmin: async ({
+    walletAddress,
+    networkId,
+  }: DeleteAdminManagementRequest): Promise<void> => {
+    const chainId = networkIdToChainId(networkId);
+
+    if (!chainId) {
+      throw new Error("Unsupported network for admin management");
+    }
+
+    await apiClient.delete(
+      ADMINS_API_ROUTES.DELETE(chainId, walletAddress.trim()),
+    );
   },
 
   isSupportedWalletAddress: (walletAddress: string) => {

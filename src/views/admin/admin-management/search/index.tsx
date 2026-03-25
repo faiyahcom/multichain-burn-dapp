@@ -1,6 +1,8 @@
 import type { MultipleSelectOption } from "@/components/common/multiple-select";
 import MultipleSelect from "@/components/common/multiple-select";
+import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
+import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import { useAdminManagementSearchFilterStore } from "@/stores/admin/admin-management/search-filter-store";
 import {
   adminManagementRoleLabels,
@@ -15,6 +17,18 @@ const roleOptions: MultipleSelectOption[] = adminManagementRoles.map(
     value: role,
   }),
 );
+
+const networkOptions: MultipleSelectOption[] = NETWORK_CONFIGS.map((network) => ({
+  label: network.label,
+  value: network.id,
+  icon: ({ className }: { className?: string }) => (
+    <NetworkImgIcon
+      src={network.iconSrc}
+      alt={network.label}
+      className={className}
+    />
+  ),
+}));
 
 const AdminManagementSearch = () => {
   const { filter, setFilter } = useAdminManagementSearchFilterStore();
@@ -43,6 +57,18 @@ const AdminManagementSearch = () => {
           classNames={{
             btn: "max-w-48",
             content: "w-60",
+          }}
+        />
+
+        <MultipleSelect
+          options={networkOptions}
+          selected={filter.network}
+          onChange={(value) => setFilter({ network: value as NetworkId[] })}
+          placeholder="Network"
+          placeholderMultiple="All Networks"
+          classNames={{
+            btn: "max-w-56",
+            content: "w-68",
           }}
         />
 

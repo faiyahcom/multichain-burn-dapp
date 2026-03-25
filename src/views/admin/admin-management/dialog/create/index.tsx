@@ -2,27 +2,36 @@ import { toast } from "@/components/common/custom-toast";
 import { Button } from "@/components/ui/button";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
-import { useAdminManagementSearchFilterStore } from "@/stores/admin/admin-management/search-filter-store";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
-import AdminManagementDialogForm, {
-  type AdminManagementFormValues,
-} from "../form";
+import { useToggleAdminRoleEvmFn } from "../../table/useToggleAdminRoleEvmFn";
+import { useToggleAdminRoleSolanaFn } from "../../table/useToggleAdminRoleSolanaFn";
+import AdminManagementDialogForm from "../form";
 
 const AdminManagementDialogCreate = () => {
   const [open, setOpen] = useState(false);
+  const [isCallingSc, setIsCallingSc] = useState(false);
   const queryClient = useQueryClient();
-  const { filter } = useAdminManagementSearchFilterStore();
+  const { caipAddress } = useAppKitAccount();
+  const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
+  const { toggleAdminRole: toggleAdminRoleSolana } =
+    useToggleAdminRoleSolanaFn();
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
+  const currentNetworkId =
+    namespace && chainRef
+      ? mapChainToSystemNetwork(namespace, chainRef)
+      : null;
 
   const { mutateAsync: createAdmin, isPending } = useMutation({
-    mutationFn: (values: AdminManagementFormValues) =>
-      adminManagementService.createAdmin(values),
+    mutationFn: adminManagementService.createAdmin,
     onSuccess: async () => {
       toast.success("Admin created successfully!");
       await queryClient.invalidateQueries({
-        queryKey: adminManagementQueryKeys.list(filter),
+        queryKey: adminManagementQueryKeys.all,
         exact: false,
       });
       setOpen(false);
@@ -49,9 +58,40 @@ const AdminManagementDialogCreate = () => {
         title="Add new Admin"
         description="Grant dashboard access and assign an administrator role."
         defaultValues={{ role: "super_admin" }}
-        isLoading={isPending}
+        isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
-          await createAdmin(values);
+          if (!currentNetworkId) {
+            toast.error("Connect the correct wallet network before saving.");
+            return;
+          }
+
+          setIsCallingSc(true);
+          try {
+            const isUpdated =
+              currentNetworkId === "solanaDevnet"
+                ? await toggleAdminRoleSolana({
+                    walletAddress: values.walletAddress,
+                    enabled: true,
+                    role: values.role,
+                  })
+                : await toggleAdminRoleEvm({
+                    walletAddress: values.walletAddress,
+                    enabled: true,
+                    role: values.role,
+                  });
+
+            if (!isUpdated) {
+              return;
+            }
+
+            await createAdmin({
+              ...values,
+              networkId: currentNetworkId,
+              enabled: true,
+            });
+          } finally {
+            setIsCallingSc(false);
+          }
         }}
       />
     </>

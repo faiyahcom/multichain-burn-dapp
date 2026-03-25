@@ -1,13 +1,16 @@
 import { toast } from "@/components/common/custom-toast";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
-import { useAdminManagementSearchFilterStore } from "@/stores/admin/admin-management/search-filter-store";
+import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import AdminManagementDialogForm, {
-  type AdminManagementFormValues,
-} from "../form";
+import { useState } from "react";
+import { useToggleAdminRoleEvmFn } from "../../table/useToggleAdminRoleEvmFn";
+import { useToggleAdminRoleSolanaFn } from "../../table/useToggleAdminRoleSolanaFn";
+import AdminManagementDialogForm from "../form";
 
 interface Props {
   admin: AdminManagementAdmin;
@@ -21,18 +24,30 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
   onOpenChange,
 }) => {
   const queryClient = useQueryClient();
-  const { filter } = useAdminManagementSearchFilterStore();
+  const [isCallingSc, setIsCallingSc] = useState(false);
+  const { caipAddress } = useAppKitAccount();
+  const { openSwitchNetworkModal } = useSystemStore();
+  const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
+  const { toggleAdminRole: toggleAdminRoleSolana } =
+    useToggleAdminRoleSolanaFn();
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
+  const currentNetworkId =
+    namespace && chainRef
+      ? mapChainToSystemNetwork(namespace, chainRef)
+      : null;
+  const targetNetworkId =
+    admin.networkIds.length === 1
+      ? admin.networkIds[0]
+      : currentNetworkId && admin.networkIds.includes(currentNetworkId)
+        ? currentNetworkId
+        : admin.networkIds[0];
 
   const { mutateAsync: updateAdmin, isPending } = useMutation({
-    mutationFn: (values: AdminManagementFormValues) =>
-      adminManagementService.updateAdmin({
-        id: admin.id,
-        ...values,
-      }),
+    mutationFn: adminManagementService.updateAdmin,
     onSuccess: async () => {
       toast.success("Admin updated successfully!");
       await queryClient.invalidateQueries({
-        queryKey: adminManagementQueryKeys.list(filter),
+        queryKey: adminManagementQueryKeys.all,
         exact: false,
       });
       onOpenChange(false);
@@ -55,9 +70,67 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         role: admin.role,
       }}
       lockWalletAddress
-      isLoading={isPending}
+      isLoading={isPending || isCallingSc}
       onSubmit={async (values) => {
-        await updateAdmin(values);
+        if (!targetNetworkId) {
+          toast.error("Cannot determine network for this admin.");
+          return;
+        }
+
+        if (currentNetworkId !== targetNetworkId) {
+          openSwitchNetworkModal(currentNetworkId, targetNetworkId);
+          return;
+        }
+
+        const roleChanged = values.role !== admin.role;
+
+        setIsCallingSc(true);
+        try {
+          if (roleChanged && admin.enabled) {
+            const enableNextRole =
+              targetNetworkId === "solanaDevnet"
+                ? await toggleAdminRoleSolana({
+                    walletAddress: admin.walletAddress,
+                    enabled: true,
+                    role: values.role,
+                  })
+                : await toggleAdminRoleEvm({
+                    walletAddress: admin.walletAddress,
+                    enabled: true,
+                    role: values.role,
+                  });
+
+            if (!enableNextRole) {
+              return;
+            }
+
+            const disablePreviousRole =
+              targetNetworkId === "solanaDevnet"
+                ? await toggleAdminRoleSolana({
+                    walletAddress: admin.walletAddress,
+                    enabled: false,
+                    role: admin.role,
+                  })
+                : await toggleAdminRoleEvm({
+                    walletAddress: admin.walletAddress,
+                    enabled: false,
+                    role: admin.role,
+                  });
+
+            if (!disablePreviousRole) {
+              return;
+            }
+          }
+
+          await updateAdmin({
+            ...values,
+            id: admin.id,
+            networkId: targetNetworkId,
+            enabled: admin.enabled,
+          });
+        } finally {
+          setIsCallingSc(false);
+        }
       }}
     />
   );
