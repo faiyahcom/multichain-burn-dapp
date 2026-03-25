@@ -1,11 +1,10 @@
 import DatePicker from "@/components/common/date-picker";
-import MultipleTokenSelect from "@/components/common/multiple-token-select";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import type { SingleSelectOption } from "@/components/common/single-select";
 import SingleSelect from "@/components/common/single-select";
 import { InputGroupAddon } from "@/components/ui/input-group";
-import { NETWORK_CONFIGS, networkIdToChainId } from "@/config/networks";
+import { NETWORK_CONFIGS } from "@/config/networks";
 import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { DollarSignIcon } from "lucide-react";
 
@@ -29,14 +28,6 @@ const AdminTransferHistorySearch = () => {
   return (
     <div className="mb-4.25 space-y-3.75 px-13.5">
       <div className="flex items-center justify-end gap-2.75">
-        <MultipleTokenSelect
-          selected={filter.tokens}
-          onChange={(tokens) => setFilter({ tokens })}
-          whitelistTokensRequest={{
-            chainIds: networkIdToChainId(filter.networkId),
-          }}
-        />
-
         <SingleSelect
           options={networkOptions}
           selected={filter.networkId}
