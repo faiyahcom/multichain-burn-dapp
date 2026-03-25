@@ -2,8 +2,10 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import type { BurnPoolStatus, PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
-import { chainIdToNetworkConfig } from "@/config/networks";
+import { chainIdToNetworkConfig, type nativeCurrency } from "@/config/networks";
+import NetworkImgIcon from "@/components/common/network-img-icon";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -21,7 +23,7 @@ const fmt = (raw: string | undefined, decimals: number) =>
     raw !== undefined ? formatAmount(raw, decimals) : "-";
 
 const fmtFee = (fee: string | undefined) =>
-    fee !== undefined ? `${Number(fee) / 10000}%` : "-";
+    fee !== undefined ? `${Number(fee) / DECIMAL_FEE_PERCENT}%` : "-";
 
 const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const status = (poolDetail?.pool.status ?? "on_going") as BurnPoolStatus;
@@ -49,6 +51,12 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
         imageUri: poolDetail?.tokenOut.imageUri,
     });
 
+    const nativeCurrencyInfo = network?.appKitNetwork.nativeCurrency as
+        | nativeCurrency
+        | undefined;
+    const nativeDecimals = nativeCurrencyInfo?.decimals ?? 18;
+    const nativeSymbol = nativeCurrencyInfo?.symbol ?? "";
+
     const rewardSymbol = rewardTokenDisplayObj.symbol;
     const burnSymbol = burnTokenDisplay.symbol;
     const rewardDec = poolDetail?.pool.rewardTokenDecimals ?? 0;
@@ -56,13 +64,28 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
 
     const formattedReward = fmt(poolDetail?.pool.currentRewardAmount, rewardDec);
     const formattedClaimed = fmt(poolDetail?.claimedRewardAmount, rewardDec);
-    const formattedRemaining = vaultBalance?.rewardBalance ?? fmt(
-        poolDetail?.pool.currentRewardAmount,
-        rewardDec,
-    );
-    const formattedBurn = vaultBalance?.depositBalance ?? fmt(poolDetail?.depositedAmount, burnDec);
+    const formattedRemaining =
+        vaultBalance?.rewardBalance ??
+        fmt(poolDetail?.pool.currentRewardAmount, rewardDec);
+    const formattedBurn =
+        vaultBalance?.depositBalance ?? fmt(poolDetail?.depositedAmount, burnDec);
     const settlementFee = fmtFee(poolDetail?.pool.settlementFee);
-    const creationFee = fmtFee(poolDetail?.pool.poolCreationFee);
+    const creationFee =
+        poolDetail?.pool.poolCreationFee !== undefined ? (
+            <span className="inline-flex items-center gap-1">
+                {formatAmount(poolDetail.pool.poolCreationFee, nativeDecimals)}
+                {network && (
+                    <NetworkImgIcon
+                        src={network.iconSrc}
+                        alt={nativeSymbol}
+                        className="size-4"
+                    />
+                )}
+                <span>{nativeSymbol}</span>
+            </span>
+        ) : (
+            "-"
+        );
 
     const extendedRows = [
         [
@@ -75,10 +98,14 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
         [
             {
                 label: "Settlement Fee",
-                value: <span className="inline-flex items-center gap-1 text-xl text-foreground">
-                    {settlementFee}{" "}
-                    <span className="text-sm whitespace-nowrap">(collected by the system)</span>
-                </span>,
+                value: (
+                    <span className="inline-flex items-center gap-1 text-xl text-foreground">
+                        {settlementFee}{" "}
+                        <span className="text-sm whitespace-nowrap">
+                            (collected by the system)
+                        </span>
+                    </span>
+                ),
             },
             null,
         ],
@@ -96,9 +123,13 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                     <span>Reward Amount</span>
                 </div>
                 <p>
-                    {!poolDetail
-                        ? <Skeleton className="inline-block h-6 w-28" />
-                        : <>{formattedReward} {rewardSymbol}</>}
+                    {!poolDetail ? (
+                        <Skeleton className="inline-block h-6 w-28" />
+                    ) : (
+                        <>
+                            {formattedReward} {rewardSymbol}
+                        </>
+                    )}
                 </p>
             </div>
 
@@ -108,7 +139,14 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                         <div className="grid grid-cols-2">
                             <span className="text-xl text-greyed">Settlement Fee:</span>
                             <span className="inline-flex items-center gap-1 text-xl text-foreground">
-                                {!poolDetail ? <Skeleton className="h-5 w-16" /> : <>{settlementFee}{" "}<span className="text-sm">(collected by the system)</span></>}
+                                {!poolDetail ? (
+                                    <Skeleton className="h-5 w-16" />
+                                ) : (
+                                    <>
+                                        {settlementFee}{" "}
+                                        <span className="text-sm">(collected by the system)</span>
+                                    </>
+                                )}
                             </span>
                         </div>
                     </div>
@@ -128,14 +166,22 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">{row[0].label}:</span>
                                 <span className="text-xl text-foreground">
-                                    {!poolDetail ? <Skeleton className="h-5 w-24" /> : row[0].value}
+                                    {!poolDetail ? (
+                                        <Skeleton className="h-5 w-24" />
+                                    ) : (
+                                        row[0].value
+                                    )}
                                 </span>
                             </div>
                             {row[1] && (
                                 <div className="grid grid-cols-2">
                                     <span className="text-xl text-greyed">{row[1].label}:</span>
                                     <span className="text-xl text-foreground">
-                                        {!poolDetail ? <Skeleton className="h-5 w-24" /> : row[1].value}
+                                        {!poolDetail ? (
+                                            <Skeleton className="h-5 w-24" />
+                                        ) : (
+                                            row[1].value
+                                        )}
                                     </span>
                                 </div>
                             )}
@@ -145,6 +191,6 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
             )}
         </div>
     );
-}
+};
 
 export default RewardAmount;

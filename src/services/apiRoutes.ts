@@ -45,4 +45,8 @@ export const API_ROUTES = {
     LIST: "/transfers",
     ANALYSIS: "/transfers/analysis",
   },
+  FEE: {
+    LIST: "/fee",
+    STATS: "/fee/stats",
+  },
 } as const;

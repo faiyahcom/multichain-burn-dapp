@@ -26,6 +26,7 @@ import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
 import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminTransferHistoryIndexRouteImport } from './routes/admin/transfer-history/index'
+import { Route as AdminRevenueFeeStatsIndexRouteImport } from './routes/admin/revenue-fee-stats/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as AdminFeeSettingsManagementIndexRouteImport } from './routes/admin/fee-settings-management/index'
 import { Route as AdminAdminManagementIndexRouteImport } from './routes/admin/admin-management/index'
@@ -125,6 +126,12 @@ const AdminTransferHistoryIndexRoute =
     path: '/admin/transfer-history/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminRevenueFeeStatsIndexRoute =
+  AdminRevenueFeeStatsIndexRouteImport.update({
+    id: '/admin/revenue-fee-stats/',
+    path: '/admin/revenue-fee-stats/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminMasterPoolManagementIndexRoute =
   AdminMasterPoolManagementIndexRouteImport.update({
     id: '/admin/master-pool-management/',
@@ -193,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/admin/admin-management': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
+  '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
@@ -221,6 +229,7 @@ export interface FileRoutesByTo {
   '/admin/admin-management': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
+  '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
@@ -250,6 +259,7 @@ export interface FileRoutesById {
   '/admin/admin-management/': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management/': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
+  '/admin/revenue-fee-stats/': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history/': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/admin/admin-management'
     | '/admin/fee-settings-management'
     | '/admin/master-pool-management'
+    | '/admin/revenue-fee-stats'
     | '/admin/transfer-history'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
@@ -308,6 +319,7 @@ export interface FileRouteTypes {
     | '/admin/admin-management'
     | '/admin/fee-settings-management'
     | '/admin/master-pool-management'
+    | '/admin/revenue-fee-stats'
     | '/admin/transfer-history'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
@@ -336,6 +348,7 @@ export interface FileRouteTypes {
     | '/admin/admin-management/'
     | '/admin/fee-settings-management/'
     | '/admin/master-pool-management/'
+    | '/admin/revenue-fee-stats/'
     | '/admin/transfer-history/'
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
@@ -365,6 +378,7 @@ export interface RootRouteChildren {
   AdminAdminManagementIndexRoute: typeof AdminAdminManagementIndexRoute
   AdminFeeSettingsManagementIndexRoute: typeof AdminFeeSettingsManagementIndexRoute
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
+  AdminRevenueFeeStatsIndexRoute: typeof AdminRevenueFeeStatsIndexRoute
   AdminTransferHistoryIndexRoute: typeof AdminTransferHistoryIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
@@ -497,6 +511,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminTransferHistoryIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/revenue-fee-stats/': {
+      id: '/admin/revenue-fee-stats/'
+      path: '/admin/revenue-fee-stats'
+      fullPath: '/admin/revenue-fee-stats'
+      preLoaderRoute: typeof AdminRevenueFeeStatsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/master-pool-management/': {
       id: '/admin/master-pool-management/'
       path: '/admin/master-pool-management'
@@ -581,6 +602,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAdminManagementIndexRoute: AdminAdminManagementIndexRoute,
   AdminFeeSettingsManagementIndexRoute: AdminFeeSettingsManagementIndexRoute,
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
+  AdminRevenueFeeStatsIndexRoute: AdminRevenueFeeStatsIndexRoute,
   AdminTransferHistoryIndexRoute: AdminTransferHistoryIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
