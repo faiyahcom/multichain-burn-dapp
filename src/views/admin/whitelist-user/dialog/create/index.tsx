@@ -143,8 +143,10 @@ const AdminWhitelistUserDialogCreate = () => {
         const hasInfo = !!data.name?.trim() || !!data.email?.trim();
         if (hasInfo) {
             try {
+                const networkCfg = NETWORK_CONFIGS.find((n) => n.id === data.networkId);
                 await whitelistUserService.updateUserInfo({
                     walletAddress: data.walletAddress.trim(),
+                    chainId: networkCfg?.backendChainId ?? "",
                     name: data.name?.trim() || undefined,
                     email: data.email?.trim() || undefined,
                 });

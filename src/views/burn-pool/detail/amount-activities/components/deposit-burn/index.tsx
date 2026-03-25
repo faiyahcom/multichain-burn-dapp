@@ -145,7 +145,15 @@ const DepositBurnDialog = ({
       const amountBase =
         percent === 100 ? balanceBase : (balanceBase * BigInt(percent)) / 100n;
       const formatted = formatUnits(amountBase, pool.tokenInDecimals);
-      setValue("amount", formatted, { shouldValidate: true });
+
+      // Keep max decimal part 6 digits
+      const [integer, decimal] = formatted.split(".");
+      const newFormattedAmount =
+        decimal && decimal.length > 0
+          ? `${integer}.${decimal.slice(0, 6)}`
+          : integer;
+
+      setValue("amount", newFormattedAmount, { shouldValidate: true });
     } catch {
       return;
     }

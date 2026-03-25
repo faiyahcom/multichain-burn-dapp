@@ -4,7 +4,8 @@ import { persist } from 'zustand/middleware'
 export type AuthUser = {
   id: string
   address?: string
-  role?: "normal" | "admin"
+  chainId?: string
+  role?: "normal" | "admin" | "super_admin"
 }
 
 type AuthState = {

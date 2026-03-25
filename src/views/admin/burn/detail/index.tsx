@@ -1,6 +1,6 @@
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
 import AmountAndActivity from "./amount-activities";
@@ -24,6 +24,8 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
     const pool = poolDetail?.pool;
     const status = pool?.status;
     const safeStatus: BurnPoolStatus = status ?? "on_going";
+
+    const queryClient = useQueryClient();
 
     // Shared on-chain vault balance — used by both RewardAmount and ClosedStatus
     const vaultBalance = useOnChainVaultBalance({
@@ -114,7 +116,14 @@ const AdminBurnPoolDetail = ({ address }: Props) => {
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">
-                    <PoolOverview poolDetail={poolDetail} />
+                    <PoolOverview
+                        poolDetail={poolDetail}
+                        onPartnerToggleSuccess={() =>
+                            queryClient.invalidateQueries({
+                                queryKey: poolQueryKeys.detail(address),
+                            })
+                        }
+                    />
                     <RewardAmount poolDetail={poolDetail} vaultBalance={vaultBalance} />
                 </div>
                 <div className="col-span-1">

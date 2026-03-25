@@ -59,6 +59,16 @@ const AdminMasterPoolManagementSearch = () => {
       return;
     }
 
+    // partner burn is a subset of burn pools — treat like burn pool for statuses
+    if (value === "partner") {
+      if (filter.status?.length === swapPoolStatuses.length) {
+        setFilter({ type: value, status: [...burnPoolStatuses] });
+        return;
+      }
+      setFilter({ type: value });
+      return;
+    }
+
     // if switching from swap pool to burn pool or all types
     // and all swap statuses were selected, expand to all burn pool statuses
     if (value === poolTypes[0].toString() || value === "all") {

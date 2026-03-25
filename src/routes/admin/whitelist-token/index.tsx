@@ -5,7 +5,8 @@ import { useAuthStore } from "@/stores/authStore";
 
 export const Route = createFileRoute("/admin/whitelist-token/")({
     beforeLoad: () => {
-        if (useAuthStore.getState().user?.role !== "admin") {
+        const role = useAuthStore.getState().user?.role;
+        if (role !== "admin" && role !== "super_admin") {
             throw redirect({ to: "/" });
         }
     },

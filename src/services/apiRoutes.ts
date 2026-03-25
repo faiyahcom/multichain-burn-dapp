@@ -16,6 +16,7 @@ export const API_ROUTES = {
     GET_POOL_TXNS: (address: string) => `/pools/${address}/txns`,
     GET_POOL_ACTIVITIES: (address: string) => `/pools/${address}/actitvites`,
     REASON_CLOSE_POOL: (address: string) => `/pools/${address}/close-reason`,
+    TOGGLE_PARTNER_POOL: (address: string) => `/pools/${address}/partner`,
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",
@@ -27,7 +28,7 @@ export const API_ROUTES = {
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
-    UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
+    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },

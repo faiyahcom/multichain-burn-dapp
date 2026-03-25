@@ -173,7 +173,15 @@ const DepositRewardDialog = ({
         BigInt(amountBN.toString()),
         pool.rewardTokenDecimals,
       );
-      setValue("amount", formatted, { shouldValidate: true });
+
+      // Keep max decimal part 6 digits
+      const [integer, decimal] = formatted.split(".");
+      const newFormattedAmount =
+        decimal && decimal.length > 0
+          ? `${integer}.${decimal.slice(0, 6)}`
+          : integer;
+
+      setValue("amount", newFormattedAmount, { shouldValidate: true });
     } catch {
       return;
     }
