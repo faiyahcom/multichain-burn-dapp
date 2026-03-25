@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { NETWORK_CONFIGS } from "@/config/networks";
 import { useSystemStore } from "@/stores/systemStore";
 import {
   adminManagementRoleLabels,
@@ -28,20 +28,11 @@ import { useEffect } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
-const networkIdValues = [
-  "ethereumTestnet",
-  "binanceTestnet",
-  "xphereTestnet",
-  "solanaDevnet",
-] as const satisfies [NetworkId, ...NetworkId[]];
+const networkIdValues = NETWORK_CONFIGS.map((x) => x.id);
 
 const adminManagementFormSchema = z.object({
   name: z.string().trim().min(1, { error: "Full name is required" }),
-  email: z
-    .string()
-    .trim()
-    .min(1, { error: "Email is required" })
-    .email({ error: "Invalid email address" }),
+  email: z.email({ error: "Invalid email address" }),
   walletAddress: z
     .string()
     .trim()
