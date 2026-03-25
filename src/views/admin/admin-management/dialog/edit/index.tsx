@@ -32,9 +32,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     useToggleAdminRoleSolanaFn();
   const [namespace, chainRef] = caipAddress?.split(":") ?? [];
   const currentNetworkId =
-    namespace && chainRef
-      ? mapChainToSystemNetwork(namespace, chainRef)
-      : null;
+    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
   const targetNetworkId =
     admin.networkIds.length === 1
       ? admin.networkIds[0]
@@ -67,9 +65,11 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         name: admin.name,
         email: admin.email,
         walletAddress: admin.walletAddress,
+        networkId: targetNetworkId,
         role: admin.role,
       }}
       lockWalletAddress
+      lockNetworkId
       isLoading={isPending || isCallingSc}
       onSubmit={async (values) => {
         if (!targetNetworkId) {

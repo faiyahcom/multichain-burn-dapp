@@ -2,6 +2,7 @@ import { toast } from "@/components/common/custom-toast";
 import { Button } from "@/components/ui/button";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
+import { useSystemStore } from "@/stores/systemStore";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
@@ -17,14 +18,13 @@ const AdminManagementDialogCreate = () => {
   const [isCallingSc, setIsCallingSc] = useState(false);
   const queryClient = useQueryClient();
   const { caipAddress } = useAppKitAccount();
+  const { openSwitchNetworkModal } = useSystemStore();
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
   const { toggleAdminRole: toggleAdminRoleSolana } =
     useToggleAdminRoleSolanaFn();
   const [namespace, chainRef] = caipAddress?.split(":") ?? [];
   const currentNetworkId =
-    namespace && chainRef
-      ? mapChainToSystemNetwork(namespace, chainRef)
-      : null;
+    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
   const { mutateAsync: createAdmin, isPending } = useMutation({
     mutationFn: adminManagementService.createAdmin,
@@ -57,18 +57,28 @@ const AdminManagementDialogCreate = () => {
         onOpenChange={setOpen}
         title="Add new Admin"
         description="Grant dashboard access and assign an administrator role."
-        defaultValues={{ role: "super_admin" }}
+        defaultValues={{
+          role: "super_admin",
+          networkId: currentNetworkId ?? "ethereumTestnet",
+        }}
         isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
+          const targetNetworkId = values.networkId;
+
           if (!currentNetworkId) {
             toast.error("Connect the correct wallet network before saving.");
+            return;
+          }
+
+          if (currentNetworkId !== targetNetworkId) {
+            openSwitchNetworkModal(currentNetworkId, targetNetworkId);
             return;
           }
 
           setIsCallingSc(true);
           try {
             const isUpdated =
-              currentNetworkId === "solanaDevnet"
+              targetNetworkId === "solanaDevnet"
                 ? await toggleAdminRoleSolana({
                     walletAddress: values.walletAddress,
                     enabled: true,
@@ -86,7 +96,7 @@ const AdminManagementDialogCreate = () => {
 
             await createAdmin({
               ...values,
-              networkId: currentNetworkId,
+              networkId: targetNetworkId,
               enabled: true,
             });
           } finally {

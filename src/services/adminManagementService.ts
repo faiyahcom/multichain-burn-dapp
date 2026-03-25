@@ -10,10 +10,12 @@ import type {
   AdminManagementRole,
   AdminManagementStatus,
 } from "@/types/admin/admin-management";
+import { adminManagementRoles } from "@/types/admin/admin-management";
 import type { PaginationResponse } from "@/types/common";
 import { isEvmAddress, isSolanaAddress } from "@/utils/helpers/address";
 
 const ADMINS_API_ROUTES = API_ROUTES.ADMINS;
+const MAX_ADMIN_LIST_LIMIT = 120;
 
 export interface ListAdminManagementRequest {
   page?: number;
@@ -56,6 +58,12 @@ type AdminManagementApiRoleStatus =
   | AdminManagementStatus
   | "active"
   | "inactive";
+type AdminManagementApiStatusValue =
+  | AdminManagementApiRoleStatus
+  | boolean
+  | number
+  | null
+  | undefined;
 type NormalizedAdminApiRole = AdminManagementRole | "normal";
 
 type AdminManagementApiItem = {
@@ -68,8 +76,10 @@ type AdminManagementApiItem = {
   wallet_address?: string | null;
   address?: string | null;
   role?: AdminManagementApiRole | null;
-  roleStatus?: AdminManagementApiRoleStatus | boolean | number | null;
-  role_status?: AdminManagementApiRoleStatus | boolean | number | null;
+  roleStatus?: AdminManagementApiStatusValue;
+  role_status?: AdminManagementApiStatusValue;
+  roleEnable?: AdminManagementApiStatusValue;
+  role_enable?: AdminManagementApiStatusValue;
   enabled?: boolean | null;
   enable?: boolean | null;
   isActive?: boolean | null;
@@ -95,6 +105,11 @@ type AdminManagementApiListResponse =
       items?: AdminManagementApiItem[];
     };
 
+const extractAdminItems = (response: AdminManagementApiListResponse) =>
+  Array.isArray(response)
+    ? response
+    : (response.admins ?? response.data ?? response.items ?? []);
+
 const normalizeAdminRole = (
   role: AdminManagementApiRole | null | undefined,
 ): NormalizedAdminApiRole => {
@@ -110,7 +125,7 @@ const normalizeAdminRole = (
 };
 
 const normalizeAdminStatus = (
-  roleStatus: AdminManagementApiItem["role_status"],
+  roleStatus: AdminManagementApiStatusValue,
 ): AdminManagementStatus | undefined => {
   if (typeof roleStatus === "boolean") {
     return roleStatus ? "enabled" : "disabled";
@@ -129,6 +144,29 @@ const normalizeAdminStatus = (
   }
 
   return undefined;
+};
+
+const resolveAdminEnabled = (
+  item: AdminManagementApiItem,
+  normalizedRole: NormalizedAdminApiRole,
+) => {
+  const normalizedStatus = [
+    item.roleEnable,
+    item.role_enable,
+    item.role_status,
+    item.roleStatus,
+    item.enabled,
+    item.enable,
+    item.isActive,
+  ]
+    .map(normalizeAdminStatus)
+    .find((status): status is AdminManagementStatus => status !== undefined);
+
+  if (normalizedStatus !== undefined) {
+    return normalizedStatus === "enabled";
+  }
+
+  return normalizedRole !== "normal";
 };
 
 const toKnownNetworkId = (
@@ -183,37 +221,96 @@ const normalizeAdminItem = (
   item: AdminManagementApiItem,
 ): { admin: AdminManagementAdmin; apiRole: NormalizedAdminApiRole } => {
   const normalizedRole = normalizeAdminRole(item.role);
-  const normalizedStatus = normalizeAdminStatus(item.role_status);
-  const normalizedRoleStatus = normalizeAdminStatus(item.roleStatus);
+  const identity =
+    item.walletAddress ??
+    item.wallet_address ??
+    item.address ??
+    item.email ??
+    "";
+  const scope =
+    item.chainId ??
+    item.chainIds?.[0] ??
+    item.networkId ??
+    item.networkIds?.[0] ??
+    "global";
 
   return {
     apiRole: normalizedRole,
     admin: {
-      id: String(
-        item.id ??
-          item.walletAddress ??
-          item.wallet_address ??
-          item.address ??
-          item.email ??
-          "",
-      ),
+      id: String(item.id ?? [scope, identity].filter(Boolean).join(":")),
       name: item.name ?? item.fullName ?? item.fullname ?? "",
       email: item.email ?? "",
-      walletAddress: item.walletAddress ?? item.wallet_address ?? item.address ?? "",
+      walletAddress:
+        item.walletAddress ?? item.wallet_address ?? item.address ?? "",
       role: normalizedRole === "super_admin" ? "super_admin" : "admin",
-      enabled:
-        normalizedStatus !== undefined
-          ? normalizedStatus === "enabled"
-          : normalizedRoleStatus !== undefined
-            ? normalizedRoleStatus === "enabled"
-            : (item.enabled ??
-              item.enable ??
-              item.isActive ??
-              normalizedRole !== "normal"),
+      enabled: resolveAdminEnabled(item, normalizedRole),
       createdAt: item.createdAt ?? item.created_at ?? "",
       networkIds: normalizeAdminNetworks(item),
     },
   };
+};
+
+const matchesAdminSearch = (
+  admin: AdminManagementAdmin,
+  search: string | undefined,
+) => {
+  const normalizedSearch = search?.trim().toLowerCase();
+
+  if (!normalizedSearch) {
+    return true;
+  }
+
+  return [admin.name, admin.email, admin.walletAddress].some((value) =>
+    value.toLowerCase().includes(normalizedSearch),
+  );
+};
+
+const compareAdminCreatedAtDesc = (
+  left: AdminManagementAdmin,
+  right: AdminManagementAdmin,
+) => {
+  const leftTimestamp = left.createdAt ? new Date(left.createdAt).getTime() : 0;
+  const rightTimestamp = right.createdAt
+    ? new Date(right.createdAt).getTime()
+    : 0;
+
+  return rightTimestamp - leftTimestamp;
+};
+
+const fetchAdminsByRole = async (
+  role: AdminManagementRole,
+): Promise<AdminManagementApiItem[]> => {
+  const items: AdminManagementApiItem[] = [];
+  let page = 1;
+  let total = Number.POSITIVE_INFINITY;
+
+  while (items.length < total) {
+    const response = await apiClient.get<AdminManagementApiListResponse>(
+      ADMINS_API_ROUTES.LIST,
+      {
+        params: {
+          page,
+          limit: MAX_ADMIN_LIST_LIMIT,
+          role,
+        },
+      },
+    );
+
+    const pageItems = extractAdminItems(response);
+    items.push(...pageItems);
+
+    total = Array.isArray(response)
+      ? items.length
+      : (response.total ?? items.length);
+
+    if (pageItems.length < MAX_ADMIN_LIST_LIMIT) {
+      break;
+    }
+
+    page += 1;
+  }
+
+  return items;
 };
 
 const buildUpsertAdminPayload = (request: UpsertAdminManagementRequest) => {
@@ -223,13 +320,16 @@ const buildUpsertAdminPayload = (request: UpsertAdminManagementRequest) => {
     throw new Error("Unsupported network for admin management");
   }
 
+  const fullname = request.name.trim();
+  const email = request.email.trim();
+
   return {
-    chainId: Number(chainId),
+    chainId,
     wallet_address: request.walletAddress.trim(),
-    fullname: request.name.trim() || null,
-    email: request.email.trim(),
+    ...(fullname ? { fullname } : {}),
+    ...(email ? { email } : {}),
     role: request.role,
-    role_status: request.enabled,
+    roleEnable: request.enabled,
   };
 };
 
@@ -237,39 +337,36 @@ export const adminManagementService = {
   getListAdmins: async (
     params?: ListAdminManagementRequest,
   ): Promise<ListAdminManagementResponse> => {
-    const role =
-      params?.roles && params.roles.length === 1 ? params.roles[0] : undefined;
-    const response = await apiClient.get<AdminManagementApiListResponse>(
-      ADMINS_API_ROUTES.LIST,
-      {
-        params: {
-          page: params?.page || 1,
-          limit: params?.limit || 20,
-          search: params?.search || undefined,
-          role,
-          networkIds: params?.networkIds?.length ? params.networkIds : undefined,
-          chainIds: params?.networkIds?.length
-            ? params.networkIds
-                .map((networkId) => networkIdToChainId(networkId))
-                .filter((chainId): chainId is string => !!chainId)
-            : undefined,
-        },
-        paramsSerializer: { indexes: null },
-      },
+    const selectedRoles =
+      params?.roles === undefined ? [...adminManagementRoles] : params.roles;
+
+    if (selectedRoles.length === 0) {
+      return {
+        page: params?.page ?? 1,
+        total: 0,
+        totalEnable: 0,
+        totalDisable: 0,
+        admins: [],
+      };
+    }
+
+    const adminsByRole = await Promise.all(
+      selectedRoles.map((role) => fetchAdminsByRole(role)),
     );
 
-    const adminsRaw = Array.isArray(response)
-      ? response
-      : (response.admins ?? response.data ?? response.items ?? []);
-    const admins = adminsRaw
+    const admins = adminsByRole
+      .flat()
       .map(normalizeAdminItem)
       .filter(({ apiRole }) =>
-        params?.roles?.length
-          ? apiRole !== "normal" && params.roles.includes(apiRole)
+        selectedRoles.length
+          ? apiRole !== "normal" && selectedRoles.includes(apiRole)
           : apiRole !== "normal",
       )
-      .map(({ admin }) => admin);
-    const filteredAdmins =
+      .map(({ admin }) => admin)
+      .filter((admin) => matchesAdminSearch(admin, params?.search))
+      .sort(compareAdminCreatedAtDesc);
+
+    const networkFilteredAdmins =
       params?.networkIds && params.networkIds.length > 0
         ? admins.filter(
             (admin) =>
@@ -279,26 +376,22 @@ export const adminManagementService = {
               ),
           )
         : admins;
+    const page = params?.page ?? 1;
+    const limit = params?.limit ?? 20;
+    const startIndex = (page - 1) * limit;
+    const paginatedAdmins = networkFilteredAdmins.slice(
+      startIndex,
+      startIndex + limit,
+    );
 
     return {
-      page: Array.isArray(response)
-        ? (params?.page ?? 1)
-        : (response.page ?? params?.page ?? 1),
-      total:
-        Array.isArray(response) || (params?.roles && params.roles.length !== 1)
-          ? filteredAdmins.length
-          : (response.total ?? filteredAdmins.length),
-      totalEnable: Array.isArray(response)
-        ? filteredAdmins.filter((admin) => admin.enabled).length
-        : (response.totalEnable ??
-          response.countEnable ??
-          filteredAdmins.filter((admin) => admin.enabled).length),
-      totalDisable: Array.isArray(response)
-        ? filteredAdmins.filter((admin) => !admin.enabled).length
-        : (response.totalDisable ??
-          response.countDisable ??
-          filteredAdmins.filter((admin) => !admin.enabled).length),
-      admins: filteredAdmins,
+      page,
+      total: networkFilteredAdmins.length,
+      totalEnable: networkFilteredAdmins.filter((admin) => admin.enabled)
+        .length,
+      totalDisable: networkFilteredAdmins.filter((admin) => !admin.enabled)
+        .length,
+      admins: paginatedAdmins,
     };
   },
 
@@ -324,7 +417,6 @@ export const adminManagementService = {
     return normalizeAdminItem(response).admin;
   },
 
-
   deleteAdmin: async ({
     walletAddress,
     networkId,
@@ -336,7 +428,10 @@ export const adminManagementService = {
     }
 
     await apiClient.delete(
-      ADMINS_API_ROUTES.DELETE(chainId, walletAddress.trim()),
+      ADMINS_API_ROUTES.DELETE(
+        chainId,
+        encodeURIComponent(walletAddress.trim()),
+      ),
     );
   },
 

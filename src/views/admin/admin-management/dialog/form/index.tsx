@@ -1,4 +1,8 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import NetworkImgIcon from "@/components/common/network-img-icon";
+import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { adminManagementService } from "@/services/adminManagementService";
+import { useSystemStore } from "@/stores/systemStore";
 import {
   Dialog,
   DialogContent,
@@ -15,15 +19,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import {
   adminManagementRoleLabels,
   adminManagementRoles,
 } from "@/types/admin/admin-management";
-import { adminManagementService } from "@/services/adminManagementService";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { z } from "zod";
+
+const networkIdValues = [
+  "ethereumTestnet",
+  "binanceTestnet",
+  "xphereTestnet",
+  "solanaDevnet",
+] as const satisfies [NetworkId, ...NetworkId[]];
 
 const adminManagementFormSchema = z.object({
   name: z.string().trim().min(1, { error: "Full name is required" }),
@@ -40,6 +52,7 @@ const adminManagementFormSchema = z.object({
       (value) => adminManagementService.isSupportedWalletAddress(value),
       "Must be a valid EVM or Solana wallet address",
     ),
+  networkId: z.enum(networkIdValues),
   role: z.enum(adminManagementRoles),
 });
 
@@ -56,6 +69,7 @@ interface Props {
   submitText?: string;
   isLoading?: boolean;
   lockWalletAddress?: boolean;
+  lockNetworkId?: boolean;
   onSubmit: (values: AdminManagementFormValues) => Promise<void> | void;
 }
 
@@ -65,6 +79,7 @@ const resolveDefaultValues = (
   name: defaultValues?.name ?? "",
   email: defaultValues?.email ?? "",
   walletAddress: defaultValues?.walletAddress ?? "",
+  networkId: defaultValues?.networkId ?? "ethereumTestnet",
   role: defaultValues?.role ?? "super_admin",
 });
 
@@ -77,16 +92,29 @@ const AdminManagementDialogForm: React.FC<Props> = ({
   submitText = "Save Changes",
   isLoading,
   lockWalletAddress,
+  lockNetworkId,
   onSubmit,
 }) => {
-  const { control, handleSubmit, reset } = useForm<AdminManagementFormValues>({
-    defaultValues: resolveDefaultValues(defaultValues),
-    resolver: zodResolver(adminManagementFormSchema),
-  });
+  const { caipAddress } = useAppKitAccount();
+  const { openSwitchNetworkModal } = useSystemStore();
+  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
+  const currentNetworkId =
+    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
+  const { control, handleSubmit, reset, setValue } =
+    useForm<AdminManagementFormValues>({
+      defaultValues: resolveDefaultValues(defaultValues),
+      resolver: zodResolver(adminManagementFormSchema),
+    });
 
   useEffect(() => {
     reset(resolveDefaultValues(defaultValues));
   }, [defaultValues, open, reset]);
+
+  useEffect(() => {
+    if (!lockNetworkId && currentNetworkId) {
+      setValue("networkId", currentNetworkId);
+    }
+  }, [currentNetworkId, lockNetworkId, setValue]);
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
@@ -181,6 +209,57 @@ const AdminManagementDialogForm: React.FC<Props> = ({
                     placeholder="0x1a2b3c4d5e6f7890abcdef1234567890abcdef12"
                     className="px-5 placeholder:text-15px placeholder:text-secondary-text disabled:opacity-60"
                   />
+                  {fieldState.invalid ? (
+                    <FieldError errors={[fieldState.error]} />
+                  ) : null}
+                </Field>
+              )}
+            />
+            <Controller
+              control={control}
+              name="networkId"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="gap-3.25">
+                  <FieldLabel htmlFor={field.name}>
+                    Network<span className="text-md-required-red">*</span>
+                  </FieldLabel>
+                  <div className="flex items-center gap-2.25">
+                    {NETWORK_CONFIGS.map((network, index) => (
+                      <AnimateIconButton
+                        key={index}
+                        variant="external-icon"
+                        icon={({ className }) => (
+                          <NetworkImgIcon
+                            src={network.iconSrc}
+                            alt={network.label}
+                            className={className}
+                          />
+                        )}
+                        isActive={field.value === network.id}
+                        btnProps={{
+                          disabled: lockNetworkId || isLoading,
+                          onClick: () => {
+                            field.onChange(network.id);
+
+                            if (
+                              !lockNetworkId &&
+                              currentNetworkId !== network.id
+                            ) {
+                              openSwitchNetworkModal(
+                                currentNetworkId,
+                                network.id,
+                              );
+                            }
+                          },
+                        }}
+                        text={network.label}
+                        color={network.color}
+                        classNames={{
+                          btn: "after:text-primary-foreground",
+                        }}
+                      />
+                    ))}
+                  </div>
                   {fieldState.invalid ? (
                     <FieldError errors={[fieldState.error]} />
                   ) : null}
