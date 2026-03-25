@@ -52,7 +52,7 @@ const buttonVariants = ({ hasHover = false }: { hasHover?: boolean }) =>
     },
   );
 
-const BUTTON_VARIANT_CONATINER_VARIANT_MAP: Record<
+const BUTTON_VARIANT_CONTAINER_VARIANT_MAP: Record<
   NonNullable<VariantProps<ReturnType<typeof buttonVariants>>["variant"]>,
   ContainerVariant | undefined
 > = {
@@ -72,7 +72,7 @@ export const getButtonVariantFromContainerVariant = ({
   containerVariant: ContainerVariant;
   isActive: boolean;
 }): NonNullable<VariantProps<ReturnType<typeof buttonVariants>>["variant"]> => {
-  const entry = Object.entries(BUTTON_VARIANT_CONATINER_VARIANT_MAP).find(
+  const entry = Object.entries(BUTTON_VARIANT_CONTAINER_VARIANT_MAP).find(
     ([key, value]) =>
       value === containerVariant && isActive === key.endsWith("-active"),
   );

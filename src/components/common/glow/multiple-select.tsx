@@ -4,6 +4,7 @@ import {
   IconSquare,
   IconSquareCheck,
 } from "@/assets/react";
+import { cn } from "@/lib/utils";
 import {
   Popover,
   PopoverContent,
@@ -12,8 +13,6 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../../ui/popover";
-import { ArrowIcon } from "../arrow-icon";
-import { cn } from "@/lib/utils";
 import { Button, getButtonVariantFromContainerVariant } from "./button";
 import { getVariantBorderClassName, type ContainerVariant } from "./container";
 
