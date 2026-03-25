@@ -32,7 +32,7 @@ export const API_ROUTES = {
     HISTORY: "/whitelist-users/history",
   },
   ADMINS: {
-    LIST: "/admins/",
+    LIST: "/admins",
     UPSERT_USER: "/admins/user",
     DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
   },
