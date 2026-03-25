@@ -1,17 +1,16 @@
+import { apiClient } from "@/config/axios";
 import {
   NETWORK_CONFIGS,
   chainIdToNetworkConfig,
   networkIdToChainId,
   type NetworkId,
 } from "@/config/networks";
-import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
 import type {
   AdminManagementAdmin,
   AdminManagementRole,
 } from "@/types/admin/admin-management";
 import type { PaginationResponse } from "@/types/common";
-import { isEvmAddress, isSolanaAddress } from "@/utils/helpers/address";
 
 const ADMINS_API_ROUTES = API_ROUTES.ADMINS;
 const allAdminManagementNetworkIds = new Set(
@@ -208,10 +207,5 @@ export const adminManagementService = {
         encodeURIComponent(walletAddress.trim()),
       ),
     );
-  },
-
-  isSupportedWalletAddress: (walletAddress: string) => {
-    const trimmedAddress = walletAddress.trim();
-    return isEvmAddress(trimmedAddress) || isSolanaAddress(trimmedAddress);
   },
 };

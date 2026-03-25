@@ -1,8 +1,5 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import NetworkImgIcon from "@/components/common/network-img-icon";
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
-import { adminManagementService } from "@/services/adminManagementService";
-import { useSystemStore } from "@/stores/systemStore";
 import {
   Dialog,
   DialogContent,
@@ -19,13 +16,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { useSystemStore } from "@/stores/systemStore";
 import {
   adminManagementRoleLabels,
   adminManagementRoles,
 } from "@/types/admin/admin-management";
+import { isSupportedWalletAddress } from "@/utils/helpers/address";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
 import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const networkIdValues = [
@@ -47,7 +47,7 @@ const adminManagementFormSchema = z.object({
     .trim()
     .min(1, { error: "Wallet address is required" })
     .refine(
-      (value) => adminManagementService.isSupportedWalletAddress(value),
+      (value) => isSupportedWalletAddress(value),
       "Must be a valid EVM or Solana wallet address",
     ),
   networkId: z.enum(networkIdValues),
