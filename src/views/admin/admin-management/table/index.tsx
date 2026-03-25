@@ -112,24 +112,8 @@ const AdminManagementTable = () => {
     },
   });
 
-  const resolveTargetNetworkId = (admin: AdminManagementAdmin) => {
-    if (admin.networkIds.length === 0) {
-      return null;
-    }
-
-    if (admin.networkIds.length === 1) {
-      return admin.networkIds[0];
-    }
-
-    if (currentNetworkId && admin.networkIds.includes(currentNetworkId)) {
-      return currentNetworkId;
-    }
-
-    return admin.networkIds[0];
-  };
-
   const handleToggleAdminStatus = async (admin: AdminManagementAdmin) => {
-    const targetNetworkId = resolveTargetNetworkId(admin);
+    const targetNetworkId = admin.networkIds[0] ?? null;
 
     if (!targetNetworkId) {
       toast.error("Cannot determine network for this admin.");
@@ -181,7 +165,7 @@ const AdminManagementTable = () => {
       return;
     }
 
-    const targetNetworkId = resolveTargetNetworkId(deleteTarget);
+    const targetNetworkId = deleteTarget.networkIds[0] ?? null;
 
     if (!targetNetworkId) {
       toast.error("Cannot determine network for this admin.");
