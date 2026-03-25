@@ -7,7 +7,7 @@ import { NETWORK_CONFIGS } from "@/config/networks";
 import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 
 const AdminTransferHistorySearch = () => {
-  const { filter, setFilter } = useAdminTransferHistoryFilterStore();
+  const { filter, setFilter, errors } = useAdminTransferHistoryFilterStore();
   const networkOptions: SingleSelectOption[] = NETWORK_CONFIGS.map(
     (network) => ({
       label: network.label,
@@ -49,6 +49,19 @@ const AdminTransferHistorySearch = () => {
             placeholder: "Min",
             type: "number",
             min: 0,
+            onKeyDown: (e) => {
+              // Prevent minus sign from being entered
+              if (e.key === "-") {
+                e.preventDefault();
+              }
+            },
+            onPaste: (e) => {
+              // Prevent minus sign from being entered
+              const pasted = e.clipboardData?.getData("text");
+              if (pasted?.includes("-")) {
+                e.preventDefault();
+              }
+            },
           }}
           addons={null}
           value={filter.amountOutMin}
@@ -61,12 +74,28 @@ const AdminTransferHistorySearch = () => {
             placeholder: "Max",
             type: "number",
             min: 0,
+            onKeyDown: (e) => {
+              // Prevent minus sign from being entered
+              if (e.key === "-") {
+                e.preventDefault();
+              }
+            },
+            onPaste: (e) => {
+              // Prevent minus sign from being entered
+              const pasted = e.clipboardData?.getData("text");
+              if (pasted?.includes("-")) {
+                e.preventDefault();
+              }
+            },
           }}
           addons={null}
           value={filter.amountOutMax}
           onValueChange={(amountOutMax) => setFilter({ amountOutMax })}
           className="max-w-40"
         />
+        {errors?.amountOutRange && (
+          <em className="text-xs text-error">{errors.amountOutRange}</em>
+        )}
       </div>
 
       <div className="flex items-center justify-start gap-2.75">
@@ -74,11 +103,17 @@ const AdminTransferHistorySearch = () => {
         <DatePicker
           value={filter.dateFrom}
           onChange={(dateFrom) => setFilter({ dateFrom })}
+          calendarProps={{
+            disabled: filter.dateTo ? { after: filter.dateTo } : undefined,
+          }}
         />
         <p className="text-13px">to</p>
         <DatePicker
           value={filter.dateTo}
           onChange={(dateTo) => setFilter({ dateTo })}
+          calendarProps={{
+            disabled: filter.dateFrom ? { before: filter.dateFrom } : undefined,
+          }}
         />
       </div>
     </div>
