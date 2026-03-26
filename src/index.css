@@ -180,6 +180,7 @@
   --color-mb-btn-pair: var(--mb-btn-pair);
   --color-banner-text: var(--banner-text);
   --color-mb-dark-popover-item: var(--mb-dark-popover-item);
+  --color-mb-dark-popover-item-border: var(--mb-dark-popover-item-border);
   /* END */
 }
 
@@ -292,7 +293,8 @@
   --mb-btn-pair: #7407e9;
 
   --banner-text: #d41317;
-  --mb-dark-popover-item: #10121F;
+  --mb-dark-popover-item: #10121f;
+  --mb-dark-popover-item-border: #212c3e;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -404,7 +406,8 @@
   --mb-btn-pair: #7407e9;
 
   --banner-text: #d41317;
-  --mb-dark-popover-item: #10121F;
+  --mb-dark-popover-item: #10121f;
+  --mb-dark-popover-item-border: #212c3e;
 }
 
 @layer base {

@@ -31,7 +31,7 @@ export const HeaderNav = () => {
               { "border-b-foreground font-bold text-foreground": isActive },
             )}
           >
-            <p className="text-xl xl:text-3xl">{item.title}</p>
+            <p className="text-2xl xl:text-3xl">{item.title}</p>
           </Link>
         );
       })}
