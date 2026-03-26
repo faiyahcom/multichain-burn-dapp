@@ -13,6 +13,7 @@ import { truncateString } from "@/utils/helpers/string";
 import { useDisconnect, useWalletInfo } from "@reown/appkit/react";
 import { useQuery } from "@tanstack/react-query";
 import { LogOutIcon } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
 
 type Props = {};
 
@@ -20,6 +21,7 @@ const ProfileMenu = ({}: Props) => {
   const { logout, user } = useAuthStore();
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const {
     data: userApiData,
@@ -45,7 +47,7 @@ const ProfileMenu = ({}: Props) => {
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn p-3">
+    <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn px-3 py-2">
       <DropdownMenu>
         <div className="flex items-center gap-3 text-left">
           <DropdownMenuTrigger className="shrink-0">
@@ -59,15 +61,42 @@ const ProfileMenu = ({}: Props) => {
               key={userApiDataUpdatedAt}
             />
           </DropdownMenuTrigger>
-          <div className="max-w-30">
-            <DropdownMenuTrigger>
-              <p
-                className="min-w-0 truncate text-13px font-extrabold"
-                title={name}
-              >
-                {name}
-              </p>
-            </DropdownMenuTrigger>
+          {!isMobile && (
+            <div className="w-35">
+              <DropdownMenuTrigger>
+                <p
+                  className="min-w-0 truncate text-13px font-extrabold"
+                  title={name}
+                >
+                  {name}
+                </p>
+              </DropdownMenuTrigger>
+              <CopyableText
+                content={user?.address}
+                displayText={truncateString({ str: user?.address ?? "--" })}
+                classNames={{
+                  container: "justify-start",
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        <DropdownMenuContent
+          align="center"
+          side="bottom"
+          sideOffset={isMobile ? 20 : 40}
+          className="min-w-44 rounded-lg border-transparent bg-mb-dark-profile-btn p-3"
+        >
+          <div className="px-2 py-1.5 sm:hidden">
+            <p
+              className="min-w-0 truncate text-13px font-extrabold"
+              title={name}
+            >
+              {name}
+            </p>
+          </div>
+          <div className="px-2 py-1.5 sm:hidden">
             <CopyableText
               content={user?.address}
               displayText={truncateString({ str: user?.address ?? "--" })}
@@ -76,14 +105,6 @@ const ProfileMenu = ({}: Props) => {
               }}
             />
           </div>
-        </div>
-
-        <DropdownMenuContent
-          align="center"
-          side="bottom"
-          sideOffset={40}
-          className="min-w-44 rounded-lg border-transparent bg-mb-dark-profile-btn p-1"
-        >
           <DropdownMenuItem
             onClick={handleLogout}
             className="cursor-pointer bg-mb-dark-profile-btn"

@@ -50,11 +50,11 @@ export default function NetworkSelect() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex items-center gap-2 rounded-lg bg-mb-dark-profile-btn text-sm font-medium text-foreground max-md:p-0"
+          className="flex h-auto items-center gap-2 rounded-lg bg-mb-dark-profile-btn p-2 text-sm font-medium text-foreground md:px-3 md:py-3.75"
           title={selectedNetwork?.label ?? selectedNetworkId}
         >
-          <NetworkIcon networkId={selectedNetworkId} />
-          <span className="max-md:sr-only">
+          <NetworkIcon networkId={selectedNetworkId} className="md:size-8.75" />
+          <span className="max-xl:sr-only">
             {selectedNetwork?.label ?? selectedNetworkId}
           </span>
         </Button>
@@ -73,14 +73,18 @@ export default function NetworkSelect() {
                 onClick={() => handleNetworkChange(network)}
                 className={cn(
                   "flex items-center gap-3 rounded-5px px-4 py-2",
-                  "transition-colors",
-                  "hover:bg-mb-btn-swap/50",
-                  { "bg-mb-btn-swap/50": isSelected },
+                  "transition-colors duration-300",
+                  "border border-mb-dark-popover-item-border bg-mb-dark-popover-item",
+                  "hover:border-transparent hover:bg-mb-btn-swap/50",
+                  { "border-transparent bg-mb-btn-swap/50": isSelected },
                 )}
                 isSelected={isSelected}
-                leftSelectedPanelClassName={cn("group-hover:bg-mb-btn-swap", {
-                  "bg-mb-btn-swap": isSelected,
-                })}
+                leftSelectedPanelClassName={cn(
+                  "duration-300 group-hover:bg-mb-btn-swap",
+                  {
+                    "bg-mb-btn-swap": isSelected,
+                  },
+                )}
               >
                 <NetworkIcon networkId={network.id} />
                 <div className="flex flex-1 justify-center">
