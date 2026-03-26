@@ -53,3 +53,13 @@ export type PairOverallStatsResponse = {
     totalTransactions: number;
   };
 };
+
+export type PairDetailRequest = {
+  chainId: string;
+  tokenIn: string;
+  tokenOut: string;
+};
+
+export type PairDetailResponse = {
+  pair: PairItemType;
+};

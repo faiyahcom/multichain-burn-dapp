@@ -40,7 +40,7 @@ export const swapPoolStatuses = [
 ] as const;
 export type SwapPoolStatus = (typeof swapPoolStatuses)[number];
 export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
-  on_going: "Ongoing",
+  on_going: "Live",
   ended: "End",
   canceled: "Cancel",
   closed: "Close",
