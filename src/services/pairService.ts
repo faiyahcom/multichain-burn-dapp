@@ -1,5 +1,7 @@
 import { apiClient } from "@/config/axios";
 import type {
+  PairDetailRequest,
+  PairDetailResponse,
   PairDetailStatsRequest,
   PairDetailStatsResponse,
   PairListRequest,
@@ -41,6 +43,21 @@ export const pairService = {
   getPairOverallStats: async () => {
     const response = await apiClient.get<PairOverallStatsResponse>(
       `${PAIRS_API_ROUTES.OVERALL_STATS}`,
+    );
+
+    return response;
+  },
+
+  getPairDetail: async (request: PairDetailRequest) => {
+    const { chainId, tokenIn, tokenOut } = request;
+    const response = await apiClient.get<PairDetailResponse>(
+      `${PAIRS_API_ROUTES.DETAIL(chainId)}`,
+      {
+        params: {
+          tokenIn,
+          tokenOut,
+        },
+      },
     );
 
     return response;

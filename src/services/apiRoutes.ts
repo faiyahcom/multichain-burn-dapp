@@ -36,6 +36,7 @@ export const API_ROUTES = {
     STATS: (chainId: string) => `/pairs/stats/${chainId}`,
     // New design stats
     OVERALL_STATS: "/pairs/stats",
+    DETAIL: (chainId: string) => `/pairs/${chainId}`,
   },
   TRANSFER_HISTORY: {
     LIST: "/transfers",
