@@ -2592,10 +2592,12 @@
       ],
       "args": [
         {
-          "name": "new_admins",
-          "type": {
-            "vec": "pubkey"
-          }
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
         }
       ]
     },
@@ -2765,10 +2767,12 @@
       ],
       "args": [
         {
-          "name": "new_subadmins",
-          "type": {
-            "vec": "pubkey"
-          }
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
         }
       ]
     },
@@ -3372,6 +3376,26 @@
       "code": 6034,
       "name": "ExceedBalance",
       "msg": "Exceed balance"
+    },
+    {
+      "code": 6035,
+      "name": "BothAssetsNative",
+      "msg": "Deposit and reward asset cannot both be native SOL"
+    },
+    {
+      "code": 6036,
+      "name": "CannotRemoveLastAdmin",
+      "msg": "Cannot remove last admin"
+    },
+    {
+      "code": 6037,
+      "name": "CannotSelfRemove",
+      "msg": "Cannot self remove"
+    },
+    {
+      "code": 6038,
+      "name": "UserAlreadyWhitelisted",
+      "msg": "User already whitelisted"
     }
   ],
   "types": [
