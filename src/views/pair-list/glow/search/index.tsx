@@ -41,7 +41,7 @@ const PairListGlowSearch = () => {
           }}
         />
         <SortSelect
-          options={["volume", "tvl"]}
+          options={["volume", "liquidity"]}
           sortBy={filter.sortBy ?? "none"}
           sortOrder={filter.sortOrder}
           setSortBy={(sortBy) => setFilter({ sortBy })}
