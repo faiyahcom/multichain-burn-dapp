@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
@@ -9,6 +9,8 @@ import { dashboardService } from "@/services/dashboardService";
 import type { PartnerPool } from "@/services/dashboardService";
 import { dashboardQueryKeys } from "@/services/queries/queryKey";
 import { formatAmount } from "@/utils/helpers/numbers";
+import { useCountdown } from "@/hooks/useCountdown";
+import { formatCountdown } from "@/utils/helpers/string";
 import PartnerBurnBgImage from "/images/dashboard/partner-burn-bg.png";
 
 const POOL_LIMIT = 4;
@@ -28,30 +30,6 @@ function resolveStatus(pool: PartnerPool): PoolStatus {
     return "ended";
 }
 
-function formatCountdown(totalSeconds: number): string {
-    const s = Math.max(0, totalSeconds);
-    const h = Math.floor(s / 3600);
-    const m = Math.floor((s % 3600) / 60);
-    const sec = s % 60;
-    return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
-}
-
-// ── Countdown hook ─────────────────────────────────────────────────────────────
-
-function useCountdown(targetTimestamp: number) {
-    const [remaining, setRemaining] = useState(() =>
-        Math.max(0, targetTimestamp - Math.floor(Date.now() / 1000)),
-    );
-    useEffect(() => {
-        const id = setInterval(() => {
-            setRemaining(
-                Math.max(0, targetTimestamp - Math.floor(Date.now() / 1000)),
-            );
-        }, 1000);
-        return () => clearInterval(id);
-    }, [targetTimestamp]);
-    return remaining;
-}
 
 // ── Pool Card ──────────────────────────────────────────────────────────────────
 
@@ -89,7 +67,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                 alt=""
                 className="pointer-events-none absolute inset-0 h-full w-full object-cover"
             />
-            <div className="pointer-events-none absolute inset-0 bg-[#301300]/72" />
+            <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
 
             {/* Content */}
             <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 px-2 py-2 text-center font-inter">
@@ -127,7 +105,7 @@ const ComingSoonCard = () => (
             alt=""
             className="pointer-events-none absolute inset-0 h-full w-full object-cover"
         />
-        <div className="pointer-events-none absolute inset-0 bg-[#301300]/72" />
+        <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
         {/* make the icon absolute centered */}
         <IconBurnCategory className="absolute top-1/2 left-1/2 size-18 -translate-x-1/2 -translate-y-1/2 transform opacity-80" />
         <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform font-inter text-[15px] font-medium text-nowrap">
@@ -185,8 +163,7 @@ const PoolCarousel = ({ pools, hasNextPage, isFetchingNextPage, fetchNextPage }:
                     {pools.map((pool) => (
                         <div
                             key={`${pool.chainId}-${pool.address}`}
-                            style={{ flex: "0 0 25%" }}
-                            className="min-w-0 pl-4"
+                            className="w-1/2 min-w-0 shrink-0 pl-4 sm:w-1/4"
                         >
                             <PartnerPoolCard pool={pool} />
                         </div>

@@ -9,34 +9,13 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import {
     truncateString,
     formatTimestampSecondsToDate,
+    formatRelativeTime,
 } from "@/utils/helpers/string";
+import { TXN_PAGE_SIZE } from "@/hooks/useScrollingFeed";
 import type { ActivityItem } from "@/services/dashboardService";
 import SwapActivityImage from "/images/dashboard/swap-activity.png";
 import TokenImage from "@/components/common/token-image";
 import { txnKind } from "@/types/pool";
-
-// ── Constants ─────────────────────────────────────────────────────────────────
-
-const TXN_SLOTS = 6;
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-const formatRelativeTime = (timestamp: string): string => {
-    const secondsAgo = Math.floor(Date.now() / 1000) - Number(timestamp);
-    if (secondsAgo < 60) return `${secondsAgo}s ago`;
-    const m = Math.floor(secondsAgo / 60);
-    if (m < 60) return `${m}m ago`;
-    const h = Math.floor(m / 60);
-    const rm = m % 60;
-    if (h < 24) return `${h}h ${rm}m ago`;
-    const d = Math.floor(h / 24);
-    const rh = h % 24;
-    return `${d}d ${rh}h ${rm}m ago`;
-};
-
-// dot | hash | time | wallet | type | tokenOut amount | tokenIn fee
-const TXN_COLS =
-    "8px minmax(0,0.75fr) minmax(0,0.5fr) minmax(0,1fr) 120px minmax(0,1fr) minmax(0,1fr)";
 
 // ── Row components ────────────────────────────────────────────────────────────
 
@@ -54,7 +33,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
     return (
         <div className="flex items-center justify-between font-inter text-[18px] font-medium">
             <div className="flex flex-nowrap items-center gap-3">
-                <Dot className="bg-[#FCD298]" size={13} />
+                <Dot className="bg-mb-burn-dot" size={13} />
                 <span className="truncate text-mb-gray-b8">
                     Burn by <span className="text-foreground">{label}</span>
                 </span>
@@ -86,7 +65,7 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
     return (
         <div className="flex items-center justify-between font-inter text-[18px] font-medium">
             <div className="space-x-3">
-                <Dot className="bg-[#638EDC]" size={13} />
+                <Dot className="bg-mb-swap-dot" size={13} />
                 <span className="text-foreground">{poolName}</span>
                 <span className="truncate text-mb-gray-b8/60">{pool}</span>
             </div>
@@ -121,14 +100,11 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
     const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
 
     return (
-        <div
-            className="grid items-center gap-x-3"
-            style={{ gridTemplateColumns: TXN_COLS }}
-        >
+        <div className="txn-grid">
             <Dot className="bg-mb-btn-swap" size={13} />
             <span className="truncate">{hash}</span>
-            <span className="truncate text-center">{time}</span>
-            <span className="truncate text-center">{wallet}</span>
+            <span className="hidden truncate text-center md:block">{time}</span>
+            <span className="hidden truncate text-center md:block">{wallet}</span>
             <span className="truncate text-center">{type}</span>
             <div className="flex items-center justify-center gap-1.5">
                 <span className="truncate font-bold tracking-normal">{amountOut}</span>
@@ -139,7 +115,7 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
                     classNames={{ img: "size-4" }}
                 />
             </div>
-            <div className="flex items-center justify-center gap-1.5">
+            <div className="hidden items-center justify-center gap-1.5 md:flex">
                 <span className="truncate font-bold tracking-normal">{amountIn}</span>
                 <TokenDisplay
                     symbol={item.tokenInSymbol}
@@ -180,15 +156,14 @@ export const ActivityFeed = ({
                 <p className="text-2xl font-medium">{title}</p>
             </div>
             <div className="flex items-center gap-2">
-                <Dot className="bg-[#4ADD55]" size={13} pulse />
-                <span className="text-2xl font-semibold text-[#4ADD55]">Live</span>
+                <Dot className="bg-mb-live-green" size={13} pulse />
+                <span className="text-2xl font-semibold text-mb-live-green">Live</span>
             </div>
         </div>
         {/* Re-key on every tick to trigger the slide-up enter animation */}
         <div
             key={animKey}
-            className="animate-feed-jump-in grid gap-x-12"
-            style={{ gridTemplateColumns: "1fr 1fr" }}
+            className="animate-feed-jump-in grid grid-cols-1 gap-x-12 sm:grid-cols-2"
         >
             {items.map((item) => (
                 <div key={item.id}>{renderRow(item)}</div>
@@ -208,7 +183,7 @@ export const TransactionFeed = ({
 }) => {
     // Always render exactly TXN_SLOTS rows — ghost rows keep the layout height
     // stable and prevent content from jumping when item count changes.
-    const slots = Array.from({ length: TXN_SLOTS }, (_, i) => visibleItems[i] ?? null);
+    const slots = Array.from({ length: TXN_PAGE_SIZE }, (_, i) => visibleItems[i] ?? null);
 
     return (
         <div className="flex flex-col gap-2 space-y-5 px-5 py-4.5 text-primary-foreground">
@@ -218,17 +193,14 @@ export const TransactionFeed = ({
                 <p className="text-2xl font-medium">TRANSACTIONS</p>
             </div>
             {/* Table header */}
-            <div
-                className="grid gap-x-3 font-inter text-lg font-bold tracking-[0.24px]"
-                style={{ gridTemplateColumns: TXN_COLS }}
-            >
+            <div className="txn-grid font-inter text-lg font-bold tracking-[0.24px]">
                 <span />
                 <span>Tx hash</span>
-                <span className="text-center">Time</span>
-                <span className="text-center">Wallet address</span>
+                <span className="hidden text-center md:block">Time</span>
+                <span className="hidden text-center md:block">Wallet address</span>
                 <span className="text-center">Type</span>
                 <span className="text-center">Amount</span>
-                <span className="text-center">Fee</span>
+                <span className="hidden text-center md:block">Fee</span>
             </div>
             <div
                 key={animKey}
@@ -241,10 +213,9 @@ export const TransactionFeed = ({
                         // Invisible placeholder preserves the row height
                         <div
                             key={`ghost-${i}`}
-                            className="grid items-center gap-x-3 invisible"
-                            style={{ gridTemplateColumns: TXN_COLS }}
+                            className="txn-grid invisible"
                         >
-                            <span /><span>&nbsp;</span><span /><span /><span /><span /><span />
+                            <span /><span>&nbsp;</span><span className="hidden md:block" /><span className="hidden md:block" /><span /><span /><span className="hidden md:block" />
                         </div>
                     )
                 )}

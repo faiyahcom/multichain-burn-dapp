@@ -69,7 +69,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
                 </div>
 
                 {/* Crypto Guy */}
-                <div className="rounded-[4px] border-[0.5px] border-[#162E8F] bg-[#0A1A65] px-1 py-0.5">
+                <div className="rounded-[4px] border-[0.5px] border-mb-swapper-badge-border bg-mb-swapper-badge-bg px-1 py-0.5">
                     Crypto Guy
                 </div>
 

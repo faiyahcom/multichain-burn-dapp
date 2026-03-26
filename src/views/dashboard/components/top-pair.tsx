@@ -47,7 +47,7 @@ const PairCard = ({ pair }: PairCardProps) => {
     );
 
     return (
-        <div className="flex items-center gap-3 rounded-xl border border-[#153353] bg-[#131d25] p-3">
+        <div className="flex items-center gap-3 rounded-xl border border-mb-pair-card-border bg-mb-dark-profile-btn p-3">
             {/* Token pair icons with network chain icon overlay */}
             <div className="relative shrink-0 pr-2 pb-2">
                 <div className="flex items-center">
@@ -66,7 +66,7 @@ const PairCard = ({ pair }: PairCardProps) => {
                     <img
                         src={network.iconSrc}
                         alt=""
-                        className="absolute right-0 bottom-0 size-4 rounded-full border border-[#153353]"
+                        className="absolute right-0 bottom-0 size-4 rounded-full border border-mb-pair-card-border"
                     />
                 )}
             </div>
@@ -91,7 +91,7 @@ const PairCard = ({ pair }: PairCardProps) => {
                         number={liquidityFormatted}
                         unit={tokenOutDisplay.symbol}
                         isShorten
-                        classNames={{ container: "text-[#a96a3f] font-bold" }}
+                        classNames={{ container: "text-mb-pair-metric font-bold" }}
                     />
                 </div>
 
@@ -101,7 +101,7 @@ const PairCard = ({ pair }: PairCardProps) => {
                     <MetricNumber
                         number={pair.volume}
                         isShorten
-                        classNames={{ container: "text-[#a96a3f] font-bold" }}
+                        classNames={{ container: "text-mb-pair-metric font-bold" }}
                     />
                 </div>
             </div>
@@ -135,7 +135,7 @@ export const TopPairSection = ({ data }: Props) => {
                 <IconPairCategory className="size-10.75" />
                 <p className="text-2xl font-medium">TOP PAIR</p>
             </div>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 2xl:grid-cols-3">
                 {pairs.map((pair, i) => (
                     <PairCard key={i} pair={pair} />
                 ))}

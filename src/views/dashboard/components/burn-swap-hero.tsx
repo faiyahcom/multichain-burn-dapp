@@ -27,6 +27,30 @@ export const sumTokenAmounts = (items: TokenAmount[]): string => {
     return shortenNumber({ number: total.toNumber() }) as string;
 };
 
+// ── Shared stat row ────────────────────────────────────────────────────────────
+
+const HeroStatRow = ({
+    icon,
+    label,
+    value,
+    valueClass,
+}: {
+    icon: React.ReactNode;
+    label: string;
+    value: React.ReactNode;
+    valueClass: string;
+}) => (
+    <div className="flex items-center justify-between">
+        <div className="flex items-center gap-5">
+            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
+                {icon}
+            </div>
+            <span className="text-base font-medium text-mb-gray-b8 sm:text-xl">{label}</span>
+        </div>
+        <div className={`text-base font-medium sm:text-xl ${valueClass}`}>{value}</div>
+    </div>
+);
+
 interface Props {
     data?: StatsStickerResponse;
 }
@@ -36,10 +60,10 @@ export const BurnSwapHero = ({ data }: Props) => {
     return (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {/* Burn Tracker */}
-            <GlowContainer className="relative flex overflow-visible" variant="burn">
+            <GlowContainer className="relative flex flex-col overflow-visible sm:flex-row" variant="burn">
                 <GlowContainer
                     variant="burn"
-                    className="-mt-1 -mb-1 -ml-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25"
+                    className="-mt-1 -mx-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:-mb-1 sm:mx-0 sm:-ml-1"
                 >
                     <div className="flex items-center gap-3">
                         <IconBurnCategory className="size-10.75" />
@@ -49,7 +73,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     <Button
                         variant="burn"
                         size="big"
-                        className="w-275px h-57px"
+                        className="h-12 w-full sm:h-57px sm:w-275px"
                         onClick={() => {
                             navigate({ to: "/burn" });
                         }}
@@ -57,87 +81,64 @@ export const BurnSwapHero = ({ data }: Props) => {
                         Start Burn
                     </Button>
                 </GlowContainer>
-                <div className="mr-5 ml-7 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 font-inter">
+                <div className="mx-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 py-4 font-inter sm:mr-5 sm:ml-7 sm:py-0">
                     <div className="flex items-center gap-2">
                         <IconBurnCategory className="size-7.25" />
                         <p className="font-orbitron text-xl font-medium">BURN</p>
                     </div>
-                    <p className="font-orbitron text-[32px] font-medium text-mb-btn-burn uppercase text-burn-glow">
+                    <p className="font-orbitron text-2xl font-medium text-mb-btn-burn uppercase text-burn-glow sm:text-[32px]">
                         {sumTokenAmounts(data?.burnSection?.volume ?? [])}
                     </p>
                     <p className="text-base font-medium text-mb-gray-b8/60">
                         Total Burned Volume
                     </p>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
-                                <IconStack />
-                            </div>
-                            <span className="text-xl font-medium text-mb-gray-b8">
-                                Total Transactions
-                            </span>
-                        </div>
-                        <div className="text-xl font-medium text-mb-btn-burn">
-                            {shortenNumber({ number: data?.burnSection?.totalTxns ?? 0 })}
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
-                                <IconStack />
-                            </div>
-                            <span className="text-xl font-medium text-mb-gray-b8">
-                                Total Pools
-                            </span>
-                        </div>
-                        <div className="text-xl font-medium text-mb-btn-burn">
-                            {shortenNumber({ number: data?.burnSection?.totalPools ?? 0 })}
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
-                                <IconParticipant className="text-mb-btn-burn" />
-                            </div>
-                            <span className="text-xl font-medium text-mb-gray-b8">
-                                Total Participants
-                            </span>
-                        </div>
-                        <div className="text-xl font-medium text-mb-btn-burn">
-                            {shortenNumber({
-                                number: data?.burnSection?.totalParticipants ?? 0,
-                            })}
-                        </div>
-                    </div>
+                    <HeroStatRow
+                        icon={<IconStack />}
+                        label="Total Transactions"
+                        value={shortenNumber({ number: data?.burnSection?.totalTxns ?? 0 })}
+                        valueClass="text-mb-btn-burn"
+                    />
+                    <HeroStatRow
+                        icon={<IconStack />}
+                        label="Total Pools"
+                        value={shortenNumber({ number: data?.burnSection?.totalPools ?? 0 })}
+                        valueClass="text-mb-btn-burn"
+                    />
+                    <HeroStatRow
+                        icon={<IconParticipant className="text-mb-btn-burn" />}
+                        label="Total Participants"
+                        value={shortenNumber({ number: data?.burnSection?.totalParticipants ?? 0 })}
+                        valueClass="text-mb-btn-burn"
+                    />
                 </div>
             </GlowContainer>
 
             {/* Token Swap */}
             <GlowContainer
-                className="relative flex flex-row-reverse overflow-visible"
+                className="relative flex flex-col overflow-visible sm:flex-row-reverse"
                 variant="swap"
             >
                 <GlowContainer
                     variant="swap"
-                    className="-mt-1 -mb-1 -ml-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25"
+                    className="-mt-1 -mx-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:-mb-1 sm:mx-0 sm:-ml-1"
                 >
                     <div className="flex items-center gap-3">
                         <IconSwapCategory className="size-10.75" />
                         <p className="text-2xl font-medium">TOKEN SWAP</p>
                     </div>
                     <img src={BurnTrackerImage} alt="Burn Tracker" />
-                    <Button variant="swap" size="big" className="w-275px h-57px">
+                    <Button variant="swap" size="big" className="h-12 w-full sm:h-57px sm:w-275px">
                         Create Pool
                     </Button>
                 </GlowContainer>
-                <div className="mr-7 ml-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 font-inter">
+                <div className="mx-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 py-4 font-inter sm:mr-7 sm:ml-5 sm:py-0">
                     <div className="flex items-center gap-2">
                         <IconSwapCategory className="size-7.25" />
                         <p className="font-orbitron text-xl font-medium">SWAP</p>
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="space-y-2.5">
-                            <p className="font-orbitron text-[32px] font-medium text-mb-btn-swap uppercase text-swap-glow">
+                            <p className="font-orbitron text-2xl font-medium text-mb-btn-swap uppercase text-swap-glow sm:text-[32px]">
                                 {sumTokenAmounts(data?.swapSection?.volume ?? [])}
                             </p>
                             <p className="text-base font-medium text-mb-gray-b8/60">
@@ -146,47 +147,24 @@ export const BurnSwapHero = ({ data }: Props) => {
                         </div>
                         <img src={SwapChartStatsImage} alt="Swap Stats" />
                     </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
-                                <IconStats />
-                            </div>
-                            <span className="text-xl font-medium text-mb-gray-b8">
-                                Total Transactions
-                            </span>
-                        </div>
-                        <div className="text-xl font-medium text-mb-btn-swap">
-                            {shortenNumber({ number: data?.swapSection?.totalTxns ?? 0 })}
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
-                                <IconStackY />
-                            </div>
-                            <span className="text-xl font-medium text-mb-gray-b8">
-                                Total Pools
-                            </span>
-                        </div>
-                        <div className="text-xl font-medium text-mb-btn-swap">
-                            {shortenNumber({ number: data?.swapSection?.totalPools ?? 0 })}
-                        </div>
-                    </div>
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-5">
-                            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
-                                <IconParticipant className="text-[#1DC0FB]" />
-                            </div>
-                            <span className="text-xl font-medium text-mb-gray-b8">
-                                Total Participants
-                            </span>
-                        </div>
-                        <div className="text-xl font-medium text-mb-btn-swap">
-                            {shortenNumber({
-                                number: data?.swapSection?.totalParticipants ?? 0,
-                            })}
-                        </div>
-                    </div>
+                    <HeroStatRow
+                        icon={<IconStats />}
+                        label="Total Transactions"
+                        value={shortenNumber({ number: data?.swapSection?.totalTxns ?? 0 })}
+                        valueClass="text-mb-btn-swap"
+                    />
+                    <HeroStatRow
+                        icon={<IconStackY />}
+                        label="Total Pools"
+                        value={shortenNumber({ number: data?.swapSection?.totalPools ?? 0 })}
+                        valueClass="text-mb-btn-swap"
+                    />
+                    <HeroStatRow
+                        icon={<IconParticipant className="text-mb-swap-light" />}
+                        label="Total Participants"
+                        value={shortenNumber({ number: data?.swapSection?.totalParticipants ?? 0 })}
+                        valueClass="text-mb-btn-swap"
+                    />
                 </div>
             </GlowContainer>
         </div>
