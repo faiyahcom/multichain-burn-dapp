@@ -27,6 +27,11 @@ const PairListGlowSearch = () => {
           variant="pair"
           selected={filter.network}
           onChange={(value) => setFilter({ network: value })}
+          otherProps={{
+            classNames: {
+              btn: "max-w-[400px]",
+            },
+          }}
         />
         <SortSelect
           options={["volume", "tvl"]}

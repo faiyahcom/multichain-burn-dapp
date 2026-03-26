@@ -14,6 +14,7 @@ interface Props {
     | "selected"
     | "onChange"
     | "defaultValuesWhenUncheckAll"
+    | "variant"
   >;
   variant: ContainerVariant;
 }
