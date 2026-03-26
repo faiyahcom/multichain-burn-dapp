@@ -1,9 +1,11 @@
 import { toast } from "@/components/common/custom-toast";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
+import { useAuthStore } from "@/stores/authStore";
 import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { useNavigate } from "@tanstack/react-router";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToggleAdminRoleEvmFn } from "../../table/useToggleAdminRoleEvmFn";
@@ -14,14 +16,17 @@ interface Props {
   admin: AdminManagementAdmin;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isSelfAdmin?: boolean;
 }
 
 const AdminManagementDialogEdit: React.FC<Props> = ({
   admin,
   open,
   onOpenChange,
+  isSelfAdmin = false,
 }) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [isCallingSc, setIsCallingSc] = useState(false);
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
   const openSwitchNetworkModal = useSystemStore(
@@ -103,12 +108,27 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         }
       }
 
-      await updateAdmin({
+      const updatedAdmin = await updateAdmin({
         ...values,
         id: admin.id,
         networkId: targetNetworkId,
         enabled: admin.enabled,
       });
+
+      if (isSelfAdmin) {
+        useAuthStore.setState((state) => ({
+          user: state.user
+            ? {
+                ...state.user,
+                role: updatedAdmin.role,
+              }
+            : state.user,
+        }));
+
+        if (updatedAdmin.role !== "super_admin") {
+          navigate({ to: "/" });
+        }
+      }
     } finally {
       setIsCallingSc(false);
     }
@@ -119,7 +139,11 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       open={open}
       onOpenChange={onOpenChange}
       title="Edit Admin"
-      description="Update the assigned role or contact details for this admin."
+      description={
+        isSelfAdmin
+          ? "Update your name, email, or role. Your wallet and network stay locked for safety."
+          : "Update the assigned role or contact details for this admin."
+      }
       defaultValues={{
         name: admin.name,
         email: admin.email,

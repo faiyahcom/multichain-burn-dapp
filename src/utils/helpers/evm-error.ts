@@ -35,7 +35,8 @@ const ONCHAIN_ERROR_MESSAGES = {
   AddressNotWhitelisted: "Wallet address is not whitelisted.",
   NoStateChange: "No state change to apply.",
   InvalidAssetPair: "Asset pair is invalid.",
-  TransferFromFailed: "Something when wrong."
+  TransferFromFailed: "Something when wrong.",
+  MustKeepAtLeastOneSuperAdmin:"Must Keep At Least One Super Admin."
 } as const;
 
 type OnchainErrorName = keyof typeof ONCHAIN_ERROR_MESSAGES;
