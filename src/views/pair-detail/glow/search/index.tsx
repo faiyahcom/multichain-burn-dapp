@@ -65,13 +65,11 @@ const PairDetailGlowSearch = () => {
       return;
     }
 
-    // if switching from swap pool to burn pool or all types
-    // and all swap statuses were selected, expand to all burn pool statuses
+    // if switching from swap pool to burn pool
     if (value === poolTypes[0]) {
-      if (filter.status?.length === userViewSwapPoolStatuses.length) {
-        setFilter({ type: value, status: [...userViewBurnPoolStatuses] });
-        return;
-      }
+      // Reset to all burn statuses
+      setFilter({ type: value, status: [...userViewBurnPoolStatuses] });
+      return;
     }
 
     setFilter({ type: value });
