@@ -12,25 +12,25 @@ const PairListGlowSummary = () => {
   const cards: { title: string; value: string }[] = [
     {
       title: "Total Volume",
-      value: Number(overallStats?.stats.totalVolume ?? 0).toLocaleString(
+      value: Number(overallStats?.stats?.totalVolume ?? 0).toLocaleString(
         "en-US",
       ),
     },
     {
       title: "Total Participants",
-      value: Number(overallStats?.stats.totalParticipants ?? 0).toLocaleString(
+      value: Number(overallStats?.stats?.totalParticipants ?? 0).toLocaleString(
         "en-US",
       ),
     },
     {
       title: "Total Pairs",
-      value: Number(overallStats?.stats.totalPairs ?? 0).toLocaleString(
+      value: Number(overallStats?.stats?.totalPairs ?? 0).toLocaleString(
         "en-US",
       ),
     },
     {
       title: "Total Transactions",
-      value: Number(overallStats?.stats.totalTransactions ?? 0).toLocaleString(
+      value: Number(overallStats?.stats?.totalTransactions ?? 0).toLocaleString(
         "en-US",
       ),
     },

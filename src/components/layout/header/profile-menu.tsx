@@ -47,9 +47,9 @@ const ProfileMenu = ({}: Props) => {
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
   return (
-    <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn px-3 py-2">
-      <DropdownMenu>
-        <div className="flex items-center gap-3 text-left">
+    <DropdownMenu>
+      <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn px-3 py-2">
+        <div className="flex w-max items-center gap-3 text-left">
           <DropdownMenuTrigger className="shrink-0">
             <TokenImage
               src={avatar}
@@ -63,9 +63,9 @@ const ProfileMenu = ({}: Props) => {
           </DropdownMenuTrigger>
           {!isMobile && (
             <div className="w-35">
-              <DropdownMenuTrigger className="w-full">
+              <DropdownMenuTrigger className="block w-full">
                 <p
-                  className="min-w-0 truncate text-13px font-extrabold"
+                  className="w-full min-w-0 truncate text-left text-13px font-extrabold"
                   title={name}
                 >
                   {name}
@@ -113,8 +113,8 @@ const ProfileMenu = ({}: Props) => {
             <span>Logout</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+      </div>
+    </DropdownMenu>
   );
 };
 
