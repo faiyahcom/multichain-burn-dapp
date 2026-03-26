@@ -34,7 +34,6 @@ const PairListGlowList = () => {
     <GlowContainer
       variant="pair"
       className={cn(
-        "",
         {
           "space-y-5 px-2.5 py-4.75 sm:space-y-10 sm:px-5 sm:py-9.5":
             listLayout === "list",

@@ -43,6 +43,7 @@ export const pairQueryKeys = {
     ["pairs", "list", params] as const,
   stats: (params?: Record<string, unknown>) =>
     ["pairs", "stats", params] as const,
+  overallStats: () => ["pairs", "overallStats"] as const,
 };
 
 export const transferHistoryQueryKeys = {
