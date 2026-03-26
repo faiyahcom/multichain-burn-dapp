@@ -42,7 +42,7 @@ import { useToggleAdminRoleSolanaFn } from "./useToggleAdminRoleSolanaFn";
 
 const PAGE_SIZE = 10;
 const SELF_ADMIN_ACTION_ERROR =
-  "You can't modify your own admin access on this chain.";
+  "You can't modify your own admin access.";
 const ADMIN_NETWORK_ERROR = "Cannot determine network for this admin.";
 
 const areWalletAddressesEqual = (left?: string, right?: string) => {
@@ -114,9 +114,10 @@ const AdminManagementTable = () => {
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
   const { toggleAdminRole: toggleAdminRoleSolana } =
     useToggleAdminRoleSolanaFn();
-  const [editingAdmin, setEditingAdmin] = useState<AdminManagementAdmin | null>(
-    null,
-  );
+  const [editingAdmin, setEditingAdmin] = useState<{
+    admin: AdminManagementAdmin;
+    isSelfAdmin: boolean;
+  } | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<AdminManagementAdmin | null>(
     null,
   );
@@ -156,17 +157,10 @@ const AdminManagementTable = () => {
   });
 
   const isSelfAdminRecord = (admin: AdminManagementAdmin) => {
-    const targetNetworkId = getAdminTargetNetworkId(admin);
-    const targetChainId = targetNetworkId
-      ? networkIdToChainId(targetNetworkId)
-      : undefined;
-
     return Boolean(
       user?.address &&
-        user.chainId &&
-        targetChainId &&
-        areWalletAddressesEqual(user.address, admin.walletAddress) &&
-        user.chainId === targetChainId,
+      areWalletAddressesEqual(user.address, admin.walletAddress) &&
+      admin.walletAddress,
     );
   };
 
@@ -310,8 +304,8 @@ const AdminManagementTable = () => {
                 : "disabled";
               const isFeaturedRow = index === 0;
               const isStatusLoading = statusUpdatingId === admin.id;
-              const isSelfActionDisabled = isSelfAdminRecord(admin);
-              const disabledActionTitle = isSelfActionDisabled
+              const isSelfAdmin = isSelfAdminRecord(admin);
+              const disabledActionTitle = isSelfAdmin
                 ? SELF_ADMIN_ACTION_ERROR
                 : undefined;
 
@@ -381,13 +375,13 @@ const AdminManagementTable = () => {
                     >
                       {admin.createdAt
                         ? new Date(admin.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            },
-                          )
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )
                         : "N/A"}
                     </p>
                   </TableCell>
@@ -395,20 +389,23 @@ const AdminManagementTable = () => {
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
                       <ActionIconButton
-                        disabled={isSelfActionDisabled}
-                        title={disabledActionTitle}
-                        onClick={() => setEditingAdmin(admin)}
+                        onClick={() =>
+                          setEditingAdmin({
+                            admin,
+                            isSelfAdmin,
+                          })
+                        }
                       >
                         <PencilIcon className="size-4" />
                       </ActionIconButton>
                       <BlueSwitch
                         active={admin.enabled}
                         isLoading={isStatusLoading}
-                        disabled={isStatusLoading || isSelfActionDisabled}
+                        disabled={isStatusLoading || isSelfAdmin}
                         onClick={() => handleToggleAdminStatus(admin)}
                       />
                       <ActionIconButton
-                        disabled={isSelfActionDisabled}
+                        disabled={isSelfAdmin}
                         destructive
                         title={disabledActionTitle}
                         onClick={() => setDeleteTarget(admin)}
@@ -440,7 +437,8 @@ const AdminManagementTable = () => {
 
       {editingAdmin ? (
         <AdminManagementDialogEdit
-          admin={editingAdmin}
+          admin={editingAdmin.admin}
+          isSelfAdmin={editingAdmin.isSelfAdmin}
           open={!!editingAdmin}
           onOpenChange={(open) => {
             if (!open) {

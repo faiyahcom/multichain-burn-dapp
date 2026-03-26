@@ -31,6 +31,7 @@ import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
 import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
 import { useDebounceValue } from "usehooks-ts";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -263,7 +264,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
 
             const feeBN = rewardBN
                 .mul(new BN(settlementFee ?? "0"))
-                .div(new BN(10000));
+                .div(new BN(DECIMAL_FEE_PERCENT));
 
             const finalReward = rewardBN.sub(feeBN);
 

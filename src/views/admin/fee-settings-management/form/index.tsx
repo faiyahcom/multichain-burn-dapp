@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ethers } from "ethers";
+import BN from "bn.js";
 import numbro from "numbro";
 import Decimal from "decimal.js";
 import { PublicKey } from "@solana/web3.js";
@@ -14,7 +15,7 @@ import {
 } from "@/config/networks";
 
 import { useSystemStore } from "@/stores/systemStore";
-import { useFeeSettings } from "../hooks/useFeeSettings";
+import { DECIMAL_FEE_PERCENT, useFeeSettings } from "../hooks/useFeeSettings";
 import { useUpdateFeeConfigEvmFn } from "../hooks/useUpdateFeeConfigEvmFn";
 import { useUpdateFeeConfigSolFn } from "../hooks/useUpdateFeeConfigSolFn";
 
@@ -78,21 +79,19 @@ const formatNum = (n: number, mantissa: number) =>
 
 const formatCreationFee = (
   value: any,
-  isSolana: boolean,
+  decimals: number,
   symbol: string,
 ): string | null => {
   if (!value) return null;
-
-  const num = isSolana
-    ? new Decimal(value.toString()).div(1e9).toNumber()
-    : new Decimal(ethers.formatEther(BigInt(value.toString()))).toNumber();
-
+  const num = new Decimal(value.toString())
+    .div(new Decimal(10).pow(decimals))
+    .toNumber();
   return `${formatNum(num, 6)} ${symbol}`;
 };
 
 const formatSettlementFee = (value: any): string | null => {
   if (!value) return null;
-  return `${formatNum(new Decimal(value.toString()).div(100).toNumber(), 4)}%`;
+  return `${formatNum(new Decimal(value.toString()).div(DECIMAL_FEE_PERCENT).toNumber(), 4)}%`;
 };
 
 const FeeSettingsForm = () => {
@@ -125,6 +124,7 @@ const FeeSettingsForm = () => {
     | undefined;
 
   const nativeSymbol = nativeCurrencyInfo?.symbol ?? "ETH";
+  const nativeDecimals = nativeCurrencyInfo?.decimals ?? 18;
   const isSolana = selectedNetworkId === "solanaDevnet";
 
   const feeSettingsSchema = useMemo(
@@ -132,15 +132,21 @@ const FeeSettingsForm = () => {
     [isSolana],
   );
 
-  const { creationFee, settlementFee, treasury, isLoading, refetch } =
-    useFeeSettings(selectedNetworkId);
+  const {
+    creationFee,
+    settlementFee,
+    treasury,
+    isLoading,
+    refetch,
+    updateValues,
+  } = useFeeSettings(selectedNetworkId);
 
   const { updateFeeConfigEvm } = useUpdateFeeConfigEvmFn();
   const { updateFeeConfigSol } = useUpdateFeeConfigSolFn();
 
   const currentCreationFee = useMemo(
-    () => formatCreationFee(creationFee, isSolana, nativeSymbol),
-    [creationFee, isSolana, nativeSymbol],
+    () => formatCreationFee(creationFee, nativeDecimals, nativeSymbol),
+    [creationFee, nativeDecimals, nativeSymbol],
   );
 
   const currentSettlementFee = useMemo(
@@ -170,16 +176,18 @@ const FeeSettingsForm = () => {
 
     reset({
       creationFee: creationFee
-        ? isSolana
-          ? new Decimal(creationFee.toString()).div(1e9).toString()
-          : ethers.formatEther(BigInt(creationFee.toString()))
+        ? new Decimal(creationFee.toString())
+          .div(new Decimal(10).pow(nativeDecimals))
+          .toString()
         : "",
       settlementFee: settlementFee
-        ? new Decimal(settlementFee.toString()).div(100).toString()
+        ? new Decimal(settlementFee.toString())
+          .div(DECIMAL_FEE_PERCENT)
+          .toString()
         : "",
       treasury: treasury ?? "",
     });
-  }, [creationFee, settlementFee, treasury, isSolana, reset]);
+  }, [creationFee, settlementFee, treasury, nativeDecimals, reset]);
 
   const handleNetworkChange = (network: NetworkConfig) => {
     openSwitchNetworkModal(selectedNetworkId as any, network.id);
@@ -193,7 +201,15 @@ const FeeSettingsForm = () => {
         await updateFeeConfigEvm(values);
       }
 
-      refetch();
+      // Optimistically update displayed current values using actual chain decimals
+      const rawAmount = new Decimal(values.creationFee)
+        .mul(new Decimal(10).pow(nativeDecimals))
+        .toFixed(0);
+      const bps = Math.round(parseFloat(values.settlementFee) * DECIMAL_FEE_PERCENT);
+      updateValues(new BN(rawAmount), new BN(bps.toString()), values.treasury);
+
+      // Background refetch to confirm from chain once the read node syncs
+      setTimeout(() => refetch(), 3000);
     } catch {
       // handled in hooks
     }

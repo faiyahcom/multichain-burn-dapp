@@ -1,10 +1,12 @@
 import { toast } from "@/components/common/custom-toast";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
+import { useAuthStore } from "@/stores/authStore";
 import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToggleAdminRoleEvmFn } from "../../table/useToggleAdminRoleEvmFn";
 import { useToggleAdminRoleSolanaFn } from "../../table/useToggleAdminRoleSolanaFn";
@@ -14,19 +16,23 @@ interface Props {
   admin: AdminManagementAdmin;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  isSelfAdmin?: boolean;
 }
 
 const AdminManagementDialogEdit: React.FC<Props> = ({
   admin,
   open,
   onOpenChange,
+  isSelfAdmin = false,
 }) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [isCallingSc, setIsCallingSc] = useState(false);
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
   const openSwitchNetworkModal = useSystemStore(
     (state) => state.openSwitchNetworkModal,
   );
+  const accessToken = useAuthStore((state) => state.accessToken);
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
   const { toggleAdminRole: toggleAdminRoleSolana } =
     useToggleAdminRoleSolanaFn();
@@ -36,6 +42,17 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       : currentNetworkId && admin.networkIds.includes(currentNetworkId)
         ? currentNetworkId
         : admin.networkIds[0];
+
+  // Fetch total super admin count to guard against demoting the last one
+  const { data: superAdminData } = useQuery({
+    queryKey: [...adminManagementQueryKeys.all, "super-admin-count"],
+    enabled: open && admin.role === "super_admin" && !!accessToken,
+    queryFn: () =>
+      adminManagementService.getListAdmins({ roles: ["super_admin"], networkIds: [targetNetworkId], limit: 1 }),
+  });
+  // Lock the role selector if this admin is the only super admin
+  const isSoleSuperAdmin =
+    admin.role === "super_admin" && (superAdminData?.total ?? 0) <= 1;
 
   const { mutateAsync: updateAdmin, isPending } = useMutation({
     mutationFn: adminManagementService.updateAdmin,
@@ -71,15 +88,15 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         const enableNextRole =
           targetNetworkId === "solanaDevnet"
             ? await toggleAdminRoleSolana({
-                walletAddress: admin.walletAddress,
-                enabled: true,
-                role: values.role,
-              })
+              walletAddress: admin.walletAddress,
+              enabled: true,
+              role: values.role,
+            })
             : await toggleAdminRoleEvm({
-                walletAddress: admin.walletAddress,
-                enabled: true,
-                role: values.role,
-              });
+              walletAddress: admin.walletAddress,
+              enabled: true,
+              role: values.role,
+            });
 
         if (!enableNextRole) {
           return;
@@ -88,27 +105,42 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         const disablePreviousRole =
           targetNetworkId === "solanaDevnet"
             ? await toggleAdminRoleSolana({
-                walletAddress: admin.walletAddress,
-                enabled: false,
-                role: admin.role,
-              })
+              walletAddress: admin.walletAddress,
+              enabled: false,
+              role: admin.role,
+            })
             : await toggleAdminRoleEvm({
-                walletAddress: admin.walletAddress,
-                enabled: false,
-                role: admin.role,
-              });
+              walletAddress: admin.walletAddress,
+              enabled: false,
+              role: admin.role,
+            });
 
         if (!disablePreviousRole) {
           return;
         }
       }
 
-      await updateAdmin({
+      const updatedAdmin = await updateAdmin({
         ...values,
         id: admin.id,
         networkId: targetNetworkId,
         enabled: admin.enabled,
       });
+
+      if (isSelfAdmin) {
+        useAuthStore.setState((state) => ({
+          user: state.user
+            ? {
+              ...state.user,
+              role: updatedAdmin.role,
+            }
+            : state.user,
+        }));
+
+        if (updatedAdmin.role !== "super_admin") {
+          navigate({ to: "/" });
+        }
+      }
     } finally {
       setIsCallingSc(false);
     }
@@ -119,7 +151,11 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       open={open}
       onOpenChange={onOpenChange}
       title="Edit Admin"
-      description="Update the assigned role or contact details for this admin."
+      description={
+        isSelfAdmin
+          ? "Update your name, email, or role. Your wallet and network stay locked for safety."
+          : "Update the assigned role or contact details for this admin."
+      }
       defaultValues={{
         name: admin.name,
         email: admin.email,
@@ -129,6 +165,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       }}
       lockWalletAddress
       lockNetworkId
+      lockRole={isSoleSuperAdmin}
       isLoading={isPending || isCallingSc}
       onSubmit={handleSubmit}
     />

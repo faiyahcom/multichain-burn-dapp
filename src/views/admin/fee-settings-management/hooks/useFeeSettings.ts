@@ -28,7 +28,10 @@ export type FeeSettingsData = {
     isLoading: boolean;
     error: string | null;
     refetch: () => void;
+    updateValues: (cf: BN, sf: BN, tr: string) => void;
 };
+
+export const DECIMAL_FEE_PERCENT = 10000;
 
 /**
  * Reads the current creation fee, settlement fee, and treasury address
@@ -45,6 +48,11 @@ export function useFeeSettings(networkId: string | undefined): FeeSettingsData {
     const { connection } = useAppKitConnection();
 
     const refetch = useCallback(() => setFetchKey((k) => k + 1), []);
+    const updateValues = useCallback((cf: BN, sf: BN, tr: string) => {
+        setCreationFee(cf);
+        setSettlementFee(sf);
+        setTreasury(tr);
+    }, []);
 
     useEffect(() => {
         if (!networkId) return;
@@ -118,5 +126,5 @@ export function useFeeSettings(networkId: string | undefined): FeeSettingsData {
         };
     }, [networkId, fetchKey]);
 
-    return { creationFee, settlementFee, treasury, isLoading, error, refetch };
+    return { creationFee, settlementFee, treasury, isLoading, error, refetch, updateValues };
 }
