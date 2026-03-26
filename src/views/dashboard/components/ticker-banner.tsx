@@ -15,7 +15,7 @@ export function TickerBanner({
   return (
     <div
       className="w-full overflow-hidden"
-      style={{ backgroundImage: "url('/images/banner-bg.png')", backgroundSize: "cover", backgroundPosition: "center" }}
+      style={{ backgroundImage: "url('/images/dashboard/banner-bg.png')", backgroundSize: "cover", backgroundPosition: "center" }}
     >
       {/* Only the inner flex row scrolls; the wrapper is static */}
       <div

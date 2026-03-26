@@ -44,5 +44,10 @@ export const API_ROUTES = {
   },
   GENERAL: {
     STATS_STICKER: "/general/stats-sticker",
+    LATEST_ACTIVITY: "/general/lastest-actitvity",
+    ACTIVITY_STREAM: "/general/activity-stream",
+    PARTNER_POOLS: "/general/partner-pools",
+    TOP_PAIR: "/general/top-pair",
+    TOP_SWAPPER: "/general/top-swapper",
   },
 } as const;

@@ -60,4 +60,11 @@ export const authQueryKeys = {
 
 export const dashboardQueryKeys = {
   statsSticker: () => ["dashboard", "stats-sticker"] as const,
+  latestActivity: () => ["dashboard", "latest-activity"] as const,
+  partnerPools: (params?: Record<string, unknown>) =>
+    ["dashboard", "partner-pools", params] as const,
+  topPair: (params?: Record<string, unknown>) =>
+    ["dashboard", "top-pair", params] as const,
+  topSwapper: (params?: Record<string, unknown>) =>
+    ["dashboard", "top-swapper", params] as const,
 };
