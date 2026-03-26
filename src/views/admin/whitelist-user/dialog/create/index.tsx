@@ -129,6 +129,28 @@ const AdminWhitelistUserDialogCreate = () => {
             return;
         }
 
+        // Check if the address is already whitelisted before calling the SC
+        const networkCfg = NETWORK_CONFIGS.find((n) => n.id === data.networkId);
+        try {
+            await whitelistUserService.checkUser({
+                walletAddress: data.walletAddress.trim(),
+                chainId: networkCfg?.backendChainId ?? "",
+            });
+        } catch (error: unknown) {
+            // The axios interceptor rejects with `error.response` directly,
+            // so the caught value is the raw response object (status is at the top level).
+            const errResp = error as { status?: number; data?: { message?: string } };
+            const status = errResp?.status;
+            if (status === 404) {
+                toast.error("User not found");
+            } else if (status === 400) {
+                toast.error("This wallet address is already in the whitelist");
+            } else {
+                toast.error(getErrorMessage({ error }));
+            }
+            return;
+        }
+
         setIsCallingSc(true);
         let scResult = false;
         if (isSolana) {
@@ -143,7 +165,6 @@ const AdminWhitelistUserDialogCreate = () => {
         const hasInfo = !!data.name?.trim() || !!data.email?.trim();
         if (hasInfo) {
             try {
-                const networkCfg = NETWORK_CONFIGS.find((n) => n.id === data.networkId);
                 await whitelistUserService.updateUserInfo({
                     walletAddress: data.walletAddress.trim(),
                     chainId: networkCfg?.backendChainId ?? "",

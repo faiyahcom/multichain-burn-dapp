@@ -84,7 +84,26 @@ export interface TransferHistoryResponse extends PaginationResponse {
   txns: TransferHistoryApiTxn[];
 }
 
+export interface CheckUserResponse {
+  address: string;
+  whitelisted: boolean;
+  [key: string]: unknown;
+}
+
 export const whitelistUserService = {
+  checkUser: async (params: { walletAddress: string; chainId: string }) => {
+    const response = await apiClient.get<CheckUserResponse>(
+      WHITELIST_USERS_API_ROUTES.CHECK_USER,
+      {
+        params: {
+          walletAddress: params.walletAddress,
+          chainId: params.chainId,
+        },
+      },
+    );
+    return response;
+  },
+
   getListUsers: async (params?: {
     search?: string;
     chainIds?: number[];
