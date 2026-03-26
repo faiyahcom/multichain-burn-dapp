@@ -21,7 +21,7 @@ type ToggleAdminRoleParams = {
 };
 
 export const useToggleAdminRoleSolanaFn = () => {
-  const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
+  const { isConnected, address } = useAppKitAccount();
   const { connection } = useAppKitConnection();
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
@@ -47,40 +47,21 @@ export const useToggleAdminRoleSolanaFn = () => {
         const program = getMultichainBurnProgram(connection, anchorWallet);
         const factoryPDA = getFactoryPDA(program.programId);
 
-        // @ts-expect-error Anchor runtime fetch result is inferred from IDL
-        const factory = await program.account.factoryAccount.fetch(factoryPDA);
-        const currentAccounts =
-          role === "super_admin" ? factory.admin : factory.subadmin;
-
-        const nextAccounts = enabled
-          ? [
-              ...currentAccounts.filter(
-                (account: PublicKey) =>
-                  account.toBase58() !== targetPubkey.toBase58(),
-              ),
-              targetPubkey,
-            ]
-          : currentAccounts.filter(
-              (account: PublicKey) =>
-                account.toBase58() !== targetPubkey.toBase58(),
-            );
-
-        const tx =
-          role === "super_admin"
-            ? await program.methods
-                .updateAdmin(nextAccounts)
-                .accounts({
-                  admin: walletPublicKey,
-                  factory: factoryPDA,
-                })
-                .transaction()
-            : await program.methods
-                .updateSubadmin(nextAccounts)
-                .accounts({
-                  admin: walletPublicKey,
-                  factory: factoryPDA,
-                })
-                .transaction();
+        const tx = await (role === "super_admin"
+          ? program.methods
+            .updateAdmin(targetPubkey, enabled)
+            .accounts({
+              admin: walletPublicKey,
+              factory: factoryPDA,
+            })
+            .transaction()
+          : program.methods
+            .updateSubadmin(targetPubkey, enabled)
+            .accounts({
+              admin: walletPublicKey,
+              factory: factoryPDA,
+            })
+            .transaction());
 
         const { blockhash, lastValidBlockHeight } =
           await connection.getLatestBlockhash();
@@ -89,7 +70,9 @@ export const useToggleAdminRoleSolanaFn = () => {
         tx.feePayer = walletPublicKey;
 
         const signedTx = await provider.signTransaction(tx);
-        const signature = await connection.sendRawTransaction(signedTx.serialize());
+        const signature = await connection.sendRawTransaction(
+          signedTx.serialize(),
+        );
 
         await connection.confirmTransaction({
           signature,
@@ -98,9 +81,7 @@ export const useToggleAdminRoleSolanaFn = () => {
         });
 
         toast.success(
-          `${role === "super_admin" ? "Super admin" : "Admin"} ${
-            enabled ? "enabled" : "disabled"
-          } successfully!`,
+          `${role === "super_admin" ? "Super admin" : "Admin"} ${enabled ? "enabled" : "disabled"} successfully!`,
           {
             description: `Tx: ${signature}`,
           },
