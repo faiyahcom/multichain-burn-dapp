@@ -1,0 +1,142 @@
+import { Button } from "@/components/common/glow/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/common/glow/table";
+import TableNoData from "@/components/common/glow/table-no-data";
+import TableSpinner from "@/components/common/glow/table-spinner";
+import MetricNumber from "@/components/common/metric-number";
+import NetworkDisplay from "@/components/common/network-display";
+import TokenImage from "@/components/common/token-image";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import type { PairItemType } from "@/types/pair";
+import { sciToFormatted } from "@/utils/helpers/numbers";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { Link } from "@tanstack/react-router";
+
+interface Props {
+  data?: PairItemType[];
+  isLoading?: boolean;
+}
+
+const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
+  const columns = ["Pair", "Volume", "Liquidity", "Network", ""];
+
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow>
+          {columns.map((column, index) => (
+            <TableHead key={index} variant="pair">
+              {column}
+            </TableHead>
+          ))}
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        <TableSpinner isLoading={isLoading} colSpan={columns.length} />
+        <TableNoData
+          colSpan={columns.length}
+          data={data}
+          isLoading={isLoading}
+        />
+        {data?.map((item, index) => {
+          const network = chainIdToNetworkConfig(item.chainId);
+
+          const tokenOutDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: item.tokenOut,
+            tokenSymbol: item.tokenOutSymbol,
+            tokenName: item.tokenOutSymbol,
+            customName: item.tokenOutSymbolCustom ?? undefined,
+            customSymbol: item.tokenOutSymbolCustom ?? undefined,
+            imageUri: item.tokenOutImageUri ?? undefined,
+          });
+
+          const tokenInDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: item.tokenIn,
+            tokenSymbol: item.tokenInSymbol,
+            tokenName: item.tokenInSymbol,
+            customName: item.tokenInSymbolCustom ?? undefined,
+            customSymbol: item.tokenInSymbolCustom ?? undefined,
+            imageUri: item.tokenInImageUri ?? undefined,
+          });
+
+          return (
+            <TableRow key={index}>
+              <TableCell
+                style={
+                  {
+                    "--max-w": "300px",
+                  } as React.CSSProperties
+                }
+                className="w-(--max-w) min-w-0"
+              >
+                <div className="flex min-w-0 items-center gap-3.25">
+                  {/* Client wants the order to be token out / token in, refers to MB-415 */}
+                  <div className="flex min-w-0 shrink-0 items-center">
+                    <TokenImage
+                      src={tokenOutDisplay.imageUri}
+                      alt={tokenOutDisplay.symbol}
+                      classNames={{
+                        common: "size-6 sm:size-8",
+                      }}
+                    />
+                    <TokenImage
+                      src={tokenInDisplay.imageUri}
+                      alt={tokenInDisplay.symbol}
+                      classNames={{
+                        common: "size-6 sm:size-8 -ml-1",
+                      }}
+                    />
+                  </div>
+                  {/* max-w - 51px - 63px - 13px = max-w - 127px (31.75) */}
+                  <span
+                    className="max-w-[calc(var(--max-w)-var(--spacing)*31.75)] min-w-0 truncate"
+                    title={`${tokenOutDisplay.symbol}/${tokenInDisplay.symbol}`}
+                  >
+                    {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
+                  </span>
+                </div>
+              </TableCell>
+              <TableCell>
+                <MetricNumber number={item.volume} isShorten />
+              </TableCell>
+              <TableCell>
+                <MetricNumber
+                  number={sciToFormatted(item.liquidity, item.tokenOutDecimals)}
+                  unit={item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
+                  isShorten
+                />
+              </TableCell>
+              <TableCell>
+                <NetworkDisplay
+                  chainId={item.chainId}
+                  classNames={{
+                    container: "flex items-center gap-3 justify-center",
+                  }}
+                />
+              </TableCell>
+              <TableCell className="pr-10">
+                <Link
+                  to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
+                >
+                  <Button variant={"pair"} hasHover>
+                    View Detail
+                  </Button>
+                </Link>
+              </TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
+};
+
+export default PairListGlowListTable;

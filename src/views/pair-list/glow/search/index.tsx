@@ -10,7 +10,14 @@ const PairListGlowSearch = () => {
   const { filter, setFilter } = usePairListSearchFilterStore();
   return (
     <>
-      <TokenListGlow variant="pair" />
+      <TokenListGlow
+        variant="pair"
+        onTokenClick={(token) => {
+          setFilter({
+            text: token.address,
+          });
+        }}
+      />
       <GlowContainer
         variant="pair"
         className="flex flex-col gap-3 p-3 md:p-6 xl:flex-row"

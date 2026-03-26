@@ -19,6 +19,7 @@ export type PairItemType = {
   tokenOutSymbolCustom: string | null;
   tokenInImageUri: string | null;
   tokenOutImageUri: string | null;
+  liquidity: string; // string number
 };
 
 export type PairListRequest = PaginationRequest & {

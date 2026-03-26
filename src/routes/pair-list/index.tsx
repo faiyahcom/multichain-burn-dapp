@@ -3,6 +3,7 @@ import PairListSearch from "../../views/pair-list/search";
 import PairListList from "@/views/pair-list/list";
 import PairListGlowSummary from "@/views/pair-list/glow/summary";
 import PairListGlowSearch from "@/views/pair-list/glow/search";
+import PairListGlowList from "@/views/pair-list/glow/list";
 
 export const Route = createFileRoute("/pair-list/")({
   component: RouteComponent,
@@ -17,6 +18,7 @@ function RouteComponent() {
     <div className="w-full space-y-4 xl:space-y-8">
       <PairListGlowSummary />
       <PairListGlowSearch />
+      <PairListGlowList />
     </div>
   );
 }

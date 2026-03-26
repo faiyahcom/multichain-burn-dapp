@@ -35,6 +35,7 @@ const customMerge = extendTailwindMerge({
         "rounded-21px",
         "rounded-18px",
         "rounded-24px",
+        "rounded-13px",
       ],
     },
   },
