@@ -1,3 +1,4 @@
+import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import GlowContainer from "@/components/common/glow/container";
@@ -19,10 +20,13 @@ import { dashboardQueryKeys } from "@/services/queries/queryKey";
 import TokenListGlow from "@/components/common/glow/token-list";
 import { useScrollingFeed } from "@/hooks/useScrollingFeed";
 import { useActivityStream } from "@/hooks/useActivityStream";
+import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
 
 const DEFAULT_POOL_LIMIT = 4;
 
 const HomeDashboard = () => {
+    const navigate = useNavigate();
+    const { setFilter } = usePairListSearchFilterStore();
     const { data } = useQuery({
         queryKey: dashboardQueryKeys.statsSticker(),
         queryFn: () => dashboardService.getStatsSticker(),
@@ -109,7 +113,13 @@ const HomeDashboard = () => {
                 />
             </GlowContainer>
             <TopPairSection data={topPairData} />
-            <TokenListGlow variant="pair" />
+            <TokenListGlow
+                variant="pair"
+                onTokenClick={(token) => {
+                    setFilter({ text: token.address });
+                    navigate({ to: "/pair-list/" });
+                }}
+            />
             <GlowContainer variant="pair">
                 <TransactionFeed
                     visibleItems={txnFeed.visibleItems}
