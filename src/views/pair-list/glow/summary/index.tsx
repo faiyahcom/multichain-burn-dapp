@@ -21,7 +21,7 @@ const PairListGlowSummary = () => {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 xl:gap-6">
+    <div className="global-grid">
       {cards.map((card, index) => (
         <GlowSummaryCard key={index} {...card} variant="pair" />
       ))}

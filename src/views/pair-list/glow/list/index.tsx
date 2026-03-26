@@ -8,6 +8,7 @@ import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { useQuery } from "@tanstack/react-query";
 import PairListGlowListTable from "./table";
 import CustomPagination from "@/components/common/glow/glow-pagination";
+import PairListGlowListGrid from "./grid";
 
 const PairListGlowList = () => {
   const { filter, setFilter } = usePairListSearchFilterStore();
@@ -32,12 +33,22 @@ const PairListGlowList = () => {
   return (
     <GlowContainer
       variant="pair"
-      className={cn("px-2.5 sm:px-5", {
-        "space-y-5 py-4.75 sm:space-y-10 sm:py-9.5": listLayout === "list",
-      })}
+      className={cn(
+        "",
+        {
+          "space-y-5 px-2.5 py-4.75 sm:space-y-10 sm:px-5 sm:py-9.5":
+            listLayout === "list",
+        },
+        {
+          "space-y-8.5 p-3 sm:space-y-17 sm:p-6": listLayout === "card",
+        },
+      )}
     >
       {listLayout === "list" && (
         <PairListGlowListTable data={pairs?.pairs} isLoading={isPendingPairs} />
+      )}
+      {listLayout === "card" && (
+        <PairListGlowListGrid data={pairs?.pairs} isLoading={isPendingPairs} />
       )}
       <CustomPagination
         currentPage={filter.page}

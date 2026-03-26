@@ -57,6 +57,18 @@ const buttonVariants = ({
             "bg-foreground text-mb-btn-swap",
             getVariantShadowClassName({ variant: "swap" }),
           ),
+          "pair-grid": cn(
+            "text-foreground grid-pair-btn-bg",
+            getVariantShadowClassName({ variant: "pair" }),
+          ),
+          "burn-grid": cn(
+            "text-foreground grid-burn-btn-bg",
+            getVariantShadowClassName({ variant: "burn" }),
+          ),
+          "swap-grid": cn(
+            "text-foreground grid-swap-btn-bg",
+            getVariantShadowClassName({ variant: "swap" }),
+          ),
         },
         size: {
           default: "py-3 px-6 text-base md:text-2xl",
@@ -89,23 +101,31 @@ const BUTTON_VARIANT_CONTAINER_VARIANT_MAP: Record<
   "burn-active": "burn",
   "pair-active": "pair",
   "swap-active": "swap",
+  "pair-grid": "pair",
+  "burn-grid": "burn",
+  "swap-grid": "swap",
 };
+
+// Mutually exclusive: can pass isActive OR isGrid, but not both
+type ButtonVariantOptions =
+  | { containerVariant: ContainerVariant; isActive?: boolean; isGrid?: never }
+  | { containerVariant: ContainerVariant; isGrid?: boolean; isActive?: never };
 
 export const getButtonVariantFromContainerVariant = ({
   containerVariant,
   isActive,
-}: {
-  containerVariant: ContainerVariant;
-  isActive: boolean;
-}): ButtonVariant => {
+  isGrid,
+}: ButtonVariantOptions): ButtonVariant => {
   const entry = Object.entries(BUTTON_VARIANT_CONTAINER_VARIANT_MAP).find(
-    ([key, value]) =>
-      value === containerVariant && isActive === key.endsWith("-active"),
+    ([key, value]) => {
+      if (value !== containerVariant) return false;
+      if (isGrid) return key.endsWith("-grid");
+      if (isActive) return key.endsWith("-active");
+      return !key.endsWith("-active") && !key.endsWith("-grid");
+    },
   );
 
-  return (entry?.[0] ?? "default") as NonNullable<
-    VariantProps<ReturnType<typeof buttonVariants>>["variant"]
-  >;
+  return (entry?.[0] ?? "default") as ButtonVariant;
 };
 
 function Button({
