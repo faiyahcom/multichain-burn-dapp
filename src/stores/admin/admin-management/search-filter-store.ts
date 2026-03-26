@@ -18,7 +18,7 @@ const resolveRolesFilter = (
     return currentRoles;
   }
 
-  return nextRoles.length > 0 ? nextRoles : allAdminManagementRoles;
+  return nextRoles;
 };
 
 const resolveNetworkFilter = (
@@ -29,7 +29,7 @@ const resolveNetworkFilter = (
     return currentNetwork;
   }
 
-  return nextNetwork.length > 0 ? nextNetwork : allAdminManagementNetworkIds;
+  return nextNetwork;
 };
 
 type AdminManagementSearchFilterType = {

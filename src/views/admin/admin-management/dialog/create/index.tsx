@@ -60,6 +60,17 @@ const AdminManagementDialogCreate = () => {
         isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
           const targetNetworkId = values.networkId;
+          const isExistingAdmin = await adminManagementService.checkExistingAdmin({
+            walletAddress: values.walletAddress,
+            networkId: targetNetworkId,
+          });
+
+          if (isExistingAdmin) {
+            toast.error(
+              "This wallet address already exists on the selected network.",
+            );
+            return;
+          }
 
           if (currentNetworkId !== targetNetworkId) {
             openSwitchNetworkModal(currentNetworkId, targetNetworkId);

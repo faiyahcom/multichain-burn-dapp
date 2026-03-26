@@ -11,6 +11,7 @@ import type {
   AdminManagementRole,
 } from "@/types/admin/admin-management";
 import type { PaginationResponse } from "@/types/common";
+import { isEvmAddress } from "@/utils/helpers/address";
 
 const ADMINS_API_ROUTES = API_ROUTES.ADMINS;
 const allAdminManagementNetworkIds = new Set(
@@ -49,6 +50,11 @@ export interface DeleteAdminManagementRequest {
   networkId: NetworkId;
 }
 
+export interface CheckExistingAdminRequest {
+  walletAddress: string;
+  networkId: NetworkId;
+}
+
 type AdminManagementApiRole = AdminManagementRole | "normal";
 
 type AdminManagementApiItem = {
@@ -80,6 +86,21 @@ const resolveAdminChainId = (networkId: NetworkId) => {
   }
 
   return chainId;
+};
+
+const areWalletAddressesEqual = (left?: string, right?: string) => {
+  if (!left || !right) {
+    return false;
+  }
+
+  const normalizedLeft = left.trim();
+  const normalizedRight = right.trim();
+
+  if (isEvmAddress(normalizedLeft) && isEvmAddress(normalizedRight)) {
+    return normalizedLeft.toLowerCase() === normalizedRight.toLowerCase();
+  }
+
+  return normalizedLeft === normalizedRight;
 };
 
 const buildAdminChainIdQuery = (networkIds?: NetworkId[]) => {
@@ -173,6 +194,33 @@ export const adminManagementService = {
       totalDisable: admins.filter((admin) => !admin.enabled).length,
       admins,
     };
+  },
+
+  checkExistingAdmin: async ({
+    walletAddress,
+    networkId,
+  }: CheckExistingAdminRequest): Promise<boolean> => {
+    const normalizedWalletAddress = walletAddress.trim();
+    const response = await apiClient.get<AdminManagementApiListResponse>(
+      ADMINS_API_ROUTES.LIST,
+      {
+        params: {
+          page: 1,
+          limit: 100,
+          search: normalizedWalletAddress || undefined,
+          chainId: resolveAdminChainId(networkId),
+        },
+      },
+    );
+
+    return response.admins.some((item) => {
+      const itemNetworkId = chainIdToNetworkConfig(String(item.chainId))?.id;
+
+      return (
+        itemNetworkId === networkId &&
+        areWalletAddressesEqual(item.address, normalizedWalletAddress)
+      );
+    });
   },
 
   createAdmin: async (

@@ -59,6 +59,7 @@ interface Props {
   isLoading?: boolean;
   lockWalletAddress?: boolean;
   lockNetworkId?: boolean;
+  lockRole?: boolean;
   onSubmit: (values: AdminManagementFormValues) => Promise<void> | void;
 }
 
@@ -82,6 +83,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
   isLoading,
   lockWalletAddress,
   lockNetworkId,
+  lockRole,
   onSubmit,
 }) => {
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
@@ -264,21 +266,34 @@ const AdminManagementDialogForm: React.FC<Props> = ({
                     Role
                     <span className="text-md-required-red">*</span>
                   </FieldLabel>
-                  <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger
+                  {lockRole ? (
+                    <Input
                       id={field.name}
-                      className="h-9 w-full rounded-md-plus border-none bg-inactive px-5 text-base text-foreground shadow-none"
+                      value={adminManagementRoleLabels[field.value]}
+                      disabled
+                      className="px-5 disabled:opacity-60"
+                    />
+                  ) : (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                      disabled={isLoading}
                     >
-                      <SelectValue placeholder="Select role" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-mb-popover">
-                      {adminManagementRoles.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {adminManagementRoleLabels[role]}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                      <SelectTrigger
+                        id={field.name}
+                        className="h-9 w-full rounded-md-plus border-none bg-inactive px-5 text-base text-foreground shadow-none"
+                      >
+                        <SelectValue placeholder="Select role" />
+                      </SelectTrigger>
+                      <SelectContent className="bg-mb-popover">
+                        {adminManagementRoles.map((role) => (
+                          <SelectItem key={role} value={role}>
+                            {adminManagementRoleLabels[role]}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                   {fieldState.invalid ? (
                     <FieldError errors={[fieldState.error]} />
                   ) : null}
