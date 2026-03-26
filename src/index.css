@@ -575,4 +575,36 @@
   );
 }
 
+@utility grid-pair-btn-bg {
+  background: linear-gradient(
+    0deg,
+    #150043 6.59%,
+    #150043 21.65%,
+    #3500a9 80.33%
+  );
+}
+
+@utility grid-burn-btn-bg {
+  background: linear-gradient(
+    0deg,
+    #8f1d00 3.23%,
+    #c72800 13%,
+    #ff6800 100%,
+    #ff6800 100%
+  );
+}
+
+@utility grid-swap-btn-bg {
+  background: linear-gradient(
+    0deg,
+    #003f79 7.41%,
+    #0173de 46.5%,
+    #0285ff 99.2%
+  );
+}
+
+@utility global-grid {
+  @apply grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4 xl:gap-6;
+}
+
 /* END */

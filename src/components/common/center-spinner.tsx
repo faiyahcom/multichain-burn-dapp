@@ -16,7 +16,7 @@ const CenterSpinner: React.FC<Props> = ({ isLoading, classNames }) => {
   return (
     <div
       className={cn(
-        "flex items-center justify-center py-1",
+        "flex items-center justify-center py-6",
         classNames?.container,
       )}
     >

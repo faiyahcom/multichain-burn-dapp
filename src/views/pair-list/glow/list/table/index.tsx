@@ -98,9 +98,9 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   {/* max-w - 51px - 63px - 13px = max-w - 127px (31.75) */}
                   <span
                     className="max-w-[calc(var(--max-w)-var(--spacing)*31.75)] min-w-0 truncate"
-                    title={`${tokenOutDisplay.symbol}/${tokenInDisplay.symbol}`}
+                    title={`${tokenOutDisplay.symbol} / ${tokenInDisplay.symbol}`}
                   >
-                    {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
+                    {tokenOutDisplay.symbol} / {tokenInDisplay.symbol}
                   </span>
                 </div>
               </TableCell>
@@ -119,6 +119,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   chainId={item.chainId}
                   classNames={{
                     container: "flex items-center gap-3 justify-center",
+                    img: "mr-0",
                   }}
                 />
               </TableCell>
