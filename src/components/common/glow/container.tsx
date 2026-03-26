@@ -87,6 +87,92 @@ export const getVariantBgClassName = ({
   return cn(variantClassName, custom);
 };
 
+export const getVariantBtnBg50ClassName = ({
+  variant,
+  custom,
+  isHover,
+  isGroupHover,
+}: {
+  variant: ContainerVariant;
+  custom?: string;
+  isHover?: boolean;
+  isGroupHover?: boolean;
+}) => {
+  let variantClassName = "";
+  switch (variant) {
+    case "pair":
+      variantClassName = cn(
+        { "bg-mb-btn-pair/50": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-pair/50": isHover },
+        { "group-hover:bg-mb-btn-pair/50": isGroupHover },
+      );
+      break;
+    case "burn":
+      variantClassName = cn(
+        { "bg-mb-btn-burn/50": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-burn/50": isHover },
+        { "group-hover:bg-mb-btn-burn/50": isGroupHover },
+      );
+      break;
+    case "swap":
+      variantClassName = cn(
+        { "bg-mb-btn-swap/50": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-swap/50": isHover },
+        { "group-hover:bg-mb-btn-swap/50": isGroupHover },
+      );
+      break;
+    default:
+      const _exhaustiveCheck: never = variant;
+      variantClassName = _exhaustiveCheck;
+      break;
+  }
+
+  return cn(variantClassName, custom);
+};
+
+export const getVariantBtnBgClassName = ({
+  variant,
+  custom,
+  isHover,
+  isGroupHover,
+}: {
+  variant: ContainerVariant;
+  custom?: string;
+  isHover?: boolean;
+  isGroupHover?: boolean;
+}) => {
+  let variantClassName = "";
+  switch (variant) {
+    case "pair":
+      variantClassName = cn(
+        { "bg-mb-btn-pair": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-pair": isHover },
+        { "group-hover:bg-mb-btn-pair": isGroupHover },
+      );
+      break;
+    case "burn":
+      variantClassName = cn(
+        { "bg-mb-btn-burn": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-burn": isHover },
+        { "group-hover:bg-mb-btn-burn": isGroupHover },
+      );
+      break;
+    case "swap":
+      variantClassName = cn(
+        { "bg-mb-btn-swap": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-swap": isHover },
+        { "group-hover:bg-mb-btn-swap": isGroupHover },
+      );
+      break;
+    default:
+      const _exhaustiveCheck: never = variant;
+      variantClassName = _exhaustiveCheck;
+      break;
+  }
+
+  return cn(variantClassName, custom);
+};
+
 const GlowContainer = ({
   variant,
   className,

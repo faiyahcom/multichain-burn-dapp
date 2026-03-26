@@ -1,4 +1,4 @@
-import { IconGrid, IconMenu } from "@/assets/react";
+import { LayoutGridIcon, ListIcon } from "lucide-react";
 import type { FunctionComponent, SVGProps } from "react";
 
 export const sortOrders = ["asc", "desc"] as const;
@@ -25,7 +25,7 @@ export const sortBysShortLabels: Record<string, string> = {
   amountBurned: "Burned",
 };
 
-export const listLayouts = ["card", "list"] as const;
+export const listLayouts = ["list", "card"] as const;
 export type ListLayout = (typeof listLayouts)[number];
 export const listLayoutsLabels: Record<ListLayout, string> = {
   list: "List",
@@ -39,8 +39,8 @@ export const listLayoutsBtnIcons: Record<
     }
   >
 > = {
-  list: IconMenu,
-  card: IconGrid,
+  list: ListIcon,
+  card: LayoutGridIcon,
 };
 
 export type ErrorResponseData = {
