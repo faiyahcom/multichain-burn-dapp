@@ -55,7 +55,7 @@ const NetworkDisplay: React.FC<Props & CommonProps> = ({
       <NetworkImgIcon
         src={networkConfig.iconSrc}
         alt={networkConfig.label}
-        className={cn("mr-1.5 inline size-4.75", classNames?.img)}
+        className={cn("mr-1.5 inline size-6 sm:size-8", classNames?.img)}
         style={styles?.img}
       />
       <span className={classNames?.label} style={styles?.label}>

@@ -40,7 +40,7 @@ const MetricNumber: React.FC<Props> = ({
   return (
     <div
       className={cn(
-        "flex w-full items-center justify-center gap-0.5",
+        "flex w-full items-center justify-center gap-2",
         classNames?.container,
       )}
     >

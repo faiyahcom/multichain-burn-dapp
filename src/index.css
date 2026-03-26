@@ -42,6 +42,8 @@
   /* 18px */
   --radius-24px: calc(var(--radius) + 12px);
   /* 24px */
+  --radius-13px: calc(var(--radius) + 1px);
+  /* 13px */
 
   /* Font */
   --font-inter:
