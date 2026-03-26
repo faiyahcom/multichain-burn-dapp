@@ -4,6 +4,7 @@ import type {
   PairDetailStatsResponse,
   PairListRequest,
   PairListResponse,
+  PairOverallStatsResponse,
 } from "@/types/pair";
 import { API_ROUTES } from "./apiRoutes";
 
@@ -32,6 +33,14 @@ export const pairService = {
       {
         params: rest,
       },
+    );
+
+    return response;
+  },
+
+  getPairOverallStats: async () => {
+    const response = await apiClient.get<PairOverallStatsResponse>(
+      `${PAIRS_API_ROUTES.OVERALL_STATS}`,
     );
 
     return response;

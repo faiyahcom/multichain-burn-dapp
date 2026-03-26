@@ -44,3 +44,12 @@ export type PairDetailStatsResponse = {
   totalPaticipants: number;
   pair: PairItemType;
 };
+
+export type PairOverallStatsResponse = {
+  stats: {
+    totalPairs: number;
+    totalParticipants: number;
+    totalVolume: string; // string number
+    totalTransactions: number;
+  };
+};
