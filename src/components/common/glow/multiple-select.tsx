@@ -1,9 +1,4 @@
-import {
-  IconCheck,
-  IconDownTriangle,
-  IconSquare,
-  IconSquareCheck,
-} from "@/assets/react";
+import { IconCheck, IconSquare, IconSquareCheck } from "@/assets/react";
 import { cn } from "@/lib/utils";
 import {
   Popover,
@@ -15,6 +10,7 @@ import {
 } from "../../ui/popover";
 import { Button, getButtonVariantFromContainerVariant } from "./button";
 import { getVariantBorderClassName, type ContainerVariant } from "./container";
+import { DownTriangleIcon } from "./down-triangle-icon";
 
 export interface MultipleSelectOption {
   label: string;
@@ -109,7 +105,7 @@ const MultipleSelect: React.FC<Props> = ({
               : placeholder
           }
         >
-          <div className="size-2.5" />
+          <div />
           {isAnySelected ? (
             <div className="flex min-w-0 items-center gap-1.75">
               {showIcon && (
@@ -134,12 +130,12 @@ const MultipleSelect: React.FC<Props> = ({
           ) : (
             placeholder
           )}{" "}
-          <IconDownTriangle className="shrink-0" />
+          <DownTriangleIcon />
         </Button>
       </PopoverTrigger>
       <PopoverContent
         className={cn(
-          "space-y-6 pb-6.75",
+          "space-y-2.5 pb-3",
           getVariantBorderClassName({
             variant,
             custom: "rounded-5px border-4",

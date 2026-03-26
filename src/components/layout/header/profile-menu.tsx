@@ -63,7 +63,7 @@ const ProfileMenu = ({}: Props) => {
           </DropdownMenuTrigger>
           {!isMobile && (
             <div className="w-35">
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="w-full">
                 <p
                   className="min-w-0 truncate text-13px font-extrabold"
                   title={name}

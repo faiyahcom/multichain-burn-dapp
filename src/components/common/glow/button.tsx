@@ -5,7 +5,13 @@ import { Slot } from "radix-ui";
 import { cn } from "@/lib/utils";
 import { getVariantShadowClassName, type ContainerVariant } from "./container";
 
-const buttonVariants = ({ hasHover = false }: { hasHover?: boolean }) =>
+const buttonVariants = ({
+  hasHover = false,
+  hasGroupHover = false,
+}: {
+  hasHover?: boolean;
+  hasGroupHover?: boolean;
+}) =>
   cva(
     "transition-all duration-300 inline-flex items-center justify-center gap-2 md:gap-3 rounded-md",
     {
@@ -15,16 +21,28 @@ const buttonVariants = ({ hasHover = false }: { hasHover?: boolean }) =>
           pair: cn(
             "bg-mb-btn-pair text-foreground",
             { "hover:bg-foreground hover:text-mb-btn-pair": hasHover },
+            {
+              "group-hover:bg-foreground group-hover:text-mb-btn-pair":
+                hasGroupHover,
+            },
             getVariantShadowClassName({ variant: "pair" }),
           ),
           burn: cn(
             "bg-mb-btn-burn text-foreground",
             { "hover:bg-foreground hover:text-mb-btn-burn": hasHover },
+            {
+              "group-hover:bg-foreground group-hover:text-mb-btn-burn":
+                hasGroupHover,
+            },
             getVariantShadowClassName({ variant: "burn" }),
           ),
           swap: cn(
             "bg-mb-btn-swap text-foreground",
             { "hover:bg-foreground hover:text-mb-btn-swap": hasHover },
+            {
+              "group-hover:bg-foreground group-hover:text-mb-btn-swap":
+                hasGroupHover,
+            },
             getVariantShadowClassName({ variant: "swap" }),
           ),
           "pair-active": cn(
@@ -41,7 +59,7 @@ const buttonVariants = ({ hasHover = false }: { hasHover?: boolean }) =>
           ),
         },
         size: {
-          default: "py-3 px-6 text-xl md:text-2xl",
+          default: "py-3 px-6 text-base md:text-2xl",
           big: "py-[25px] px-[66px] text-22px",
         },
       },
@@ -88,10 +106,12 @@ function Button({
   size = "default",
   asChild = false,
   hasHover = false,
+  hasGroupHover = false,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<ReturnType<typeof buttonVariants>> & {
     hasHover?: boolean;
+    hasGroupHover?: boolean;
     asChild?: boolean;
   }) {
   const Comp = asChild ? Slot.Root : "button";
@@ -101,7 +121,13 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      className={cn(buttonVariants({ hasHover })({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ hasHover, hasGroupHover })({
+          variant,
+          size,
+          className,
+        }),
+      )}
       {...props}
     />
   );
