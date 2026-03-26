@@ -159,8 +159,8 @@ const AdminManagementTable = () => {
   const isSelfAdminRecord = (admin: AdminManagementAdmin) => {
     return Boolean(
       user?.address &&
-        areWalletAddressesEqual(user.address, admin.walletAddress) &&
-        admin.walletAddress,
+      areWalletAddressesEqual(user.address, admin.walletAddress) &&
+      admin.walletAddress,
     );
   };
 
@@ -375,13 +375,13 @@ const AdminManagementTable = () => {
                     >
                       {admin.createdAt
                         ? new Date(admin.createdAt).toLocaleDateString(
-                            "en-US",
-                            {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            },
-                          )
+                          "en-US",
+                          {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          },
+                        )
                         : "N/A"}
                     </p>
                   </TableCell>

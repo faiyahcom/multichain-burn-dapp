@@ -6,7 +6,7 @@ import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { useNavigate } from "@tanstack/react-router";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useToggleAdminRoleEvmFn } from "../../table/useToggleAdminRoleEvmFn";
 import { useToggleAdminRoleSolanaFn } from "../../table/useToggleAdminRoleSolanaFn";
@@ -32,6 +32,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
   const openSwitchNetworkModal = useSystemStore(
     (state) => state.openSwitchNetworkModal,
   );
+  const accessToken = useAuthStore((state) => state.accessToken);
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
   const { toggleAdminRole: toggleAdminRoleSolana } =
     useToggleAdminRoleSolanaFn();
@@ -41,6 +42,17 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       : currentNetworkId && admin.networkIds.includes(currentNetworkId)
         ? currentNetworkId
         : admin.networkIds[0];
+
+  // Fetch total super admin count to guard against demoting the last one
+  const { data: superAdminData } = useQuery({
+    queryKey: [...adminManagementQueryKeys.all, "super-admin-count"],
+    enabled: open && admin.role === "super_admin" && !!accessToken,
+    queryFn: () =>
+      adminManagementService.getListAdmins({ roles: ["super_admin"], networkIds: [targetNetworkId], limit: 1 }),
+  });
+  // Lock the role selector if this admin is the only super admin
+  const isSoleSuperAdmin =
+    admin.role === "super_admin" && (superAdminData?.total ?? 0) <= 1;
 
   const { mutateAsync: updateAdmin, isPending } = useMutation({
     mutationFn: adminManagementService.updateAdmin,
@@ -76,15 +88,15 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         const enableNextRole =
           targetNetworkId === "solanaDevnet"
             ? await toggleAdminRoleSolana({
-                walletAddress: admin.walletAddress,
-                enabled: true,
-                role: values.role,
-              })
+              walletAddress: admin.walletAddress,
+              enabled: true,
+              role: values.role,
+            })
             : await toggleAdminRoleEvm({
-                walletAddress: admin.walletAddress,
-                enabled: true,
-                role: values.role,
-              });
+              walletAddress: admin.walletAddress,
+              enabled: true,
+              role: values.role,
+            });
 
         if (!enableNextRole) {
           return;
@@ -93,15 +105,15 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         const disablePreviousRole =
           targetNetworkId === "solanaDevnet"
             ? await toggleAdminRoleSolana({
-                walletAddress: admin.walletAddress,
-                enabled: false,
-                role: admin.role,
-              })
+              walletAddress: admin.walletAddress,
+              enabled: false,
+              role: admin.role,
+            })
             : await toggleAdminRoleEvm({
-                walletAddress: admin.walletAddress,
-                enabled: false,
-                role: admin.role,
-              });
+              walletAddress: admin.walletAddress,
+              enabled: false,
+              role: admin.role,
+            });
 
         if (!disablePreviousRole) {
           return;
@@ -119,9 +131,9 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         useAuthStore.setState((state) => ({
           user: state.user
             ? {
-                ...state.user,
-                role: updatedAdmin.role,
-              }
+              ...state.user,
+              role: updatedAdmin.role,
+            }
             : state.user,
         }));
 
@@ -153,6 +165,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       }}
       lockWalletAddress
       lockNetworkId
+      lockRole={isSoleSuperAdmin}
       isLoading={isPending || isCallingSc}
       onSubmit={handleSubmit}
     />

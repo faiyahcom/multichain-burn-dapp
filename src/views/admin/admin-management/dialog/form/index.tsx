@@ -270,7 +270,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
                     <Input
                       id={field.name}
                       value={adminManagementRoleLabels[field.value]}
-                      disabled
+                      disabled={lockRole || isLoading}
                       className="px-5 disabled:opacity-60"
                     />
                   ) : (
