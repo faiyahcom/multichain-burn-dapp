@@ -11,6 +11,8 @@ export const poolQueryKeys = {
     ["pools", "list", params] as const,
   stats: (poolKind: PoolKindCode) =>
     ["pools", "stats", poolKind] as const,
+  recents: (poolKind: PoolKindCode) =>
+    ["pools", "recents", poolKind] as const,
 };
 
 export const whitelistQueryKeys = {

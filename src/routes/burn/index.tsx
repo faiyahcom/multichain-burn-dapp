@@ -1,11 +1,10 @@
-import CommonPoolLayout from "@/views/pool";
-import { PoolKindCodeEnum } from "@/types/pool";
 import { createFileRoute } from "@tanstack/react-router";
+import { BurnPoolList } from "@/views/pool/glow/pool";
 
 export const Route = createFileRoute("/burn/")({
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <CommonPoolLayout poolType={PoolKindCodeEnum.Burn} />;
+  return <BurnPoolList />;
 }

@@ -1,5 +1,4 @@
-import CommonPoolLayout from "@/views/pool";
-import { PoolKindCodeEnum } from "@/types/pool";
+import { SwapPoolList } from "@/views/pool/glow/pool";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/swap/")({
@@ -7,5 +6,5 @@ export const Route = createFileRoute("/swap/")({
 });
 
 function RouteComponent() {
-  return <CommonPoolLayout poolType={PoolKindCodeEnum.Swap} />;
+  return <SwapPoolList />;
 }

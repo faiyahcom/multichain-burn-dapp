@@ -1,4 +1,3 @@
-import Decimal from "decimal.js";
 import GlowContainer from "@/components/common/glow/container";
 import { Button } from "@/components/common/glow/button";
 import {
@@ -10,23 +9,19 @@ import {
     IconStats,
     IconTwoDArrow,
 } from "@/assets/react";
-import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
-import type {
-    StatsStickerResponse,
-    TokenAmount,
-} from "@/services/dashboardService";
+import { shortenNumber } from "@/utils/helpers/numbers";
+import type { StatsStickerResponse } from "@/services/dashboardService";
 import BurnTrackerImage from "/images/dashboard/burn-tracker.png";
 import SwapChartStatsImage from "/images/dashboard/swap-stats.png";
 import { useNavigate } from "@tanstack/react-router";
-
-export const sumTokenAmounts = (items: TokenAmount[]): string => {
-    const total = items.reduce((acc, item) => {
-        const parsed = safeDecimalParse({ value: item.amount, throwValue: null });
-        if (!parsed) return acc;
-        return acc.add(parsed.div(new Decimal(10).pow(item.decimals)));
-    }, new Decimal(0));
-    return shortenNumber({ number: total.toNumber() }) as string;
-};
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import WhitelistTokenSelect, {
+    type TokenOption,
+} from "@/components/common/glow/whitelist-token-select";
+import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
+import TokenDisplay from "@/components/common/token-display";
+import { sumTokenAmounts } from "@/utils/shared-functions/calculate";
 
 // ── Shared stat row ────────────────────────────────────────────────────────────
 
@@ -55,14 +50,6 @@ const HeroStatRow = ({
         </div>
     </div>
 );
-
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import WhitelistTokenSelect, {
-    type TokenOption,
-} from "@/components/common/glow/whitelist-token-select";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
-import TokenDisplay from "@/components/common/token-display";
 
 const HeroSwapMiniForm = () => {
     const [tokenFrom, setTokenFrom] = useState<TokenOption>();
@@ -217,7 +204,7 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="swap"
-                    className="max-w-19/40 -mx-1 -mt-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:mx-0 sm:-mb-1 sm:-ml-1"
+                    className="-mx-1 -mt-1 flex max-w-19/40 shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:mx-0 sm:-mb-1 sm:-ml-1"
                 >
                     <div className="flex items-center gap-3">
                         <IconSwapCategory className="size-10.75" />

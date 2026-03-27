@@ -10,7 +10,6 @@ import {
 } from "@/views/dashboard/components/activity-feed";
 import {
     BurnSwapHero,
-    sumTokenAmounts,
 } from "@/views/dashboard/components/burn-swap-hero";
 import { PartnerBurnSection } from "@/views/dashboard/components/partner-burn";
 import { TopSwapperSection } from "@/views/dashboard/components/top-swapper";
@@ -21,6 +20,7 @@ import TokenListGlow from "@/components/common/glow/token-list";
 import { useScrollingFeed } from "@/hooks/useScrollingFeed";
 import { useActivityStream } from "@/hooks/useActivityStream";
 import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
+import { sumTokenAmounts } from "@/utils/shared-functions/calculate";
 
 const DEFAULT_POOL_LIMIT = 4;
 
