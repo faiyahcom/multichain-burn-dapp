@@ -171,7 +171,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               )}
               <TableCell>
                 <Button
-                  variant={"pair"}
+                  variant={"swap"}
                   hasGroupHover
                   className="font-orbitron"
                 >
