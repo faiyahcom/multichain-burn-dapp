@@ -91,9 +91,9 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
         desktop:
         100% - spacing * (5 + 12 + 56.75) = 100% - spacing * 73.75
         mobile:
-        100% - spacing * (2.5 + 3 + 27) = 100% - spacing * 32.5
+        100% - spacing * (2.5 + 3 + 30) = 100% - spacing * 35.5
       */}
-      <div className="flex w-[calc(100%-var(--spacing)*32.5)] items-center gap-3 xl:w-[calc(100%-var(--spacing)*73.75)] xl:gap-6">
+      <div className="flex w-[calc(100%-var(--spacing)*35.5)] items-center gap-3 xl:w-[calc(100%-var(--spacing)*73.75)] xl:gap-6">
         <button className={buttonClassName} onClick={() => scroll("prev")}>
           <ChevronLeftIcon className="size-6.25 text-[#7B879F] xl:size-8.75" />
         </button>

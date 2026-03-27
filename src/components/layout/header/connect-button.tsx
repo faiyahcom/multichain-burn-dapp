@@ -19,7 +19,7 @@ const ConnectButton = () => {
         "flex items-center",
         getVariantBorderClassName({ variant: "swap" }),
         getVariantShadowClassName({ variant: "swap" }),
-        "rounded-24px bg-transparent px-6 py-5.25 hover:bg-transparent",
+        "rounded-24px bg-transparent px-6 py-5.75 hover:bg-transparent",
       )}
       onClick={handleConnect}
     >
