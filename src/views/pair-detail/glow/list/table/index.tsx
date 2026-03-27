@@ -11,7 +11,6 @@ import {
 import TableNoData from "@/components/common/glow/table-no-data";
 import TableSpinner from "@/components/common/glow/table-spinner";
 import MetricNumber from "@/components/common/metric-number";
-import NetworkDisplay from "@/components/common/network-display";
 import RatioDisplay from "@/components/common/ratio-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TokenImage from "@/components/common/token-image";
@@ -38,7 +37,6 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
     "Pool",
     "Ratio",
     ...(isBurnPool ? ["Time", "Status"] : ["Volume"]),
-    "Network",
     "Action",
   ];
 
@@ -154,15 +152,6 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   <MetricNumber number={pool.volume} isShorten />
                 </TableCell>
               )}
-              <TableCell>
-                <NetworkDisplay
-                  chainId={pool.chainId}
-                  classNames={{
-                    container: "flex items-center gap-3 justify-center",
-                    img: "mr-0",
-                  }}
-                />
-              </TableCell>
               <TableCell>
                 <Link
                   to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}

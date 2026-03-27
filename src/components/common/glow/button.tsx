@@ -13,7 +13,7 @@ const buttonVariants = ({
   hasGroupHover?: boolean;
 }) =>
   cva(
-    "transition-all duration-300 inline-flex items-center justify-center gap-2 md:gap-3 rounded-md",
+    "transition-all duration-300 inline-flex items-center justify-center gap-2 md:gap-3 rounded-md disabled:opacity-50",
     {
       variants: {
         variant: {

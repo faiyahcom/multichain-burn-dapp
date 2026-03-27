@@ -20,6 +20,7 @@ interface Props {
   pageSize: number;
   hideIfLessThanTwoPages?: boolean;
   variant: ContainerVariant;
+  onlyShowCurrentPage?: boolean;
 }
 
 const CustomPagination: React.FC<Props> = ({
@@ -30,6 +31,7 @@ const CustomPagination: React.FC<Props> = ({
   pageSize,
   hideIfLessThanTwoPages = false,
   variant,
+  onlyShowCurrentPage = false,
 }) => {
   const paginationRange = usePagination({
     currentPage,
@@ -71,32 +73,47 @@ const CustomPagination: React.FC<Props> = ({
             })}
           />
         </PaginationItem>
-        {paginationRange?.map((page, index) => {
-          if (page === DOTS) {
+        {onlyShowCurrentPage ? (
+          <PaginationItem>
+            <PaginationLink
+              isActive={true}
+              className="cursor-pointer"
+              variant={getButtonVariantFromContainerVariant({
+                containerVariant: variant,
+                isActive: false,
+              })}
+            >
+              {currentPage}
+            </PaginationLink>
+          </PaginationItem>
+        ) : (
+          paginationRange?.map((page, index) => {
+            if (page === DOTS) {
+              return (
+                <PaginationItem key={`dots-${index}`}>
+                  <PaginationEllipsis />
+                </PaginationItem>
+              );
+            }
             return (
-              <PaginationItem key={`dots-${index}`}>
-                <PaginationEllipsis />
+              <PaginationItem
+                key={page}
+                onClick={() => onPageChange(Number(page))}
+              >
+                <PaginationLink
+                  isActive={page === currentPage}
+                  className="cursor-pointer"
+                  variant={getButtonVariantFromContainerVariant({
+                    containerVariant: variant,
+                    isActive: page === currentPage,
+                  })}
+                >
+                  {page}
+                </PaginationLink>
               </PaginationItem>
             );
-          }
-          return (
-            <PaginationItem
-              key={page}
-              onClick={() => onPageChange(Number(page))}
-            >
-              <PaginationLink
-                isActive={page === currentPage}
-                className="cursor-pointer data-[active=true]:bg-primary data-[active=true]:text-white"
-                variant={getButtonVariantFromContainerVariant({
-                  containerVariant: variant,
-                  isActive: false,
-                })}
-              >
-                {page}
-              </PaginationLink>
-            </PaginationItem>
-          );
-        })}
+          })
+        )}
         <PaginationItem onClick={onNext}>
           <PaginationNext
             className={cn("cursor-pointer", {

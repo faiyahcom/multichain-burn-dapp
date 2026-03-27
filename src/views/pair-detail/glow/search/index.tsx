@@ -5,8 +5,7 @@ import MultipleSelect from "@/components/common/glow/multiple-select";
 import RadioGroupButton from "@/components/common/glow/radio-group-btn";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
 import SortSelect from "@/components/common/glow/sort-select";
-import NetworkDisplay from "@/components/common/network-display";
-import TokenImage from "@/components/common/token-image";
+import TokenOutInNetworkDisplay from "@/components/common/glow/token-out-in-network-display";
 import { Skeleton } from "@/components/ui/skeleton";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
@@ -103,39 +102,21 @@ const PairDetailGlowSearch = () => {
     <>
       <div className="w-full space-y-3 xl:space-y-6">
         <div className="flex w-full items-center gap-2.75">
-          <div className="shrink-0 space-y-3 xl:space-y-6">
-            <div className="relative flex items-center gap-0.5 py-1.5 pr-1.5">
-              <TokenImage
-                isLoading={isPairDetailPending}
-                src={tokenOutDisplay.imageUri}
-                alt={tokenOutDisplay.symbol}
-                classNames={{
-                  common: "size-7 sm:size-9.75",
-                }}
-              />
-              <TokenImage
-                isLoading={isPairDetailPending}
-                src={tokenInDisplay.imageUri}
-                alt={tokenInDisplay.symbol}
-                classNames={{
-                  common: "size-7 sm:size-9.75",
-                }}
-              />
-              <NetworkDisplay
-                chainId={chainId}
-                classNames={{
-                  container: "absolute right-0 bottom-0",
-                  img: "size-4.75 sm:size-4.75 mr-0",
-                  label: "sr-only",
-                }}
-                styles={{
-                  img: {
-                    boxShadow: "-1px -1px 0px 0px #00000040",
-                  },
-                }}
-              />
-            </div>
-          </div>
+          <TokenOutInNetworkDisplay
+            tokenOutProps={{
+              isLoading: isPairDetailPending,
+              src: tokenOutDisplay.imageUri,
+              alt: tokenOutDisplay.symbol,
+            }}
+            tokenInProps={{
+              isLoading: isPairDetailPending,
+              src: tokenInDisplay.imageUri,
+              alt: tokenInDisplay.symbol,
+            }}
+            networkProps={{
+              chainId,
+            }}
+          />
           {isPairDetailPending ? (
             <Skeleton className="h-10 w-45" />
           ) : (

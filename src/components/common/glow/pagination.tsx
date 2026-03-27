@@ -3,7 +3,6 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 import { buttonVariants, type Button, type ButtonVariant } from "./button";
-// import { buttonVariants, type Button } from "@/components/ui/button"
 
 function Pagination({ className, ...props }: React.ComponentProps<"nav">) {
   return (
@@ -24,7 +23,10 @@ function PaginationContent({
   return (
     <ul
       data-slot="pagination-content"
-      className={cn("flex flex-row items-center gap-3 sm:gap-6", className)}
+      className={cn(
+        "flex flex-row flex-wrap items-center gap-3 sm:gap-6 justify-center",
+        className,
+      )}
       {...props}
     />
   );
@@ -53,6 +55,7 @@ function PaginationLink({
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
+      data-variant={variant}
       className={cn(
         buttonVariants({})({
           variant,

@@ -12,12 +12,14 @@ import {
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { useQuery } from "@tanstack/react-query";
 import PairDetailGlowListTable from "./table";
+import { useMediaQuery } from "usehooks-ts";
 
 const PairDetailGlowList = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
   const { listLayout, ...restFilter } = filter;
   const { chainId, tokenIn, tokenOut } = Route.useParams();
   const limit = 12;
+  const onlyShowCurrentPage = useMediaQuery("(max-width: 1024px)");
 
   const { data: pools, isPending: isPendingPools } = useQuery({
     queryKey: poolQueryKeys.list({ ...restFilter, chainId, tokenIn, tokenOut }),
@@ -62,6 +64,7 @@ const PairDetailGlowList = () => {
         pageSize={limit}
         onPageChange={(page) => setFilter({ page })}
         variant="pair"
+        onlyShowCurrentPage={onlyShowCurrentPage}
       />
     </GlowContainer>
   );
