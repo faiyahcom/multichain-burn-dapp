@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import NetworkDisplay from "../network-display";
 import TokenImage from "../token-image";
 
@@ -5,12 +6,14 @@ interface Props {
   tokenOutProps: React.ComponentProps<typeof TokenImage>;
   tokenInProps: React.ComponentProps<typeof TokenImage>;
   networkProps: React.ComponentProps<typeof NetworkDisplay>;
+  className?: string;
 }
 
 const TokenOutInNetworkDisplay: React.FC<Props> = ({
   tokenOutProps,
   tokenInProps,
   networkProps,
+  className,
 }) => {
   const { classNames: tokenOutClassNames, ...tokenOutPropsRest } =
     tokenOutProps;
@@ -18,7 +21,12 @@ const TokenOutInNetworkDisplay: React.FC<Props> = ({
   const { classNames: networkClassNames, ...networkPropsRest } = networkProps;
 
   return (
-    <div className="relative flex shrink-0 items-center gap-0.5 py-1.5 pr-1.5">
+    <div
+      className={cn(
+        "relative flex w-max shrink-0 items-center gap-0.5 py-1.5 pr-1.5",
+        className,
+      )}
+    >
       <TokenImage
         {...tokenOutPropsRest}
         classNames={{

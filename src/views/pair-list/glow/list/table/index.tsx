@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/components/common/glow/table";
 import TableNoData from "@/components/common/glow/table-no-data";
-import TableSpinner from "@/components/common/glow/table-spinner";
+import TableSkeleton from "@/components/common/glow/table-skeleton";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import TokenImage from "@/components/common/token-image";
@@ -24,21 +24,33 @@ interface Props {
 }
 
 const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
-  const columns = ["Pair", "Volume", "Liquidity", "Network", ""];
+  const columns = ["Pair", "Volume", "Liquidity", "Network", "Action"];
+
+  const cellWdith: React.CSSProperties["width"] = `400px`;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
           {columns.map((column, index) => (
-            <TableHead key={index} variant="pair">
+            <TableHead
+              key={index}
+              variant="pair"
+              style={{
+                width: cellWdith,
+              }}
+            >
               {column}
             </TableHead>
           ))}
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableSpinner isLoading={isLoading} colSpan={columns.length} />
+        <TableSkeleton
+          colCount={columns.length}
+          rowCount={12}
+          isLoading={isLoading}
+        />
         <TableNoData
           colSpan={columns.length}
           data={data}
@@ -69,14 +81,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
 
           return (
             <TableRow key={index}>
-              <TableCell
-                style={
-                  {
-                    "--max-w": "300px",
-                  } as React.CSSProperties
-                }
-                className="w-(--max-w) min-w-0"
-              >
+              <TableCell className="min-w-0">
                 <div className="flex min-w-0 items-center gap-3.25">
                   {/* Client wants the order to be token out / token in, refers to MB-415 */}
                   <div className="flex min-w-0 shrink-0 items-center">
@@ -127,7 +132,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                 <Link
                   to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
                 >
-                  <Button variant={"pair"} hasHover>
+                  <Button variant={"pair"} hasHover className="font-orbitron">
                     View Detail
                   </Button>
                 </Link>
