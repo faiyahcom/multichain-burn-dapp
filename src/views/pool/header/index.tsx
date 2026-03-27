@@ -1,5 +1,6 @@
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import { Button } from "@/components/ui/button";
+import { PoolKindCodeEnum } from "@/types/pool";
 import type { PoolType } from "@/types/admin/master-pool-management";
 import { Link } from "@tanstack/react-router";
 
@@ -8,7 +9,7 @@ interface Props {
 }
 
 const PoolListHeader: React.FC<Props> = ({ poolType }) => {
-  const text = poolType === 0 ? "burn" : "swap";
+  const text = poolType === PoolKindCodeEnum.Burn ? "burn" : "swap";
 
   return (
     <div className="mb-12.75 flex w-full items-center justify-between gap-10 pt-12.75 pr-13.5 pl-20.25">

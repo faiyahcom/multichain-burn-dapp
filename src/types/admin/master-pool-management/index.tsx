@@ -4,13 +4,13 @@ import type {
   SortBy,
   SortOrder,
 } from "@/types/common";
+import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
 
-// 0 - burn pool | 1 - swap pool
-export const poolTypes = [0, 1] as const;
-export type PoolType = (typeof poolTypes)[number];
+export const poolTypes = [PoolKindCodeEnum.Burn, PoolKindCodeEnum.Swap] as const;
+export type PoolType = PoolKindCode;
 export const poolTypeLabels: Record<PoolType, string> = {
-  0: "Burn pool",
-  1: "Swap pool",
+  [PoolKindCodeEnum.Burn]: "Burn pool",
+  [PoolKindCodeEnum.Swap]: "Swap pool",
 };
 
 export const poolTypeOptionValues = [
@@ -96,7 +96,7 @@ export type PoolItemType = {
   tokenOut: string;
   tokenOutSymbol: string;
   tokenOutDecimals: number;
-  kind: PoolType;
+  kind: PoolKindCode;
   timestamp: string;
   tokenInSymbolCustom: string | null;
   tokenOutSymbolCustom: string | null;

@@ -7,8 +7,8 @@ import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
-  poolTypes,
   poolTypeShortenOptions,
   userViewBurnPoolStatuses,
   userViewSwapPoolStatuses,
@@ -42,7 +42,7 @@ const PairDetailDetailHeader = () => {
   const handleSelectType = (value: PoolType) => {
     // swap pool has fewer statuses than burn pool
     // filter out statuses that don't exist in the selected pool type
-    if (value === poolTypes[1]) {
+    if (value === PoolKindCodeEnum.Swap) {
       const newStatuses =
         filter.status?.filter((status) =>
           (userViewSwapPoolStatuses as ReadonlyArray<SwapPoolStatus>).includes(
@@ -55,7 +55,7 @@ const PairDetailDetailHeader = () => {
 
     // if switching from swap pool to burn pool or all types
     // and all swap statuses were selected, expand to all burn pool statuses
-    if (value === poolTypes[0]) {
+    if (value === PoolKindCodeEnum.Burn) {
       if (filter.status?.length === userViewSwapPoolStatuses.length) {
         setFilter({ type: value, status: [...userViewBurnPoolStatuses] });
         return;

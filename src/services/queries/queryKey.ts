@@ -1,3 +1,5 @@
+import type { PoolKindCode } from "@/types/pool";
+
 export const poolQueryKeys = {
   all: ["pools"] as const,
   detail: (address: string) => ["pools", "detail", address] as const,
@@ -7,6 +9,8 @@ export const poolQueryKeys = {
     ["pools", "activities", address, page, excludeKinds] as const,
   list: (params?: Record<string, unknown>) =>
     ["pools", "list", params] as const,
+  stats: (poolKind: PoolKindCode) =>
+    ["pools", "stats", poolKind] as const,
 };
 
 export const whitelistQueryKeys = {

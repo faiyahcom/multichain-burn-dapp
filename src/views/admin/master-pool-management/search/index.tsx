@@ -6,12 +6,12 @@ import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SingleSelect from "@/components/common/single-select";
 import { useMasterPoolManagementSearchFilterStore } from "@/stores/admin/master-pool-management/search-filter-store";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
   burnPoolStatusColors,
   burnPoolStatuses,
   burnPoolStatusLabels,
   poolTypeOptions,
-  poolTypes,
   swapPoolStatusColors,
   swapPoolStatuses,
   swapPoolStatusLabels,
@@ -23,7 +23,7 @@ import {
 const AdminMasterPoolManagementSearch = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
   const statusOptions: MultipleSelectOption[] =
-    filter.type === poolTypes[1].toString()
+    filter.type === String(PoolKindCodeEnum.Swap)
       ? swapPoolStatuses.map((status) => ({
           label: swapPoolStatusLabels[status],
           value: status,
@@ -50,7 +50,7 @@ const AdminMasterPoolManagementSearch = () => {
   const handleSelectType = (value: PoolTypeOptionValue) => {
     // swap pool has fewer statuses than burn pool
     // filter out statuses that don't exist in the selected pool type
-    if (value === poolTypes[1].toString()) {
+    if (value === String(PoolKindCodeEnum.Swap)) {
       const newStatuses =
         filter.status?.filter((status) =>
           swapPoolStatuses.includes(status as SwapPoolStatus),
@@ -61,7 +61,7 @@ const AdminMasterPoolManagementSearch = () => {
 
     // if switching from swap pool to burn pool or all types
     // and all swap statuses were selected, expand to all burn pool statuses
-    if (value === poolTypes[0].toString() || value === "all") {
+    if (value === String(PoolKindCodeEnum.Burn) || value === "all") {
       if (filter.status?.length === swapPoolStatuses.length) {
         setFilter({ type: value, status: [...burnPoolStatuses] });
         return;

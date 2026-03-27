@@ -1,6 +1,6 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
-import { activityKind } from "@/types/pool";
+import { activityKind, type PoolKindCode } from "@/types/pool";
 
 export interface TokenAmount {
   chainId: string;
@@ -43,7 +43,7 @@ export interface ActivityItem {
   amountOut: string;
   chainId: string;
   poolAddress: string;
-  poolKind: number;
+  poolKind: PoolKindCode;
   recipient: string;
   executor: string;
   executorName: string | null;

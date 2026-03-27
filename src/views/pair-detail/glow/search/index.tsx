@@ -12,9 +12,9 @@ import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
   burnPoolStatusLabels,
-  poolTypes,
   poolTypeShortenOptions,
   swapPoolStatusLabels,
   userViewBurnPoolStatuses,
@@ -29,7 +29,7 @@ import { useQuery } from "@tanstack/react-query";
 const PairDetailGlowSearch = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
   const { chainId, tokenIn, tokenOut } = Route.useParams();
-  const isBurnPool = filter.type === poolTypes[0];
+  const isBurnPool = filter.type === PoolKindCodeEnum.Burn;
 
   const { data: pairDetail, isPending: isPairDetailPending } = useQuery({
     queryKey: pairQueryKeys.detail({
@@ -59,13 +59,13 @@ const PairDetailGlowSearch = () => {
   const handleSelectType = (value: PoolType) => {
     // swap pool only show ongoing
     // switching from burn pool to swap pool will fill out all statuses
-    if (value === poolTypes[1]) {
+    if (value === PoolKindCodeEnum.Swap) {
       setFilter({ type: value, status: [...userViewSwapPoolStatuses] });
       return;
     }
 
     // if switching from swap pool to burn pool
-    if (value === poolTypes[0]) {
+    if (value === PoolKindCodeEnum.Burn) {
       // Reset to all burn statuses
       setFilter({ type: value, status: [...userViewBurnPoolStatuses] });
       return;

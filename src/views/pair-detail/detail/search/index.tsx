@@ -5,10 +5,10 @@ import MultipleSelect from "@/components/common/multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SortSelect from "@/components/common/sort-select";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
   burnPoolStatusColors,
   burnPoolStatusLabels,
-  poolTypes,
   swapPoolStatusColors,
   swapPoolStatusLabels,
   userViewBurnPoolStatuses,
@@ -20,7 +20,7 @@ import {
 const PairDetailDetailSearch = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
   const statusOptions: MultipleSelectOption[] =
-    filter.type === poolTypes[1]
+    filter.type === PoolKindCodeEnum.Swap
       ? userViewSwapPoolStatuses.map((status) => ({
           label: swapPoolStatusLabels[status],
           value: status,

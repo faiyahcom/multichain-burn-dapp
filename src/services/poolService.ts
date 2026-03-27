@@ -7,6 +7,7 @@ import type {
 import type {
   PoolActivitiesResponse,
   PoolDetailResponse,
+  PoolKindCode,
   PoolTxnsResponse,
 } from "@/types/pool";
 const POOLS_API_ROUTES = API_ROUTES.POOLS;
@@ -52,6 +53,17 @@ export const poolService = {
       `${POOLS_API_ROUTES.REASON_CLOSE_POOL(address)}`,
       {
         reason,
+      },
+    );
+    return response;
+  },
+  getPoolStats: async (poolKind: PoolKindCode) => {
+    const response = await apiClient.get(
+      `${POOLS_API_ROUTES.STATS}`,
+      {
+        params: {
+          poolKind,
+        },
       },
     );
     return response;
