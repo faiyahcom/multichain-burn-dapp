@@ -657,42 +657,6 @@
     linear-gradient(0deg, rgba(13, 11, 20, 0.6), rgba(13, 11, 20, 0.6));
 }
 
-@utility grid-pair-bg {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(46, 0, 148, 0.7) -4.94%,
-      rgba(46, 0, 148, 0) 30.16%,
-      rgba(46, 0, 148, 0.7) 74.87%,
-      #2e0094 95.06%
-    ),
-    linear-gradient(0deg, rgba(42, 31, 82, 0.68), rgba(42, 31, 82, 0.68));
-}
-
-@utility grid-burn-bg {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(255, 102, 0, 0.3) -4.94%,
-      rgba(255, 102, 0, 0) 23.43%,
-      rgba(255, 102, 0, 0) 62.37%,
-      rgba(255, 102, 0, 0.7) 95.06%
-    ),
-    linear-gradient(0deg, rgba(13, 11, 20, 0.35), rgba(13, 11, 20, 0.35));
-}
-
-@utility grid-swap-bg {
-  background:
-    linear-gradient(
-      180deg,
-      rgba(2, 133, 255, 0.3) -4.94%,
-      rgba(2, 133, 255, 0) 23.43%,
-      rgba(2, 133, 255, 0) 62.37%,
-      rgba(0, 80, 154, 0.7) 95.06%
-    ),
-    linear-gradient(0deg, rgba(13, 11, 20, 0.6), rgba(13, 11, 20, 0.6));
-}
-
 @utility grid-pair-btn-bg {
   background: linear-gradient(
     0deg,
