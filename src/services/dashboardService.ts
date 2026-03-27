@@ -55,7 +55,8 @@ export interface ActivityItem {
   tokenOutImage: string | null;
   pool?: {
     name: string | null;
-  }
+  };
+  fee?: string;
 }
 
 export interface LatestActivityResponse {
