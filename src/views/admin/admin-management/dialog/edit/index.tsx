@@ -74,10 +74,6 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     const currentAuthState = useAuthStore.getState();
     const nextAddress =
       refreshedUser.address || currentAuthState.user?.address || "";
-    const nextAccessToken =
-      refreshedUser.accessToken ??
-      refreshedUser.token ??
-      currentAuthState.accessToken;
 
     useAuthStore.setState((state) => ({
       user: state.user
@@ -92,7 +88,6 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
           address: nextAddress,
           role: refreshedUser.role,
         },
-      accessToken: nextAccessToken,
     }));
 
     return refreshedUser;
