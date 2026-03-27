@@ -34,7 +34,10 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
   );
   const accessToken = useAuthStore((state) => state.accessToken);
   const { toggleAdminRole: toggleAdminRoleEvm } = useToggleAdminRoleEvmFn();
-  const { toggleAdminRole: toggleAdminRoleSolana } =
+  const {
+    toggleAdminRole: toggleAdminRoleSolana,
+    toggleAdminRoles: toggleAdminRolesSolana,
+  } =
     useToggleAdminRoleSolanaFn();
   const targetNetworkId =
     admin.networkIds.length === 1
@@ -126,43 +129,65 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     setIsCallingSc(true);
     try {
       if (roleChanged && admin.enabled) {
-        const enableNextRole =
-          targetNetworkId === "solanaDevnet"
-            ? await toggleAdminRoleSolana({
+        const shouldBatchSolanaRoleSwap =
+          targetNetworkId === "solanaDevnet" && shouldDisablePreviousRole;
+
+        if (shouldBatchSolanaRoleSwap) {
+          const isRoleSwapped = await toggleAdminRolesSolana([
+            {
               walletAddress: admin.walletAddress,
               enabled: true,
               role: values.role,
-            })
-            : await toggleAdminRoleEvm({
+            },
+            {
               walletAddress: admin.walletAddress,
-              enabled: true,
-              role: values.role,
-            });
+              enabled: false,
+              role: admin.role,
+            },
+          ]);
 
-        if (!enableNextRole) {
-          return;
-        }
-
-        if (isSelfDemotedFromSuperAdmin) {
-          didSelfDemoteOnChain = true;
-        }
-
-        if (shouldDisablePreviousRole) {
-          const disablePreviousRole =
+          if (!isRoleSwapped) {
+            return;
+          }
+        } else {
+          const enableNextRole =
             targetNetworkId === "solanaDevnet"
               ? await toggleAdminRoleSolana({
                 walletAddress: admin.walletAddress,
-                enabled: false,
-                role: admin.role,
+                enabled: true,
+                role: values.role,
               })
               : await toggleAdminRoleEvm({
                 walletAddress: admin.walletAddress,
-                enabled: false,
-                role: admin.role,
+                enabled: true,
+                role: values.role,
               });
 
-          if (!disablePreviousRole) {
+          if (!enableNextRole) {
             return;
+          }
+
+          if (isSelfDemotedFromSuperAdmin) {
+            didSelfDemoteOnChain = true;
+          }
+
+          if (shouldDisablePreviousRole) {
+            const disablePreviousRole =
+              targetNetworkId === "solanaDevnet"
+                ? await toggleAdminRoleSolana({
+                  walletAddress: admin.walletAddress,
+                  enabled: false,
+                  role: admin.role,
+                })
+                : await toggleAdminRoleEvm({
+                  walletAddress: admin.walletAddress,
+                  enabled: false,
+                  role: admin.role,
+                });
+
+            if (!disablePreviousRole) {
+              return;
+            }
           }
         }
       }
