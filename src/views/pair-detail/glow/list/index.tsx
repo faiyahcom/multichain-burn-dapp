@@ -13,6 +13,7 @@ import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { useQuery } from "@tanstack/react-query";
 import PairDetailGlowListTable from "./table";
 import { useMediaQuery } from "usehooks-ts";
+import PairDetailGlowListGrid from "./grid";
 
 const PairDetailGlowList = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
@@ -54,6 +55,12 @@ const PairDetailGlowList = () => {
     >
       {listLayout === "list" && (
         <PairDetailGlowListTable
+          data={pools?.pools}
+          isLoading={isPendingPools}
+        />
+      )}
+      {listLayout === "card" && (
+        <PairDetailGlowListGrid
           data={pools?.pools}
           isLoading={isPendingPools}
         />

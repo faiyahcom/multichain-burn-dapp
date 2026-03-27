@@ -8,6 +8,10 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
     <div
       data-slot="table-container"
       className="relative w-full overflow-x-auto overflow-y-hidden"
+      style={{
+        scrollbarWidth: "thin",
+        scrollbarColor: "rgba(0, 0, 0, 0.3) transparent",
+      }}
     >
       <table
         data-slot="table"
@@ -36,7 +40,13 @@ function TableHeader({
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
-  return <tbody data-slot="table-body" className={cn(className)} {...props} />;
+  return (
+    <tbody
+      data-slot="table-body"
+      className={cn("font-inter", className)}
+      {...props}
+    />
+  );
 }
 
 function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {

@@ -9,11 +9,11 @@ import {
   TableRow,
 } from "@/components/common/glow/table";
 import TableNoData from "@/components/common/glow/table-no-data";
-import TableSpinner from "@/components/common/glow/table-spinner";
+import TableSkeleton from "@/components/common/glow/table-skeleton";
+import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-intercept-display";
 import MetricNumber from "@/components/common/metric-number";
 import RatioDisplay from "@/components/common/ratio-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
-import TokenImage from "@/components/common/token-image";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
 import {
@@ -40,6 +40,8 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
     "Action",
   ];
 
+  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+
   return (
     <Table>
       <TableHeader>
@@ -49,6 +51,9 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={column}
               className="h-12 pt-2 align-baseline"
               variant="pair"
+              style={{
+                width: cellWdith,
+              }}
             >
               {column}
             </TableHead>
@@ -56,7 +61,11 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        <TableSpinner isLoading={isLoading} colSpan={columns.length} />
+        <TableSkeleton
+          colCount={columns.length}
+          rowCount={12}
+          isLoading={isLoading}
+        />
         <TableNoData
           colSpan={columns.length}
           data={data}
@@ -90,22 +99,16 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
             <TableRow key={pool.address}>
               <TableCell className="text-left">
                 <div className="flex min-w-0 items-center gap-3.25">
-                  <div className="flex min-w-0 shrink-0 items-center">
-                    <TokenImage
-                      src={tokenOutDisplay.imageUri}
-                      alt={tokenOutDisplay.symbol}
-                      classNames={{
-                        common: "size-6 sm:size-8",
-                      }}
-                    />
-                    <TokenImage
-                      src={tokenInDisplay.imageUri}
-                      alt={tokenInDisplay.symbol}
-                      classNames={{
-                        common: "size-6 sm:size-8 -ml-1",
-                      }}
-                    />
-                  </div>
+                  <TokenOutInInterceptDisplay
+                    tokenOutProps={{
+                      src: tokenOutDisplay.imageUri,
+                      alt: tokenOutDisplay.symbol,
+                    }}
+                    tokenInProps={{
+                      src: tokenInDisplay.imageUri,
+                      alt: tokenInDisplay.symbol,
+                    }}
+                  />
                   <div>
                     <p className="max-w-full truncate" title={pool.name}>
                       {pool.name}
@@ -117,7 +120,6 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                       })}
                       classNames={{
                         container: "justify-start",
-                        displayText: "text-foreground font-normal",
                       }}
                     />
                   </div>
@@ -141,6 +143,9 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                     <StartEndDateDisplay
                       startDate={pool.timeStart}
                       endDate={pool.timeEnd}
+                      classNames={{
+                        container: "w-max mx-auto",
+                      }}
                     />
                   </TableCell>
                   <TableCell>
@@ -156,7 +161,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                 <Link
                   to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
                 >
-                  <Button variant={"pair"} hasHover>
+                  <Button variant={"pair"} hasHover className="font-orbitron">
                     View Detail
                   </Button>
                 </Link>
