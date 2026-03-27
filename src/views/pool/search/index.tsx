@@ -5,6 +5,7 @@ import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SortSelect from "@/components/common/sort-select";
 import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
   burnPoolStatusColors,
   burnPoolStatusLabels,
@@ -47,7 +48,7 @@ const PoolListSearch: React.FC<Props> = ({ poolType }) => {
         onChange={(value) => setFilter({ network: value })}
       />
       {/* Swap pool only allow status ongoing so the status select is hidden */}
-      {poolType === 0 && (
+      {poolType === PoolKindCodeEnum.Burn && (
         <MultipleSelect
           options={statusOptions}
           selected={filter.status}
@@ -70,7 +71,7 @@ const PoolListSearch: React.FC<Props> = ({ poolType }) => {
         sortOrder={filter.sortOrder}
         setSortBy={(sortBy) => setFilter({ sortBy })}
         setSortOrder={(sortOrder) => setFilter({ sortOrder })}
-        defaultSortBy={poolType === 0 ? "tvl" : "timestamp"}
+        defaultSortBy={poolType === PoolKindCodeEnum.Burn ? "tvl" : "timestamp"}
       />
       <LayoutPicker
         layout={filter.listLayout}

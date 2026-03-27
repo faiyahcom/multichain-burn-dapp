@@ -16,6 +16,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { SearchIcon, XIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { TokenMode, BatchRecipient } from "./hooks/useBatchTransferSolFn";
+import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -93,7 +94,7 @@ export interface TransferTokensDialogProps {
     onOpenChange: (open: boolean) => void;
     chainId: string;
     /** 0 = burn pool (dynamic), 1 = swap pool (fixed ratio) */
-    poolKind?: number;
+    poolKind?: PoolKindCode;
     poolInfo: {
         tokenInSymbol?: string;
         rewardTokenSymbol?: string;
@@ -113,7 +114,7 @@ const TransferTokensDialog = ({
     poolInfo,
     onTransfer,
 }: TransferTokensDialogProps) => {
-    const isSwapPool = poolKind === 1;
+    const isSwapPool = poolKind === PoolKindCodeEnum.Swap;
     const [search, setSearch] = useState("");
     const [mode, setMode] = useState<TokenMode>("reward");
     /** map: address → amount string */

@@ -195,6 +195,8 @@
   --color-mb-pair-metric: var(--mb-pair-metric);
   --color-mb-swapper-badge-border: var(--mb-swapper-badge-border);
   --color-mb-swapper-badge-bg: var(--mb-swapper-badge-bg);
+  --color-mb-burn-activity-amount: var(--mb-burn-activity-amount);
+  --color-mb-swap-activity-amount: var(--mb-swap-activity-amount);
   /* END */
 }
 
@@ -320,6 +322,8 @@
   --mb-pair-metric: #a96a3f;
   --mb-swapper-badge-border: #162e8f;
   --mb-swapper-badge-bg: #0a1a65;
+  --mb-burn-activity-amount: #bf9879;
+  --mb-swap-activity-amount: #8288bb;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -444,6 +448,9 @@
   --mb-pair-metric: #a96a3f;
   --mb-swapper-badge-border: #162e8f;
   --mb-swapper-badge-bg: #0a1a65;
+  --mb-burn-activity-amount: #bf9879;
+  --mb-swap-activity-amount: #8288bb;
+  /* END */
 }
 
 @layer base {
@@ -503,6 +510,7 @@
   from {
     transform: translateX(0);
   }
+
   to {
     transform: translateX(-50%);
   }
@@ -649,6 +657,42 @@
     linear-gradient(0deg, rgba(13, 11, 20, 0.6), rgba(13, 11, 20, 0.6));
 }
 
+@utility grid-pair-bg {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(46, 0, 148, 0.7) -4.94%,
+      rgba(46, 0, 148, 0) 30.16%,
+      rgba(46, 0, 148, 0.7) 74.87%,
+      #2e0094 95.06%
+    ),
+    linear-gradient(0deg, rgba(42, 31, 82, 0.68), rgba(42, 31, 82, 0.68));
+}
+
+@utility grid-burn-bg {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(255, 102, 0, 0.3) -4.94%,
+      rgba(255, 102, 0, 0) 23.43%,
+      rgba(255, 102, 0, 0) 62.37%,
+      rgba(255, 102, 0, 0.7) 95.06%
+    ),
+    linear-gradient(0deg, rgba(13, 11, 20, 0.35), rgba(13, 11, 20, 0.35));
+}
+
+@utility grid-swap-bg {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(2, 133, 255, 0.3) -4.94%,
+      rgba(2, 133, 255, 0) 23.43%,
+      rgba(2, 133, 255, 0) 62.37%,
+      rgba(0, 80, 154, 0.7) 95.06%
+    ),
+    linear-gradient(0deg, rgba(13, 11, 20, 0.6), rgba(13, 11, 20, 0.6));
+}
+
 @utility grid-pair-btn-bg {
   background: linear-gradient(
     0deg,
@@ -687,6 +731,7 @@
     opacity: 0;
     transform: translateY(50px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -702,6 +747,7 @@
   align-items: center;
   column-gap: 0.75rem;
   grid-template-columns: 8px minmax(0, 1fr) 80px minmax(0, 1fr);
+
   @media (min-width: 48rem) {
     grid-template-columns:
       8px minmax(0, 0.75fr) minmax(0, 0.5fr) minmax(0, 1fr)

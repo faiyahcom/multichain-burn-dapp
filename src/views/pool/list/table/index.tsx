@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/table";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { poolQueryKeys } from "@/services/queries/queryKey";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
   getPoolStatusColor,
   getPoolStatusLabel,
@@ -41,7 +42,7 @@ interface Props {
 
 const PoolListTable: React.FC<Props> = ({ poolType, data, isLoading }) => {
   const navigate = useNavigate();
-  const isBurnPool = poolType === 0;
+  const isBurnPool = poolType === PoolKindCodeEnum.Burn;
   const queryClient = useQueryClient();
   const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
 

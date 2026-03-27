@@ -1,4 +1,5 @@
 import CommonPoolLayout from "@/views/pool";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/burn/")({
@@ -6,5 +7,5 @@ export const Route = createFileRoute("/burn/")({
 });
 
 function RouteComponent() {
-  return <CommonPoolLayout poolType={0} />;
+  return <CommonPoolLayout poolType={PoolKindCodeEnum.Burn} />;
 }

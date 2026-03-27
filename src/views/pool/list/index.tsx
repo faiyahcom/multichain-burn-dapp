@@ -1,4 +1,5 @@
 import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { PoolKindCodeEnum } from "@/types/pool";
 import {
   userHiddenBurnPoolStatuses,
   userHiddenSwapPoolStatuses,
@@ -19,7 +20,7 @@ interface Props {
 }
 
 const PoolList: React.FC<Props> = ({ poolType }) => {
-  const isBurnPool = poolType === 0;
+  const isBurnPool = poolType === PoolKindCodeEnum.Burn;
   const { filter, setFilter } = usePoolListSearchFilterStore(poolType);
   const limit = 18;
 

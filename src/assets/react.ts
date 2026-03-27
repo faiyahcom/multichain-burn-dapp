@@ -61,6 +61,7 @@ export { default as IconStack } from "./icons/glow/stack.svg?react";
 export { default as IconStackY } from "./icons/glow/stack-y.svg?react";
 export { default as IconStats } from "./icons/glow/stats.svg?react";
 export { default as IconGlowArrow } from "./icons/glow/glow-arrow.svg?react";
+export { default as IconTwoDArrow } from "./icons/glow/two-d-arrow.svg?react";
 
 export { default as IconDownTriangle } from "./icons/down-triangle.svg?react";
 

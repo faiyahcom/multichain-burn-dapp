@@ -3,6 +3,7 @@ import CenterSpinner from "@/components/common/center-spinner";
 import NoData from "@/components/common/no-data";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { poolQueryKeys } from "@/services/queries/queryKey";
+import { PoolKindCodeEnum } from "@/types/pool";
 import type {
   PoolItemType,
   PoolType,
@@ -20,7 +21,7 @@ interface Props {
 }
 
 const PoolListGrid: React.FC<Props> = ({ data, isLoading, poolType }) => {
-  const isBurnPool = poolType === 0;
+  const isBurnPool = poolType === PoolKindCodeEnum.Burn;
   const queryClient = useQueryClient();
   const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
 

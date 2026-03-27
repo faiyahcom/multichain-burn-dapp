@@ -13,10 +13,15 @@ export type BurnPoolStatus =
     | "upcoming"
     | "holding"
     | "ended";
+export enum PoolKindCodeEnum {
+    Burn = 0,
+    Swap = 1,
+}
+export type PoolKindCode = PoolKindCodeEnum.Burn | PoolKindCodeEnum.Swap;
 export type PoolKind = "burn_pool" | "swap_pool";
-export const POOL_KIND: Record<number, PoolKind> = {
-    0: "burn_pool",
-    1: "swap_pool",
+export const POOL_KIND: Record<PoolKindCode, PoolKind> = {
+    [PoolKindCodeEnum.Burn]: "burn_pool",
+    [PoolKindCodeEnum.Swap]: "swap_pool",
 };
 interface TokenInfo {
     address: string;
@@ -54,7 +59,7 @@ export interface PoolDetailResponse {
         rewardToken: string;
         tokenIn: string;
         pool_id: string;
-        kind: number;
+        kind: PoolKindCode;
         chainId: string;
         timestamp: string;
         status: SwapPoolStatus | BurnPoolStatus;
@@ -113,7 +118,7 @@ export const txnKind = {
     3: "Maker Deposit Reward",
     4: "Taker Claim Reward",
     5: "Refund to Maker",
-    6: "Burn Success"
+    6: "Burn Success",
 } as const;
 
 export const activityKind = {
@@ -139,7 +144,7 @@ export const activityKind = {
     31: "Taker Claim", //taker claim reward from burn pool
 
     // Operator actions
-    40: "Burn Success"
+    40: "Burn Success",
 } as const;
 
 export interface PoolActivitiesResponse {

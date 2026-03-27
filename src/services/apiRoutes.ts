@@ -16,6 +16,8 @@ export const API_ROUTES = {
     GET_POOL_TXNS: (address: string) => `/pools/${address}/txns`,
     GET_POOL_ACTIVITIES: (address: string) => `/pools/${address}/actitvites`,
     REASON_CLOSE_POOL: (address: string) => `/pools/${address}/close-reason`,
+    STATS: "/pools/stats",
+    RECENT_POOLS: "/pools/recent-pools",
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",

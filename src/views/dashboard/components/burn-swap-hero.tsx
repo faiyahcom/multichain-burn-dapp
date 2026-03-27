@@ -8,6 +8,7 @@ import {
     IconSwapCategory,
     IconStackY,
     IconStats,
+    IconTwoDArrow,
 } from "@/assets/react";
 import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
 import type {
@@ -45,11 +46,100 @@ const HeroStatRow = ({
             <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
                 {icon}
             </div>
-            <span className="text-base font-medium text-mb-gray-b8 sm:text-xl">{label}</span>
+            <span className="text-base font-medium text-mb-gray-b8 sm:text-xl">
+                {label}
+            </span>
         </div>
-        <div className={`text-base font-medium sm:text-xl ${valueClass}`}>{value}</div>
+        <div className={`text-base font-medium sm:text-xl ${valueClass}`}>
+            {value}
+        </div>
     </div>
 );
+
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import WhitelistTokenSelect, {
+    type TokenOption,
+} from "@/components/common/glow/whitelist-token-select";
+import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
+import TokenDisplay from "@/components/common/token-display";
+
+const HeroSwapMiniForm = () => {
+    const [tokenFrom, setTokenFrom] = useState<TokenOption>();
+    const [tokenTo, setTokenTo] = useState<TokenOption>();
+    const [amount, setAmount] = useState("");
+
+    return (
+        <div className="flex w-full flex-1 flex-col justify-end font-inter">
+            {/* From / To */}
+            <div className="mb-2 flex items-center justify-between text-base text-mb-gray-b8/60">
+                <span>From</span>
+                <span>to</span>
+            </div>
+
+            {/* Token Select */}
+            <div className="mb-2 flex items-center gap-2 rounded-[6px] border-2 border-[#212C3E] px-3">
+                <div className="flex-1">
+                    <WhitelistTokenSelect
+                        value={tokenFrom}
+                        onChange={setTokenFrom}
+                        disabledAddress={tokenTo?.address}
+                        classNames={{
+                            trigger: "w-full",
+                        }}
+                    />
+                </div>
+
+                <IconTwoDArrow />
+
+                <div className="flex-1">
+                    <WhitelistTokenSelect
+                        value={tokenTo}
+                        onChange={setTokenTo}
+                        disabledAddress={tokenFrom?.address}
+                        classNames={{
+                            trigger: "w-full justify-end",
+                        }}
+                    />
+                </div>
+            </div>
+
+            {/* Amount */}
+            <div className="flex flex-col gap-2">
+                <span className="text-base text-mb-gray-b8/60">Amount</span>
+                <div className="flex justify-between rounded-[6px] border-2 border-[#212C3E] px-3">
+                    <Input
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        type="number"
+                        step={DEFAULT_INPUT_NUMBER_STEP}
+                        placeholder="0.0"
+                        className="bg-transparent pl-4"
+                    />
+                    {tokenTo && (
+                        <TokenDisplay
+                            symbol={tokenTo.customSymbol ?? tokenTo.symbol}
+                            customSymbol={tokenTo.customSymbol ?? tokenTo.symbol}
+                            imageUri={tokenTo.imageUri ?? undefined}
+                            classNames={{ img: "size-5", container: "space-x-1 text-sm" }}
+                        />
+                    )}
+                </div>
+            </div>
+
+            {/* CTA */}
+            <Button
+                variant="swap"
+                size="big"
+                className="sm:h-57px sm:w-275px mt-5.5 h-12 w-full font-orbitron"
+            >
+                Create Pool
+            </Button>
+        </div>
+    );
+};
+
+export default HeroSwapMiniForm;
 
 interface Props {
     data?: StatsStickerResponse;
@@ -60,10 +150,13 @@ export const BurnSwapHero = ({ data }: Props) => {
     return (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
             {/* Burn Tracker */}
-            <GlowContainer className="relative flex flex-col overflow-visible sm:flex-row" variant="burn">
+            <GlowContainer
+                className="relative flex flex-col overflow-visible sm:flex-row"
+                variant="burn"
+            >
                 <GlowContainer
                     variant="burn"
-                    className="-mt-1 -mx-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:-mb-1 sm:mx-0 sm:-ml-1"
+                    className="-mx-1 -mt-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:mx-0 sm:-mb-1 sm:-ml-1"
                 >
                     <div className="flex items-center gap-3">
                         <IconBurnCategory className="size-10.75" />
@@ -73,7 +166,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     <Button
                         variant="burn"
                         size="big"
-                        className="h-12 w-full sm:h-57px sm:w-275px"
+                        className="sm:h-57px sm:w-275px h-12 w-full"
                         onClick={() => {
                             navigate({ to: "/burn" });
                         }}
@@ -101,13 +194,17 @@ export const BurnSwapHero = ({ data }: Props) => {
                     <HeroStatRow
                         icon={<IconStack />}
                         label="Total Pools"
-                        value={shortenNumber({ number: data?.burnSection?.totalPools ?? 0 })}
+                        value={shortenNumber({
+                            number: data?.burnSection?.totalPools ?? 0,
+                        })}
                         valueClass="text-mb-btn-burn"
                     />
                     <HeroStatRow
                         icon={<IconParticipant className="text-mb-btn-burn" />}
                         label="Total Participants"
-                        value={shortenNumber({ number: data?.burnSection?.totalParticipants ?? 0 })}
+                        value={shortenNumber({
+                            number: data?.burnSection?.totalParticipants ?? 0,
+                        })}
                         valueClass="text-mb-btn-burn"
                     />
                 </div>
@@ -120,16 +217,13 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="swap"
-                    className="-mt-1 -mx-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:-mb-1 sm:mx-0 sm:-ml-1"
+                    className="max-w-19/40 -mx-1 -mt-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:mx-0 sm:-mb-1 sm:-ml-1"
                 >
                     <div className="flex items-center gap-3">
                         <IconSwapCategory className="size-10.75" />
                         <p className="text-2xl font-medium">TOKEN SWAP</p>
                     </div>
-                    <img src={BurnTrackerImage} alt="Burn Tracker" />
-                    <Button variant="swap" size="big" className="h-12 w-full sm:h-57px sm:w-275px">
-                        Create Pool
-                    </Button>
+                    <HeroSwapMiniForm />
                 </GlowContainer>
                 <div className="mx-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 py-4 font-inter sm:mr-7 sm:ml-5 sm:py-0">
                     <div className="flex items-center gap-2">
@@ -156,13 +250,17 @@ export const BurnSwapHero = ({ data }: Props) => {
                     <HeroStatRow
                         icon={<IconStackY />}
                         label="Total Pools"
-                        value={shortenNumber({ number: data?.swapSection?.totalPools ?? 0 })}
+                        value={shortenNumber({
+                            number: data?.swapSection?.totalPools ?? 0,
+                        })}
                         valueClass="text-mb-btn-swap"
                     />
                     <HeroStatRow
                         icon={<IconParticipant className="text-mb-swap-light" />}
                         label="Total Participants"
-                        value={shortenNumber({ number: data?.swapSection?.totalParticipants ?? 0 })}
+                        value={shortenNumber({
+                            number: data?.swapSection?.totalParticipants ?? 0,
+                        })}
                         valueClass="text-mb-btn-swap"
                     />
                 </div>

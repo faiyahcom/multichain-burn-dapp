@@ -5,7 +5,7 @@ import {
 } from "@/assets/react";
 import Dot from "@/components/common/glow/dot";
 import TokenDisplay from "@/components/common/token-display";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import {
     truncateString,
     formatTimestampSecondsToDate,
@@ -15,7 +15,7 @@ import { TXN_PAGE_SIZE } from "@/hooks/useScrollingFeed";
 import type { ActivityItem } from "@/services/dashboardService";
 import SwapActivityImage from "/images/dashboard/swap-activity.png";
 import TokenImage from "@/components/common/token-image";
-import { txnKind } from "@/types/pool";
+import { POOL_KIND } from "@/types/pool";
 
 // ── Row components ────────────────────────────────────────────────────────────
 
@@ -42,7 +42,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
                 <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
             </div>
             <div className="flex items-center justify-end gap-3">
-                <span className="font-medium">{`${amount} ${item.tokenInSymbol}`}</span>
+                <span className="font-medium text-mb-burn-activity-amount">{`${amount} ${item.tokenInSymbol}`}</span>
                 <TokenImage
                     src={item.tokenInImage ?? undefined}
                     alt={item.tokenInSymbol}
@@ -83,8 +83,8 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
                     imageUri={item.tokenOutImage ?? undefined}
                     classNames={{ img: "size-10.5", container: "space-x-3" }}
                 />
-                <span className="truncate text-right text-mb-gray-b8">
-                    {amountIn} <span className="text-mb-gray-b8/60">→</span> {amountOut}
+                <span className="truncate text-right text-mb-swap-activity-amount">
+                    {amountIn} <span className="">→</span> {amountOut}
                 </span>
             </div>
         </div>
@@ -95,8 +95,8 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
     const hash = truncateString({ str: item.hash, left: 6, right: 6 });
     const wallet = truncateString({ str: item.executor, left: 6, right: 6 });
     const time = formatRelativeTime(item.timestamp);
-    const type = (txnKind as Record<number, string | undefined>)[item.kind] ?? `Kind ${item.kind}`;
-    const amountOut = formatAmount(item.amountOut, item.tokenOutDecimals);
+    const type = POOL_KIND[item.poolKind] === "burn_pool" ? "Burn" : "Swap";
+    const fee = shortenNumber({ number: Number(item.fee) }) ?? "0";
     const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
 
     return (
@@ -107,15 +107,6 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
             <span className="hidden truncate text-center md:block">{wallet}</span>
             <span className="truncate text-center">{type}</span>
             <div className="flex items-center justify-center gap-1.5">
-                <span className="truncate font-bold tracking-normal">{amountOut}</span>
-                <TokenDisplay
-                    symbol={item.tokenOutSymbol}
-                    customSymbol={item.tokenOutCustomSymbol ?? undefined}
-                    imageUri={item.tokenOutImage ?? undefined}
-                    classNames={{ img: "size-4" }}
-                />
-            </div>
-            <div className="hidden items-center justify-center gap-1.5 md:flex">
                 <span className="truncate font-bold tracking-normal">{amountIn}</span>
                 <TokenDisplay
                     symbol={item.tokenInSymbol}
@@ -123,6 +114,9 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
                     imageUri={item.tokenInImage ?? undefined}
                     classNames={{ img: "size-4" }}
                 />
+            </div>
+            <div className="hidden items-center justify-center gap-1.5 md:flex">
+                <span className="truncate font-bold tracking-normal">{fee}</span>
             </div>
         </div>
     );
@@ -163,7 +157,7 @@ export const ActivityFeed = ({
         {/* Re-key on every tick to trigger the slide-up enter animation */}
         <div
             key={animKey}
-            className="animate-feed-jump-in grid grid-cols-1 gap-x-12 sm:grid-cols-2"
+            className="grid animate-feed-jump-in grid-cols-1 gap-x-12 sm:grid-cols-2"
         >
             {items.map((item) => (
                 <div key={item.id}>{renderRow(item)}</div>
@@ -183,7 +177,10 @@ export const TransactionFeed = ({
 }) => {
     // Always render exactly TXN_SLOTS rows — ghost rows keep the layout height
     // stable and prevent content from jumping when item count changes.
-    const slots = Array.from({ length: TXN_PAGE_SIZE }, (_, i) => visibleItems[i] ?? null);
+    const slots = Array.from(
+        { length: TXN_PAGE_SIZE },
+        (_, i) => visibleItems[i] ?? null,
+    );
 
     return (
         <div className="flex flex-col gap-2 space-y-5 px-5 py-4.5 text-primary-foreground">
@@ -211,13 +208,16 @@ export const TransactionFeed = ({
                         <TransactionRow key={item.id} item={item} />
                     ) : (
                         // Invisible placeholder preserves the row height
-                        <div
-                            key={`ghost-${i}`}
-                            className="txn-grid invisible"
-                        >
-                            <span /><span>&nbsp;</span><span className="hidden md:block" /><span className="hidden md:block" /><span /><span /><span className="hidden md:block" />
+                        <div key={`ghost-${i}`} className="invisible txn-grid">
+                            <span />
+                            <span>&nbsp;</span>
+                            <span className="hidden md:block" />
+                            <span className="hidden md:block" />
+                            <span />
+                            <span />
+                            <span className="hidden md:block" />
                         </div>
-                    )
+                    ),
                 )}
             </div>
         </div>
@@ -231,7 +231,10 @@ interface ScrollingFeedProps {
     animKey: number;
 }
 
-export const BurnActivityFeed = ({ visibleItems, animKey }: ScrollingFeedProps) => (
+export const BurnActivityFeed = ({
+    visibleItems,
+    animKey,
+}: ScrollingFeedProps) => (
     <ActivityFeed
         title="BURN ACTIVITY"
         icon={<IconBurnCategory className="size-10.75" />}
@@ -241,7 +244,10 @@ export const BurnActivityFeed = ({ visibleItems, animKey }: ScrollingFeedProps) 
     />
 );
 
-export const SwapActivityFeed = ({ visibleItems, animKey }: ScrollingFeedProps) => (
+export const SwapActivityFeed = ({
+    visibleItems,
+    animKey,
+}: ScrollingFeedProps) => (
     <ActivityFeed
         title="SWAP ACTIVITY"
         icon={<IconSwapCategory className="size-10.75" />}
