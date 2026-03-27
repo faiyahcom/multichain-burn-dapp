@@ -43,8 +43,11 @@ const CustomPagination: React.FC<Props> = ({
   const maxPage = pageSize > 0 ? Math.ceil(totalCount / pageSize) : 0;
 
   if (
-    (currentPage === 0 || (paginationRange && paginationRange?.length < 2)) &&
-    hideIfLessThanTwoPages
+    currentPage === 0 ||
+    (paginationRange &&
+      paginationRange?.length < 2 &&
+      hideIfLessThanTwoPages) ||
+    totalCount === 0
   ) {
     return null;
   }

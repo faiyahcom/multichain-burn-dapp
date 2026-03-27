@@ -27,7 +27,7 @@ const SwapSearch = () => {
         onChange={(value) => setFilter({ network: value })}
         otherProps={{
           classNames: {
-            btn: "max-w-[400px]",
+            btn: "xl:max-w-[400px]",
           },
         }}
       />
