@@ -76,93 +76,95 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
     <>
       <CenterSpinner isLoading={isLoading} />
       <NoData isLoading={isLoading} data={data} />
-      <div className="global-grid">
-        {data?.map((pool) => {
-          const network = chainIdToNetworkConfig(pool.chainId);
+      {data && data.length > 0 && (
+        <div className="global-grid">
+          {data?.map((pool) => {
+            const network = chainIdToNetworkConfig(pool.chainId);
 
-          const tokenOutDisplay = resolvePoolTokenDisplay({
-            network,
-            tokenAddress: pool.tokenOut,
-            tokenSymbol: pool.tokenOutSymbol,
-            tokenName: pool.tokenOutSymbol,
-            customName: pool.tokenOutSymbolCustom ?? undefined,
-            customSymbol: pool.tokenOutSymbolCustom ?? undefined,
-            imageUri: pool.tokenOutImageUri ?? undefined,
-          });
+            const tokenOutDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: pool.tokenOut,
+              tokenSymbol: pool.tokenOutSymbol,
+              tokenName: pool.tokenOutSymbol,
+              customName: pool.tokenOutSymbolCustom ?? undefined,
+              customSymbol: pool.tokenOutSymbolCustom ?? undefined,
+              imageUri: pool.tokenOutImageUri ?? undefined,
+            });
 
-          const tokenInDisplay = resolvePoolTokenDisplay({
-            network,
-            tokenAddress: pool.tokenIn,
-            tokenSymbol: pool.tokenInSymbol,
-            tokenName: pool.tokenInSymbol,
-            customName: pool.tokenInSymbolCustom ?? undefined,
-            customSymbol: pool.tokenInSymbolCustom ?? undefined,
-            imageUri: pool.tokenInImageUri ?? undefined,
-          });
-          return (
-            <GridCard
-              key={pool.address}
-              variant="pair"
-              topSection={
-                <div className="space-y-1 sm:space-y-2">
-                  <p className="max-w-full truncate" title={pool.name}>
-                    {pool.name}
-                  </p>
-                  <CopyableText
-                    content={pool.address}
-                    displayText={truncateString({
-                      str: pool.address,
-                    })}
-                  />
-                </div>
-              }
-              bottomSection={
-                <div className="space-y-1 sm:space-y-2">
-                  <TokenOutInNetworkDisplay
-                    tokenOutProps={{
-                      src: tokenOutDisplay.imageUri,
-                      alt: tokenOutDisplay.symbol,
-                    }}
-                    tokenInProps={{
-                      src: tokenInDisplay.imageUri,
-                      alt: tokenInDisplay.symbol,
-                    }}
-                    networkProps={{
-                      chainId: pool.chainId,
-                    }}
-                    className="mx-auto"
-                  />
-                  <MetricNumber number={pool.volume} isShorten />
-                  {isBurnPool ? (
-                    <p key={tick}>{renderBurnPoolTime(pool)}</p>
-                  ) : (
-                    <RatioDisplay
-                      inValue={pool.rewardDenominator}
-                      outValue={pool.rewardNumerator}
-                      inSymbol={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
-                      outSymbol={
-                        pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol
-                      }
+            const tokenInDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: pool.tokenIn,
+              tokenSymbol: pool.tokenInSymbol,
+              tokenName: pool.tokenInSymbol,
+              customName: pool.tokenInSymbolCustom ?? undefined,
+              customSymbol: pool.tokenInSymbolCustom ?? undefined,
+              imageUri: pool.tokenInImageUri ?? undefined,
+            });
+            return (
+              <GridCard
+                key={pool.address}
+                variant="pair"
+                topSection={
+                  <div className="space-y-1 sm:space-y-2">
+                    <p className="max-w-full truncate" title={pool.name}>
+                      {pool.name}
+                    </p>
+                    <CopyableText
+                      content={pool.address}
+                      displayText={truncateString({
+                        str: pool.address,
+                      })}
                     />
-                  )}
-                </div>
-              }
-              btn={{
-                asChild: true,
-                children: (
-                  <Link
-                    to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
-                  >
-                    {isBurnPool
-                      ? getPoolStatusLabel(pool.status)
-                      : "View"}
-                  </Link>
-                ),
-              }}
-            />
-          );
-        })}
-      </div>
+                  </div>
+                }
+                bottomSection={
+                  <div className="space-y-1 sm:space-y-2">
+                    <TokenOutInNetworkDisplay
+                      tokenOutProps={{
+                        src: tokenOutDisplay.imageUri,
+                        alt: tokenOutDisplay.symbol,
+                      }}
+                      tokenInProps={{
+                        src: tokenInDisplay.imageUri,
+                        alt: tokenInDisplay.symbol,
+                      }}
+                      networkProps={{
+                        chainId: pool.chainId,
+                      }}
+                      className="mx-auto"
+                    />
+                    <MetricNumber number={pool.volume} isShorten />
+                    {isBurnPool ? (
+                      <p key={tick}>{renderBurnPoolTime(pool)}</p>
+                    ) : (
+                      <RatioDisplay
+                        inValue={pool.rewardDenominator}
+                        outValue={pool.rewardNumerator}
+                        inSymbol={
+                          pool.tokenInSymbolCustom ?? pool.tokenInSymbol
+                        }
+                        outSymbol={
+                          pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol
+                        }
+                      />
+                    )}
+                  </div>
+                }
+                btn={{
+                  asChild: true,
+                  children: (
+                    <Link
+                      to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
+                    >
+                      {isBurnPool ? getPoolStatusLabel(pool.status) : "View"}
+                    </Link>
+                  ),
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
     </>
   );
 };
