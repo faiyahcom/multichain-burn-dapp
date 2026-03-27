@@ -1,10 +1,6 @@
 import { toast } from "@/components/common/custom-toast";
 import { adminManagementService } from "@/services/adminManagementService";
-import { authService } from "@/services/authService";
-import {
-  adminManagementQueryKeys,
-  authQueryKeys,
-} from "@/services/queries/queryKey";
+import { adminManagementQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
@@ -32,7 +28,6 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [isCallingSc, setIsCallingSc] = useState(false);
-  const authUser = useAuthStore((state) => state.user);
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
   const openSwitchNetworkModal = useSystemStore(
     (state) => state.openSwitchNetworkModal,
@@ -61,50 +56,47 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
 
   const { mutateAsync: updateAdmin, isPending } = useMutation({
     mutationFn: adminManagementService.updateAdmin,
+    onSuccess: (updatedAdmin) => {
+      if (!isSelfAdmin) {
+        return;
+      }
+
+      useAuthStore.setState((state) => ({
+        user: state.user
+          ? {
+            ...state.user,
+            role: updatedAdmin.role,
+          }
+          : state.user,
+      }));
+    },
   });
 
-  const syncCurrentUserFromMe = async () => {
-    const refreshedUser = await queryClient.fetchQuery({
-      queryKey: authQueryKeys.me({
-        address: authUser?.address ?? admin.walletAddress,
-      }),
-      queryFn: () => authService.getCurrentUser(),
-      staleTime: 0,
-    });
-    const currentAuthState = useAuthStore.getState();
-    const nextAddress =
-      refreshedUser.address || currentAuthState.user?.address || "";
+  const syncSelfRoleToStore = (role: AdminManagementAdmin["role"]) => {
+    if (!isSelfAdmin) {
+      return;
+    }
 
     useAuthStore.setState((state) => ({
       user: state.user
         ? {
           ...state.user,
-          id: refreshedUser.id,
-          address: nextAddress || state.user.address,
-          role: refreshedUser.role,
+          role,
         }
-        : {
-          id: refreshedUser.id,
-          address: nextAddress,
-          role: refreshedUser.role,
-        },
+        : state.user,
     }));
-
-    return refreshedUser;
   };
 
-  const leaveAdminManagementIfUnauthorized = async () => {
-    if (useAuthStore.getState().user?.role === "super_admin") {
-      return false;
-    }
-
+  const redirectSelfOutOfAdminManagement = async (
+    role: AdminManagementAdmin["role"],
+  ) => {
+    syncSelfRoleToStore(role);
     onOpenChange(false);
     queryClient.removeQueries({
       queryKey: adminManagementQueryKeys.all,
       exact: false,
     });
     await navigate({ to: "/", replace: true });
-    return true;
   };
 
   const handleSubmit = async (values: AdminManagementFormValues) => {
@@ -181,15 +173,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         networkId: targetNetworkId,
         enabled: admin.enabled,
       });
-      let currentRole: "normal" | "admin" | "super_admin" =
-        updatedAdmin.role;
-
-      if (isSelfAdmin) {
-        const refreshedUser = await syncCurrentUserFromMe();
-        currentRole = refreshedUser.role;
-      }
-
-      const isSelfDemoted = isSelfAdmin && currentRole !== "super_admin";
+      const isSelfDemoted = isSelfAdmin && updatedAdmin.role !== "super_admin";
 
       toast.success("Admin updated successfully!");
       onOpenChange(false);
@@ -209,15 +193,8 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       });
     } catch (error) {
       if (didSelfDemoteOnChain) {
-        try {
-          await syncCurrentUserFromMe();
-        } catch {
-          // Ignore refresh failures here and fall back to current auth state.
-        }
-
-        if (await leaveAdminManagementIfUnauthorized()) {
-          return;
-        }
+        await redirectSelfOutOfAdminManagement(values.role);
+        return;
       }
 
       toast.error(getErrorMessage({ error }));
