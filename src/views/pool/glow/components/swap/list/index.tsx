@@ -13,6 +13,7 @@ import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "usehooks-ts";
 import SwapPoolListTable from "./table";
+import SwapPoolListGrid from "./grid";
 
 const SwapPoolList = () => {
   const { filter, setFilter } = useSwapPoolListSearchFilterStore();
@@ -57,6 +58,12 @@ const SwapPoolList = () => {
     >
       {filter.listLayout === "list" && (
         <SwapPoolListTable
+          data={poolList?.pools}
+          isLoading={isPoolListPending}
+        />
+      )}
+      {filter.listLayout === "card" && (
+        <SwapPoolListGrid
           data={poolList?.pools}
           isLoading={isPoolListPending}
         />

@@ -114,11 +114,14 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       displayText={truncateString({
                         str: pool.address,
                       })}
+                      classNames={{
+                        displayText: "font-inter",
+                      }}
                     />
                   </div>
                 }
                 bottomSection={
-                  <div className="space-y-1 sm:space-y-2">
+                  <div className="space-y-1 font-inter sm:space-y-2">
                     <TokenOutInNetworkDisplay
                       tokenOutProps={{
                         src: tokenOutDisplay.imageUri,
