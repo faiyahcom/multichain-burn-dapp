@@ -48,7 +48,7 @@ export const useSwapPoolListSearchFilterStore =
       text: "",
       network: NETWORK_CONFIGS.map((network) => network.id),
       status: [...userViewSwapPoolStatuses],
-      sortBy: "timestamp",
+      sortBy: "liquidity",
       sortOrder: "desc",
       listLayout: "list",
     },
