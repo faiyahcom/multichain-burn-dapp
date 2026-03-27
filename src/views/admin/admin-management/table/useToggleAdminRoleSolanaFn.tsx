@@ -11,7 +11,7 @@ import {
   type Provider,
 } from "@reown/appkit-adapter-solana/react";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, Transaction } from "@solana/web3.js";
 import { useCallback } from "react";
 
 type ToggleAdminRoleParams = {
@@ -21,60 +21,84 @@ type ToggleAdminRoleParams = {
 };
 
 export const useToggleAdminRoleSolanaFn = () => {
-  const { isConnected, address } = useAppKitAccount();
+  const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
   const { connection } = useAppKitConnection();
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
+
+  const getProgramContext = () => {
+    if (!isConnected || !address) {
+      throw new Error("Wallet is not connected");
+    }
+    if (!connection || !provider) {
+      throw new Error("Solana connection or provider is not available");
+    }
+
+    const walletPublicKey = new PublicKey(address);
+    const anchorWallet: BrowserWallet = {
+      publicKey: walletPublicKey,
+      signTransaction: provider.signTransaction.bind(provider),
+      signAllTransactions: provider.signAllTransactions?.bind(provider),
+    };
+
+    const program = getMultichainBurnProgram(connection, anchorWallet);
+    const factoryPDA = getFactoryPDA(program.programId);
+
+    return {
+      connection,
+      provider,
+      walletPublicKey,
+      program,
+      factoryPDA,
+    };
+  };
+
+  const buildToggleInstruction = async (
+    programContext: ReturnType<typeof getProgramContext>,
+    { walletAddress, enabled, role }: ToggleAdminRoleParams,
+  ) => {
+    const targetPubkey = new PublicKey(walletAddress);
+
+    return role === "super_admin"
+      ? programContext.program.methods
+        .updateAdmin(targetPubkey, enabled)
+        .accounts({
+          admin: programContext.walletPublicKey,
+          factory: programContext.factoryPDA,
+        })
+        .instruction()
+      : programContext.program.methods
+        .updateSubadmin(targetPubkey, enabled)
+        .accounts({
+          admin: programContext.walletPublicKey,
+          factory: programContext.factoryPDA,
+        })
+        .instruction();
+  };
 
   const toggleAdminRole = useCallback(
     async ({ walletAddress, enabled, role }: ToggleAdminRoleParams) => {
       try {
-        if (!isConnected || !address) {
-          throw new Error("Wallet is not connected");
-        }
-        if (!connection || !provider) {
-          throw new Error("Solana connection or provider is not available");
-        }
-
-        const walletPublicKey = new PublicKey(address);
-        const targetPubkey = new PublicKey(walletAddress);
-
-        const anchorWallet: BrowserWallet = {
-          publicKey: walletPublicKey,
-          signTransaction: provider.signTransaction.bind(provider),
-          signAllTransactions: provider.signAllTransactions?.bind(provider),
-        };
-
-        const program = getMultichainBurnProgram(connection, anchorWallet);
-        const factoryPDA = getFactoryPDA(program.programId);
-
-        const tx = await (role === "super_admin"
-          ? program.methods
-            .updateAdmin(targetPubkey, enabled)
-            .accounts({
-              admin: walletPublicKey,
-              factory: factoryPDA,
-            })
-            .transaction()
-          : program.methods
-            .updateSubadmin(targetPubkey, enabled)
-            .accounts({
-              admin: walletPublicKey,
-              factory: factoryPDA,
-            })
-            .transaction());
+        const programContext = getProgramContext();
+        const tx = new Transaction().add(
+          await buildToggleInstruction(programContext, {
+            walletAddress,
+            enabled,
+            role,
+          }),
+        );
 
         const { blockhash, lastValidBlockHeight } =
-          await connection.getLatestBlockhash();
+          await programContext.connection.getLatestBlockhash();
 
         tx.recentBlockhash = blockhash;
-        tx.feePayer = walletPublicKey;
+        tx.feePayer = programContext.walletPublicKey;
 
-        const signedTx = await provider.signTransaction(tx);
-        const signature = await connection.sendRawTransaction(
+        const signedTx = await programContext.provider.signTransaction(tx);
+        const signature = await programContext.connection.sendRawTransaction(
           signedTx.serialize(),
         );
 
-        await connection.confirmTransaction({
+        await programContext.connection.confirmTransaction({
           signature,
           blockhash,
           lastValidBlockHeight,
@@ -98,5 +122,51 @@ export const useToggleAdminRoleSolanaFn = () => {
     [isConnected, address, connection, provider],
   );
 
-  return { toggleAdminRole };
+  const toggleAdminRoles = useCallback(
+    async (operations: ToggleAdminRoleParams[]) => {
+      try {
+        if (!operations.length) {
+          return true;
+        }
+
+        const programContext = getProgramContext();
+        const tx = new Transaction();
+
+        for (const operation of operations) {
+          tx.add(await buildToggleInstruction(programContext, operation));
+        }
+
+        const { blockhash, lastValidBlockHeight } =
+          await programContext.connection.getLatestBlockhash();
+
+        tx.recentBlockhash = blockhash;
+        tx.feePayer = programContext.walletPublicKey;
+
+        const signedTx = await programContext.provider.signTransaction(tx);
+        const signature = await programContext.connection.sendRawTransaction(
+          signedTx.serialize(),
+        );
+
+        await programContext.connection.confirmTransaction({
+          signature,
+          blockhash,
+          lastValidBlockHeight,
+        });
+
+        toast.success("Admin role updated successfully!", {
+          description: `Tx: ${signature}`,
+        });
+
+        return true;
+      } catch (error: unknown) {
+        toast.error("Failed to update admin role", {
+          description: getErrorMessage({ error }),
+        });
+        return false;
+      }
+    },
+    [isConnected, address, connection, provider],
+  );
+
+  return { toggleAdminRole, toggleAdminRoles };
 };

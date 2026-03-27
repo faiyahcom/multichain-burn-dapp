@@ -3,11 +3,36 @@ import { useState, useEffect } from "react";
 import { ModeToggle } from "../../shared/theme/mode-toggle";
 import { navItems, navSection, NavSectionLabel } from "./const";
 import { useAuthStore } from "@/stores/authStore";
+import { authService } from "@/services/authService";
+import { authQueryKeys } from "@/services/queries/queryKey";
+import { useQuery } from "@tanstack/react-query";
 
 export function Sidebar() {
   const { user } = useAuthStore();
-  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
-  const isSuperAdmin = user?.role === "super_admin";
+  const { data: userApiData } = useQuery({
+    queryKey: authQueryKeys.me({
+      address: user?.address,
+    }),
+    queryFn: async () => {
+      return authService.getCurrentUser();
+    },
+    enabled: !!user?.address,
+  });
+  const resolvedRole =
+    ((userApiData as
+      | {
+          actualRole?: "normal" | "admin" | "super_admin";
+          role?: "normal" | "admin" | "super_admin";
+          roleEnAble?: boolean;
+        }
+      | undefined)?.actualRole ??
+      userApiData?.role) ?? null;
+  const hasEnabledAdminRole =
+    ((userApiData as { roleEnAble?: boolean } | undefined)?.roleEnAble ?? true) &&
+    (resolvedRole === "admin" || resolvedRole === "super_admin");
+  const isAdmin = hasEnabledAdminRole;
+  const isSuperAdmin =
+    hasEnabledAdminRole && resolvedRole === "super_admin";
   const { pathname, searchStr } = useLocation({
     select: (location) => ({
       pathname: location.pathname,

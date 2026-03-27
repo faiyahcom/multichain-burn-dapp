@@ -53,6 +53,8 @@ const AdminManagementDialogCreate = () => {
         open={open}
         onOpenChange={setOpen}
         title="Add new Admin"
+        submitText="Create"
+        loadingText="Creating..."
         defaultValues={{
           role: "super_admin",
           networkId: currentNetworkId ?? "ethereumTestnet",

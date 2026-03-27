@@ -24,7 +24,7 @@ import {
 } from "@/types/admin/admin-management";
 import { isSupportedWalletAddress } from "@/utils/helpers/address";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -56,6 +56,7 @@ interface Props {
   description?: string;
   defaultValues?: Partial<AdminManagementFormValues>;
   submitText?: string;
+  loadingText?: string;
   isLoading?: boolean;
   lockWalletAddress?: boolean;
   lockNetworkId?: boolean;
@@ -80,6 +81,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
   description,
   defaultValues,
   submitText = "Save Changes",
+  loadingText = "Saving...",
   isLoading,
   lockWalletAddress,
   lockNetworkId,
@@ -90,15 +92,30 @@ const AdminManagementDialogForm: React.FC<Props> = ({
   const openSwitchNetworkModal = useSystemStore(
     (state) => state.openSwitchNetworkModal,
   );
+  const resolvedDefaultValues = useMemo(
+    () => resolveDefaultValues(defaultValues),
+    [
+      defaultValues?.email,
+      defaultValues?.name,
+      defaultValues?.networkId,
+      defaultValues?.role,
+      defaultValues?.walletAddress,
+    ],
+  );
+  const wasOpenRef = useRef(false);
   const { control, handleSubmit, reset, setValue } =
     useForm<AdminManagementFormValues>({
-      defaultValues: resolveDefaultValues(defaultValues),
+      defaultValues: resolvedDefaultValues,
       resolver: zodResolver(adminManagementFormSchema),
     });
 
   useEffect(() => {
-    reset(resolveDefaultValues(defaultValues));
-  }, [defaultValues, open, reset]);
+    if (open && !wasOpenRef.current) {
+      reset(resolvedDefaultValues);
+    }
+
+    wasOpenRef.current = open;
+  }, [open, reset, resolvedDefaultValues]);
 
   useEffect(() => {
     if (!lockNetworkId && currentNetworkId) {
@@ -108,7 +125,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
 
   const handleDialogOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
-      reset(resolveDefaultValues(defaultValues));
+      reset(resolvedDefaultValues);
     }
     onOpenChange(nextOpen);
   };
@@ -328,7 +345,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
                 btn: "border border-mb-submit-border sm:min-w-55 sm:px-2.25 sm:py-4.25",
               }}
               isLoading={isLoading}
-              isLoadingText="Saving..."
+              isLoadingText={loadingText}
               btnProps={{
                 type: "submit",
                 disabled: isLoading,
