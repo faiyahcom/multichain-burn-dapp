@@ -49,6 +49,7 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
             return (
               // Client wants the order to be token out / token in, refers to MB-415
               <GridCard
+                key={pool.address}
                 variant="swap"
                 topSection={
                   <div className="space-y-1 text-xl sm:space-y-2 sm:text-28px">
