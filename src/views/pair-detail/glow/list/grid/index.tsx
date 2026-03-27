@@ -1,6 +1,6 @@
-import CenterSpinner from "@/components/common/center-spinner";
 import CopyableText from "@/components/common/copyable-text";
 import GridCard from "@/components/common/glow/grid-card";
+import GridCardSkeleton from "@/components/common/glow/grid-card-skeleton";
 import TokenOutInNetworkDisplay from "@/components/common/glow/token-out-in-network-display";
 import MetricNumber from "@/components/common/metric-number";
 import NoData from "@/components/common/no-data";
@@ -74,7 +74,7 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
 
   return (
     <>
-      <CenterSpinner isLoading={isLoading} />
+      <GridCardSkeleton count={12} isLoading={isLoading} />
       <NoData isLoading={isLoading} data={data} />
       {data && data.length > 0 && (
         <div className="global-grid">
