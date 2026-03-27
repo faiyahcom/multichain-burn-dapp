@@ -101,7 +101,6 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
           return (
             <TableRow
               key={pool.address}
-              title={href}
               className={"cursor-pointer"}
               onClick={() => {
                 navigate({
