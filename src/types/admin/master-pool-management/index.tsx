@@ -1,3 +1,4 @@
+import type { TokenAmount } from "@/services/dashboardService";
 import type {
   PaginationRequest,
   PaginationResponse,
@@ -132,6 +133,14 @@ export type PoolListResponse = PaginationResponse & {
 export type RecentPoolsResponse = {
   pools: PoolItemType[];
 };
+
+export type PoolListStatsResponse = {
+  totalTransactions: number;
+  totalPools: number;
+  totalParticipants: number;
+  totalBurned?: TokenAmount[];
+  totalSwapVolume?: TokenAmount[];
+}
 
 // user view pool list can only see certain statuses
 export const userViewBurnPoolStatuses = [

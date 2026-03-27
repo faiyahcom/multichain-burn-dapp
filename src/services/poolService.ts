@@ -3,6 +3,7 @@ import { API_ROUTES } from "@/services/apiRoutes";
 import type {
   PoolListRequest,
   PoolListResponse,
+  PoolListStatsResponse,
   RecentPoolsResponse,
 } from "@/types/admin/master-pool-management";
 import type {
@@ -75,7 +76,7 @@ export const poolService = {
     return response;
   },
   getPoolStats: async (poolKind: PoolKindCode) => {
-    const response = await apiClient.get<PoolListResponse>(
+    const response = await apiClient.get<PoolListStatsResponse>(
       `${POOLS_API_ROUTES.STATS}`,
       {
         params: {
