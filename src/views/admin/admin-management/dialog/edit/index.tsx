@@ -1,6 +1,10 @@
 import { toast } from "@/components/common/custom-toast";
 import { adminManagementService } from "@/services/adminManagementService";
-import { adminManagementQueryKeys } from "@/services/queries/queryKey";
+import { authService } from "@/services/authService";
+import {
+  adminManagementQueryKeys,
+  authQueryKeys,
+} from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import { useSystemStore } from "@/stores/systemStore";
 import type { AdminManagementAdmin } from "@/types/admin/admin-management";
@@ -28,6 +32,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [isCallingSc, setIsCallingSc] = useState(false);
+  const authUser = useAuthStore((state) => state.user);
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
   const openSwitchNetworkModal = useSystemStore(
     (state) => state.openSwitchNetworkModal,
@@ -56,18 +61,56 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
 
   const { mutateAsync: updateAdmin, isPending } = useMutation({
     mutationFn: adminManagementService.updateAdmin,
-    onSuccess: async () => {
-      toast.success("Admin updated successfully!");
-      await queryClient.invalidateQueries({
-        queryKey: adminManagementQueryKeys.all,
-        exact: false,
-      });
-      onOpenChange(false);
-    },
-    onError: (error) => {
-      toast.error(getErrorMessage({ error }));
-    },
   });
+
+  const syncCurrentUserFromMe = async () => {
+    const refreshedUser = await queryClient.fetchQuery({
+      queryKey: authQueryKeys.me({
+        address: authUser?.address ?? admin.walletAddress,
+      }),
+      queryFn: () => authService.getCurrentUser(),
+      staleTime: 0,
+    });
+    const currentAuthState = useAuthStore.getState();
+    const nextAddress =
+      refreshedUser.address || currentAuthState.user?.address || "";
+    const nextAccessToken =
+      refreshedUser.accessToken ??
+      refreshedUser.token ??
+      currentAuthState.accessToken;
+
+    useAuthStore.setState((state) => ({
+      user: state.user
+        ? {
+          ...state.user,
+          id: refreshedUser.id,
+          address: nextAddress || state.user.address,
+          role: refreshedUser.role,
+        }
+        : {
+          id: refreshedUser.id,
+          address: nextAddress,
+          role: refreshedUser.role,
+        },
+      accessToken: nextAccessToken,
+    }));
+
+    return refreshedUser;
+  };
+
+  const leaveAdminManagementIfUnauthorized = async () => {
+    if (useAuthStore.getState().user?.role === "super_admin") {
+      return false;
+    }
+
+    onOpenChange(false);
+    queryClient.removeQueries({
+      queryKey: adminManagementQueryKeys.all,
+      exact: false,
+    });
+    await navigate({ to: "/", replace: true });
+    return true;
+  };
 
   const handleSubmit = async (values: AdminManagementFormValues) => {
     if (!targetNetworkId) {
@@ -81,6 +124,17 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     }
 
     const roleChanged = values.role !== admin.role;
+    const isSelfDemotedFromSuperAdmin =
+      isSelfAdmin &&
+      admin.role === "super_admin" &&
+      values.role === "admin";
+    const isEvmAdminPromotedToSuperAdmin =
+      targetNetworkId !== "solanaDevnet" &&
+      admin.role === "admin" &&
+      values.role === "super_admin";
+    const shouldDisablePreviousRole =
+      !isSelfDemotedFromSuperAdmin && !isEvmAdminPromotedToSuperAdmin;
+    let didSelfDemoteOnChain = false;
 
     setIsCallingSc(true);
     try {
@@ -102,21 +156,27 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
           return;
         }
 
-        const disablePreviousRole =
-          targetNetworkId === "solanaDevnet"
-            ? await toggleAdminRoleSolana({
-              walletAddress: admin.walletAddress,
-              enabled: false,
-              role: admin.role,
-            })
-            : await toggleAdminRoleEvm({
-              walletAddress: admin.walletAddress,
-              enabled: false,
-              role: admin.role,
-            });
+        if (isSelfDemotedFromSuperAdmin) {
+          didSelfDemoteOnChain = true;
+        }
 
-        if (!disablePreviousRole) {
-          return;
+        if (shouldDisablePreviousRole) {
+          const disablePreviousRole =
+            targetNetworkId === "solanaDevnet"
+              ? await toggleAdminRoleSolana({
+                walletAddress: admin.walletAddress,
+                enabled: false,
+                role: admin.role,
+              })
+              : await toggleAdminRoleEvm({
+                walletAddress: admin.walletAddress,
+                enabled: false,
+                role: admin.role,
+              });
+
+          if (!disablePreviousRole) {
+            return;
+          }
         }
       }
 
@@ -126,21 +186,46 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
         networkId: targetNetworkId,
         enabled: admin.enabled,
       });
+      let currentRole: "normal" | "admin" | "super_admin" =
+        updatedAdmin.role;
 
       if (isSelfAdmin) {
-        useAuthStore.setState((state) => ({
-          user: state.user
-            ? {
-              ...state.user,
-              role: updatedAdmin.role,
-            }
-            : state.user,
-        }));
+        const refreshedUser = await syncCurrentUserFromMe();
+        currentRole = refreshedUser.role;
+      }
 
-        if (updatedAdmin.role !== "super_admin") {
-          navigate({ to: "/" });
+      const isSelfDemoted = isSelfAdmin && currentRole !== "super_admin";
+
+      toast.success("Admin updated successfully!");
+      onOpenChange(false);
+
+      if (isSelfDemoted) {
+        queryClient.removeQueries({
+          queryKey: adminManagementQueryKeys.all,
+          exact: false,
+        });
+        await navigate({ to: "/" });
+        return;
+      }
+
+      await queryClient.invalidateQueries({
+        queryKey: adminManagementQueryKeys.all,
+        exact: false,
+      });
+    } catch (error) {
+      if (didSelfDemoteOnChain) {
+        try {
+          await syncCurrentUserFromMe();
+        } catch {
+          // Ignore refresh failures here and fall back to current auth state.
+        }
+
+        if (await leaveAdminManagementIfUnauthorized()) {
+          return;
         }
       }
+
+      toast.error(getErrorMessage({ error }));
     } finally {
       setIsCallingSc(false);
     }
@@ -151,6 +236,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       open={open}
       onOpenChange={onOpenChange}
       title="Edit Admin"
+      submitText="Save Changes"
       description={
         isSelfAdmin
           ? "Update your name, email, or role. Your wallet and network stay locked for safety."

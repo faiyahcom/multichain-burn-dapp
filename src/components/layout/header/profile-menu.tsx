@@ -14,10 +14,9 @@ import { truncateString } from "@/utils/helpers/string";
 import { useDisconnect, useWalletInfo } from "@reown/appkit/react";
 import { useQuery } from "@tanstack/react-query";
 import { LogOutIcon } from "lucide-react";
+import { useEffect } from "react";
 
-type Props = {};
-
-const ProfileMenu = ({}: Props) => {
+const ProfileMenu = () => {
   const { logout, user } = useAuthStore();
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
@@ -44,6 +43,27 @@ const ProfileMenu = ({}: Props) => {
 
   const avatar = userApiData?.avatar ?? walletInfo?.icon;
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
+
+  useEffect(() => {
+    if (!userApiData) {
+      return;
+    }
+
+    useAuthStore.setState((state) => ({
+      user: state.user
+        ? {
+          ...state.user,
+          id: userApiData.id,
+          address: userApiData.address || state.user.address,
+          role: userApiData.role,
+        }
+        : {
+          id: userApiData.id,
+          address: userApiData.address,
+          role: userApiData.role,
+        },
+    }));
+  }, [userApiData]);
 
   return (
     <div className="flex w-76.25 items-center justify-between gap-5.5 rounded-md-plus bg-primary-foreground pt-0.5 pr-4.25 pb-0.75 pl-1.75">

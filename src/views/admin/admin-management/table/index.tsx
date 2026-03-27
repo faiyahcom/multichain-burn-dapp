@@ -4,7 +4,7 @@ import ConfirmDialog from "@/components/common/confirm-dialog";
 import CopyableText from "@/components/common/copyable-text";
 import CustomPagination from "@/components/common/pagination";
 import NetworkDisplay from "@/components/common/network-display";
-import { networkIdToChainId, type NetworkId } from "@/config/networks";
+import type { NetworkId } from "@/config/networks";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
@@ -126,7 +126,7 @@ const AdminManagementTable = () => {
 
   const { data, isPending } = useQuery({
     queryKey: adminManagementQueryKeys.list(filter),
-    enabled: hasHydrated && !!accessToken,
+    enabled: hasHydrated && !!accessToken && user?.role === "super_admin",
     queryFn: () =>
       adminManagementService.getListAdmins({
         page: filter.page,
@@ -247,22 +247,29 @@ const AdminManagementTable = () => {
       return;
     }
 
-    if (currentNetworkId !== targetNetworkId) {
+    const shouldRevokeOnChain = deleteTarget.enabled;
+
+    if (shouldRevokeOnChain && currentNetworkId !== targetNetworkId) {
       openSwitchNetworkModal(currentNetworkId, targetNetworkId);
       return;
     }
 
-    setIsDeletingOnChain(true);
-    try {
-      const isUpdated = await toggleAdminRoleOnChain({
-        walletAddress: deleteTarget.walletAddress,
-        role: deleteTarget.role,
-        enabled: false,
-        networkId: targetNetworkId,
-      });
+    if (shouldRevokeOnChain) {
+      setIsDeletingOnChain(true);
+    }
 
-      if (!isUpdated) {
-        return;
+    try {
+      if (shouldRevokeOnChain) {
+        const isUpdated = await toggleAdminRoleOnChain({
+          walletAddress: deleteTarget.walletAddress,
+          role: deleteTarget.role,
+          enabled: false,
+          networkId: targetNetworkId,
+        });
+
+        if (!isUpdated) {
+          return;
+        }
       }
 
       await deleteAdmin({
@@ -456,7 +463,11 @@ const AdminManagementTable = () => {
           }
         }}
         title="Delete Admin"
-        description="This will revoke the admin role onchain first, then remove the admin from the management list."
+        description={
+          deleteTarget?.enabled
+            ? "This will revoke the admin role onchain first, then remove the admin from the management list."
+            : "This admin no longer has an active onchain role, so this will only remove the admin from the management list."
+        }
         buttonConfirmText="Delete"
         isLoading={isDeletingOnChain || isDeletePending}
         onCancel={() => setDeleteTarget(null)}

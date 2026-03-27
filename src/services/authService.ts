@@ -28,6 +28,8 @@ export interface UserResponse {
   role: "normal" | "admin" | "super_admin";
   avatar: string | null;
   name: string | null; // nickname
+  token?: string | null;
+  accessToken?: string | null;
 }
 
 export interface UpdatePersonalInfoRequest {
