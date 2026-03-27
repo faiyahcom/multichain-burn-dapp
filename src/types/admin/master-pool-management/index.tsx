@@ -89,7 +89,7 @@ export type PoolItemType = {
   status: AllPoolStatus;
   volume: string; // string number
   tvl: string; // string number
-  budget: string; // string number
+  budget?: string; // string number
   tokenIn: string;
   tokenInSymbol: string;
   tokenInDecimals: number;
@@ -109,6 +109,7 @@ export type PoolItemType = {
   rewardDenominator: string;
   isPartner: boolean;
   liquidity: string; // string number
+  rewardAmount: string; // string number
 };
 
 export type PoolListRequest = PaginationRequest & {
@@ -125,6 +126,10 @@ export type PoolListRequest = PaginationRequest & {
 };
 
 export type PoolListResponse = PaginationResponse & {
+  pools: PoolItemType[];
+};
+
+export type RecentPoolsResponse = {
   pools: PoolItemType[];
 };
 
