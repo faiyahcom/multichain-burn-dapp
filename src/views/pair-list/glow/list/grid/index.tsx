@@ -68,7 +68,7 @@ const PairListGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       />
                     </div>
                     <p
-                      className="w-full min-w-0 truncate"
+                      className="w-full min-w-0 truncate text-xl sm:text-28px"
                       title={`${tokenOutDisplay.symbol} / ${tokenInDisplay.symbol}`}
                     >
                       {tokenOutDisplay.symbol} / {tokenInDisplay.symbol}
@@ -78,13 +78,13 @@ const PairListGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       classNames={{
                         container: "flex items-center gap-3 justify-center",
                         img: "sm:size-6.25 mr-0",
-                        label: "text-sm",
+                        label: "text-sm font-inter",
                       }}
                     />
                   </div>
                 }
                 bottomSection={
-                  <div className="w-full space-y-1 sm:space-y-2">
+                  <div className="w-full space-y-1 font-inter sm:space-y-2">
                     <MetricNumber number={item.volume} isShorten />
                     <MetricNumber
                       number={sciToFormatted(
@@ -102,7 +102,7 @@ const PairListGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                     <Link
                       to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
                     >
-                      View Pool
+                      View Detail
                     </Link>
                   ),
                 }}
