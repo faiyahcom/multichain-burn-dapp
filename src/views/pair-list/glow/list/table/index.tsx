@@ -86,7 +86,6 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
           return (
             <TableRow
               key={index}
-              title={href}
               className={"cursor-pointer"}
               onClick={() => {
                 navigate({
