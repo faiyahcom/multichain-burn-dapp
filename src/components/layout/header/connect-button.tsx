@@ -19,11 +19,11 @@ const ConnectButton = () => {
         "flex items-center",
         getVariantBorderClassName({ variant: "swap" }),
         getVariantShadowClassName({ variant: "swap" }),
-        "rounded-24px bg-transparent px-6 py-4 hover:bg-transparent",
+        "rounded-24px bg-transparent px-6 py-5.25 hover:bg-transparent",
       )}
       onClick={handleConnect}
     >
-      <span className="text-sm font-semibold">Connect wallet</span>
+      <span className="text-15px font-semibold">CONNECT WALLET</span>
     </Button>
   );
 };

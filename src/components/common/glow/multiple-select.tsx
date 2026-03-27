@@ -11,6 +11,7 @@ import {
 import { Button, getButtonVariantFromContainerVariant } from "./button";
 import { getVariantBorderClassName, type ContainerVariant } from "./container";
 import { DownTriangleIcon } from "./down-triangle-icon";
+import { useState } from "react";
 
 export interface MultipleSelectOption {
   label: string;
@@ -44,6 +45,8 @@ const MultipleSelect: React.FC<Props> = ({
   defaultValuesWhenUncheckAll,
   variant,
 }) => {
+  const [open, setOpen] = useState(false);
+
   const isAllSelected =
     options && options.length > 0 && selected?.length === options.length;
   const isAnySelected = (selected?.length ?? 0) > 0;
@@ -90,7 +93,7 @@ const MultipleSelect: React.FC<Props> = ({
   };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant={getButtonVariantFromContainerVariant({
@@ -130,7 +133,7 @@ const MultipleSelect: React.FC<Props> = ({
           ) : (
             placeholder
           )}{" "}
-          <DownTriangleIcon />
+          <DownTriangleIcon direction={open ? "up" : "down"} />
         </Button>
       </PopoverTrigger>
       <PopoverContent

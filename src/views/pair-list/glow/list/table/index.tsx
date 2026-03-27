@@ -140,7 +140,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
                 >
                   <Button variant={"pair"} hasHover className="font-orbitron">
-                    View Detail
+                    View
                   </Button>
                 </Link>
               </TableCell>
