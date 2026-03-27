@@ -51,14 +51,16 @@ const PairListGlowList = () => {
       {listLayout === "card" && (
         <PairListGlowListGrid data={pairs?.pairs} isLoading={isPendingPairs} />
       )}
-      <CustomPagination
-        currentPage={filter.page}
-        totalCount={pairs?.total || 0}
-        pageSize={limit}
-        onPageChange={(page) => setFilter({ page })}
-        variant="pair"
-        onlyShowCurrentPage={onlyShowCurrentPage}
-      />
+      {!!pairs?.pairs?.length && (
+        <CustomPagination
+          currentPage={filter.page}
+          totalCount={pairs?.total || 0}
+          pageSize={limit}
+          onPageChange={(page) => setFilter({ page })}
+          variant="pair"
+          onlyShowCurrentPage={onlyShowCurrentPage}
+        />
+      )}
     </GlowContainer>
   );
 };

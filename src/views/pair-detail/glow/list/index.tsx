@@ -65,14 +65,16 @@ const PairDetailGlowList = () => {
           isLoading={isPendingPools}
         />
       )}
-      <CustomPagination
-        currentPage={filter.page}
-        totalCount={pools?.total || 0}
-        pageSize={limit}
-        onPageChange={(page) => setFilter({ page })}
-        variant="pair"
-        onlyShowCurrentPage={onlyShowCurrentPage}
-      />
+      {!!pools?.pools?.length && (
+        <CustomPagination
+          currentPage={filter.page}
+          totalCount={pools?.total || 0}
+          pageSize={limit}
+          onPageChange={(page) => setFilter({ page })}
+          variant="pair"
+          onlyShowCurrentPage={onlyShowCurrentPage}
+        />
+      )}
     </GlowContainer>
   );
 };
