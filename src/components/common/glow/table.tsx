@@ -1,7 +1,11 @@
 import * as React from "react";
 
 import { cn } from "@/lib/utils";
-import { getVariantBorderClassName, type ContainerVariant } from "./container";
+import {
+  getVariantBorderClassName,
+  getVariantBtnBg30ClassName,
+  type ContainerVariant,
+} from "./container";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
@@ -64,15 +68,17 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
 
 function TableRow({
   className,
-
+  variant,
   ...props
-}: React.ComponentProps<"tr">) {
+}: React.ComponentProps<"tr"> & {
+  variant?: ContainerVariant;
+}) {
   return (
     <tr
       data-slot="table-row"
       className={cn(
-        "group transition-all",
-
+        "group transition-all duration-300",
+        variant && getVariantBtnBg30ClassName({ variant, isHover: true }),
         className,
       )}
       {...props}

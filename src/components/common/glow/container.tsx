@@ -130,6 +130,49 @@ export const getVariantBtnBg50ClassName = ({
   return cn(variantClassName, custom);
 };
 
+export const getVariantBtnBg30ClassName = ({
+  variant,
+  custom,
+  isHover,
+  isGroupHover,
+}: {
+  variant: ContainerVariant;
+  custom?: string;
+  isHover?: boolean;
+  isGroupHover?: boolean;
+}) => {
+  let variantClassName = "";
+  switch (variant) {
+    case "pair":
+      variantClassName = cn(
+        { "bg-mb-btn-pair/30": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-pair/30": isHover },
+        { "group-hover:bg-mb-btn-pair/30": isGroupHover },
+      );
+      break;
+    case "burn":
+      variantClassName = cn(
+        { "bg-mb-btn-burn/30": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-burn/30": isHover },
+        { "group-hover:bg-mb-btn-burn/30": isGroupHover },
+      );
+      break;
+    case "swap":
+      variantClassName = cn(
+        { "bg-mb-btn-swap/30": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-swap/30": isHover },
+        { "group-hover:bg-mb-btn-swap/30": isGroupHover },
+      );
+      break;
+    default:
+      const _exhaustiveCheck: never = variant;
+      variantClassName = _exhaustiveCheck;
+      break;
+  }
+
+  return cn(variantClassName, custom);
+};
+
 export const getVariantBtnBgClassName = ({
   variant,
   custom,

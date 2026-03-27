@@ -22,7 +22,7 @@ import {
 } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
   data?: PoolItemType[];
@@ -30,6 +30,7 @@ interface Props {
 }
 
 const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
+  const navigate = useNavigate();
   const { filter } = usePairDetailSearchFilterStore();
   const isBurnPool = filter.type === 0;
 
@@ -95,8 +96,20 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
             imageUri: pool.tokenInImageUri ?? undefined,
           });
 
+          const href = `/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`;
+
           return (
-            <TableRow key={pool.address}>
+            <TableRow
+              key={pool.address}
+              title={href}
+              className={"cursor-pointer"}
+              onClick={() => {
+                navigate({
+                  to: href,
+                });
+              }}
+              variant="pair"
+            >
               <TableCell className="text-left">
                 <div className="flex min-w-0 items-center gap-3.25">
                   <TokenOutInInterceptDisplay
@@ -158,13 +171,13 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                 </TableCell>
               )}
               <TableCell>
-                <Link
-                  to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
+                <Button
+                  variant={"pair"}
+                  hasGroupHover
+                  className="font-orbitron"
                 >
-                  <Button variant={"pair"} hasHover className="font-orbitron">
-                    View
-                  </Button>
-                </Link>
+                  View
+                </Button>
               </TableCell>
             </TableRow>
           );

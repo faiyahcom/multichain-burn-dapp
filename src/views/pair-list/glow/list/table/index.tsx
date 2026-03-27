@@ -16,7 +16,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PairItemType } from "@/types/pair";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
   data?: PairItemType[];
@@ -27,6 +27,8 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
   const columns = ["Pair", "Volume", "Liquidity", "Network", "Action"];
 
   const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+
+  const navigate = useNavigate();
 
   return (
     <Table>
@@ -79,8 +81,20 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
             imageUri: item.tokenInImageUri ?? undefined,
           });
 
+          const href = `/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`;
+
           return (
-            <TableRow key={index}>
+            <TableRow
+              key={index}
+              title={href}
+              className={"cursor-pointer"}
+              onClick={() => {
+                navigate({
+                  to: href,
+                });
+              }}
+              variant="pair"
+            >
               <TableCell
                 style={
                   {
@@ -136,13 +150,13 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                 />
               </TableCell>
               <TableCell className="pr-10">
-                <Link
-                  to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
+                <Button
+                  variant={"pair"}
+                  hasGroupHover
+                  className="font-orbitron"
                 >
-                  <Button variant={"pair"} hasHover className="font-orbitron">
-                    View
-                  </Button>
-                </Link>
+                  View
+                </Button>
               </TableCell>
             </TableRow>
           );
