@@ -9,11 +9,13 @@ import { useQuery } from "@tanstack/react-query";
 import PairListGlowListTable from "./table";
 import CustomPagination from "@/components/common/glow/glow-pagination";
 import PairListGlowListGrid from "./grid";
+import { useMediaQuery } from "usehooks-ts";
 
 const PairListGlowList = () => {
   const { filter, setFilter } = usePairListSearchFilterStore();
   const { listLayout, ...filterWithoutListLayout } = filter;
   const limit = 12;
+  const onlyShowCurrentPage = useMediaQuery("(max-width: 1024px)");
 
   const { data: pairs, isPending: isPendingPairs } = useQuery({
     queryKey: pairQueryKeys.list(filterWithoutListLayout),
@@ -55,6 +57,7 @@ const PairListGlowList = () => {
         pageSize={limit}
         onPageChange={(page) => setFilter({ page })}
         variant="pair"
+        onlyShowCurrentPage={onlyShowCurrentPage}
       />
     </GlowContainer>
   );
