@@ -26,7 +26,7 @@ interface Props {
 const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
   const columns = ["Pair", "Volume", "Liquidity", "Network", "Action"];
 
-  const cellWdith: React.CSSProperties["width"] = `400px`;
+  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
 
   return (
     <Table>
@@ -37,7 +37,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="pair"
               style={{
-                width: cellWdith,
+                width: index === 0 ? "400px" : cellWdith, // 400px for first column
               }}
             >
               {column}
@@ -81,7 +81,14 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
 
           return (
             <TableRow key={index}>
-              <TableCell className="min-w-0">
+              <TableCell
+                style={
+                  {
+                    "--max-w": "400px",
+                  } as React.CSSProperties
+                }
+                className="w-(--max-w) min-w-0"
+              >
                 <div className="flex min-w-0 items-center gap-3.25">
                   {/* Client wants the order to be token out / token in, refers to MB-415 */}
                   <div className="flex min-w-0 shrink-0 items-center">

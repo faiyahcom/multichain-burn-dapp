@@ -98,7 +98,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
           return (
             <TableRow key={pool.address}>
               <TableCell className="text-left">
-                <div className="flex w-max min-w-0 items-center gap-3.25">
+                <div className="flex min-w-0 items-center gap-3.25">
                   <TokenOutInInterceptDisplay
                     tokenOutProps={{
                       src: tokenOutDisplay.imageUri,
@@ -161,7 +161,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                 <Link
                   to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
                 >
-                  <Button variant={"pair"} hasHover>
+                  <Button variant={"pair"} hasHover className="font-orbitron">
                     View Detail
                   </Button>
                 </Link>
