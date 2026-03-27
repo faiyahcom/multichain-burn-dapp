@@ -78,23 +78,22 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
   return (
     <GlowContainer
       variant={variant}
-      className="flex items-center gap-6 px-2.5 py-3.25 xl:gap-12 xl:px-5 xl:py-6.25"
+      className="flex items-center gap-3 px-2.5 py-3.25 xl:gap-12 xl:px-5 xl:py-6.25"
     >
-      <div className="flex w-27 items-center gap-1.75 xl:w-35 xl:gap-3.25">
+      <div className="flex w-30 shrink-0 items-center gap-1.75 xl:w-56.75 xl:gap-3.25">
         <IconTokenList className="shrink-0" />
-        <div className="text-center text-md font-medium xl:text-2xl">
-          <p>TOKENS</p>
-          <p>LIST</p>
+        <div className="text-center text-md font-medium xl:shrink-0 xl:text-2xl">
+          TOKENS LIST
         </div>
       </div>
 
       {/* 
         desktop:
-        100% - spacing * (5 + 12 + 35) = 100% - spacing * 52
+        100% - spacing * (5 + 12 + 56.75) = 100% - spacing * 73.75
         mobile:
-        100% - spacing * (2.5 + 6 + 27) = 100% - spacing * 35.5
+        100% - spacing * (2.5 + 3 + 30) = 100% - spacing * 35.5
       */}
-      <div className="flex w-[calc(100%-var(--spacing)*35.5)] items-center gap-3 xl:w-[calc(100%-var(--spacing)*52)] xl:gap-6">
+      <div className="flex w-[calc(100%-var(--spacing)*35.5)] items-center gap-3 xl:w-[calc(100%-var(--spacing)*73.75)] xl:gap-6">
         <button className={buttonClassName} onClick={() => scroll("prev")}>
           <ChevronLeftIcon className="size-6.25 text-[#7B879F] xl:size-8.75" />
         </button>

@@ -11,7 +11,7 @@ export const getVariantBorderClassName = ({
   variant: ContainerVariant;
   custom?: string;
 }) => {
-  const className = "border-4 rounded-21px";
+  const className = "border-2 rounded-21px";
 
   let variantClassName = "";
   switch (variant) {

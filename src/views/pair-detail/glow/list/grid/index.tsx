@@ -155,7 +155,7 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   >
                     {isBurnPool
                       ? getPoolStatusLabel(pool.status)
-                      : "View Detail"}
+                      : "View"}
                   </Link>
                 ),
               }}

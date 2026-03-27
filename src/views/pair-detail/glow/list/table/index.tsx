@@ -162,7 +162,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
                 >
                   <Button variant={"pair"} hasHover className="font-orbitron">
-                    View Detail
+                    View
                   </Button>
                 </Link>
               </TableCell>

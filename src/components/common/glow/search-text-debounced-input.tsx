@@ -65,7 +65,7 @@ const SearchTextDebouncedInput: React.FC<Props> = ({
         {...inputProps}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
-        className="text-base placeholder:text-base md:text-28px placeholder:md:text-28px"
+        className="font-inter text-base placeholder:text-base md:text-28px placeholder:md:text-28px"
       />
       {addons}
     </InputGroup>

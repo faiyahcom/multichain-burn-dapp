@@ -105,7 +105,7 @@ const CustomPagination: React.FC<Props> = ({
                   className="cursor-pointer"
                   variant={getButtonVariantFromContainerVariant({
                     containerVariant: variant,
-                    isActive: page === currentPage,
+                    isActive: page !== currentPage,
                   })}
                 >
                   {page}

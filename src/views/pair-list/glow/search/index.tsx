@@ -14,7 +14,7 @@ const PairListGlowSearch = () => {
         variant="pair"
         onTokenClick={(token) => {
           setFilter({
-            text: token.address,
+            text: token.customSymbol ?? token.symbol,
           });
         }}
       />
