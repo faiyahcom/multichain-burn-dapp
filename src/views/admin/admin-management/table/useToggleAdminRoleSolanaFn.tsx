@@ -21,7 +21,7 @@ type ToggleAdminRoleParams = {
 };
 
 export const useToggleAdminRoleSolanaFn = () => {
-  const { isConnected, address } = useAppKitAccount();
+  const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
   const { connection } = useAppKitConnection();
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
