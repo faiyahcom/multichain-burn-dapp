@@ -138,6 +138,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   outValue={pool.rewardNumerator}
                   inSymbol={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
                   outSymbol={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                  equalSign="/"
                 />
               </TableCell>
               <TableCell>

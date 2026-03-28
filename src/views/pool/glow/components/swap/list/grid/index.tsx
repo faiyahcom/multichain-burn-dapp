@@ -102,6 +102,7 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       outSymbol={
                         pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol
                       }
+                      equalSign="/"
                     />
                   </div>
                 }

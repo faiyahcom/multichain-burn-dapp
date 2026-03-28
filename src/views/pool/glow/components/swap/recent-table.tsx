@@ -135,6 +135,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                     outValue={pool.rewardNumerator}
                     inSymbol={tokenInDisplay.symbol}
                     outSymbol={tokenOutDisplay.symbol}
+                    equalSign="/"
                   />
                 </TableCell>
                 <TableCell>

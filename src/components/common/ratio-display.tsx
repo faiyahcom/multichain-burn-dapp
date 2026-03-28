@@ -10,6 +10,7 @@ interface Props {
   classNames?: {
     container?: string;
   };
+  equalSign?: string;
 }
 
 const RatioDisplay: React.FC<Props> = ({
@@ -18,6 +19,7 @@ const RatioDisplay: React.FC<Props> = ({
   inSymbol,
   outSymbol,
   classNames,
+  equalSign = "=",
 }) => {
   const inValueDecimal = safeDecimalParse({ value: inValue });
   const outValueDecimal = safeDecimalParse({ value: outValue });
@@ -35,7 +37,7 @@ const RatioDisplay: React.FC<Props> = ({
   return (
     <div
       className={cn(
-        "flex max-w-full flex-wrap items-center justify-center gap-0.5",
+        "flex max-w-full flex-wrap items-center justify-center gap-1",
         classNames?.container,
       )}
     >
@@ -46,7 +48,7 @@ const RatioDisplay: React.FC<Props> = ({
           container: "max-w-max",
         }}
       />
-      <span>=</span>
+      <span>{equalSign}</span>
       <MetricNumber
         number={displayOutValue}
         unit={outSymbol}
