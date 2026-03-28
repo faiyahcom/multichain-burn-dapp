@@ -50,11 +50,11 @@ export default function NetworkSelect() {
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex h-auto items-center gap-2 rounded-lg bg-mb-dark-profile-btn p-2 text-sm font-medium text-foreground md:px-3 md:py-3.75"
+          className="flex h-auto items-center gap-2 rounded-lg bg-mb-dark-profile-btn p-2 text-foreground md:px-3 md:py-3.75 xl:gap-3 xl:pr-6"
           title={selectedNetwork?.label ?? selectedNetworkId}
         >
           <NetworkIcon networkId={selectedNetworkId} className="md:size-8.75" />
-          <span className="max-xl:sr-only">
+          <span className="text-base font-normal text-mb-gray-profile max-xl:sr-only">
             {selectedNetwork?.label ?? selectedNetworkId}
           </span>
         </Button>

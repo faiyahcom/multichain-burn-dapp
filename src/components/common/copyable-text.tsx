@@ -8,6 +8,7 @@ interface Props {
   classNames?: {
     container?: string;
     displayText?: string;
+    icon?: string;
   };
 }
 
@@ -44,7 +45,7 @@ const CopyableText: React.FC<Props> = ({
           handleCopy();
         }}
       >
-        <IconCopy className="text-mb-copy-gray" />
+        <IconCopy className={cn("text-mb-copy-gray", classNames?.icon)} />
       </button>
     </div>
   );

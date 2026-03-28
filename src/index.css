@@ -3,6 +3,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
 @import url("https://fonts.cdnfonts.com/css/ds-digital");
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap");
 @import "tailwindcss";
 
 /* Optional: import Poppins from Google Fonts (or include your own @font-face) */
@@ -52,6 +53,9 @@
     sans-serif;
   --font-orbitron:
     "Orbitron", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  --font-instrument-sans:
+    "Instrument Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
     sans-serif;
 
   /* Text sizes (Tailwind text-*) */
@@ -177,6 +181,7 @@
 
   --color-mb-gray-b8: var(--mb-gray-b8);
   --color-mb-dark-profile-btn: var(--mb-dark-profile-btn);
+  --color-mb-gray-profile: var(--mb-gray-profile);
   --color-mb-dark-popover: var(--mb-dark-popover);
   --color-mb-btn-swap: var(--mb-btn-swap);
   --color-mb-btn-burn: var(--mb-btn-burn);
@@ -303,6 +308,7 @@
 
   --mb-gray-b8: #b8b8b8;
   --mb-dark-profile-btn: #131d27;
+  --mb-gray-profile: #e5e7eb;
   --mb-dark-popover: #0f1d34;
   --mb-btn-swap: #0285ff;
   --mb-btn-burn: #f16100;
@@ -429,6 +435,7 @@
 
   --mb-gray-b8: #b8b8b8;
   --mb-dark-profile-btn: #131d27;
+  --mb-gray-profile: #e5e7eb;
   --mb-dark-popover: #0f1d34;
   --mb-btn-swap: #0779e9;
   --mb-btn-burn: #fb781d;
