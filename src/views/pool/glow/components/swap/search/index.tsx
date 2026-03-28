@@ -17,6 +17,7 @@ const SwapSearch = () => {
         variant="swap"
         inputProps={{
           placeholder: "Search",
+          className: "font-orbitron text-xl",
         }}
         value={filter.text}
         onValueChange={(value) => setFilter({ text: value })}

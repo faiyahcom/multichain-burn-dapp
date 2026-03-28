@@ -64,6 +64,7 @@ const PoolGlowPageLayout = ({
                     variant={variant}
                     className="px-14 text-22px font-bold"
                     onClick={() => navigate({ to: createTo })}
+                    hasHover
                 >
                     {createLabel}
                 </Button>

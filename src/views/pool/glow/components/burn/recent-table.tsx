@@ -11,7 +11,7 @@ import {
 import TableNoData from "@/components/common/glow/table-no-data";
 import TableSkeleton from "@/components/common/glow/table-skeleton";
 import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import NetworkDisplay from "@/components/common/network-display";
 import TokenImage from "@/components/common/token-image";
 import { chainIdToNetworkConfig } from "@/config/networks";
@@ -25,6 +25,7 @@ import { useQuery } from "@tanstack/react-query";
 import { IconBurnCategory } from "@/assets/react";
 
 const BurnRecentPoolsTable = ({ }: {}) => {
+    const navigate = useNavigate();
     const { data: recentPools, isPending: isRecentPoolsPending } = useQuery({
         queryKey: poolQueryKeys.recents(PoolKindCodeEnum.Burn),
         queryFn: () => poolService.getRecentPools(PoolKindCodeEnum.Burn),
@@ -92,9 +93,15 @@ const BurnRecentPoolsTable = ({ }: {}) => {
                         });
                         const statusLabel = getPoolStatusLabel(pool.status);
                         const isLive = pool.status === "on_going";
+                        const href = `/burn/detail/${pool.address}`;
 
                         return (
-                            <TableRow key={pool.address}>
+                            <TableRow
+                                key={pool.address}
+                                variant="burn"
+                                className="sm:text-24px cursor-pointer text-xl"
+                                onClick={() => navigate({ to: href })}
+                            >
                                 <TableCell className="text-left">
                                     <div className="flex min-w-0 items-center gap-3">
                                         <IconBurnCategory className="size-10.75" />
@@ -163,14 +170,13 @@ const BurnRecentPoolsTable = ({ }: {}) => {
                                     <span className="sm:text-24px text-xl">Dynamic</span>
                                 </TableCell>
                                 <TableCell>
-                                    <Link to={`/burn/detail/${pool.address}`}>
-                                        <Button
-                                            variant={isLive ? "burn" : "burn-active"}
-                                            className="sm:text-24px min-w-28 rounded-13px px-6 py-2 text-xl font-semibold sm:min-w-35"
-                                        >
-                                            {statusLabel}
-                                        </Button>
-                                    </Link>
+                                    <Button
+                                        variant={isLive ? "burn" : "burn-active"}
+                                        hasGroupHover
+                                        className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
+                                    >
+                                        {statusLabel}
+                                    </Button>
                                 </TableCell>
                             </TableRow>
                         );

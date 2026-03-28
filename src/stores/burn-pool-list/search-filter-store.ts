@@ -31,7 +31,7 @@ export const useBurnPoolListSearchFilterStore =
       text: "",
       network: NETWORK_CONFIGS.map((network) => network.id),
       status: [...userViewBurnPoolStatuses],
-      sortBy: "tvl",
+      sortBy: "volume",
       sortOrder: "desc",
       listLayout: "list",
     },

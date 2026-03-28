@@ -2,12 +2,15 @@ import { PoolKindCodeEnum } from "@/types/pool";
 import PoolGlowPageLayout, { PoolGlowSection } from "./shared/layout";
 import BurnRecentPoolsTable from "./components/burn/recent-table";
 import SwapRecentPoolsTable from "./components/swap/recent-table";
+import BurnPoolSection from "./components/burn/pool-section";
 import SwapPoolSection from "./components/swap/pool-section";
-import { useSwapPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { useBurnPoolListSearchFilterStore, useSwapPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
 
 type Props = {};
 
 const BurnPoolList = ({}: Props) => {
+  const { setFilter } = useBurnPoolListSearchFilterStore();
+
   return (
     <PoolGlowPageLayout
       poolKind={PoolKindCodeEnum.Burn}
@@ -16,6 +19,12 @@ const BurnPoolList = ({}: Props) => {
           <BurnRecentPoolsTable />
         </PoolGlowSection>
       }
+      poolSection={<BurnPoolSection />}
+      onTokenClick={(token) => {
+        setFilter({
+          text: token.customSymbol ?? token.symbol,
+        });
+      }}
     />
   );
 };

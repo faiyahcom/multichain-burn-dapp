@@ -31,6 +31,11 @@ interface Props {
   placeholder?: string;
   defaultSortBy?: SortBy; // if set then it will be selected by default instead of none
   variant: ContainerVariant;
+  classNames?: {
+    container?: string;
+    btn?: string;
+    content?: string;
+  };
 }
 
 const SortSelect: React.FC<Props> = ({
@@ -42,6 +47,7 @@ const SortSelect: React.FC<Props> = ({
   placeholder = "Sort by",
   defaultSortBy,
   variant,
+  classNames,
 }) => {
   const isActive = sortBy !== undefined && sortBy !== "none";
 
@@ -62,58 +68,62 @@ const SortSelect: React.FC<Props> = ({
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={getButtonVariantFromContainerVariant({
-            containerVariant: variant,
-            isActive: false,
-          })}
-          size={"default"}
-        >
-          {isActive && <div className={cn("size-4")} />}
-          {!isActive
-            ? placeholder
-            : (sortBysShortLabels[sortBy ?? "none"] ?? sortBy)}{" "}
-          {isActive && (
-            <DownTriangleIcon direction={sortOrder === "asc" ? "up" : "down"} />
+    <div className={classNames?.container}>
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button
+            variant={getButtonVariantFromContainerVariant({
+              containerVariant: variant,
+              isActive: false,
+            })}
+            size={"default"}
+            className={classNames?.btn}
+          >
+            {isActive && <div className={cn("size-4")} />}
+            {!isActive
+              ? placeholder
+              : (sortBysShortLabels[sortBy ?? "none"] ?? sortBy)}{" "}
+            {isActive && (
+              <DownTriangleIcon direction={sortOrder === "asc" ? "up" : "down"} />
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className={cn(
+            getVariantBorderClassName({
+              variant,
+              custom: "rounded-5px border-4",
+            }),
+            "w-58.5 space-y-1 overflow-y-auto sm:w-75",
+            "bg-mb-dark-popover",
+            classNames?.content,
           )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className={cn(
-          getVariantBorderClassName({
-            variant,
-            custom: "rounded-5px border-4",
-          }),
-          "w-58.5 space-y-1 overflow-y-auto sm:w-75",
-          "bg-mb-dark-popover",
-        )}
-        // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
-        style={{
-          maxHeight: "var(--radix-popover-content-available-height)",
-        }}
-      >
-        <PopoverHeader className="sr-only">
-          <PopoverTitle>Sort by</PopoverTitle>
-          <PopoverDescription>Sort by</PopoverDescription>
-        </PopoverHeader>
-        {options?.map((sortByItem) => {
-          const isActive = sortByItem === sortBy;
-          return (
-            <OptionItem
-              key={sortByItem}
-              sortBy={sortByItem}
-              sortOrder={sortOrder}
-              isActive={isActive}
-              toggleSort={handleToggleSort}
-              label={sortBysLabels[sortByItem]}
-              variant={variant}
-            />
-          );
-        })}
-      </PopoverContent>
-    </Popover>
+          // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
+          style={{
+            maxHeight: "var(--radix-popover-content-available-height)",
+          }}
+        >
+          <PopoverHeader className="sr-only">
+            <PopoverTitle>Sort by</PopoverTitle>
+            <PopoverDescription>Sort by</PopoverDescription>
+          </PopoverHeader>
+          {options?.map((sortByItem) => {
+            const isActive = sortByItem === sortBy;
+            return (
+              <OptionItem
+                key={sortByItem}
+                sortBy={sortByItem}
+                sortOrder={sortOrder}
+                isActive={isActive}
+                toggleSort={handleToggleSort}
+                label={sortBysLabels[sortByItem]}
+                variant={variant}
+              />
+            );
+          })}
+        </PopoverContent>
+      </Popover>
+    </div>
   );
 };
 

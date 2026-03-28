@@ -29,6 +29,7 @@ interface Props {
   classNames?: {
     btn?: string;
     content?: string;
+    item?: string;
   };
   defaultValuesWhenUncheckAll?: string[]; // By default, "clear" like action will result in an empty array. This will override that behavior.
   variant: ContainerVariant;
@@ -120,9 +121,9 @@ const MultipleSelect: React.FC<Props> = ({
                 />
               )}
               {isAllSelected ? (
-                <span>{allLabel}</span>
+                <span className={classNames?.item}>{allLabel}</span>
               ) : (
-                <span className="min-w-0 truncate">
+                <span className={cn("min-w-0 truncate", classNames?.item)}>
                   {options
                     ?.filter((option) => selected?.includes(option.value))
                     ?.map((option) => option.label)
@@ -165,6 +166,7 @@ const MultipleSelect: React.FC<Props> = ({
             value=""
             checked={isAllSelected}
             toggleCheck={handleToggleAllCheck}
+            classNames={classNames}
           />
           {options?.map((option, index) => (
             <OptionItem
@@ -174,12 +176,13 @@ const MultipleSelect: React.FC<Props> = ({
               icon={option.icon}
               checked={selected?.includes(option.value)}
               toggleCheck={handleToggleCheck}
+              classNames={classNames}
             />
           ))}
         </div>
         <div className="pl-3">
           <button
-            className="text-15px font-medium text-mb-clear-blue"
+            className={cn("text-15px font-medium text-mb-clear-blue", classNames?.item)}
             onClick={handleClearAllCheck}
           >
             Clear All
@@ -193,6 +196,9 @@ const MultipleSelect: React.FC<Props> = ({
 interface OptionItemProps {
   checked?: boolean;
   toggleCheck?: (value?: string) => void;
+  classNames?: {
+    item?: string;
+  };
 }
 
 const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
@@ -201,6 +207,7 @@ const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
   icon,
   checked,
   toggleCheck,
+  classNames,
 }) => {
   const Icon = icon;
   return (
@@ -219,7 +226,7 @@ const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
         ) : (
           <div className="size-7.75" />
         )}
-        <span className="text-15px font-medium select-none">{label}</span>
+        <span className={cn("text-15px font-medium select-none", classNames?.item)}>{label}</span>
       </div>
       {checked ? (
         <IconCheck className="h-2.5 w-3.75 text-mb-check-blue" />
