@@ -38,12 +38,12 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
     "Pool",
     "Volume",
     "Ratio",
-    ...(isBurnPool ? ["Time", "Status"] : [""]),
+    ...(isBurnPool ? ["Time", "Status"] : []),
     "Action",
   ];
 
   const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
-  const fixWdith: React.CSSProperties["minWidth"] = `350px`;
+  const fixWidth: React.CSSProperties["minWidth"] = `350px`;
 
   return (
     <Table>
@@ -55,8 +55,8 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               className="h-12 pt-2 align-baseline"
               variant="pair"
               style={{
-                width: index === 0 ? fixWdith : cellWdith, // 350px for first column
-                minWidth: index === 0 ? fixWdith : "", // 350px for first column
+                width: index === 0 ? fixWidth : cellWdith, // 350px for first column
+                minWidth: index === 0 ? fixWidth : "", // 350px for first column
               }}
             >
               {column}
@@ -115,7 +115,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               <TableCell
                 style={
                   {
-                    "--max-w": fixWdith,
+                    "--max-w": fixWidth,
                   } as React.CSSProperties
                 }
                 className="w-(--max-w) min-w-0"
@@ -132,7 +132,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                     }}
                   />
                   {/* max-w - 60px - 13px = max-w - 73px (18.25) */}
-                  <div className="max-w-[calc(var(--max-w)-var(--spacing)*18.25)] min-w-0">
+                  <div className="max-w-[calc(var(--max-w)-var(--spacing)*18.25)] min-w-0 text-left">
                     <p className="min-w-0 truncate" title={pool.name}>
                       {pool.name}
                     </p>
@@ -163,7 +163,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   />
                 )}
               </TableCell>
-              {isBurnPool ? (
+              {isBurnPool && (
                 <>
                   <TableCell>
                     <StartEndDateDisplay
@@ -178,8 +178,6 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                     <p>{getPoolStatusLabel(pool.status)}</p>
                   </TableCell>
                 </>
-              ) : (
-                <></>
               )}
               <TableCell>
                 <Button
