@@ -169,11 +169,11 @@ const BurnRecentPoolsTable = ({ }: {}) => {
                                 <TableCell>
                                     <span className="sm:text-24px text-xl">Dynamic</span>
                                 </TableCell>
-                                <TableCell>
+                                <TableCell className="max-w-max w-max min-w-max">
                                     <Button
                                         variant={isLive ? "burn" : "burn-active"}
                                         hasGroupHover
-                                        className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
+                                        className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
                                     >
                                         {statusLabel}
                                     </Button>
@@ -184,7 +184,7 @@ const BurnRecentPoolsTable = ({ }: {}) => {
                 </TableBody>
             </Table>
             <div className="flex justify-end">
-                <Link to="/burn/" className="sm:text-24px text-xl font-semibold">
+                <Link to="/burn/" className="sm:text-24px text-xl font-semibold pr-3">
                     See more
                 </Link>
             </div>

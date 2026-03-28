@@ -170,10 +170,10 @@ const SwapRecentPoolsTable = ({}: {}) => {
                     }}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell className="max-w-max w-max min-w-max">
                   <Button
                     variant={"swap"}
-                    className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
+                    className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
                     hasGroupHover
                   >
                     Swap
@@ -187,7 +187,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
       <div className="flex justify-end">
         <Link
           to="/swap/"
-          className="sm:text-24px font-inter text-xl font-semibold"
+          className="sm:text-24px font-inter text-xl font-semibold pr-3"
         >
           See more
         </Link>

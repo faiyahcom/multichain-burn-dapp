@@ -48,7 +48,7 @@ const ProfileMenu = ({}: Props) => {
 
   return (
     <DropdownMenu>
-      <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn px-3 py-2">
+      <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn px-3 py-2 sm:pr-6">
         <div className="flex w-max items-center gap-3 text-left">
           <DropdownMenuTrigger className="shrink-0">
             <TokenImage
@@ -62,10 +62,10 @@ const ProfileMenu = ({}: Props) => {
             />
           </DropdownMenuTrigger>
           {!isMobile && (
-            <div className="w-35">
+            <div className="w-26.25 space-y-1">
               <DropdownMenuTrigger className="block w-full">
                 <p
-                  className="w-full min-w-0 truncate text-left text-13px font-extrabold"
+                  className="w-full min-w-0 truncate text-left text-15px font-semibold text-[#EB8C41]"
                   title={name}
                 >
                   {name}
@@ -75,7 +75,10 @@ const ProfileMenu = ({}: Props) => {
                 content={user?.address}
                 displayText={truncateString({ str: user?.address ?? "--" })}
                 classNames={{
-                  container: "justify-start",
+                  container: "justify-start gap-1.75 h-5",
+                  displayText:
+                    "font-instrument-sans text-xs text-mb-gray-profile",
+                  icon: "text-mb-gray-profile",
                 }}
               />
             </div>
