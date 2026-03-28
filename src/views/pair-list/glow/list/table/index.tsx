@@ -9,9 +9,9 @@ import {
 } from "@/components/common/glow/table";
 import TableNoData from "@/components/common/glow/table-no-data";
 import TableSkeleton from "@/components/common/glow/table-skeleton";
+import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-intercept-display";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
-import TokenImage from "@/components/common/token-image";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PairItemType } from "@/types/pair";
 import { sciToFormatted } from "@/utils/helpers/numbers";
@@ -27,7 +27,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
   const columns = ["Pair", "Volume", "Liquidity", "Network", "Action"];
 
   const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
-  const fixWdith: React.CSSProperties["minWidth"] = `350px`;
+  const fixWidth: React.CSSProperties["minWidth"] = `350px`;
 
   const navigate = useNavigate();
 
@@ -40,8 +40,8 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="pair"
               style={{
-                width: index === 0 ? fixWdith : cellWdith, // 350px for first column
-                minWidth: index === 0 ? fixWdith : "", // 350px for first column
+                width: index === 0 ? fixWidth : cellWdith, // 350px for first column
+                minWidth: index === 0 ? fixWidth : "", // 350px for first column
               }}
             >
               {column}
@@ -99,29 +99,23 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               <TableCell
                 style={
                   {
-                    "--max-w": fixWdith,
+                    "--max-w": fixWidth,
                   } as React.CSSProperties
                 }
                 className="w-(--max-w) min-w-0"
               >
                 <div className="flex min-w-0 items-center gap-3.25">
                   {/* Client wants the order to be token out / token in, refers to MB-415 */}
-                  <div className="flex min-w-0 shrink-0 items-center">
-                    <TokenImage
-                      src={tokenOutDisplay.imageUri}
-                      alt={tokenOutDisplay.symbol}
-                      classNames={{
-                        common: "size-6 sm:size-8",
-                      }}
-                    />
-                    <TokenImage
-                      src={tokenInDisplay.imageUri}
-                      alt={tokenInDisplay.symbol}
-                      classNames={{
-                        common: "size-6 sm:size-8 -ml-1",
-                      }}
-                    />
-                  </div>
+                  <TokenOutInInterceptDisplay
+                    tokenOutProps={{
+                      src: tokenOutDisplay.imageUri,
+                      alt: tokenOutDisplay.symbol,
+                    }}
+                    tokenInProps={{
+                      src: tokenInDisplay.imageUri,
+                      alt: tokenInDisplay.symbol,
+                    }}
+                  />
                   {/* max-w - 51px - 63px - 13px = max-w - 127px (31.75) */}
                   <span
                     className="max-w-[calc(var(--max-w)-var(--spacing)*31.75)] min-w-0 truncate"

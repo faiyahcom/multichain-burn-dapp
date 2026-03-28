@@ -39,13 +39,14 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
   }, [isBurnPool]);
 
   const renderBurnPoolTime = (pool: PoolItemType) => {
-    if (pool.status !== "upcoming" && pool.status !== "on_going") return "N/A";
+    if (pool.status !== "upcoming" && pool.status !== "on_going")
+      return "00:00:00";
     const timeStart = Number(pool.timeStart);
     const timeEnd = Number(pool.timeEnd);
 
     const renderTimeEnd = () => {
       if (isNaN(timeEnd)) {
-        return "N/A";
+        return "00:00:00";
       }
       const diffEnd = timeEnd - nowInSeconds;
       if (diffEnd > 0) {
@@ -57,7 +58,7 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
 
     if (pool.status === "upcoming") {
       if (isNaN(timeStart)) {
-        return "N/A";
+        return "00:00:00";
       }
       const diffStart = timeStart - nowInSeconds;
       if (diffStart > 0) {

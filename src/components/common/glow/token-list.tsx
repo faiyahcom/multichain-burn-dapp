@@ -78,7 +78,7 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
   return (
     <GlowContainer
       variant={variant}
-      className="flex items-center gap-3 px-2.5 py-3.25 xl:gap-12 xl:px-5 xl:py-6.25"
+      className="flex items-center gap-3 px-2.5 py-2.25 xl:gap-12 xl:px-5 xl:py-4.5"
     >
       <div className="flex w-30 shrink-0 items-center gap-1.75 xl:w-56.75 xl:gap-3.25">
         <IconTokenList className="shrink-0" />

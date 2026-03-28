@@ -82,6 +82,7 @@ const GridCard: React.FC<Props> = ({
             }),
             btnClassName,
           )}
+          hasHover
           {...btnProps}
         >
           {btn.children}

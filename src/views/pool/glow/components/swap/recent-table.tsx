@@ -33,6 +33,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
   });
 
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
+  const fixWidth: React.CSSProperties["minWidth"] = `280px`;
 
   return (
     <div className="space-y-6">
@@ -45,7 +46,8 @@ const SwapRecentPoolsTable = ({}: {}) => {
                 variant="swap"
                 className="h-12 pt-2 align-baseline"
                 style={{
-                  width: index === 0 ? "280px" : `${100 / columns.length}%`,
+                  width: index === 0 ? fixWidth : `${100 / columns.length}%`,
+                  minWidth: index === 0 ? fixWidth : "", // 280px for first column
                 }}
               >
                 {column}
@@ -98,11 +100,22 @@ const SwapRecentPoolsTable = ({}: {}) => {
                 }}
                 variant="swap"
               >
-                <TableCell className="text-left">
-                  <div className="flex min-w-0 items-center gap-3">
+                <TableCell
+                  className="w-(--max-w) min-w-0 text-left"
+                  style={
+                    {
+                      "--max-w": fixWidth,
+                    } as React.CSSProperties
+                  }
+                >
+                  <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
                     <IconSwapCategory className="size-10.75" />
-                    <div className="min-w-0">
-                      <p className="truncate font-semibold" title={pool.name}>
+                    {/* max-w - spacing * (10.75 + 3) */}
+                    <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
+                      <p
+                        className="max-w-full min-w-0 truncate font-semibold"
+                        title={pool.name}
+                      >
                         {pool.name}
                       </p>
                       <CopyableText

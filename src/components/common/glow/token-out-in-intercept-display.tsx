@@ -21,14 +21,14 @@ const TokenOutInInterceptDisplay: React.FC<Props> = ({
       <TokenImage
         {...tokenOutPropsRest}
         classNames={{
-          common: "size-6 sm:size-8",
+          common: "size-6 sm:size-8 relative z-10",
           ...tokenOutClassNames,
         }}
       />
       <TokenImage
         {...tokenInPropsRest}
         classNames={{
-          common: "size-6 sm:size-8 -ml-1",
+          common: "size-6 sm:size-8 -ml-1 relative z-0",
           ...tokenInClassNames,
         }}
       />
