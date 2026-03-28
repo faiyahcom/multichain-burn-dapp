@@ -5,6 +5,7 @@ import GlowContainer from "./container";
 interface Props {
   title: string;
   value: string;
+  valueTitle?: string; // Optional if the value is too long
   variant: ContainerVariant;
   classNames?: {
     container?: string;
@@ -27,6 +28,7 @@ const CARD_VARIANT_BG: Record<ContainerVariant, string> = {
 const GlowSummaryCard: React.FC<Props> = ({
   title,
   value,
+  valueTitle,
   variant,
   classNames,
 }) => {
@@ -52,7 +54,12 @@ const GlowSummaryCard: React.FC<Props> = ({
         )}
       >
         <p className="text-2xl md:text-28px">{title}</p>
-        <p className="text-28px md:text-3xl">{value}</p>
+        <p
+          className="max-w-full min-w-0 truncate text-28px md:text-3xl"
+          title={valueTitle ?? value}
+        >
+          {value}
+        </p>
       </GlowContainer>
     </div>
   );

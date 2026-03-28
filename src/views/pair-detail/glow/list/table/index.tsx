@@ -36,24 +36,27 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
 
   const columns = [
     "Pool",
+    "Volume",
     "Ratio",
-    ...(isBurnPool ? ["Time", "Status"] : ["Volume"]),
+    ...(isBurnPool ? ["Time", "Status"] : [""]),
     "Action",
   ];
 
   const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const fixWdith: React.CSSProperties["minWidth"] = `350px`;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
-          {columns.map((column) => (
+          {columns.map((column, index) => (
             <TableHead
               key={column}
               className="h-12 pt-2 align-baseline"
               variant="pair"
               style={{
-                width: cellWdith,
+                width: index === 0 ? fixWdith : cellWdith, // 350px for first column
+                minWidth: index === 0 ? fixWdith : "", // 350px for first column
               }}
             >
               {column}
@@ -109,7 +112,14 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               }}
               variant="pair"
             >
-              <TableCell className="text-left">
+              <TableCell
+                style={
+                  {
+                    "--max-w": fixWdith,
+                  } as React.CSSProperties
+                }
+                className="w-(--max-w) min-w-0"
+              >
                 <div className="flex min-w-0 items-center gap-3.25">
                   <TokenOutInInterceptDisplay
                     tokenOutProps={{
@@ -121,8 +131,9 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                       alt: tokenInDisplay.symbol,
                     }}
                   />
-                  <div>
-                    <p className="max-w-full truncate" title={pool.name}>
+                  {/* max-w - 60px - 13px = max-w - 73px (18.25) */}
+                  <div className="max-w-[calc(var(--max-w)-var(--spacing)*18.25)] min-w-0">
+                    <p className="min-w-0 truncate" title={pool.name}>
                       {pool.name}
                     </p>
                     <CopyableText
@@ -136,6 +147,9 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                     />
                   </div>
                 </div>
+              </TableCell>
+              <TableCell>
+                <MetricNumber number={pool.volume} isShorten />
               </TableCell>
               <TableCell>
                 {isBurnPool ? (
@@ -165,9 +179,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   </TableCell>
                 </>
               ) : (
-                <TableCell>
-                  <MetricNumber number={pool.volume} isShorten />
-                </TableCell>
+                <></>
               )}
               <TableCell>
                 <Button

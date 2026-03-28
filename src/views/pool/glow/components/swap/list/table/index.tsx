@@ -33,6 +33,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
 
   const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const fixWdith: React.CSSProperties["minWidth"] = `280px`;
 
   return (
     <Table>
@@ -43,7 +44,8 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="swap"
               style={{
-                width: cellWdith,
+                width: index === 0 ? fixWdith : cellWdith, // 280px for first column
+                minWidth: index === 0 ? fixWdith : "", // 280px for first column
               }}
             >
               {column}
@@ -98,12 +100,20 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               className="sm:text-24px cursor-pointer text-xl"
               variant="swap"
             >
-              <TableCell className="text-left">
-                <div className="flex min-w-0 items-center gap-3">
+              <TableCell
+                className="w-(--max-w) min-w-0 text-left"
+                style={
+                  {
+                    "--max-w": fixWdith,
+                  } as React.CSSProperties
+                }
+              >
+                <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
                   <IconSwapCategory className="size-10.75" />
-                  <div className="min-w-0">
+                  {/* max-w - spacing * (10.75 + 3) */}
+                  <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
                     <p
-                      className="sm:text-24px truncate text-xl font-semibold"
+                      className="sm:text-24px max-w-full min-w-0 truncate text-xl font-semibold"
                       title={pool.name}
                     >
                       {pool.name}

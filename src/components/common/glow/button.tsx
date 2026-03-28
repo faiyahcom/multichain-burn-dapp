@@ -58,16 +58,40 @@ const buttonVariants = ({
             getVariantShadowClassName({ variant: "swap" }),
           ),
           "pair-grid": cn(
-            "text-foreground grid-pair-btn-bg",
+            "bg-mb-btn-pair text-foreground grid-pair-btn-bg",
             getVariantShadowClassName({ variant: "pair" }),
+            {
+              "hover:bg-foreground hover:bg-none hover:text-mb-btn-pair":
+                hasHover,
+            },
+            {
+              "group-hover:bg-foreground group-hover:bg-none group-hover:text-mb-btn-pair":
+                hasGroupHover,
+            },
           ),
           "burn-grid": cn(
-            "text-foreground grid-burn-btn-bg",
+            "bg-mb-btn-burn text-foreground grid-burn-btn-bg",
             getVariantShadowClassName({ variant: "burn" }),
+            {
+              "hover:bg-foreground hover:bg-none hover:text-mb-btn-burn":
+                hasHover,
+            },
+            {
+              "group-hover:bg-foreground group-hover:bg-none group-hover:text-mb-btn-burn":
+                hasGroupHover,
+            },
           ),
           "swap-grid": cn(
-            "text-foreground grid-swap-btn-bg",
+            "bg-mb-btn-swap text-foreground grid-swap-btn-bg",
             getVariantShadowClassName({ variant: "swap" }),
+            {
+              "hover:bg-foreground hover:bg-none hover:text-mb-btn-swap":
+                hasHover,
+            },
+            {
+              "group-hover:bg-foreground group-hover:bg-none group-hover:text-mb-btn-swap":
+                hasGroupHover,
+            },
           ),
         },
         size: {

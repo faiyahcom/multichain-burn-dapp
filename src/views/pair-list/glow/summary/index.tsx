@@ -1,6 +1,7 @@
 import GlowSummaryCard from "@/components/common/glow/summary-card";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
 
 const PairListGlowSummary = () => {
@@ -9,30 +10,42 @@ const PairListGlowSummary = () => {
     queryFn: pairService.getPairOverallStats,
   });
 
-  const cards: { title: string; value: string }[] = [
+  const cards: { title: string; value: string; valueTitle?: string }[] = [
     {
       title: "Total Volume",
-      value: Number(overallStats?.stats?.totalVolume ?? 0).toLocaleString(
+      value: shortenNumber({
+        number: Number(overallStats?.stats?.totalVolume ?? 0),
+      }).toLocaleUpperCase(),
+      valueTitle: Number(overallStats?.stats?.totalVolume ?? 0).toLocaleString(
         "en-US",
       ),
     },
     {
       title: "Total Participants",
-      value: Number(overallStats?.stats?.totalParticipants ?? 0).toLocaleString(
-        "en-US",
-      ),
+      value: shortenNumber({
+        number: Number(overallStats?.stats?.totalParticipants ?? 0),
+      }).toLocaleUpperCase(),
+      valueTitle: Number(
+        overallStats?.stats?.totalParticipants ?? 0,
+      ).toLocaleString("en-US"),
     },
     {
       title: "Total Pairs",
-      value: Number(overallStats?.stats?.totalPairs ?? 0).toLocaleString(
+      value: shortenNumber({
+        number: Number(overallStats?.stats?.totalPairs ?? 0),
+      }).toLocaleUpperCase(),
+      valueTitle: Number(overallStats?.stats?.totalPairs ?? 0).toLocaleString(
         "en-US",
       ),
     },
     {
       title: "Total Transactions",
-      value: Number(overallStats?.stats?.totalTransactions ?? 0).toLocaleString(
-        "en-US",
-      ),
+      value: shortenNumber({
+        number: Number(overallStats?.stats?.totalTransactions ?? 0),
+      }).toLocaleUpperCase(),
+      valueTitle: Number(
+        overallStats?.stats?.totalTransactions ?? 0,
+      ).toLocaleString("en-US"),
     },
   ];
 
