@@ -17,7 +17,6 @@ import NetworkDisplay from "@/components/common/network-display";
 import RatioDisplay from "@/components/common/ratio-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PoolItemType } from "@/types/admin/master-pool-management";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
@@ -153,7 +152,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={sciToFormatted(pool.liquidity, pool.tokenOutDecimals)}
+                  number={pool.liquidity}
                   unit={tokenOutDisplay.symbol}
                   isShorten
                 />

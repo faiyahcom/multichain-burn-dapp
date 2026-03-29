@@ -7,7 +7,6 @@ import NoData from "@/components/common/no-data";
 import RatioDisplay from "@/components/common/ratio-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PoolItemType } from "@/types/admin/master-pool-management";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
@@ -88,10 +87,7 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       className="mx-auto"
                     />
                     <MetricNumber
-                      number={sciToFormatted(
-                        pool.liquidity,
-                        pool.tokenOutDecimals,
-                      )}
+                      number={pool.liquidity}
                       unit={tokenOutDisplay.symbol}
                       isShorten
                     />
