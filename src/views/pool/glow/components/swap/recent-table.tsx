@@ -19,7 +19,6 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { PoolKindCodeEnum } from "@/types/pool";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
@@ -154,10 +153,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                 </TableCell>
                 <TableCell>
                   <MetricNumber
-                    number={sciToFormatted(
-                      pool.liquidity,
-                      pool.tokenOutDecimals,
-                    )}
+                    number={pool.liquidity}
                     unit={tokenOutDisplay.symbol}
                     isShorten
                   />

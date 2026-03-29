@@ -1,17 +1,22 @@
 import { IconTokenList } from "@/assets/react";
-import GlowContainer, { type ContainerVariant } from "./container";
-import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { cn } from "@/lib/utils";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import {
   whitelistService,
   type WhitelistToken,
 } from "@/services/whitelistService";
-import { useInfiniteQuery } from "@tanstack/react-query";
-import TokenImage from "../token-image";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { chainIdToNetworkConfig } from "@/config/networks";
-import { useIntersectionObserver } from "usehooks-ts";
-import { useEffect, useRef } from "react";
+import { useQuery } from "@tanstack/react-query";
+import TokenImage from "../token-image";
+import GlowContainer, { type ContainerVariant } from "./container";
 
 interface Props {
   variant: ContainerVariant;
@@ -20,60 +25,61 @@ interface Props {
 
 const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
   const buttonClassName =
-    "flex size-10 shrink-0 items-center justify-center rounded-full bg-[#3C404F]/40 xl:size-15";
-  const limit = 20;
-  const { isIntersecting, ref } = useIntersectionObserver({
-    threshold: 0.5,
-  });
-  const containerRef = useRef<HTMLDivElement>(null);
+    "flex size-10 shrink-0 items-center justify-center rounded-full bg-[#3C404F]/40 xl:size-15 text-[#7B879F] border-none";
+  const limit = 100;
 
-  const {
-    data: tokenData,
-    isPending: isPendingTokens,
-    hasNextPage: hasNextPageTokens,
-    isFetchingNextPage: isFetchingNextPageTokens,
-    fetchNextPage: fetchNextPageTokens,
-  } = useInfiniteQuery({
-    queryKey: whitelistQueryKeys.listTokens({
-      infinite: true,
-    }),
-    initialPageParam: 1,
-    queryFn: async ({ pageParam }) => {
-      return whitelistService.getListTokens({
-        page: pageParam,
-        limit: limit,
-        active: "true",
-        isDropped: "false",
-      });
-    },
-    getNextPageParam: (lastPage) => {
-      const currentPage = lastPage.page;
-      const totalItems = lastPage.total;
-      return currentPage * limit < totalItems ? currentPage + 1 : undefined;
-    },
-  });
-
-  useEffect(() => {
-    if (!isFetchingNextPageTokens && hasNextPageTokens && isIntersecting) {
-      fetchNextPageTokens();
-    }
-  }, [isFetchingNextPageTokens, hasNextPageTokens, isIntersecting]);
-
-  const scroll = (direction: "prev" | "next") => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    // size-10 = 40px, size-15 = 60px, gap-3 = 12px, gap-6 = 24px
-    const isXl = window.innerWidth >= 1280;
-    const itemSize = isXl ? 60 : 40;
-    const gap = isXl ? 24 : 12;
-    const scrollAmount = itemSize + gap;
-
-    container.scrollBy({
-      left: direction === "next" ? scrollAmount : -scrollAmount,
-      behavior: "smooth",
+  // Fetches up to 300 tokens max (3 pages × 100 per page) to keep the carousel
+  // performant. Beyond ~300 items, a carousel becomes unusable — if data grows
+  // past this, consider replacing the carousel with a search/filter UI instead.
+  const mostlyExhaustiveWhitelistTokenFetch = async () => {
+    const firstPage = await whitelistService.getListTokens({
+      page: 1,
+      limit: limit, // 100 items per page
+      active: "true",
+      isDropped: "false",
     });
+
+    const totalPages = Math.ceil(firstPage.total / limit);
+
+    // Cap at 3 pages (300 tokens). This is a deliberate product limit, not just
+    // a safety net — if the API returns more, we intentionally ignore the rest.
+    const maxPages = 3;
+
+    // Subtract 1 from both because page 1 is already fetched above.
+    // e.g. totalPages=3 → pagesToFetch=2 → Promise.all fetches pages 2 and 3.
+    const pagesToFetch = Math.min(totalPages - 1, maxPages - 1);
+
+    const rest = await Promise.all(
+      Array.from({ length: pagesToFetch }, (_, i) =>
+        whitelistService.getListTokens({
+          page: i + 2, // starts at page 2 since page 1 is already fetched
+          limit: limit,
+          active: "true",
+          isDropped: "false",
+        }),
+      ),
+    );
+
+    return [
+      ...firstPage.whitelistTokens,
+      ...rest.flatMap((page) => page.whitelistTokens),
+    ];
   };
+
+  const { data: tokenList, isPending: isPendingTokens } = useQuery({
+    queryKey: whitelistQueryKeys.listTokens({
+      mostlyExhaustive: true,
+    }),
+    queryFn: mostlyExhaustiveWhitelistTokenFetch,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
+
+  // If the token list is less than 13 tokens, we need to double the list to trigger the carousel loop option
+  const MIN_TO_LOOP = 13;
+  const displayTokens =
+    tokenList && tokenList.length < MIN_TO_LOOP
+      ? [...tokenList, ...tokenList]
+      : tokenList;
 
   return (
     <GlowContainer
@@ -87,46 +93,41 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
         </div>
       </div>
 
-      {/* 
-        desktop:
-        100% - spacing * (5 + 12 + 56.75) = 100% - spacing * 73.75
-        mobile:
-        100% - spacing * (2.5 + 3 + 30) = 100% - spacing * 35.5
-      */}
-      <div className="flex w-[calc(100%-var(--spacing)*35.5)] items-center gap-3 xl:w-[calc(100%-var(--spacing)*73.75)] xl:gap-6">
-        <button className={buttonClassName} onClick={() => scroll("prev")}>
-          <ChevronLeftIcon className="size-6.25 text-[#7B879F] xl:size-8.75" />
-        </button>
+      <Carousel
+        className="h-10 w-[calc(100%-var(--spacing)*35.5)] xl:h-15 xl:w-[calc(100%-var(--spacing)*73.75)]"
+        opts={{
+          align: "start",
+          loop: true,
+        }}
+      >
         {/* 
-            desktop:
-            100% - spacing * (8.75 * 2 + 6 * 2) = 100% - spacing * 29.5
-            mobile:
-            100% - spacing * (6.25 * 2 + 3 * 2) = 100% - spacing * 18.5
-        */}
-        <div
-          className="flex w-[calc(100%-var(--spacing)*18.5)] snap-x snap-mandatory items-center gap-3 overflow-x-auto xl:w-[calc(100%-var(--spacing)*29.5)] xl:gap-6"
-          style={{
-            scrollbarWidth: "none",
-          }}
-          ref={containerRef}
+          desktop: 15 + 4.75
+          mobile: 10 + 2.25
+         */}
+        <CarouselContent
+          containerClassName="mx-12.25 xl:mx-19.75"
+          className="ml-0"
         >
-          {tokenData?.pages?.map((page) =>
-            page?.whitelistTokens?.map((token) => {
-              const tokenDisplay = resolvePoolTokenDisplay({
-                imageUri: token.imageUri,
-                tokenName: token.name,
-                tokenSymbol: token.symbol,
-                customName: token.customName,
-                customSymbol: token.customSymbol,
-                network: chainIdToNetworkConfig(token.chainId),
-                tokenAddress: token.address,
-              });
-              return (
+          {displayTokens?.map((token) => {
+            const tokenDisplay = resolvePoolTokenDisplay({
+              imageUri: token.imageUri,
+              tokenName: token.name,
+              tokenSymbol: token.symbol,
+              customName: token.customName,
+              customSymbol: token.customSymbol,
+              network: chainIdToNetworkConfig(token.chainId),
+              tokenAddress: token.address,
+            });
+            return (
+              <CarouselItem
+                className="ml-2.25 size-10 shrink-0 basis-auto pl-0 xl:ml-4.75 xl:size-15"
+                key={token.address}
+              >
                 <button
                   key={token.address}
                   title={token.address}
-                  className="shrink-0 snap-start"
                   onClick={() => onTokenClick?.(token)}
+                  className="size-10 shrink-0 xl:size-15"
                 >
                   <TokenImage
                     src={tokenDisplay.imageUri}
@@ -136,26 +137,27 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
                     }}
                   />
                 </button>
-              );
-            }),
-          )}
-          {(isPendingTokens || hasNextPageTokens) && (
-            <div className="size-10 xl:size-15" ref={ref}>
-              {(isPendingTokens || isFetchingNextPageTokens) && (
+              </CarouselItem>
+            );
+          })}
+          {isPendingTokens &&
+            Array.from({ length: MIN_TO_LOOP }, (_, i) => (
+              <CarouselItem
+                key={i}
+                className="ml-2.25 size-10 shrink-0 basis-auto pl-0 xl:ml-4.75 xl:size-15"
+              >
                 <TokenImage
                   isLoading
                   classNames={{
                     common: "size-10 xl:size-15",
                   }}
                 />
-              )}
-            </div>
-          )}
-        </div>
-        <button className={buttonClassName} onClick={() => scroll("next")}>
-          <ChevronRightIcon className="size-6.25 text-[#7B879F] xl:size-8.75" />
-        </button>
-      </div>
+              </CarouselItem>
+            ))}
+        </CarouselContent>
+        <CarouselPrevious className={cn("left-0", buttonClassName)} />
+        <CarouselNext className={cn("right-0", buttonClassName)} />
+      </Carousel>
     </GlowContainer>
   );
 };
