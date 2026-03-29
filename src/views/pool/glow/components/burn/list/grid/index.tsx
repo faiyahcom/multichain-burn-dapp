@@ -9,7 +9,6 @@ import {
   getPoolStatusLabel,
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { formatCountdown, truncateString } from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
@@ -127,10 +126,7 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       className="mx-auto"
                     />
                     <MetricNumber
-                      number={sciToFormatted(
-                        pool.liquidity,
-                        pool.tokenOutDecimals,
-                      )}
+                      number={pool.liquidity}
                       unit={tokenOutDisplay.symbol}
                       isShorten
                     />

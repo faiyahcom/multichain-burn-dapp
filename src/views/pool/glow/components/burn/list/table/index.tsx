@@ -20,7 +20,6 @@ import {
   getPoolStatusLabel,
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
@@ -33,7 +32,15 @@ interface Props {
 const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   const navigate = useNavigate();
 
-  const columns = ["Pool", "Time", "Pair", "Liquidity", "Network", "Ratio", "Status"];
+  const columns = [
+    "Pool",
+    "Time",
+    "Pair",
+    "Liquidity",
+    "Network",
+    "Ratio",
+    "Status",
+  ];
 
   const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
 
@@ -42,11 +49,7 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
       <TableHeader>
         <TableRow>
           {columns.map((column, index) => (
-            <TableHead
-              key={index}
-              variant="burn"
-              style={{ width: cellWidth }}
-            >
+            <TableHead key={index} variant="burn" style={{ width: cellWidth }}>
               {column}
             </TableHead>
           ))}
@@ -142,7 +145,7 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={sciToFormatted(pool.liquidity, pool.tokenOutDecimals)}
+                  number={pool.liquidity}
                   unit={tokenOutDisplay.symbol}
                   isShorten
                 />
