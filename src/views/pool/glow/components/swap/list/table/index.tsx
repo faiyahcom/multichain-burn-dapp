@@ -32,7 +32,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
 
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
 
-  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
   const fixWidth: React.CSSProperties["minWidth"] = `280px`;
 
   return (
@@ -44,7 +44,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="swap"
               style={{
-                width: index === 0 ? fixWidth : cellWdith, // 280px for first column
+                width: index === 0 ? fixWidth : cellWidth, // 280px for first column
                 minWidth: index === 0 ? fixWidth : "", // 280px for first column
               }}
             >
@@ -97,7 +97,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   to: href,
                 });
               }}
-              className="sm:text-24px cursor-pointer text-xl"
+              className="cursor-pointer font-medium"
               variant="swap"
             >
               <TableCell
@@ -113,7 +113,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   {/* max-w - spacing * (10.75 + 3) */}
                   <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
                     <p
-                      className="sm:text-24px max-w-full min-w-0 truncate text-xl font-semibold"
+                      className="max-w-full min-w-0 truncate font-semibold"
                       title={pool.name}
                     >
                       {pool.name}
@@ -123,7 +123,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                       displayText={truncateString({ str: pool.address })}
                       classNames={{
                         container: "justify-start",
-                        displayText: "text-mb-gray-b8 text-base sm:text-xl",
+                        displayText: "text-base sm:text-xl",
                       }}
                     />
                   </div>
@@ -163,11 +163,10 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   chainId={pool.chainId}
                   classNames={{
                     container: "flex items-center justify-center gap-3",
-                    label: "text-base sm:text-28px",
                   }}
                 />
               </TableCell>
-              <TableCell>
+              <TableCell className="w-max max-w-max min-w-max">
                 <Button
                   variant={"swap"}
                   hasGroupHover

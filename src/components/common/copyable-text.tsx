@@ -36,7 +36,10 @@ const CopyableText: React.FC<Props> = ({
         classNames?.container,
       )}
     >
-      <span className={cn("text-sm", classNames?.displayText)} title={content}>
+      <span
+        className={cn("text-sm text-mb-gray-profile", classNames?.displayText)}
+        title={content}
+      >
         {displayText ?? content}
       </span>
       <button
@@ -45,7 +48,7 @@ const CopyableText: React.FC<Props> = ({
           handleCopy();
         }}
       >
-        <IconCopy className={cn("text-mb-copy-gray", classNames?.icon)} />
+        <IconCopy className={cn("text-mb-gray-profile", classNames?.icon)} />
       </button>
     </div>
   );

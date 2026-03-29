@@ -42,7 +42,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
     "Action",
   ];
 
-  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
   const fixWidth: React.CSSProperties["minWidth"] = `350px`;
 
   return (
@@ -55,7 +55,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               className="h-12 pt-2 align-baseline"
               variant="pair"
               style={{
-                width: index === 0 ? fixWidth : cellWdith, // 350px for first column
+                width: index === 0 ? fixWidth : cellWidth, // 350px for first column
                 minWidth: index === 0 ? fixWidth : "", // 350px for first column
               }}
             >
