@@ -33,6 +33,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
   });
 
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
+  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
   const fixWidth: React.CSSProperties["minWidth"] = `280px`;
 
   return (
@@ -46,7 +47,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                 variant="swap"
                 className="h-12 pt-2 align-baseline"
                 style={{
-                  width: index === 0 ? fixWidth : `${100 / columns.length}%`,
+                  width: index === 0 ? fixWidth : cellWdith, // 280px for first column
                   minWidth: index === 0 ? fixWidth : "", // 280px for first column
                 }}
               >
@@ -92,7 +93,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
             return (
               <TableRow
                 key={pool.address}
-                className="sm:text-24px cursor-pointer text-xl"
+                className="cursor-pointer font-medium"
                 onClick={() => {
                   navigate({
                     to: href,
@@ -123,7 +124,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                         displayText={truncateString({ str: pool.address })}
                         classNames={{
                           container: "justify-start",
-                          displayText: "text-mb-gray-b8 text-base sm:text-xl",
+                          displayText: "text-base sm:text-xl",
                         }}
                       />
                     </div>
@@ -166,11 +167,10 @@ const SwapRecentPoolsTable = ({}: {}) => {
                     chainId={pool.chainId}
                     classNames={{
                       container: "flex items-center justify-center gap-3",
-                      label: "text-base sm:text-28px",
                     }}
                   />
                 </TableCell>
-                <TableCell className="max-w-max w-max min-w-max">
+                <TableCell className="w-max max-w-max min-w-max">
                   <Button
                     variant={"swap"}
                     className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
@@ -186,8 +186,11 @@ const SwapRecentPoolsTable = ({}: {}) => {
       </Table>
       <div className="flex justify-end">
         <Link
-          to="/swap/"
-          className="sm:text-24px font-inter text-xl font-semibold pr-3"
+          to="/my-participated-pools/"
+          search={{
+            tab: "swap-pool",
+          }}
+          className="sm:text-24px pr-3 font-inter text-xl font-semibold"
         >
           See more
         </Link>

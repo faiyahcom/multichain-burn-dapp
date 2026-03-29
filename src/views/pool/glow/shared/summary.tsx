@@ -28,7 +28,9 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
   const cards: { title: string; value: string; valueTitle?: string }[] = [
     {
       title:
-        poolKind === PoolKindCodeEnum.Burn ? "Total Burned" : "Total Swapped",
+        poolKind === PoolKindCodeEnum.Burn
+          ? "Total Burned"
+          : "Total Swap Volume",
       value: shortenNumber({
         number: Number(totalVolume ?? 0),
       }).toLocaleUpperCase(),
