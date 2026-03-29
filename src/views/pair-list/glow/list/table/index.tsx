@@ -26,7 +26,7 @@ interface Props {
 const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
   const columns = ["Pair", "Volume", "Liquidity", "Network", "Action"];
 
-  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
   const fixWidth: React.CSSProperties["minWidth"] = `350px`;
 
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="pair"
               style={{
-                width: index === 0 ? fixWidth : cellWdith, // 350px for first column
+                width: index === 0 ? fixWidth : cellWidth, // 350px for first column
                 minWidth: index === 0 ? fixWidth : "", // 350px for first column
               }}
             >

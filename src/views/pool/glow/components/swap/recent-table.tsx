@@ -33,7 +33,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
   });
 
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
-  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
   const fixWidth: React.CSSProperties["minWidth"] = `280px`;
 
   return (
@@ -47,7 +47,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                 variant="swap"
                 className="h-12 pt-2 align-baseline"
                 style={{
-                  width: index === 0 ? fixWidth : cellWdith, // 280px for first column
+                  width: index === 0 ? fixWidth : cellWidth, // 280px for first column
                   minWidth: index === 0 ? fixWidth : "", // 280px for first column
                 }}
               >

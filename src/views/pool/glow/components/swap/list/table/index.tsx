@@ -32,7 +32,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
 
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
 
-  const cellWdith: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
   const fixWidth: React.CSSProperties["minWidth"] = `280px`;
 
   return (
@@ -44,7 +44,7 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="swap"
               style={{
-                width: index === 0 ? fixWidth : cellWdith, // 280px for first column
+                width: index === 0 ? fixWidth : cellWidth, // 280px for first column
                 minWidth: index === 0 ? fixWidth : "", // 280px for first column
               }}
             >
