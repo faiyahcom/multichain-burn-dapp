@@ -92,6 +92,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               onClick={() => {
                 navigate({
                   to: href,
+                  resetScroll: false,
                 });
               }}
               variant="pair"
