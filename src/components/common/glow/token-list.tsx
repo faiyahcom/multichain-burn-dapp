@@ -108,7 +108,7 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
           containerClassName="mx-12.25 xl:mx-19.75"
           className="ml-0"
         >
-          {displayTokens?.map((token) => {
+          {displayTokens?.map((token, index) => {
             const tokenDisplay = resolvePoolTokenDisplay({
               imageUri: token.imageUri,
               tokenName: token.name,
@@ -121,7 +121,7 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
             return (
               <CarouselItem
                 className="ml-2.25 size-10 shrink-0 basis-auto pl-0 xl:ml-4.75 xl:size-15"
-                key={token.address}
+                key={`${token.address}-${index}`}
               >
                 <button
                   key={token.address}
