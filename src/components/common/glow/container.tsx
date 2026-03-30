@@ -223,6 +223,7 @@ const GlowContainer = ({
   hasBorder = true,
   hasShadow = true,
   hasBg = true,
+  onClick,
 }: {
   variant: ContainerVariant;
   className?: string;
@@ -230,6 +231,7 @@ const GlowContainer = ({
   hasBorder?: boolean;
   hasShadow?: boolean;
   hasBg?: boolean;
+  onClick?: () => void;
 }) => {
   return (
     <div
@@ -239,6 +241,7 @@ const GlowContainer = ({
         hasBg && getVariantBgClassName({ variant }),
         className,
       )}
+      onClick={onClick}
     >
       {children}
     </div>

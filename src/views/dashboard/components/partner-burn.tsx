@@ -33,22 +33,14 @@ function resolveStatus(pool: PartnerPool): PoolStatus {
 
 // ── Pool Card ──────────────────────────────────────────────────────────────────
 
-const LiveStatus = ({
-    timeEnd,
-    onJoin,
-}: {
-    timeEnd: string;
-    onJoin: () => void;
-}) => {
+const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
     const remaining = useCountdown(Number(timeEnd));
     return (
         <div className="flex flex-col items-center gap-1">
             <span className="text-xs font-medium">
                 Live {formatCountdown(remaining)}
             </span>
-            <span className="cursor-pointer text-xs font-semibold" onClick={onJoin}>
-                JOIN
-            </span>
+            <span className="text-xs font-semibold">JOIN</span>
         </div>
     );
 };
@@ -68,7 +60,12 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
     return (
         <GlowContainer
             variant="burn"
-            className="relative flex aspect-square flex-col items-center justify-around overflow-hidden"
+            className="relative flex aspect-square cursor-pointer flex-col items-center justify-around overflow-hidden"
+            onClick={() => {
+                navigate({
+                    to: `/burn/detail/${pool.address}`,
+                });
+            }}
         >
             {/* Fire background */}
             <img
@@ -87,16 +84,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                     alt={symbol}
                     classNames={{ common: "size-11" }}
                 />
-                {status === "live" && (
-                    <LiveStatus
-                        timeEnd={pool.timeEnd}
-                        onJoin={() => {
-                            navigate({
-                                to: `/burn/detail/${pool.address}`,
-                            });
-                        }}
-                    />
-                )}
+                {status === "live" && <LiveStatus timeEnd={pool.timeEnd} />}
                 {status === "upcoming" && (
                     <div className="flex flex-col items-center gap-0.5">
                         <span className="text-xs font-medium">Upcoming</span>
