@@ -46,7 +46,7 @@ const LiveStatus = ({
             <span className="text-xs font-medium">
                 Live {formatCountdown(remaining)}
             </span>
-            <span className="cursor-pointer text-xs font-medium" onClick={onJoin}>
+            <span className="cursor-pointer text-xs font-semibold" onClick={onJoin}>
                 JOIN
             </span>
         </div>
