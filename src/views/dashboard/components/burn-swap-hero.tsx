@@ -118,6 +118,7 @@ const HeroSwapMiniForm = () => {
             <Button
                 variant="swap"
                 size="big"
+                hasHover
                 className="sm:h-57px sm:w-275px mt-5.5 h-12 w-full font-orbitron"
             >
                 Create Pool
@@ -152,6 +153,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     <img src={BurnTrackerImage} alt="Burn Tracker" />
                     <Button
                         variant="burn"
+                        hasHover
                         size="big"
                         className="sm:h-57px sm:w-275px h-12 w-full"
                         onClick={() => {
@@ -166,7 +168,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         <IconBurnCategory className="size-7.25" />
                         <p className="font-orbitron text-xl font-medium">BURN</p>
                     </div>
-                    <p className="font-orbitron text-2xl font-medium text-mb-btn-burn uppercase text-burn-glow sm:text-[32px]">
+                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase text-burn-glow sm:text-[32px]">
                         {sumTokenAmounts(data?.burnSection?.volume ?? [])}
                     </p>
                     <p className="text-base font-medium text-mb-gray-b8/60">
@@ -176,7 +178,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         icon={<IconStack />}
                         label="Total Transactions"
                         value={shortenNumber({ number: data?.burnSection?.totalTxns ?? 0 })}
-                        valueClass="text-mb-btn-burn"
+                        valueClass="text-mb-burn-light"
                     />
                     <HeroStatRow
                         icon={<IconStack />}
@@ -184,15 +186,15 @@ export const BurnSwapHero = ({ data }: Props) => {
                         value={shortenNumber({
                             number: data?.burnSection?.totalPools ?? 0,
                         })}
-                        valueClass="text-mb-btn-burn"
+                        valueClass="text-mb-burn-light"
                     />
                     <HeroStatRow
-                        icon={<IconParticipant className="text-mb-btn-burn" />}
+                        icon={<IconParticipant className="text-mb-burn-light" />}
                         label="Total Participants"
                         value={shortenNumber({
                             number: data?.burnSection?.totalParticipants ?? 0,
                         })}
-                        valueClass="text-mb-btn-burn"
+                        valueClass="text-mb-burn-light"
                     />
                 </div>
             </GlowContainer>
@@ -219,7 +221,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     </div>
                     <div className="flex items-center justify-between">
                         <div className="space-y-2.5">
-                            <p className="font-orbitron text-2xl font-medium text-mb-btn-swap uppercase text-swap-glow sm:text-[32px]">
+                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase text-swap-glow sm:text-[32px]">
                                 {sumTokenAmounts(data?.swapSection?.volume ?? [])}
                             </p>
                             <p className="text-base font-medium text-mb-gray-b8/60">
@@ -232,7 +234,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         icon={<IconStats />}
                         label="Total Transactions"
                         value={shortenNumber({ number: data?.swapSection?.totalTxns ?? 0 })}
-                        valueClass="text-mb-btn-swap"
+                        valueClass="text-mb-swap-light"
                     />
                     <HeroStatRow
                         icon={<IconStackY />}
@@ -240,7 +242,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         value={shortenNumber({
                             number: data?.swapSection?.totalPools ?? 0,
                         })}
-                        valueClass="text-mb-btn-swap"
+                        valueClass="text-mb-swap-light"
                     />
                     <HeroStatRow
                         icon={<IconParticipant className="text-mb-swap-light" />}
@@ -248,7 +250,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         value={shortenNumber({
                             number: data?.swapSection?.totalParticipants ?? 0,
                         })}
-                        valueClass="text-mb-btn-swap"
+                        valueClass="text-mb-swap-light"
                     />
                 </div>
             </GlowContainer>
