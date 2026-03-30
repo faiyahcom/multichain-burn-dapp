@@ -1,5 +1,7 @@
 import { cn } from "@/lib/utils";
 import TokenImage from "./token-image";
+import { isNativeTokenSymbol } from "@/hooks/useTokenBalance";
+import { NETWORK_CONFIGS } from "@/config/networks";
 
 interface ITokenDisplay {
   customSymbol?: string;
@@ -10,6 +12,7 @@ interface ITokenDisplay {
     container?: string;
     img?: string;
   };
+  hasSymbol?: boolean;
 }
 
 function TokenDisplay({
@@ -18,7 +21,17 @@ function TokenDisplay({
   imageUri,
   className,
   classNames,
+  hasSymbol = true,
 }: ITokenDisplay) {
+  const resolveImgSrc = () => {
+    if (!imageUri && !customSymbol) {
+      if (isNativeTokenSymbol(symbol)) {
+        return NETWORK_CONFIGS.find((config) => config.shortLabel === symbol)
+          ?.iconSrc;
+      }
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -27,7 +40,7 @@ function TokenDisplay({
       )}
     >
       <TokenImage
-        src={imageUri}
+        src={resolveImgSrc() ?? imageUri}
         alt={customSymbol ?? symbol}
         classNames={{
           common: cn(
@@ -37,7 +50,7 @@ function TokenDisplay({
           ),
         }}
       />
-      <span>{customSymbol ?? symbol}</span>
+      {hasSymbol && <span>{customSymbol ?? symbol}</span>}
     </div>
   );
 }

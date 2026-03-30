@@ -14,7 +14,6 @@ import {
 import { TXN_PAGE_SIZE } from "@/hooks/useScrollingFeed";
 import type { ActivityItem } from "@/services/dashboardService";
 import SwapActivityImage from "/images/dashboard/swap-activity.png";
-import TokenImage from "@/components/common/token-image";
 import { POOL_KIND } from "@/types/pool";
 
 // ── Row components ────────────────────────────────────────────────────────────
@@ -23,7 +22,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
     const label =
         item.executorName ??
         truncateString({ str: item.executor, left: 4, right: 4 });
-    const pool = truncateString({ str: item.poolAddress, left: 4, right: 4 });
+    const taker = truncateString({ str: item.executor, left: 4, right: 4 });
     const time = formatTimestampSecondsToDate({
         timestamp: item.timestamp,
         formatStr: "HH:mm:ss",
@@ -37,18 +36,20 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
                 <span className="truncate text-mb-gray-b8">
                     Burn by <span className="text-foreground">{label}</span>
                 </span>
-                <span className="truncate text-mb-gray-b8/60">{pool}</span>
+                <span className="truncate text-mb-gray-b8/60">{taker}</span>
                 <IconBurnCategory className="size-13 shrink-0" />
                 <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
             </div>
             <div className="flex items-center justify-end gap-3">
-                <span className="font-medium text-mb-burn-activity-amount">{`${amount} ${item.tokenInSymbol}`}</span>
-                <TokenImage
-                    src={item.tokenInImage ?? undefined}
-                    alt={item.tokenInSymbol}
+                <span className="font-medium text-mb-burn-activity-amount">{`${amount} ${item.tokenInCustomSymbol ?? item.tokenInSymbol}`}</span>
+                <TokenDisplay
+                    symbol={item.tokenInSymbol}
+                    customSymbol={item.tokenInCustomSymbol ?? undefined}
+                    imageUri={item.tokenInImage ?? undefined}
                     classNames={{
                         img: "size-10.5",
                     }}
+                    hasSymbol={false}
                 />
             </div>
         </div>
@@ -56,8 +57,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
 };
 
 const SwapRow = ({ item }: { item: ActivityItem }) => {
-    const pool =
-        truncateString({ str: item.poolAddress, left: 4, right: 4 }) ?? "";
+    const taker = truncateString({ str: item.executor, left: 4, right: 4 }) ?? "";
     const poolName = item.pool?.name ? `${item.pool.name}` : "";
     const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
     const amountOut = formatAmount(item.amountOut, item.tokenOutDecimals);
@@ -67,19 +67,19 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
             <div className="space-x-3">
                 <Dot className="bg-mb-swap-dot" size={13} />
                 <span className="text-foreground">{poolName}</span>
-                <span className="truncate text-mb-gray-b8/60">{pool}</span>
+                <span className="truncate text-mb-gray-b8/60">{taker}</span>
             </div>
             <div className="flex items-center justify-end gap-3">
                 <TokenDisplay
                     symbol={item.tokenInSymbol}
-                    customSymbol={item.tokenInCustomSymbol ?? item.tokenInSymbol}
+                    customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
                     classNames={{ img: "size-10.5", container: "space-x-3" }}
                 />
                 <img src={SwapActivityImage} className="size-10.5 shrink-0" />
                 <TokenDisplay
                     symbol={item.tokenOutSymbol}
-                    customSymbol={item.tokenOutCustomSymbol ?? item.tokenOutSymbol}
+                    customSymbol={item.tokenOutCustomSymbol ?? undefined}
                     imageUri={item.tokenOutImage ?? undefined}
                     classNames={{ img: "size-10.5", container: "space-x-3" }}
                 />
@@ -107,13 +107,17 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
             <span className="hidden truncate text-center md:block">{wallet}</span>
             <span className="truncate text-center">{type}</span>
             <div className="flex items-center justify-center gap-1.5">
-                <span className="truncate font-bold tracking-normal">{amountIn}</span>
                 <TokenDisplay
                     symbol={item.tokenInSymbol}
                     customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
                     classNames={{ img: "size-4" }}
+                    hasSymbol={false}
                 />
+                <span className="truncate font-bold tracking-normal">{amountIn}</span>
+                <span className="">
+                    {item.tokenInCustomSymbol ?? item.tokenInSymbol}
+                </span>
             </div>
             <div className="hidden items-center justify-center gap-1.5 md:flex">
                 <span className="truncate font-bold tracking-normal">{fee}</span>
@@ -151,7 +155,9 @@ export const ActivityFeed = ({
             </div>
             <div className="flex items-center gap-2">
                 <Dot className="bg-mb-live-green" size={13} pulse />
-                <span className="text-2xl font-semibold text-mb-live-green">Live</span>
+                <span className="font-inter text-2xl font-semibold text-mb-live-green">
+                    Live
+                </span>
             </div>
         </div>
         {/* Re-key on every tick to trigger the slide-up enter animation */}

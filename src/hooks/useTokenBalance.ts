@@ -7,6 +7,7 @@ import type { Address } from "viem";
 import { formatUnits } from "viem";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
+import { NETWORK_CONFIGS } from "@/config/networks";
 
 type UseTokenBalanceParams = {
   tokenAddress?: string;
@@ -16,12 +17,18 @@ type UseTokenBalanceParams = {
 
 
 
-const isNativeToken = (address?: string) => {
+export const isNativeToken = (address?: string) => {
   if (!address) return false;
   return (
     address === ZERO_ADDRESS ||
     address === WSOL_ADDRESS
   );
+};
+
+export const isNativeTokenSymbol = (symbol?: string) => {
+  if (!symbol) return false;
+  const nativeSymbols = NETWORK_CONFIGS.map((n) => n.shortLabel);
+  return nativeSymbols.includes(symbol);
 };
 
 export function useTokenBalance({

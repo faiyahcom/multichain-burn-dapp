@@ -49,15 +49,17 @@ export const safeDecimalParse = <
 export const shortenNumber = ({
   number,
   customFormat,
+  decimalPlaces = 6,
 }: {
   number: number;
   customFormat?: numbro.Format;
+  decimalPlaces?: number;
 }) => {
   if (typeof number !== "number") return number;
 
   if (number < 10000)
     return number.toLocaleString("en-US", {
-      maximumFractionDigits: 6,
+      maximumFractionDigits: decimalPlaces,
       minimumFractionDigits: 0,
     });
 
