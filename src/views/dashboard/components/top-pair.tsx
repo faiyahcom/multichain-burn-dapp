@@ -111,6 +111,7 @@ const PairCard = ({ pair }: PairCardProps) => {
                 variant="swap"
                 asChild
                 className="shrink-0 rounded-13px px-6 py-3 text-[15px] md:text-[15px]"
+                hasHover
             >
                 <Link
                     to={`/pair-detail/${pair.chainId}/${pair.tokenIn}/${pair.tokenOut}`}

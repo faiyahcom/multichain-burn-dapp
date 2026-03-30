@@ -9,11 +9,20 @@ export function toBaseUnits(amount: string, decimals: number): BN {
   return new BN(whole + paddedFraction);
 }
 
-export function formatAmount(amount: string, decimals: number): string {
+export function formatAmount(
+  amount: string,
+  decimals: number,
+  digitDisplayed?: number,
+): string {
   if (!amount) return "0";
   const amt = Number(amount);
   if (isNaN(amt)) return amount;
-  return String(shortenNumber({ number: amt / Math.pow(10, decimals) }));
+  return String(
+    shortenNumber({
+      number: amt / Math.pow(10, decimals),
+      decimalPlaces: digitDisplayed ?? undefined,
+    }),
+  );
 }
 
 export function sciToFormatted(value: string, decimals: number): string {

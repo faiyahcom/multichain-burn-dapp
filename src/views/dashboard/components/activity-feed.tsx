@@ -19,15 +19,15 @@ import { POOL_KIND } from "@/types/pool";
 // ── Row components ────────────────────────────────────────────────────────────
 
 const BurnRow = ({ item }: { item: ActivityItem }) => {
+    const taker = truncateString({ str: item.executor, left: 4, right: 4 });
     const label =
         item.executorName ??
         truncateString({ str: item.executor, left: 4, right: 4 });
-    const taker = truncateString({ str: item.executor, left: 4, right: 4 });
     const time = formatTimestampSecondsToDate({
         timestamp: item.timestamp,
         formatStr: "HH:mm:ss",
     });
-    const amount = formatAmount(item.amountIn, item.tokenInDecimals);
+    const amount = formatAmount(item.amountIn, item.tokenInDecimals, 3);
 
     return (
         <div className="flex items-center justify-between font-inter text-[18px] font-medium">
@@ -37,7 +37,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
                     Burn by <span className="text-foreground">{label}</span>
                 </span>
                 <span className="truncate text-mb-gray-b8/60">{taker}</span>
-                <IconBurnCategory className="size-13 shrink-0" />
+                <IconBurnCategory className="size-10.75 shrink-0" />
                 <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
             </div>
             <div className="flex items-center justify-end gap-3">
@@ -47,7 +47,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
                     customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
                     classNames={{
-                        img: "size-10.5",
+                        img: "size-8.5",
                     }}
                     hasSymbol={false}
                 />
@@ -59,8 +59,8 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
 const SwapRow = ({ item }: { item: ActivityItem }) => {
     const taker = truncateString({ str: item.executor, left: 4, right: 4 }) ?? "";
     const poolName = item.pool?.name ? `${item.pool.name}` : "";
-    const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
-    const amountOut = formatAmount(item.amountOut, item.tokenOutDecimals);
+    const amountIn = formatAmount(item.amountIn, item.tokenInDecimals, 3);
+    const amountOut = formatAmount(item.amountOut, item.tokenOutDecimals, 3);
 
     return (
         <div className="flex items-center justify-between font-inter text-[18px] font-medium">
@@ -74,14 +74,14 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
                     symbol={item.tokenInSymbol}
                     customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
-                    classNames={{ img: "size-10.5", container: "space-x-3" }}
+                    classNames={{ img: "size-8.5", container: "gap-3 flex-row-reverse" }}
                 />
-                <img src={SwapActivityImage} className="size-10.5 shrink-0" />
+                <img src={SwapActivityImage} className="size-8.5 shrink-0" />
                 <TokenDisplay
                     symbol={item.tokenOutSymbol}
                     customSymbol={item.tokenOutCustomSymbol ?? undefined}
                     imageUri={item.tokenOutImage ?? undefined}
-                    classNames={{ img: "size-10.5", container: "space-x-3" }}
+                    classNames={{ img: "size-8.5", container: "space-x-3" }}
                 />
                 <span className="truncate text-right text-mb-swap-activity-amount">
                     {amountIn} <span className="">→</span> {amountOut}
@@ -147,7 +147,7 @@ export const ActivityFeed = ({
     animKey,
     renderRow,
 }: ActivityFeedProps) => (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 overflow-hidden">
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
                 {icon}
