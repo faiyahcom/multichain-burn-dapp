@@ -12,7 +12,11 @@ import {
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { formatCountdown, truncateString } from "@/utils/helpers/string";
+import {
+  formatCountdown,
+  formatTimestampSecondsToDate,
+  truncateString,
+} from "@/utils/helpers/string";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -39,8 +43,21 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
   }, [isBurnPool]);
 
   const renderBurnPoolTime = (pool: PoolItemType) => {
-    if (pool.status !== "upcoming" && pool.status !== "on_going")
-      return "00:00:00";
+    // all possible status is stored in userViewBurnPoolStatuses
+    if (pool.status !== "upcoming" && pool.status !== "on_going") {
+      // return nothing for pending and holding
+      if (pool.status === "pending" || pool.status === "holding") {
+        return "\u00A0"; // non-breaking space
+      }
+      // return formatted end date for ended
+      if (pool.status === "ended") {
+        return formatTimestampSecondsToDate({
+          timestamp: pool.timeEnd,
+          formatStr: "yyyy-MM-dd",
+        });
+      }
+    }
+
     const timeStart = Number(pool.timeStart);
     const timeEnd = Number(pool.timeEnd);
 
