@@ -27,7 +27,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
 
     return (
         <GlowContainer
-            className="relative aspect-square overflow-hidden p-3"
+            className="relative aspect-square overflow-hidden p-3 md:p-1 2xl:p-3"
             variant="swap"
         >
             {/* Background */}
@@ -42,19 +42,19 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
                 <img
                     src={medal}
                     alt={`Rank ${rank + 1}`}
-                    className="absolute top-2 left-2 z-10 size-7"
+                    className="absolute top-2 left-2 z-10 size-7 md:top-1 md:left-1 md:size-5 2xl:top-2 2xl:left-2 2xl:size-7"
                 />
             )}
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-[8.5px] font-inter text-[8px] font-medium text-primary-foreground">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-[8.5px] font-inter text-[8px] font-medium text-primary-foreground md:gap-0.5 2xl:gap-[8.5px] 2xl:text-tiny">
                 {/* Name */}
-                <p className="max-w-full truncate text-center text-[9px]">
+                <p className="max-w-full truncate text-center text-[9px] 2xl:text-xs">
                     {displayName}
                 </p>
 
                 {/* Avatar */}
-                <div className="size-9.5 overflow-hidden rounded-full bg-mb-gray-b8/20">
+                <div className="size-9.5 overflow-hidden rounded-full bg-mb-gray-b8/20 md:size-7.5 2xl:size-9.5">
                     {swapper?.avatar ? (
                         <img
                             src={swapper.avatar}
@@ -74,7 +74,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
                 </div>
 
                 {/* Stats */}
-                <div className="w-full space-y-[8.5px] text-center">
+                <div className="w-full space-y-[8.5px] text-center md:space-y-0.5 2xl:space-y-[8.5px]">
                     <p className="tracking-[-2%]">
                         Participated swap pools:{" "}
                         <span className="">

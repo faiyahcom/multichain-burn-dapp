@@ -17,12 +17,16 @@ import SwapActivityImage from "/images/dashboard/swap-activity.png";
 import { POOL_KIND } from "@/types/pool";
 import { cn } from "@/lib/utils";
 
-// ── Row components ────────────────────────────────────────────────────────────
+// ── Grid Constants (Responsive & Synced) ──────────────────────────────────────
 
+// Mobile: text-xs (12px) | Tablet: text-base (16px) | 2xl: 18px
 const ROW_BURN_GRID =
-    "grid grid-cols-[minmax(0,1.9fr)_60px_minmax(0,1fr)] items-center gap-4 font-inter text-[18px] font-medium";
+    "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.9fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+
 const ROW_SWAP_GRID =
-    "grid grid-cols-[minmax(0,1fr)_160px_minmax(0,1fr)] items-center gap-4 font-inter text-[18px] font-medium";
+    "grid grid-cols-[minmax(0,1fr)_90px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_160px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+
+// ── Row components ────────────────────────────────────────────────────────────
 
 const BurnRow = ({ item }: { item: ActivityItem }) => {
     const taker = truncateString({ str: item.executor, left: 4, right: 4 });
@@ -38,24 +42,21 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
     const amount = formatAmount(item.amountIn, item.tokenInDecimals, 3);
 
     return (
-        <div className={ROW_BURN_GRID}>
-            {/* LEFT */}
-            <div className="flex min-w-0 items-center gap-3">
-                <Dot className="shrink-0 bg-mb-burn-dot" size={13} />
+        <div className={cn(ROW_BURN_GRID, "text-tiny lg:text-sm 2xl:text-md")}>
+            <div className="flex min-w-0 items-center gap-2 md:gap-3">
+                <Dot className="size-2.5 shrink-0 bg-mb-burn-dot md:size-3.25" />
                 <span className="truncate text-mb-gray-b8">
                     Burn by <span className="text-foreground">{label}</span>
                 </span>
                 <span className="truncate text-mb-gray-b8/60">{taker}</span>
             </div>
 
-            {/* MIDDLE (ICON COLUMN - ALIGNED) */}
-            <div className="flex items-center justify-center gap-2">
-                <IconBurnCategory className="size-10.75 shrink-0" />
+            <div className="flex items-center justify-center gap-1 md:gap-2">
+                <IconBurnCategory className="size-7 shrink-0 md:size-10 2xl:size-10.75" />
                 <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
             </div>
 
-            {/* RIGHT */}
-            <div className="flex items-center justify-end gap-3 tabular-nums">
+            <div className="flex items-center justify-end gap-1.5 tabular-nums md:gap-3">
                 <span className="text-right text-mb-burn-activity-amount">
                     {amount} {item.tokenInCustomSymbol ?? item.tokenInSymbol}
                 </span>
@@ -63,9 +64,7 @@ const BurnRow = ({ item }: { item: ActivityItem }) => {
                     symbol={item.tokenInSymbol}
                     customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
-                    classNames={{
-                        img: "size-8.5",
-                    }}
+                    classNames={{ img: "size-5 md:size-7 2xl:size-8.5" }}
                     hasSymbol={false}
                 />
             </div>
@@ -80,38 +79,38 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
     const amountOut = formatAmount(item.amountOut, item.tokenOutDecimals, 3);
 
     return (
-        <div className={cn(ROW_SWAP_GRID, "pb-2")}>
-            {/* LEFT */}
-            <div className="flex min-w-0 items-center gap-3">
-                <Dot className="shrink-0 bg-mb-swap-dot" size={13} />
+        <div className={cn(ROW_SWAP_GRID, "text-tiny lg:text-sm 2xl:text-md")}>
+            <div className="flex min-w-0 items-center gap-2 md:gap-3">
+                <Dot className="size-2.5 shrink-0 bg-mb-swap-dot md:size-3.25" />
                 <span className="truncate text-foreground">{poolName}</span>
                 <span className="truncate text-mb-gray-b8/60">{taker}</span>
             </div>
 
-            {/* MIDDLE (ICON COLUMN - ALIGNED) */}
-            <div className="grid w-full grid-cols-[1fr_34px_1fr] items-center gap-2">
+            <div className="grid w-full grid-cols-[1fr_20px_1fr] items-center gap-1 md:grid-cols-[1fr_34px_1fr] md:gap-2">
                 <TokenDisplay
                     symbol={item.tokenInSymbol}
                     customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
                     classNames={{
-                        img: "size-8.5",
-                        container: "flex-row-reverse gap-2",
+                        img: "size-5 md:size-7 2xl:size-8.5",
+                        container: "flex-row-reverse gap-1 md:gap-2",
                     }}
                 />
-                <img src={SwapActivityImage} className="size-8.5 shrink-0" />
+                <img
+                    src={SwapActivityImage}
+                    className="size-5 shrink-0 md:size-7 2xl:size-8.5"
+                />
                 <TokenDisplay
                     symbol={item.tokenOutSymbol}
                     customSymbol={item.tokenOutCustomSymbol ?? undefined}
                     imageUri={item.tokenOutImage ?? undefined}
                     classNames={{
-                        img: "size-8.5",
-                        container: "gap-2",
+                        img: "size-5 md:size-7 2xl:size-8.5",
+                        container: "gap-1 md:gap-2",
                     }}
                 />
             </div>
 
-            {/* RIGHT */}
             <div className="truncate text-right text-mb-swap-activity-amount tabular-nums">
                 {amountIn} → {amountOut}
             </div>
@@ -128,22 +127,22 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
     const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
 
     return (
-        <div className="txn-grid">
-            <Dot className="bg-mb-btn-swap" size={13} />
+        <div className="txn-grid py-1 md:py-0">
+            <Dot className="size-2.5 bg-mb-btn-swap md:size-3.25" />
             <span className="truncate">{hash}</span>
             <span className="hidden truncate text-center md:block">{time}</span>
             <span className="hidden truncate text-center md:block">{wallet}</span>
             <span className="truncate text-center">{type}</span>
-            <div className="flex items-center justify-center gap-1.5">
+            <div className="flex items-center justify-center gap-1 md:gap-1.5">
                 <TokenDisplay
                     symbol={item.tokenInSymbol}
                     customSymbol={item.tokenInCustomSymbol ?? undefined}
                     imageUri={item.tokenInImage ?? undefined}
-                    classNames={{ img: "size-4" }}
+                    classNames={{ img: "size-3.5 md:size-4" }}
                     hasSymbol={false}
                 />
                 <span className="truncate font-bold tracking-normal">{amountIn}</span>
-                <span className="">
+                <span className="hidden sm:inline">
                     {item.tokenInCustomSymbol ?? item.tokenInSymbol}
                 </span>
             </div>
@@ -160,13 +159,8 @@ interface ActivityFeedProps {
     title: string;
     icon: React.ReactNode;
     items: ActivityItem[];
-    /**
-     * Incremented on every page jump. Used as the React `key` on the items
-     * container so it re-mounts with a CSS enter-animation on each tick.
-     */
     animKey: number;
     renderRow: (item: ActivityItem) => React.ReactNode;
-    /** Applied to ghost placeholder rows so they match the real row height. */
     ghostRowClassName?: string;
 }
 
@@ -186,29 +180,36 @@ export const ActivityFeed = ({
     return (
         <div className="flex flex-col gap-4 overflow-hidden">
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 md:gap-3">
                     {icon}
-                    <p className="text-2xl font-medium">{title}</p>
+                    <p className="text-base font-medium tracking-wide uppercase md:text-xl 2xl:text-2xl">
+                        {title}
+                    </p>
                 </div>
                 <div className="flex items-center gap-2">
-                    <Dot className="bg-mb-live-green" size={13} pulse />
-                    <span className="font-inter text-2xl font-semibold text-mb-live-green">
+                    <Dot className="size-2.5 bg-mb-live-green md:size-3.25" pulse />
+                    <span className="font-inter text-base font-semibold text-mb-live-green md:text-xl 2xl:text-2xl">
                         Live
                     </span>
                 </div>
             </div>
-            {/* Re-key on every tick to trigger the slide-up enter animation */}
+
             <div
                 key={animKey}
-                className="grid animate-feed-jump-in grid-cols-1 gap-x-12 sm:grid-cols-2"
+                className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-12 2xl:gap-y-4"
             >
                 {slots.map((item, i) =>
                     item ? (
-                        <div key={item.id}>{renderRow(item)}</div>
+                        <div key={item.id} className="py-1 2xl:py-2">
+                            {renderRow(item)}
+                        </div>
                     ) : (
                         <div
                             key={`ghost-${i}`}
-                            className={cn("pointer-events-none invisible", ghostRowClassName)}
+                            className={cn(
+                                "pointer-events-none invisible py-1.5 2xl:py-[11.5px]",
+                                ghostRowClassName,
+                            )}
                         >
                             &nbsp;
                         </div>
@@ -228,22 +229,21 @@ export const TransactionFeed = ({
     visibleItems: ActivityItem[];
     animKey: number;
 }) => {
-    // Always render exactly TXN_SLOTS rows — ghost rows keep the layout height
-    // stable and prevent content from jumping when item count changes.
     const slots = Array.from(
         { length: TXN_PAGE_SIZE },
         (_, i) => visibleItems[i] ?? null,
     );
 
     return (
-        <div className="flex flex-col gap-2 space-y-5 px-5 py-4.5 text-primary-foreground">
-            {/* Header */}
-            <div className="flex items-center gap-3">
-                <IconPairCategory className="size-10.75" />
-                <p className="text-2xl font-medium">TRANSACTIONS</p>
+        <div className="flex flex-col gap-4 overflow-x-auto overflow-y-hidden px-3 py-4.5 text-primary-foreground md:px-5">
+            <div className="flex items-center gap-2 md:gap-3">
+                <IconPairCategory className="size-7 md:size-10 2xl:size-10.75" />
+                <p className="text-base font-medium md:text-xl 2xl:text-2xl">
+                    TRANSACTIONS
+                </p>
             </div>
-            {/* Table header */}
-            <div className="txn-grid font-inter text-lg font-bold tracking-[0.24px]">
+
+            <div className="txn-grid font-inter text-xs font-bold tracking-[0.24px] opacity-60 md:text-base 2xl:text-lg">
                 <span />
                 <span>Tx hash</span>
                 <span className="hidden text-center md:block">Time</span>
@@ -252,15 +252,15 @@ export const TransactionFeed = ({
                 <span className="text-center">Amount</span>
                 <span className="hidden text-center md:block">Fee</span>
             </div>
+
             <div
                 key={animKey}
-                className="animate-feed-jump-in space-y-5 font-inter text-lg tracking-[0.24px]"
+                className="animate-feed-jump-in space-y-3 font-inter text-xs tracking-[0.24px] md:space-y-5 md:text-base 2xl:text-lg"
             >
                 {slots.map((item, i) =>
                     item ? (
                         <TransactionRow key={item.id} item={item} />
                     ) : (
-                        // Invisible placeholder preserves the row height
                         <div key={`ghost-${i}`} className="invisible txn-grid">
                             <span />
                             <span>&nbsp;</span>
@@ -289,8 +289,8 @@ export const BurnActivityFeed = ({
     animKey,
 }: ScrollingFeedProps) => (
     <ActivityFeed
-        title="BURN ACTIVITY"
-        icon={<IconBurnCategory className="size-10.75" />}
+        title="Burn Activity"
+        icon={<IconBurnCategory className="size-7 md:size-10 2xl:size-10.75" />}
         items={visibleItems}
         animKey={animKey}
         renderRow={(item) => <BurnRow item={item} />}
@@ -303,11 +303,11 @@ export const SwapActivityFeed = ({
     animKey,
 }: ScrollingFeedProps) => (
     <ActivityFeed
-        title="SWAP ACTIVITY"
-        icon={<IconSwapCategory className="size-10.75" />}
+        title="Swap Activity"
+        icon={<IconSwapCategory className="size-7 md:size-10 2xl:size-10.75" />}
         items={visibleItems}
         animKey={animKey}
         renderRow={(item) => <SwapRow item={item} />}
-        ghostRowClassName={cn(ROW_SWAP_GRID, "pb-6")}
+        ghostRowClassName={ROW_SWAP_GRID}
     />
 );

@@ -8,6 +8,8 @@ import {
     IconStackY,
     IconStats,
     IconTwoDArrow,
+    IconBurnTracker,
+    IconSwapStatChart,
 } from "@/assets/react";
 import { shortenNumber } from "@/utils/helpers/numbers";
 import type { StatsStickerResponse } from "@/services/dashboardService";
@@ -37,15 +39,15 @@ const HeroStatRow = ({
     valueClass: string;
 }) => (
     <div className="flex items-center justify-between">
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-2.5 lg:gap-5">
             <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
                 {icon}
             </div>
-            <span className="text-base font-medium text-mb-gray-b8 sm:text-xl">
+            <span className="text-sm font-medium text-mb-gray-b8 2xl:text-base">
                 {label}
             </span>
         </div>
-        <div className={`text-base font-medium sm:text-xl ${valueClass}`}>
+        <div className={`text-sm font-medium 2xl:text-base ${valueClass}`}>
             {value}
         </div>
     </div>
@@ -59,13 +61,13 @@ const HeroSwapMiniForm = () => {
     return (
         <div className="flex w-full flex-1 flex-col justify-end font-inter">
             {/* From / To */}
-            <div className="mb-2 flex items-center justify-between text-base text-mb-gray-b8/60">
+            <div className="mb-1 flex items-center justify-between text-sm text-mb-gray-b8/60 2xl:mb-2 2xl:text-base">
                 <span>From</span>
                 <span>to</span>
             </div>
 
             {/* Token Select */}
-            <div className="mb-2 flex items-center gap-2 rounded-[6px] border-2 border-[#212C3E] px-3">
+            <div className="mb-1 flex items-center gap-2 rounded-[6px] border-2 border-[#212C3E] px-3 2xl:mb-2">
                 <div className="flex-1">
                     <WhitelistTokenSelect
                         value={tokenFrom}
@@ -92,8 +94,8 @@ const HeroSwapMiniForm = () => {
             </div>
 
             {/* Amount */}
-            <div className="flex flex-col gap-2">
-                <span className="text-base text-mb-gray-b8/60">Amount</span>
+            <div className="flex flex-col gap-1 2xl:gap-2">
+                <span className="text-sm text-mb-gray-b8/60 2xl:text-base">Amount</span>
                 <div className="flex justify-between rounded-[6px] border-2 border-[#212C3E] px-3">
                     <Input
                         value={amount}
@@ -101,7 +103,7 @@ const HeroSwapMiniForm = () => {
                         type="number"
                         step={DEFAULT_INPUT_NUMBER_STEP}
                         placeholder="0.0"
-                        className="bg-transparent pl-4"
+                        className="bg-transparent pl-2 2xl:pl-4"
                     />
                     {tokenTo && (
                         <TokenDisplay
@@ -119,7 +121,7 @@ const HeroSwapMiniForm = () => {
                 variant="swap"
                 size="big"
                 hasHover
-                className="sm:h-57px sm:w-275px mt-5.5 h-12 w-full font-orbitron text-xl font-medium"
+                className="sm:h-57px sm:w-275px mt-4.5 h-12 w-full font-orbitron text-lg font-medium text-nowrap 2xl:mt-5.5 2xl:text-xl"
             >
                 Create Pool
             </Button>
@@ -136,7 +138,7 @@ interface Props {
 export const BurnSwapHero = ({ data }: Props) => {
     const navigate = useNavigate();
     return (
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Burn Tracker */}
             <GlowContainer
                 className="relative flex flex-col overflow-visible sm:flex-row"
@@ -144,18 +146,21 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="burn"
-                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex shrink-0 flex-col gap-8.75 px-5 py-6.25"
+                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex flex-col justify-between gap-8.75 px-5 py-6.25 sm:max-w-19/40"
                 >
                     <div className="flex items-center gap-3">
                         <IconBurnCategory className="size-10.75" />
-                        <p className="text-2xl font-medium">BURN TRACKER</p>
+                        <p className="text-xl font-medium text-nowrap 2xl:text-2xl">
+                            BURN TRACKER
+                        </p>
                     </div>
-                    <img src={BurnTrackerImage} alt="Burn Tracker" />
+                    {/* <img src={BurnTrackerImage} alt="Burn Tracker" /> */}
+                    <IconBurnTracker className="mx-auto w-9/9 2xl:w-auto" />
                     <Button
                         variant="burn"
                         hasHover
                         size="big"
-                        className="sm:h-57px sm:w-275px h-12 w-full text-xl font-medium"
+                        className="sm:h-57px sm:w-275px h-12 w-full text-lg font-medium text-nowrap 2xl:text-xl"
                         onClick={() => {
                             navigate({ to: "/burn" });
                         }}
@@ -166,12 +171,14 @@ export const BurnSwapHero = ({ data }: Props) => {
                 <div className="mx-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 py-4 font-inter sm:mr-5 sm:ml-7 sm:py-0">
                     <div className="flex items-center gap-2">
                         <IconBurnCategory className="size-7.25" />
-                        <p className="font-orbitron text-xl font-medium">BURN</p>
+                        <p className="font-orbitron text-lg font-medium 2xl:text-xl">
+                            BURN
+                        </p>
                     </div>
                     <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase text-burn-glow sm:text-[32px]">
                         {sumTokenAmounts(data?.burnSection?.volume ?? [], true, 2)}
                     </p>
-                    <p className="text-base font-medium text-mb-gray-b8/60">
+                    <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
                         Total Burned Volume
                     </p>
                     <HeroStatRow
@@ -206,29 +213,32 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="swap"
-                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex max-w-19/40 shrink-0 flex-col gap-8.75 px-5 py-6.25"
+                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:max-w-19/40"
                 >
                     <div className="flex items-center gap-3">
                         <IconSwapCategory className="size-10.75" />
-                        <p className="text-2xl font-medium">TOKEN SWAP</p>
+                        <p className="text-xl font-medium 2xl:text-2xl">TOKEN SWAP</p>
                     </div>
                     <HeroSwapMiniForm />
                 </GlowContainer>
                 <div className="mx-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 py-4 font-inter sm:mr-7 sm:ml-5 sm:py-0">
                     <div className="flex items-center gap-2">
                         <IconSwapCategory className="size-7.25" />
-                        <p className="font-orbitron text-xl font-medium">SWAP</p>
+                        <p className="font-orbitron text-lg font-medium 2xl:text-xl">
+                            SWAP
+                        </p>
                     </div>
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2">
                         <div className="space-y-2.5">
                             <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase text-swap-glow sm:text-[32px]">
                                 {sumTokenAmounts(data?.swapSection?.volume ?? [], true, 2)}
                             </p>
-                            <p className="text-base font-medium text-mb-gray-b8/60">
+                            <p className="text-sm font-medium text-mb-gray-b8/60 lg:text-nowrap 2xl:text-base">
                                 Total Swap Volume
                             </p>
                         </div>
-                        <img src={SwapChartStatsImage} alt="Swap Stats" />
+                        {/* <img src={SwapChartStatsImage} alt="Swap Stats" /> */}
+                        <IconSwapStatChart className="" />
                     </div>
                     <HeroStatRow
                         icon={<IconStats />}

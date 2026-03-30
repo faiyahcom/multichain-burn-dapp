@@ -21,7 +21,7 @@ export function formatAmount(
     shortenNumber({
       number: amt / Math.pow(10, decimals),
       decimalPlaces: digitDisplayed ?? undefined,
-    }),
+    }).toUpperCase(),
   );
 }
 

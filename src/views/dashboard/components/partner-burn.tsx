@@ -36,11 +36,13 @@ function resolveStatus(pool: PartnerPool): PoolStatus {
 const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
     const remaining = useCountdown(Number(timeEnd));
     return (
-        <div className="flex flex-col items-center gap-1">
-            <span className="text-xs font-medium">
+        <div className="flex flex-col items-center gap-1 sm:gap-0.5 2xl:gap-1">
+            <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
                 Live {formatCountdown(remaining)}
             </span>
-            <span className="text-xs font-semibold">JOIN</span>
+            <span className="text-xs font-semibold sm:text-tiny 2xl:text-xs">
+                JOIN
+            </span>
         </div>
     );
 };
@@ -76,25 +78,33 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
             <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 px-2 py-2 text-center font-inter">
-                <p className="max-w-full truncate text-xs font-semibold">{pool.name}</p>
-                <p className="text-lg font-semibold">{rewardFormatted}</p>
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 px-2 py-2 text-center font-inter sm:gap-0 sm:px-1 sm:py-1 2xl:gap-1 2xl:px-2 2xl:py-2">
+                <p className="max-w-full truncate text-xs font-semibold sm:text-tiny 2xl:text-xs">
+                    {pool.name}
+                </p>
+                <p className="text-2xl font-semibold sm:text-sm 2xl:text-lg">
+                    {rewardFormatted}
+                </p>
                 <TokenImage
                     src={pool.tokenInImageUri ?? undefined}
                     alt={symbol}
-                    classNames={{ common: "size-11" }}
+                    classNames={{ common: "size-11 sm:size-7.5 2xl:size-11" }}
                 />
                 {status === "live" && <LiveStatus timeEnd={pool.timeEnd} />}
                 {status === "upcoming" && (
-                    <div className="flex flex-col items-center gap-0.5">
-                        <span className="text-xs font-medium">Upcoming</span>
-                        <span className="text-xs font-medium">
+                    <div className="flex flex-col items-center gap-0.5 sm:gap-px 2xl:gap-0.5">
+                        <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
+                            Upcoming
+                        </span>
+                        <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
                             {daysUntil} day{daysUntil !== 1 ? "s" : ""}
                         </span>
                     </div>
                 )}
                 {status === "ended" && (
-                    <span className="text-xs font-medium">Ended</span>
+                    <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
+                        Ended
+                    </span>
                 )}
             </div>
         </GlowContainer>
@@ -113,8 +123,8 @@ const ComingSoonCard = () => (
         />
         <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
         {/* make the icon absolute centered */}
-        <IconBurnCategory className="absolute top-1/2 left-1/2 size-18 -translate-x-1/2 -translate-y-1/2 transform opacity-80" />
-        <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform font-inter text-[15px] font-medium text-nowrap">
+        <IconBurnCategory className="absolute top-1/2 left-1/2 size-18 -translate-x-1/2 -translate-y-1/2 transform opacity-80 sm:size-9 2xl:size-18" />
+        <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform font-inter text-[15px] font-medium text-nowrap sm:text-tiny 2xl:text-[15px]">
             Coming soon
         </p>
     </GlowContainer>
