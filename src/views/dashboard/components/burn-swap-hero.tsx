@@ -143,7 +143,7 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="burn"
-                    className="-mx-1 -mt-1 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:mx-0 sm:-mb-1 sm:-ml-1"
+                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex shrink-0 flex-col gap-8.75 px-5 py-6.25"
                 >
                     <div className="flex items-center gap-3">
                         <IconBurnCategory className="size-10.75" />
@@ -204,7 +204,7 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="swap"
-                    className="-mx-1 -mt-1 flex max-w-19/40 shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:mx-0 sm:-mb-1 sm:-ml-1"
+                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex max-w-19/40 shrink-0 flex-col gap-8.75 px-5 py-6.25"
                 >
                     <div className="flex items-center gap-3">
                         <IconSwapCategory className="size-10.75" />
