@@ -48,6 +48,9 @@ const PairListGlowSearch = () => {
           setSortOrder={(sortOrder) => setFilter({ sortOrder })}
           defaultSortBy="volume"
           variant="pair"
+          classNames={{
+            btn: "max-xl:w-full",
+          }}
         />
         <LayoutPicker
           layout={filter.listLayout}

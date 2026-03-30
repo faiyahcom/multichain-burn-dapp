@@ -39,6 +39,9 @@ const SwapSearch = () => {
         setSortOrder={(sortOrder) => setFilter({ sortOrder })}
         defaultSortBy="liquidity"
         variant="swap"
+        classNames={{
+          btn: "max-xl:w-full",
+        }}
       />
       <LayoutPicker
         layout={filter.listLayout}
