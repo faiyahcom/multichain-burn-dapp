@@ -12,6 +12,7 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import { useCountdown } from "@/hooks/useCountdown";
 import { formatCountdown } from "@/utils/helpers/string";
 import PartnerBurnBgImage from "/images/dashboard/partner-burn-bg.png";
+import { useNavigate } from "@tanstack/react-router";
 
 const POOL_LIMIT = 4;
 
@@ -30,22 +31,30 @@ function resolveStatus(pool: PartnerPool): PoolStatus {
     return "ended";
 }
 
-
 // ── Pool Card ──────────────────────────────────────────────────────────────────
 
-const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
+const LiveStatus = ({
+    timeEnd,
+    onJoin,
+}: {
+    timeEnd: string;
+    onJoin: () => void;
+}) => {
     const remaining = useCountdown(Number(timeEnd));
     return (
         <div className="flex flex-col items-center gap-1">
             <span className="text-xs font-medium">
                 Live {formatCountdown(remaining)}
             </span>
-            <span className="text-xs font-medium">JOIN</span>
+            <span className="cursor-pointer text-xs font-medium" onClick={onJoin}>
+                JOIN
+            </span>
         </div>
     );
 };
 
 const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
+    const navigate = useNavigate();
     const status = resolveStatus(pool);
     const rewardFormatted = formatAmount(
         pool.rewardAmount,
@@ -78,7 +87,16 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                     alt={symbol}
                     classNames={{ common: "size-11" }}
                 />
-                {status === "live" && <LiveStatus timeEnd={pool.timeEnd} />}
+                {status === "live" && (
+                    <LiveStatus
+                        timeEnd={pool.timeEnd}
+                        onJoin={() => {
+                            navigate({
+                                to: `/burn/detail/${pool.address}`,
+                            });
+                        }}
+                    />
+                )}
                 {status === "upcoming" && (
                     <div className="flex flex-col items-center gap-0.5">
                         <span className="text-xs font-medium">Upcoming</span>
@@ -123,7 +141,12 @@ interface PoolCarouselProps {
     fetchNextPage: () => void;
 }
 
-const PoolCarousel = ({ pools, hasNextPage, isFetchingNextPage, fetchNextPage }: PoolCarouselProps) => {
+const PoolCarousel = ({
+    pools,
+    hasNextPage,
+    isFetchingNextPage,
+    fetchNextPage,
+}: PoolCarouselProps) => {
     const [emblaRef, emblaApi] = useEmblaCarousel(
         { loop: false, align: "start", dragFree: true },
         [
@@ -153,13 +176,15 @@ const PoolCarousel = ({ pools, hasNextPage, isFetchingNextPage, fetchNextPage }:
     useEffect(() => {
         if (!emblaApi) return;
         emblaApi.on("scroll", onScroll);
-        return () => { emblaApi.off("scroll", onScroll); };
+        return () => {
+            emblaApi.off("scroll", onScroll);
+        };
     }, [emblaApi, onScroll]);
 
     return (
         <div className="-m-4 overflow-hidden p-4">
             <div ref={emblaRef}>
-                <div className="flex -ml-4">
+                <div className="-ml-4 flex">
                     {pools.map((pool) => (
                         <div
                             key={`${pool.chainId}-${pool.address}`}
