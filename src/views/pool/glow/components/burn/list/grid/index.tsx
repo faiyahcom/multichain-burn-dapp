@@ -10,7 +10,8 @@ import {
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { formatCountdown, truncateString } from "@/utils/helpers/string";
+import { truncateString } from "@/utils/helpers/string";
+import { renderBurnPoolTime } from "@/views/pool/glow/shared/helpers";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -20,7 +21,6 @@ interface Props {
 }
 
 const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
-  const nowInSeconds = Math.floor(Date.now() / 1000);
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -29,32 +29,6 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
-
-  const renderBurnPoolTime = (pool: PoolItemType) => {
-    const timeStart = Number(pool.timeStart);
-    const timeEnd = Number(pool.timeEnd);
-
-    if (pool.status === "upcoming") {
-      if (isNaN(timeStart)) return "N/A";
-      const diffStart = timeStart - nowInSeconds;
-      return `In ${formatCountdown(Math.max(0, diffStart))}`;
-    }
-
-    if (pool.status === "on_going") {
-      if (isNaN(timeEnd)) return "N/A";
-      const diffEnd = timeEnd - nowInSeconds;
-      if (diffEnd > 0) return formatCountdown(diffEnd);
-      return getPoolStatusLabel("ended");
-    }
-
-    if (pool.status === "ended") {
-      if (isNaN(timeEnd)) return "N/A";
-      const diffEnd = nowInSeconds - timeEnd;
-      return `${formatCountdown(Math.max(0, diffEnd))} ago`;
-    }
-
-    return "N/A";
-  };
 
   return (
     <>

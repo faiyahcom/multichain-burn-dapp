@@ -43,13 +43,21 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   ];
 
   const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const fixWidth: React.CSSProperties["minWidth"] = `200px`;
 
   return (
     <Table>
       <TableHeader>
         <TableRow>
           {columns.map((column, index) => (
-            <TableHead key={index} variant="burn" style={{ width: cellWidth }}>
+            <TableHead
+              key={index}
+              variant="burn"
+              style={{
+                width: index === 0 ? fixWidth : cellWidth, // 200px for first column
+                minWidth: index === 0 ? fixWidth : "", // 200px for first column
+              }}
+            >
               {column}
             </TableHead>
           ))}
@@ -90,24 +98,27 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
           });
 
           const statusLabel = getPoolStatusLabel(pool.status);
-          const isLive = pool.status === "on_going";
           const href = `/burn/detail/${pool.address}`;
 
           return (
             <TableRow
               key={pool.address}
               onClick={() => navigate({ to: href })}
-              className="sm:text-24px cursor-pointer text-xl"
+              className="cursor-pointer font-medium"
               variant="burn"
             >
-              <TableCell className="text-left">
-                <div className="flex min-w-0 items-center gap-3">
-                  <IconBurnCategory className="size-10.75" />
+              <TableCell
+                className="w-(--max-w) min-w-0 text-left"
+                style={
+                  {
+                    "--max-w": fixWidth,
+                  } as React.CSSProperties
+                }
+              >
+                <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
+                  <IconBurnCategory className="size-10.75 shrink-0" />
                   <div className="min-w-0">
-                    <p
-                      className="sm:text-24px truncate text-xl font-semibold"
-                      title={pool.name}
-                    >
+                    <p className="truncate font-semibold" title={pool.name}>
                       {pool.name}
                     </p>
                     <CopyableText
@@ -126,7 +137,7 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   startDate={pool.timeStart}
                   endDate={pool.timeEnd}
                   classNames={{
-                    container: "mx-auto w-max text-xl sm:text-24px",
+                    container: "mx-auto w-max",
                   }}
                 />
               </TableCell>
@@ -155,18 +166,17 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   chainId={pool.chainId}
                   classNames={{
                     container: "flex items-center justify-center gap-3",
-                    label: "text-base sm:text-28px",
                   }}
                 />
               </TableCell>
               <TableCell>
-                <span className="sm:text-24px text-xl">Dynamic</span>
+                <span>Dynamic</span>
               </TableCell>
               <TableCell>
                 <Button
-                  variant={isLive ? "burn" : "burn-active"}
+                  variant={"burn"}
                   hasGroupHover
-                  className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
+                  className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
                 >
                   {statusLabel}
                 </Button>

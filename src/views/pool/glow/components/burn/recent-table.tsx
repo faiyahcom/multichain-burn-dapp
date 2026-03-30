@@ -1,5 +1,6 @@
-import { Button } from "@/components/common/glow/button";
+import { IconBurnCategory } from "@/assets/react";
 import CopyableText from "@/components/common/copyable-text";
+import { Button } from "@/components/common/glow/button";
 import {
   Table,
   TableBody,
@@ -10,19 +11,18 @@ import {
 } from "@/components/common/glow/table";
 import TableNoData from "@/components/common/glow/table-no-data";
 import TableSkeleton from "@/components/common/glow/table-skeleton";
-import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
-import { Link, useNavigate } from "@tanstack/react-router";
 import NetworkDisplay from "@/components/common/network-display";
-import TokenImage from "@/components/common/token-image";
-import { chainIdToNetworkConfig } from "@/config/networks";
-import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { truncateString } from "@/utils/helpers/string";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
-import { PoolKindCodeEnum } from "@/types/pool";
+import TokenDisplay from "@/components/common/token-display";
+import { chainIdToNetworkConfig } from "@/config/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
+import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
+import { PoolKindCodeEnum } from "@/types/pool";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
-import { IconBurnCategory } from "@/assets/react";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 const BurnRecentPoolsTable = ({}: {}) => {
   const navigate = useNavigate();
@@ -40,6 +40,8 @@ const BurnRecentPoolsTable = ({}: {}) => {
     "Ratio",
     "Status",
   ];
+  const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const fixWidth: React.CSSProperties["minWidth"] = `200px`;
 
   return (
     <div className="space-y-6">
@@ -52,7 +54,8 @@ const BurnRecentPoolsTable = ({}: {}) => {
                 variant="burn"
                 className="h-12 pt-2 align-baseline"
                 style={{
-                  width: index === 0 ? "280px" : `${100 / columns.length}%`,
+                  width: index === 0 ? fixWidth : cellWidth, // 200px for first column
+                  minWidth: index === 0 ? fixWidth : "", // 200px for first column
                 }}
               >
                 {column}
@@ -92,24 +95,27 @@ const BurnRecentPoolsTable = ({}: {}) => {
               imageUri: pool.tokenOutImageUri ?? undefined,
             });
             const statusLabel = getPoolStatusLabel(pool.status);
-            const isLive = pool.status === "on_going";
             const href = `/burn/detail/${pool.address}`;
 
             return (
               <TableRow
                 key={pool.address}
                 variant="burn"
-                className="sm:text-24px cursor-pointer text-xl"
+                className="cursor-pointer font-medium"
                 onClick={() => navigate({ to: href })}
               >
-                <TableCell className="text-left">
-                  <div className="flex min-w-0 items-center gap-3">
-                    <IconBurnCategory className="size-10.75" />
+                <TableCell
+                  className="w-(--max-w) min-w-0 text-left"
+                  style={
+                    {
+                      "--max-w": fixWidth,
+                    } as React.CSSProperties
+                  }
+                >
+                  <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
+                    <IconBurnCategory className="size-10.75 shrink-0" />
                     <div className="min-w-0">
-                      <p
-                        className="sm:text-24px truncate text-xl font-semibold"
-                        title={pool.name}
-                      >
+                      <p className="truncate font-semibold" title={pool.name}>
                         {pool.name}
                       </p>
                       <CopyableText
@@ -128,50 +134,45 @@ const BurnRecentPoolsTable = ({}: {}) => {
                     startDate={pool.timeStart}
                     endDate={pool.timeEnd}
                     classNames={{
-                      container: "mx-auto w-max text-xl sm:text-24px",
+                      container: "mx-auto w-max",
                     }}
                   />
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center justify-center gap-3">
-                    <TokenImage
-                      src={burnTokenDisplay.imageUri}
-                      alt={burnTokenDisplay.symbol}
-                      classNames={{ common: "size-10 sm:size-12" }}
-                    />
-                    <span className="sm:text-24px text-xl">
-                      {burnTokenDisplay.symbol}
-                    </span>
-                  </div>
+                  <TokenDisplay
+                    symbol={burnTokenDisplay.symbol}
+                    imageUri={burnTokenDisplay.imageUri}
+                    classNames={{
+                      img: "size-6 sm:size-8",
+                      container: "gap-3",
+                    }}
+                  />
                 </TableCell>
                 <TableCell>
-                  <div className="flex items-center justify-center gap-3">
-                    <TokenImage
-                      src={rewardTokenDisplay.imageUri}
-                      alt={rewardTokenDisplay.symbol}
-                      classNames={{ common: "size-10 sm:size-12" }}
-                    />
-                    <span className="sm:text-24px text-xl">
-                      {rewardTokenDisplay.symbol}
-                    </span>
-                  </div>
+                  <TokenDisplay
+                    symbol={rewardTokenDisplay.symbol}
+                    imageUri={rewardTokenDisplay.imageUri}
+                    classNames={{
+                      img: "size-6 sm:size-8",
+                      container: "gap-3",
+                    }}
+                  />
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay
                     chainId={pool.chainId}
                     classNames={{
                       container: "flex items-center justify-center gap-3",
-                      img: "mr-0 size-10 sm:size-12",
-                      label: "text-xl sm:text-24px",
+                      img: "mr-0",
                     }}
                   />
                 </TableCell>
                 <TableCell>
-                  <span className="sm:text-24px text-xl">Dynamic</span>
+                  <span>Dynamic</span>
                 </TableCell>
                 <TableCell className="w-max max-w-max min-w-max">
                   <Button
-                    variant={isLive ? "burn" : "burn-active"}
+                    variant={"burn"}
                     hasGroupHover
                     className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
                   >
@@ -189,7 +190,7 @@ const BurnRecentPoolsTable = ({}: {}) => {
           search={{
             tab: "burn-pool",
           }}
-          className="sm:text-24px pr-3 text-xl font-semibold"
+          className="sm:text-24px pr-3 font-inter text-xl font-semibold"
         >
           See more
         </Link>
