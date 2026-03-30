@@ -10,8 +10,8 @@ export function MainHeader() {
   const { isConnected } = useAppKitAccount();
 
   return (
-    <header className="flex items-end justify-between gap-2 bg-transparent sm:gap-4">
-      <div className="flex items-center gap-2 sm:gap-4">
+    <header className="flex items-center justify-between gap-2 bg-transparent sm:gap-4 lg:items-end">
+      <div className="flex items-center gap-3 sm:gap-4">
         <HeaderNavMobile />
         <Link to="/" className="flex items-center gap-3.75" title="Faiyah.com">
           <img
@@ -22,7 +22,7 @@ export function MainHeader() {
           <img
             src="/logo.png"
             alt="Logo"
-            className="block h-25.25 w-16.5 object-contain xl:hidden"
+            className="block h-25.25 w-11 object-contain xl:hidden"
           />
           <h1 className="sr-only">FAIYAH.COM</h1>
         </Link>
@@ -33,7 +33,7 @@ export function MainHeader() {
       {!isConnected ? (
         <ConnectButton />
       ) : (
-        <div className="flex items-center gap-2 sm:gap-2.5">
+        <div className="flex items-center gap-3 sm:gap-2.5">
           <button className="rounded-full bg-mb-dark-profile-btn p-2 sm:p-5">
             <IconBell className="size-6 sm:size-7.25" />
           </button>
