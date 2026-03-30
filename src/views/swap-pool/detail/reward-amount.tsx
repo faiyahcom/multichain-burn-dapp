@@ -24,7 +24,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
+        tokenAddress: poolDetail?.pool?.tokenIn,
         tokenSymbol: poolDetail?.tokenIn?.symbol,
         tokenName: poolDetail?.tokenIn?.name,
         customName: poolDetail?.tokenIn?.customName,
@@ -33,7 +33,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
+        tokenAddress: poolDetail?.pool?.rewardToken,
         tokenSymbol: poolDetail?.tokenOut?.symbol,
         tokenName: poolDetail?.tokenOut?.name,
         customName: poolDetail?.tokenOut?.customName,
@@ -51,7 +51,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
 
         // Raw reward amount (in base units)
         const rewardRaw = new Decimal(poolDetail.rewardAmount ?? 0);
-        const rewardDecimals = poolDetail?.pool?.rewardTokenDecimals;
+        const rewardDecimals = poolDetail?.pool?.rewardTokenDecimals ?? 0;
 
         // Convert reward to human-readable
         const rewardHuman = rewardRaw.div(new Decimal(10).pow(rewardDecimals));

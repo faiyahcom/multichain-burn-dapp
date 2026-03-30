@@ -36,11 +36,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
     imageUri: poolDetail?.tokenOut?.imageUri,
   });
   const rows = useMemo(() => {
-    if (!poolDetail) return [];
+    if (!poolDetail?.pool) return [];
 
     const cleanRatio = toCleanRatio(
-      poolDetail.pool.rewardDenominator,
-      poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
+      poolDetail?.pool?.rewardDenominator,
+      poolDetail?.pool?.rewardNumerator, // It's reward num and dem, not ratio on onchain
     );
 
     return [

@@ -47,9 +47,9 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 container: "inline-flex items-center gap-2",
                 displayText: "text-xl",
               }}
-              content={poolDetail?.pool.owner}
+              content={poolDetail?.pool?.owner}
               displayText={truncateString({
-                str: poolDetail?.pool.owner || "",
+                str: poolDetail?.pool?.owner || "",
               })}
             />
           ),
@@ -119,7 +119,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
           <span className="text-xl font-medium">Pool Overview</span>
         </div>
         <p className="text-[13px] text-greyed">
-          {poolDetail?.pool.timeStart && poolDetail?.pool.timeEnd
+          {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
             ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
                 Number(poolDetail.pool.timeEnd) * 1000,
               ).toLocaleDateString()}`
