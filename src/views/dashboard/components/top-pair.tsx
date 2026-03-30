@@ -54,19 +54,19 @@ const PairCard = ({ pair }: PairCardProps) => {
                     <TokenImage
                         src={tokenOutDisplay.imageUri}
                         alt={tokenOutDisplay.symbol}
-                        classNames={{ common: "size-8" }}
+                        classNames={{ common: "size-8 z-10" }}
                     />
                     <TokenImage
                         src={tokenInDisplay.imageUri}
                         alt={tokenInDisplay.symbol}
-                        classNames={{ common: "size-8 -ml-2" }}
+                        classNames={{ common: "size-8 -ml-2 z-0" }}
                     />
                 </div>
                 {network?.iconSrc && (
                     <img
                         src={network.iconSrc}
                         alt=""
-                        className="absolute right-0 bottom-0 size-4 rounded-full border border-mb-pair-card-border"
+                        className="absolute right-1 bottom-1 size-4 rounded-full border border-mb-pair-card-border"
                     />
                 )}
             </div>

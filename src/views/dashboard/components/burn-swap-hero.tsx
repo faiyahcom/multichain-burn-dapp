@@ -119,7 +119,7 @@ const HeroSwapMiniForm = () => {
                 variant="swap"
                 size="big"
                 hasHover
-                className="sm:h-57px sm:w-275px mt-5.5 h-12 w-full font-orbitron"
+                className="sm:h-57px sm:w-275px mt-5.5 h-12 w-full font-orbitron text-xl font-medium"
             >
                 Create Pool
             </Button>
@@ -155,7 +155,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         variant="burn"
                         hasHover
                         size="big"
-                        className="sm:h-57px sm:w-275px h-12 w-full"
+                        className="sm:h-57px sm:w-275px h-12 w-full text-xl font-medium"
                         onClick={() => {
                             navigate({ to: "/burn" });
                         }}
