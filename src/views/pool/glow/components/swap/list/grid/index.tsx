@@ -71,26 +71,29 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   </div>
                 }
                 bottomSection={
-                  <div className="space-y-1 font-inter text-base sm:space-y-2 sm:text-2xl">
-                    <TokenOutInNetworkDisplay
-                      tokenOutProps={{
-                        src: tokenOutDisplay.imageUri,
-                        alt: tokenOutDisplay.symbol,
-                      }}
-                      tokenInProps={{
-                        src: tokenInDisplay.imageUri,
-                        alt: tokenInDisplay.symbol,
-                      }}
-                      networkProps={{
-                        chainId: pool.chainId,
-                      }}
-                      className="mx-auto"
-                    />
-                    <MetricNumber
-                      number={pool.liquidity}
-                      unit={tokenOutDisplay.symbol}
-                      isShorten
-                    />
+                  <div className="flex flex-1 flex-col items-stretch justify-between font-inter">
+                    <div className="space-y-1 text-base sm:space-y-2 sm:text-2xl">
+                      <TokenOutInNetworkDisplay
+                        tokenOutProps={{
+                          src: tokenOutDisplay.imageUri,
+                          alt: tokenOutDisplay.symbol,
+                        }}
+                        tokenInProps={{
+                          src: tokenInDisplay.imageUri,
+                          alt: tokenInDisplay.symbol,
+                        }}
+                        networkProps={{
+                          chainId: pool.chainId,
+                        }}
+                        className="mx-auto"
+                      />
+                      <MetricNumber
+                        number={pool.liquidity}
+                        unit={tokenOutDisplay.symbol}
+                        isShorten
+                      />
+                    </div>
+
                     <RatioDisplay
                       inValue={pool.rewardDenominator}
                       outValue={pool.rewardNumerator}
@@ -99,6 +102,9 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                         pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol
                       }
                       equalSign="/"
+                      classNames={{
+                        container: "flex-1",
+                      }}
                     />
                   </div>
                 }
@@ -108,7 +114,9 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   ),
                 }}
                 classNames={{
-                  content: "space-y-1.5 sm:space-y-3",
+                  content:
+                    "space-y-0 sm:space-y-0 flex flex-col gap-y-1.5 sm:gap-y-3 flex-1",
+                  glowContainer: "flex flex-col justify-between",
                 }}
               />
             );

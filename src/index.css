@@ -487,6 +487,14 @@
   [role="button"]:disabled {
     cursor: not-allowed;
   }
+
+  /* Fix a bug in Safari where the input line-height more than 1 will push the text down */
+  @supports (-webkit-hyphens: none) {
+    input,
+    textarea {
+      line-height: 1;
+    }
+  }
 }
 
 @utility popover-shadow {

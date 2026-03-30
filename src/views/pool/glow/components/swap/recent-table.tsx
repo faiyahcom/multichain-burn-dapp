@@ -109,7 +109,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                   }
                 >
                   <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
-                    <IconSwapCategory className="size-10.75" />
+                    <IconSwapCategory className="size-10.75 shrink-0" />
                     {/* max-w - spacing * (10.75 + 3) */}
                     <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
                       <p

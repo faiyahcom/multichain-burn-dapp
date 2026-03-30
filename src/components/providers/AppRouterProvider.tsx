@@ -1,17 +1,9 @@
-import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "@/routeTree.gen";
-import { useEffect } from "react";
+import { RouterProvider, createRouter } from "@tanstack/react-router";
 
-const router = createRouter({ routeTree } as any);
+const router = createRouter({ routeTree, scrollRestoration: true });
 
 function AppRouterProvider() {
-  useEffect(() => {
-    const unsubscribe = router.subscribe("onResolved", function resetToTop() {
-      window.scrollTo({ top: 0, behavior: "instant" });
-    });
-    return unsubscribe;
-  }, []);
-  
   return <RouterProvider router={router} />;
 }
 export default AppRouterProvider;
