@@ -492,7 +492,7 @@
   @supports (-webkit-hyphens: none) {
     input,
     textarea {
-      line-height: 1;
+      line-height: 1 !important;
     }
   }
 }
