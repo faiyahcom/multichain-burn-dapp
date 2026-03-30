@@ -37,20 +37,20 @@ const EndStatus = ({ poolDetail }: Props) => {
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network: networkConfig,
         tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network: networkConfig,
         tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
     const tokenInSymbolDisplay = burnTokenDisplay.symbol;
     const rewardTokenSymbolDisplay = rewardTokenDisplay.symbol;
