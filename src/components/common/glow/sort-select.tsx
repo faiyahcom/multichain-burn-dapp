@@ -29,7 +29,7 @@ interface Props {
   setSortBy?: (sortBy: SortBy | undefined) => void;
   setSortOrder?: (sortOrder: SortOrder) => void;
   placeholder?: string;
-  defaultSortBy?: SortBy; // if set then it will be selected by default instead of none
+  defaultSortBy?: SortBy; // deprecated due to new logic
   variant: ContainerVariant;
   classNames?: {
     container?: string;
@@ -45,13 +45,12 @@ const SortSelect: React.FC<Props> = ({
   setSortBy,
   setSortOrder,
   placeholder = "Sort by",
-  defaultSortBy,
   variant,
   classNames,
 }) => {
   const isActive = sortBy !== undefined && sortBy !== "none";
 
-  // Cycle through No sort => Sort desc => Sort asc => No sort (or defaultSortBy)
+  // New logic, cycle through asc <=> desc of the current sortBy (no escape to none)
   const handleToggleSort = (inputSortBy: SortBy) => {
     if (inputSortBy === "none") {
       return;
@@ -62,7 +61,6 @@ const SortSelect: React.FC<Props> = ({
     } else if (sortOrder === "desc") {
       setSortOrder?.("asc");
     } else {
-      setSortBy?.(defaultSortBy);
       setSortOrder?.("desc");
     }
   };
@@ -84,7 +82,9 @@ const SortSelect: React.FC<Props> = ({
               ? placeholder
               : (sortBysShortLabels[sortBy ?? "none"] ?? sortBy)}{" "}
             {isActive && (
-              <DownTriangleIcon direction={sortOrder === "asc" ? "up" : "down"} />
+              <DownTriangleIcon
+                direction={sortOrder === "asc" ? "up" : "down"}
+              />
             )}
           </Button>
         </PopoverTrigger>
