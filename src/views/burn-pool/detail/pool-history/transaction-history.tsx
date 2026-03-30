@@ -70,20 +70,20 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     // Map a transaction's raw token address to the pool's custom display symbol
