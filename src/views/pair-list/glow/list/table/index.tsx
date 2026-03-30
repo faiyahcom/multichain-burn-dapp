@@ -14,7 +14,6 @@ import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PairItemType } from "@/types/pair";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -130,7 +129,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={sciToFormatted(item.liquidity, item.tokenOutDecimals)}
+                  number={item.liquidity}
                   unit={item.tokenOutSymbolCustom ?? item.tokenOutSymbol}
                   isShorten
                 />
