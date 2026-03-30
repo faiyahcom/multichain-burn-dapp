@@ -15,7 +15,7 @@ export const getPoolGlowVariant = (
   return poolKind === PoolKindCodeEnum.Burn ? "burn" : "swap";
 };
 
-export const renderBurnPoolTime = (pool: PoolItemType) => {
+export const renderBurnPoolTime = (pool: PoolItemType): string => {
   const nowInSeconds = Math.floor(Date.now() / 1000);
   // all possible status is stored in userViewBurnPoolStatuses
   if (pool.status !== "upcoming" && pool.status !== "on_going") {
@@ -62,4 +62,7 @@ export const renderBurnPoolTime = (pool: PoolItemType) => {
   if (pool.status === "on_going") {
     return renderTimeEnd();
   }
+
+  // Fallback for any unexpected status
+  return "\u00A0";
 };
