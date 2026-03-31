@@ -79,7 +79,7 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
     const amountOut = formatAmount(item.amountOut, item.tokenOutDecimals, 3);
 
     return (
-        <div className={cn(ROW_SWAP_GRID, "text-tiny lg:text-sm 2xl:text-md")}>
+        <div className={cn(ROW_SWAP_GRID, "text-tiny lg:text-sm 2xl:text-md py-1")}>
             <div className="flex min-w-0 items-center gap-2 md:gap-3">
                 <Dot className="size-2.5 shrink-0 bg-mb-swap-dot md:size-3.25" />
                 <span className="truncate text-foreground">{poolName}</span>
@@ -200,7 +200,7 @@ export const ActivityFeed = ({
             >
                 {slots.map((item, i) =>
                     item ? (
-                        <div key={item.id} className="py-1 2xl:py-2">
+                        <div key={item.id} className="py-0 2xl:py-1">
                             {renderRow(item)}
                         </div>
                     ) : (
