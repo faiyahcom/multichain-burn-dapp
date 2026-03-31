@@ -7,6 +7,8 @@ export const MULTICHAIN_BURN_PROGRAM_ID = new PublicKey(
   MULTICHAIN_BURN_PROGRAM_SOLANA_ADDRESS,
 );
 
+type MultichainBurnProgramIdl = typeof idl & Idl;
+
 export type BrowserWallet = {
   publicKey: PublicKey;
   signTransaction: (tx: Transaction) => Promise<Transaction>;
@@ -16,7 +18,7 @@ export type BrowserWallet = {
 export function getMultichainBurnProgram(
   connection: Connection,
   wallet: BrowserWallet,
-) {
+): Program<MultichainBurnProgramIdl> {
   const provider = new AnchorProvider(
     connection,
     wallet as AnchorProvider["wallet"],
@@ -25,5 +27,5 @@ export function getMultichainBurnProgram(
 
   // In current Anchor versions the Program constructor signature is (idl, provider?)
   // and programId is read from idl.metadata.address.
-  return new Program(idl as Idl, provider);
+  return new Program(idl as MultichainBurnProgramIdl, provider);
 }

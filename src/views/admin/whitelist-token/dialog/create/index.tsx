@@ -35,7 +35,6 @@ import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { booleanString } from "@/types/common";
-import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -64,7 +63,6 @@ const whitelistTokenSchema = z.object({
 type WhitelistTokenFormValues = z.infer<typeof whitelistTokenSchema>;
 
 const AdminWhitelistTokenDialogCreate = () => {
-  const { filter } = useAdminWhitelistTokenSearchFilterStore();
   const [open, setOpen] = useState<boolean>(false);
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
@@ -142,8 +140,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     onSuccess: () => {
       toast.success("Token whitelisted successfully!");
       queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokens(filter),
-        exact: false,
+        queryKey: whitelistQueryKeys.listTokensRoot(),
       });
 
       handleOpenChange(false);

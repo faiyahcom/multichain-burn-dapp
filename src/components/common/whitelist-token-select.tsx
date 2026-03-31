@@ -38,18 +38,25 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
   const isSolana = selectedNetworkId === "solanaDevnet";
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
-  const { data: whitelistTokens, isPending: isLoading } = useGetWhitelistTokens(
-    {
-      search: textSearch || undefined,
-      chainIds: networkConfig?.backendChainId,
-      active: "1",
-      isDropped: "0",
-    },
-  );
+  const {
+    data: whitelistTokens,
+    isPending,
+    isFetching,
+    refetch,
+  } = useGetWhitelistTokens({
+    search: textSearch || undefined,
+    chainIds: networkConfig?.backendChainId,
+    active: "1",
+    isDropped: "0",
+  });
+
+  const isLoading = isPending || (open && isFetching);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setTextSearch("");
+    } else {
+      void refetch();
     }
     setOpen(open);
   };
