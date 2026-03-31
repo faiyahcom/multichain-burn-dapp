@@ -22,7 +22,7 @@ const POOL_LIMIT = 4;
 const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
     const remaining = useCountdown(Number(timeEnd));
     return (
-        <div className="flex flex-col items-center gap-1 sm:gap-0.5 2xl:gap-1">
+        <div className="flex flex-col items-center gap-1px sm:gap-0.5 2xl:gap-1">
             <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
                 Live {formatCountdown(remaining)}
             </span>
@@ -83,7 +83,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                 />
                 {status === "on_going" && <LiveStatus timeEnd={pool.timeEnd} />}
                 {status === "upcoming" && (
-                    <div className="flex flex-col items-center gap-0.5 sm:gap-px 2xl:gap-0.5">
+                    <div className="flex flex-col items-center gap-px sm:gap-px 2xl:gap-0.5">
                         <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
                             Upcoming
                         </span>
