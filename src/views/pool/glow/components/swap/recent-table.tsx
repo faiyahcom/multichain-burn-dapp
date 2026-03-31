@@ -169,7 +169,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
                 <TableCell className="w-max max-w-max min-w-max">
                   <Button
                     variant={"swap"}
-                    className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
+                    className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
                     hasGroupHover
                   >
                     Swap
