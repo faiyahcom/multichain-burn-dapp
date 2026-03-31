@@ -104,7 +104,7 @@ const HeroSwapMiniForm = () => {
                         type="number"
                         step={DEFAULT_INPUT_NUMBER_STEP}
                         placeholder="0.0"
-                        className="bg-transparent pl-2 2xl:pl-4"
+                        className="bg-transparent px-0"
                     />
                     {tokenTo && (
                         <TokenDisplay
@@ -224,7 +224,7 @@ export const BurnSwapHero = ({ data }: Props) => {
             >
                 <GlowContainer
                     variant="swap"
-                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:max-w-19/40"
+                    className="-mx-0.5 -mt-0.5 -mb-0.5 -ml-0.5 flex shrink-0 flex-col gap-8.75 px-5 py-6.25 sm:w-19/40"
                 >
                     <div className="flex items-center gap-3">
                         <IconSwapCategory className="size-10.75" />
