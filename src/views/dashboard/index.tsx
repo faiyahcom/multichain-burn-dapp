@@ -8,9 +8,7 @@ import {
     SwapActivityFeed,
     TransactionFeed,
 } from "@/views/dashboard/components/activity-feed";
-import {
-    BurnSwapHero,
-} from "@/views/dashboard/components/burn-swap-hero";
+import { BurnSwapHero } from "@/views/dashboard/components/burn-swap-hero";
 import { PartnerBurnSection } from "@/views/dashboard/components/partner-burn";
 import { TopSwapperSection } from "@/views/dashboard/components/top-swapper";
 import { TopPairSection } from "@/views/dashboard/components/top-pair";
@@ -116,7 +114,7 @@ const HomeDashboard = () => {
             <TokenListGlow
                 variant="pair"
                 onTokenClick={(token) => {
-                    setFilter({ text: token.address });
+                    setFilter({ text: token.customSymbol });
                     navigate({ to: "/pair-list/" });
                 }}
             />

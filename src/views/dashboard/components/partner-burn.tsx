@@ -10,27 +10,12 @@ import type { PartnerPool } from "@/services/dashboardService";
 import { dashboardQueryKeys } from "@/services/queries/queryKey";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { useCountdown } from "@/hooks/useCountdown";
-import { formatCountdown } from "@/utils/helpers/string";
+import { formatCountdown, truncateString } from "@/utils/helpers/string";
 import PartnerBurnBgImage from "/images/dashboard/partner-burn-bg.png";
 import { useNavigate } from "@tanstack/react-router";
 import TokenDisplay from "@/components/common/token-display";
 
 const POOL_LIMIT = 4;
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
-
-type PoolStatus = "live" | "upcoming" | "ended";
-
-function resolveStatus(pool: PartnerPool): PoolStatus {
-    const s = pool.status?.toLowerCase();
-    if (s === "live" || s === "upcoming" || s === "ended") return s;
-    const now = Math.floor(Date.now() / 1000);
-    const start = Number(pool.timeStart);
-    const end = Number(pool.timeEnd);
-    if (now >= start && now <= end) return "live";
-    if (now < start) return "upcoming";
-    return "ended";
-}
 
 // ── Pool Card ──────────────────────────────────────────────────────────────────
 
@@ -50,11 +35,12 @@ const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
 
 const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
     const navigate = useNavigate();
-    const status = resolveStatus(pool);
+    const status = pool.status;
     const rewardFormatted = formatAmount(
         pool.rewardAmount,
         pool.tokenOutDecimals,
     );
+    const poolName = truncateString({ str: pool.name, left: 5, right: 5 });
     const symbol = pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol;
     const daysUntil = Math.ceil(
         (Number(pool.timeStart) - Math.floor(Date.now() / 1000)) / 86400,
@@ -80,10 +66,10 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
 
             {/* Content */}
             <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 px-2 py-2 text-center font-inter sm:gap-0 sm:px-1 sm:py-1 2xl:gap-1 2xl:px-2 2xl:py-2">
-                <p className="max-w-full truncate text-xs font-semibold sm:text-tiny 2xl:text-xs">
-                    {pool.name}
+                <p className="max-w-full text-xs font-semibold sm:text-tiny 2xl:text-xs">
+                    {poolName}
                 </p>
-                <p className="text-2xl font-semibold sm:text-sm 2xl:text-lg">
+                <p className="text-2xl font-semibold sm:text-xs 2xl:text-lg">
                     {rewardFormatted}
                 </p>
                 <TokenDisplay
@@ -95,7 +81,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                     }}
                     hasSymbol={false}
                 />
-                {status === "live" && <LiveStatus timeEnd={pool.timeEnd} />}
+                {status === "on_going" && <LiveStatus timeEnd={pool.timeEnd} />}
                 {status === "upcoming" && (
                     <div className="flex flex-col items-center gap-0.5 sm:gap-px 2xl:gap-0.5">
                         <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
@@ -106,9 +92,9 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                         </span>
                     </div>
                 )}
-                {status === "ended" && (
+                {status !== "on_going" && status !== "upcoming" && (
                     <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
-                        Ended
+                        {status.charAt(0).toUpperCase() + status.slice(1)}
                     </span>
                 )}
             </div>
