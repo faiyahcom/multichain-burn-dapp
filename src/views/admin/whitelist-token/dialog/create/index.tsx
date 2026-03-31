@@ -33,8 +33,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { whitelistService } from "@/services/whitelistService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
-import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { booleanString } from "@/types/common";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -140,7 +140,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     onSuccess: () => {
       toast.success("Token whitelisted successfully!");
       queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokensRoot(),
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
 
       handleOpenChange(false);

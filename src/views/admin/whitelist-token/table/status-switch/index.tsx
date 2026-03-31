@@ -8,7 +8,6 @@ import {
   whitelistService,
   type ForceUpdateWhitelistTokenStatusRequest,
 } from "@/services/whitelistService";
-import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
 import { useCreateWhitelistTokenSolanaFn } from "../../dialog/create/useCreateWhitelistTokenSolanaFn";
@@ -16,6 +15,7 @@ import { useCreateWhitelistTokenEvmFn } from "../../dialog/create/useCreateWhite
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 interface Props {
   switchProps?: React.ComponentProps<typeof BlueSwitch>;
@@ -55,7 +55,7 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokensRoot(),
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
     },
     onError: (error) => {

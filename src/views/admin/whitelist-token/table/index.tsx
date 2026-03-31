@@ -101,7 +101,7 @@ const AdminWhitelistTokenTable = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
-          queryKey: whitelistQueryKeys.listTokensRoot(),
+         queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
         });
         toast.success("Token deleted successfully!");
       },
