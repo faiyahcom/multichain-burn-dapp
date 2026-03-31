@@ -23,6 +23,7 @@ import {
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
+import { useMediaQuery } from "usehooks-ts";
 
 interface Props {
   data?: PoolItemType[];
@@ -33,6 +34,7 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
   const navigate = useNavigate();
   const { filter } = usePairDetailSearchFilterStore();
   const isBurnPool = filter.type === 0;
+  const isDesktop = useMediaQuery("(min-width: 640px)");
 
   const columns = [
     "Pool",
@@ -43,7 +45,9 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
   ];
 
   const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
-  const fixWidth: React.CSSProperties["minWidth"] = `350px`;
+  const fixWidth: React.CSSProperties["minWidth"] = isDesktop
+    ? `350px`
+    : "200px";
 
   return (
     <Table>
@@ -55,8 +59,8 @@ const PairDetailGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               className="h-12 pt-2 align-baseline"
               variant="pair"
               style={{
-                width: index === 0 ? fixWidth : cellWidth, // 350px for first column
-                minWidth: index === 0 ? fixWidth : "", // 350px for first column
+                width: index === 0 ? fixWidth : cellWidth,
+                minWidth: index === 0 ? fixWidth : "",
               }}
             >
               {column}
