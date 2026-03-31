@@ -118,7 +118,7 @@ const PairCard = ({ pair }: PairCardProps) => {
             <Button
                 variant="swap"
                 asChild
-                className="mx-auto w-1/2 shrink-0 rounded-13px py-3 text-[16px] md:mx-0 md:w-auto md:px-6 md:py-3 md:text-[15px]"
+                className="mx-auto w-2/3 text-nowrap shrink-0 rounded-13px py-3 text-[16px] md:mx-0 md:w-auto md:px-6 md:py-3 md:text-[15px]"
                 hasHover
             >
                 <Link
