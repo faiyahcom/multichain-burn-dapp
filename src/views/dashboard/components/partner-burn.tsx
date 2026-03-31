@@ -13,6 +13,7 @@ import { useCountdown } from "@/hooks/useCountdown";
 import { formatCountdown } from "@/utils/helpers/string";
 import PartnerBurnBgImage from "/images/dashboard/partner-burn-bg.png";
 import { useNavigate } from "@tanstack/react-router";
+import TokenDisplay from "@/components/common/token-display";
 
 const POOL_LIMIT = 4;
 
@@ -85,10 +86,14 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                 <p className="text-2xl font-semibold sm:text-sm 2xl:text-lg">
                     {rewardFormatted}
                 </p>
-                <TokenImage
-                    src={pool.tokenInImageUri ?? undefined}
-                    alt={symbol}
-                    classNames={{ common: "size-11 sm:size-7.5 2xl:size-11" }}
+                <TokenDisplay
+                    symbol={pool.tokenInSymbol}
+                    customSymbol={pool.tokenInSymbolCustom ?? undefined}
+                    imageUri={pool.tokenInImageUri ?? undefined}
+                    classNames={{
+                        img: "size-11 sm:size-7.5 2xl:size-11",
+                    }}
+                    hasSymbol={false}
                 />
                 {status === "live" && <LiveStatus timeEnd={pool.timeEnd} />}
                 {status === "upcoming" && (
