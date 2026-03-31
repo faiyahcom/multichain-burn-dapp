@@ -27,7 +27,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
 
     return (
         <GlowContainer
-            className="relative aspect-square overflow-hidden p-3 sm:p-1.5 2xl:p-3"
+            className="relative aspect-square overflow-hidden p-1.5 sm:p-1.5 2xl:p-3"
             variant="swap"
         >
             {/* Background */}
