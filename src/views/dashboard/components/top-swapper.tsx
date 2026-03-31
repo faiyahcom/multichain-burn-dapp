@@ -47,7 +47,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
             )}
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-[8.5px] font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 2xl:gap-[8.5px] 2xl:text-tiny">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 sm:py-px font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 2xl:gap-[8.5px] 2xl:text-tiny">
                 {/* Name */}
                 <p className="max-w-full truncate text-center text-[9px] 2xl:text-xs">
                     {displayName}
