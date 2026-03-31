@@ -17,11 +17,21 @@ export const useCreateWhitelistTokenEvmFn = () => {
           throw new Error("Wallet not connected");
         }
 
-        const provider = new ethers.BrowserProvider(walletProvider as Eip1193Provider);
+        const normalizedTokenAddress = ethers.getAddress(tokenAddress.trim());
+        const provider = new ethers.BrowserProvider(
+          walletProvider as Eip1193Provider,
+        );
         const signer = await provider.getSigner();
         const swapFactoryContract = getContractSwapFactory(signer);
+        const isTokenWhitelisted =
+          await swapFactoryContract.isTokenWhitelisted(normalizedTokenAddress);
 
-        const tx = await swapFactoryContract.whitelistToken(tokenAddress);
+        if (isTokenWhitelisted) {
+          throw new Error("Token is already whitelisted on-chain");
+        }
+
+        const tx =
+          await swapFactoryContract.whitelistToken(normalizedTokenAddress);
         const receipt = await tx.wait();
 
         toast.success("Token whitelisted successfully!", {
@@ -29,7 +39,7 @@ export const useCreateWhitelistTokenEvmFn = () => {
         });
 
         return true;
-      } catch (error: any) {
+      } catch (error: unknown) {
         toast.error("Failed to create whitelist token", {
           description: getErrorMessage({ error }),
         });
