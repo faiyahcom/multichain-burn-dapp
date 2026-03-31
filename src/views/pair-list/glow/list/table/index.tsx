@@ -16,6 +16,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PairItemType } from "@/types/pair";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useNavigate } from "@tanstack/react-router";
+import { useMediaQuery } from "usehooks-ts";
 
 interface Props {
   data?: PairItemType[];
@@ -23,10 +24,13 @@ interface Props {
 }
 
 const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
+  const isDesktop = useMediaQuery("(min-width: 640px)");
   const columns = ["Pair", "Volume", "Liquidity", "Network", "Action"];
 
   const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
-  const fixWidth: React.CSSProperties["minWidth"] = `350px`;
+  const fixWidth: React.CSSProperties["minWidth"] = isDesktop
+    ? `300px`
+    : "200px";
 
   const navigate = useNavigate();
 
@@ -39,8 +43,8 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="pair"
               style={{
-                width: index === 0 ? fixWidth : cellWidth, // 350px for first column
-                minWidth: index === 0 ? fixWidth : "", // 350px for first column
+                width: index === 0 ? fixWidth : cellWidth,
+                minWidth: index === 0 ? fixWidth : "",
               }}
             >
               {column}
@@ -115,9 +119,9 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                       alt: tokenInDisplay.symbol,
                     }}
                   />
-                  {/* max-w - 51px - 63px - 13px = max-w - 127px (31.75) */}
+                  {/* max-w - 60px - 13px = max-w - 73px (18.25) */}
                   <span
-                    className="max-w-[calc(var(--max-w)-var(--spacing)*31.75)] min-w-0 truncate"
+                    className="max-w-[calc(var(--max-w)-var(--spacing)*18.25)] min-w-0 truncate"
                     title={`${tokenOutDisplay.symbol} / ${tokenInDisplay.symbol}`}
                   >
                     {tokenOutDisplay.symbol} / {tokenInDisplay.symbol}
@@ -143,7 +147,7 @@ const PairListGlowListTable: React.FC<Props> = ({ data, isLoading }) => {
                   }}
                 />
               </TableCell>
-              <TableCell className="pr-10">
+              <TableCell>
                 <Button
                   variant={"swap"}
                   hasGroupHover
