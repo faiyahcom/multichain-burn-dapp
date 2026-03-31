@@ -3,9 +3,10 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useOnChainVaultBalance } from "@/views/admin/burn/detail/amount-activities/hooks/useOnChainVaultBalance";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -48,22 +49,36 @@ const EndStatus = ({ poolDetail }: Props) => {
     imageUri: poolDetail?.tokenOut?.imageUri,
   });
 
-    const { rewardBalance } = useOnChainVaultBalance({
-        poolAddress: poolDetail?.pool.address,
-        chainId: poolDetail?.pool.chainId,
-        rewardToken: poolDetail?.pool.rewardToken,
-        tokenIn: poolDetail?.pool.tokenIn,
-        rewardTokenDecimals: poolDetail?.pool.rewardTokenDecimals,
-        tokenInDecimals: poolDetail?.pool.tokenInDecimals,
-        assetTypeReward: poolDetail?.pool.assetTypeReward,
-        assetTypeIn: poolDetail?.pool.assetTypeIn,
-    });
+  const { rewardBalance } = useOnChainVaultBalance({
+    poolAddress: poolDetail?.pool.address,
+    chainId: poolDetail?.pool.chainId,
+    rewardToken: poolDetail?.pool.rewardToken,
+    tokenIn: poolDetail?.pool.tokenIn,
+    rewardTokenDecimals: poolDetail?.pool.rewardTokenDecimals,
+    tokenInDecimals: poolDetail?.pool.tokenInDecimals,
+    assetTypeReward: poolDetail?.pool.assetTypeReward,
+    assetTypeIn: poolDetail?.pool.assetTypeIn,
+  });
 
+  const estmatedReward = useMemo(() => {
+    if (!poolDetail) return "-";
     const rewardSymbol =
-        rewardTokenDisplay?.symbol ?? poolDetail?.pool.rewardTokenSymbol ?? "";
-    const estmatedReward = rewardBalance !== undefined
-        ? `${rewardBalance} ${rewardSymbol}`
-        : "-";
+      rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+    const totalDeposited =
+      Number(poolDetail.depositedAmount) /
+      Math.pow(10, poolDetail.pool.tokenInDecimals);
+
+    const yourCurrentDeposited =
+      Number(poolDetail?.userAmount?.deposited) /
+      Math.pow(10, poolDetail.pool.tokenInDecimals);
+    const rewardBalanceNum = rewardBalance !== undefined
+      ? Number(rewardBalance.replace(/,/g, ""))
+      : 0;
+    if (totalDeposited === 0 || rewardBalanceNum === 0 || yourCurrentDeposited === 0)
+      return `0 ${rewardSymbol}`;
+    const reward = (yourCurrentDeposited / totalDeposited) * rewardBalanceNum;
+    return `${shortenNumber({ number: reward })?.toUpperCase()} ${rewardSymbol}`;
+  }, [poolDetail, rewardTokenDisplay, rewardBalance]);
 
   return (
     <PoolChainGuard chainId={poolDetail?.pool.chainId}>

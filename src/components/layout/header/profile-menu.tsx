@@ -46,6 +46,7 @@ const ProfileMenu = ({}: Props) => {
   const avatar = userApiData?.avatar ?? walletInfo?.icon;
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
+
   return (
     <DropdownMenu>
       <div className="flex items-center justify-between gap-3 rounded-18px bg-mb-dark-profile-btn px-3 py-2 sm:pr-6">

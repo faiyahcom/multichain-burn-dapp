@@ -122,6 +122,11 @@ export const navItems: NavItem[] = [
     to: "/settings",
   },
   {
+    label: "Admin Management",
+    section: navSection.admin,
+    to: "/admin/admin-management",
+  },
+  {
     label: "Whitelist Token",
     section: navSection.admin,
     to: "/admin/whitelist-token",

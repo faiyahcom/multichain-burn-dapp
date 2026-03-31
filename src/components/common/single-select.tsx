@@ -22,6 +22,8 @@ interface Props {
   selected?: string;
   onChange?: (value: string) => void;
   placeholder?: string;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
   classNames?: {
     btn?: string;
     content?: string;
@@ -33,6 +35,8 @@ const SingleSelect: React.FC<Props> = ({
   selected,
   onChange,
   placeholder = "Select",
+  open,
+  onOpenChange,
   classNames,
 }) => {
   const selectedOption = options?.find((option) => option.value === selected);
@@ -45,7 +49,7 @@ const SingleSelect: React.FC<Props> = ({
   };
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant={selected ? "mb-active" : "mb-inactive"}

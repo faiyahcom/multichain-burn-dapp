@@ -13,6 +13,7 @@ import {
     type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
 import { getFactoryPDA } from "@/web3/helpers";
+import { DECIMAL_FEE_PERCENT } from "./useFeeSettings";
 
 export type UpdateFeeConfigSolParams = {
     treasury: string;
@@ -54,7 +55,7 @@ export const useUpdateFeeConfigSolFn = () => {
                 );
                 // settlementFee: percentage → basis points (e.g. 5% → 500)
                 const settlementFeeBps = new BN(
-                    Math.round(parseFloat(settlementFee) * 100),
+                    Math.round(parseFloat(settlementFee) * DECIMAL_FEE_PERCENT),
                 );
                 const treasuryPubkey = new PublicKey(treasury);
 

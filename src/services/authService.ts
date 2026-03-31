@@ -25,7 +25,7 @@ export interface SignInResponse {
 export interface UserResponse {
   id: string;
   address: string;
-  role: "normal" | "admin";
+  role: "normal" | "admin" | "super_admin";
   avatar: string | null;
   name: string | null; // nickname
 }

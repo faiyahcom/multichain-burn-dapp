@@ -34,7 +34,7 @@
   { "inputs": [], "name": "InvalidRatio", "type": "error" },
   { "inputs": [], "name": "InvalidSettlementFee", "type": "error" },
   { "inputs": [], "name": "InvalidValue", "type": "error" },
-  { "inputs": [], "name": "NoStateChange", "type": "error" },
+  { "inputs": [], "name": "MustKeepAtLeastOneSuperAdmin", "type": "error" },
   { "inputs": [], "name": "NotAuthorized", "type": "error" },
   { "inputs": [], "name": "NotInitializing", "type": "error" },
   { "inputs": [], "name": "NotPool", "type": "error" },
@@ -769,6 +769,13 @@
   {
     "inputs": [],
     "name": "settlementFee",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "superAdminCount",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"

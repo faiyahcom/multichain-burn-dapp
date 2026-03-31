@@ -4,15 +4,17 @@ import type { PoolDetailResponse } from "@/types/pool";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { truncateString } from "@/utils/helpers/string";
 import CopyableText from "@/components/common/copyable-text";
+import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
+  onPartnerToggleSuccess?: () => void;
 };
 
-const PoolOverview = ({ poolDetail }: Props) => {
+const PoolOverview = ({ poolDetail, onPartnerToggleSuccess }: Props) => {
   const network = poolDetail?.pool?.chainId
     ? chainIdToNetworkConfig(poolDetail.pool.chainId)
     : undefined;
@@ -51,6 +53,16 @@ const PoolOverview = ({ poolDetail }: Props) => {
               displayText={truncateString({
                 str: poolDetail?.pool?.owner || "",
               })}
+            />
+          ),
+        },
+        {
+          label: "Partner Burn",
+          value: (
+            <PartnerBurnSwitch
+              address={poolDetail?.pool?.address}
+              isPartner={poolDetail?.pool?.isPartner}
+              onSuccess={onPartnerToggleSuccess}
             />
           ),
         },
@@ -109,7 +121,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         },
       ],
     ];
-  }, [burnTokenDisplay, network, poolDetail, rewardTokenDisplay]);
+  }, [burnTokenDisplay, network, onPartnerToggleSuccess, poolDetail, rewardTokenDisplay]);
 
   return (
     <div className="mt-3 w-full py-4">
@@ -121,8 +133,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
         <p className="text-[13px] text-greyed">
           {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
             ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
-                Number(poolDetail.pool.timeEnd) * 1000,
-              ).toLocaleDateString()}`
+              Number(poolDetail.pool.timeEnd) * 1000,
+            ).toLocaleDateString()}`
             : "No time limit"}
         </p>
       </div>

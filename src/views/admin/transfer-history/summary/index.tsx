@@ -1,6 +1,5 @@
 import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { whitelistUserService } from "@/services/whitelistUserService";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import type { DialogData } from "./dialog";
@@ -19,15 +18,11 @@ const AdminTransferHistorySummary = () => {
   const groupedAnalysisData: {
     chainId: string;
     txnCount: number;
-    totalAmount: number;
+    totalAmount: number; // this means the number of tokens (different addresses) instead of the total amount
   }[] = useMemo(() => {
     const grouped =
       analysisData?.analysis?.reduce(
         (acc, item) => {
-          const amount = Number(
-            sciToFormatted(item.totalAmount, item.tokenDecimals),
-          );
-
           if (!acc[item.chainId]) {
             acc[item.chainId] = {
               chainId: item.chainId,
@@ -37,7 +32,7 @@ const AdminTransferHistorySummary = () => {
           }
 
           acc[item.chainId].txnCount += item.txnCount;
-          acc[item.chainId].totalAmount += amount;
+          acc[item.chainId].totalAmount += 1;
 
           return acc;
         },

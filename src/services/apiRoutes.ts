@@ -18,6 +18,7 @@ export const API_ROUTES = {
     REASON_CLOSE_POOL: (address: string) => `/pools/${address}/close-reason`,
     STATS: "/pools/stats",
     RECENT_POOLS: "/pools/recent-pools",
+    TOGGLE_PARTNER_POOL: (address: string) => `/pools/${address}/partner`,
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",
@@ -29,9 +30,15 @@ export const API_ROUTES = {
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
-    UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
+    CHECK_USER: "/whitelist-users/check-user",
+    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
+  },
+  ADMINS: {
+    LIST: "/admins",
+    UPSERT_USER: "/admins/user",
+    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
   },
   PAIRS: {
     LIST: "/pairs",
@@ -51,5 +58,9 @@ export const API_ROUTES = {
     PARTNER_POOLS: "/general/partner-pools",
     TOP_PAIR: "/general/top-pair",
     TOP_SWAPPER: "/general/top-swapper",
+  },
+  FEE: {
+    LIST: "/fee",
+    STATS: "/fee/stats",
   },
 } as const;

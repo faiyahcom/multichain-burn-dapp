@@ -83,6 +83,7 @@ export interface PoolDetailResponse {
         rewardAmount: string;
         settlementFee: string;
         poolCreationFee: string;
+        isPartner?: boolean;
     };
     returningAmountOnCanceling?: {
         amount: string;
