@@ -165,8 +165,8 @@ export const BurnSwapHero = ({ data }: Props) => {
                             BURN TRACKER
                         </p>
                     </div>
-                    {/* <img src={BurnTrackerImage} alt="Burn Tracker" /> */}
-                    <IconBurnTracker className="mx-auto w-9/9 2xl:w-auto" />
+                    <img src={BurnTrackerImage} alt="Burn Tracker" />
+                    {/* <IconBurnTracker className="mx-auto w-9/9 2xl:w-auto" /> */}
                     <Button
                         variant="burn"
                         hasHover
