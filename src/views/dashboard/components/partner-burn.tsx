@@ -40,7 +40,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
         pool.rewardAmount,
         pool.tokenOutDecimals,
     );
-    const poolName = truncateString({ str: pool.name, left: 5, right: 5 });
+    const poolName = truncateString({ str: pool.name, left: 10, right: 0 });
     const symbol = pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol;
     const daysUntil = Math.ceil(
         (Number(pool.timeStart) - Math.floor(Date.now() / 1000)) / 86400,
@@ -65,11 +65,11 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
             <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 px-2 py-2 text-center font-inter sm:gap-0 sm:px-1 sm:py-1 2xl:gap-1 2xl:px-2 2xl:py-2">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 px-2 py-2 text-center font-inter sm:gap-0 sm:px-1 sm:py-1.5 2xl:gap-1 2xl:px-2 2xl:py-2">
                 <p className="max-w-full text-xs font-semibold sm:text-tiny 2xl:text-xs">
                     {poolName}
                 </p>
-                <p className="text-2xl font-semibold sm:text-xs 2xl:text-lg">
+                <p className="text-2xl font-semibold sm:text-sm 2xl:text-lg">
                     {rewardFormatted}
                 </p>
                 <TokenDisplay

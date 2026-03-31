@@ -27,7 +27,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
 
     return (
         <GlowContainer
-            className="relative aspect-square overflow-hidden p-3 md:p-1 2xl:p-3"
+            className="relative aspect-square overflow-hidden p-3 sm:p-1.5 2xl:p-3"
             variant="swap"
         >
             {/* Background */}
@@ -47,7 +47,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
             )}
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-[8.5px] font-inter text-[8px] font-medium text-primary-foreground sm:gap-0.5 2xl:gap-[8.5px] 2xl:text-tiny">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-[8.5px] font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 2xl:gap-[8.5px] 2xl:text-tiny">
                 {/* Name */}
                 <p className="max-w-full truncate text-center text-[9px] 2xl:text-xs">
                     {displayName}
@@ -75,13 +75,13 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
 
                 {/* Stats */}
                 <div className="w-full space-y-[8.5px] text-center md:space-y-0.5 2xl:space-y-[8.5px]">
-                    <p className="tracking-[-2%]">
+                    <p className="tracking-[-2%] text-nowrap">
                         Participated swap pools:{" "}
                         <span className="">
                             {swapper?.totalJoinedSwapPools?.toLocaleString() ?? "-"}
                         </span>
                     </p>
-                    <p className="">
+                    <p className="text-nowrap">
                         Swap count:{" "}
                         <span className="">
                             {swapper?.totalSwapTxns?.toLocaleString() ?? "-"}

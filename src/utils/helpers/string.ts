@@ -12,6 +12,9 @@ export const truncateString = ({
   if (typeof str !== "string") {
     return str;
   }
+  if (right === 0) {
+    return str.length > left ? `${str.slice(0, left)}...` : str;
+  }
   if (str.length <= left + right + 1) { // 1 for the ... in the middle
     return str;
   }
