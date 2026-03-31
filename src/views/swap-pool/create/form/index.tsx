@@ -2,6 +2,7 @@ import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { PublicKey } from "@solana/web3.js";
+import { useEffect, useRef } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
 import { useCreateSwapPoolSolanaFn } from "@/views/swap-pool/create/useCreateSwapPoolSolanaFn";
@@ -26,9 +27,12 @@ type CreateSwapPoolFormValues = {
 
 type Props = {
   onSubmitForm?: (values: CreateSwapPoolFormValues) => void;
+  initialTokenBurn?: string;
+  initialTokenReward?: string;
+  initialBudget?: string;
 };
 
-const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
+const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward, initialBudget }: Props) => {
   const { caipAddress } = useAppKitAccount();
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
 
@@ -61,6 +65,20 @@ const CreateSwapPoolForm = ({ onSubmitForm }: Props) => {
 
   const selectedTokenBurn = watch("tokenBurn");
   const selectedTokenReward = watch("tokenReward");
+
+  // Pre-fill from navigation search params (once, on mount)
+  const prefilledRef = useRef(false);
+  useEffect(() => {
+    if (prefilledRef.current) return;
+    prefilledRef.current = true;
+    if (initialTokenBurn)
+      setValue("tokenBurn", initialTokenBurn, { shouldValidate: false });
+    if (initialTokenReward)
+      setValue("tokenReward", initialTokenReward, { shouldValidate: false });
+    if (initialBudget)
+      setValue("budget", initialBudget, { shouldValidate: false });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
     const [rawNumerator, rawDenominator] = values.ratio

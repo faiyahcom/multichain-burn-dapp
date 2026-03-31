@@ -54,6 +54,7 @@ const HeroStatRow = ({
 );
 
 const HeroSwapMiniForm = () => {
+    const navigate = useNavigate();
     const [tokenFrom, setTokenFrom] = useState<TokenOption>();
     const [tokenTo, setTokenTo] = useState<TokenOption>();
     const [amount, setAmount] = useState("");
@@ -122,6 +123,16 @@ const HeroSwapMiniForm = () => {
                 size="big"
                 hasHover
                 className="sm:h-57px sm:w-275px mt-4.5 h-12 w-full font-orbitron text-lg font-medium text-nowrap 2xl:mt-5.5 2xl:text-xl"
+                onClick={() =>
+                    navigate({
+                        to: "/swap/create/",
+                        search: {
+                            tokenFrom: tokenFrom?.address,
+                            tokenTo: tokenTo?.address,
+                            amount: amount || undefined,
+                        },
+                    })
+                }
             >
                 Create Pool
             </Button>
