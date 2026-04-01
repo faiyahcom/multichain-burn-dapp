@@ -43,6 +43,7 @@ const MyActivityList = () => {
           search: filter.text ? filter.text : undefined,
           kinds: convertArrayToStringParam({ array: filter.activityKind }),
         }),
+      enabled: !!user,
     },
   );
 
@@ -79,7 +80,7 @@ const MyActivityList = () => {
             data={userActivities?.activities}
             isLoading={isPendingUserActivities}
           />
-          {userActivities?.activities.map((activity) => {
+          {userActivities?.activities?.map((activity) => {
             const activityLabel = getActivityKindLabel(activity.kind);
             const poolName = activity.pool?.name;
             const poolAddress = activity.poolAddress;
