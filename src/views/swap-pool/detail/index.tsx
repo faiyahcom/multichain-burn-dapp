@@ -5,11 +5,11 @@ import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
 import AmountAndActivity from "./amount-activity";
 import { SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
-import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { SwapPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import ScanLink from "@/components/common/scan-link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SwapPoolStatusDisplay } from "@/components/shared/glow/pool/pool-status";
 
 type Props = {
     address: string;
@@ -24,43 +24,36 @@ const SwapPoolDetail = ({ address }: Props) => {
 
     const status = poolDetail?.pool.status;
     const safeStatus: SwapPoolStatus = (status as SwapPoolStatus) ?? "on_going";
-    const formattedStatus =
-        safeStatus.charAt(0).toUpperCase() +
-        safeStatus.slice(1).split("_").join("");
 
     return (
-        <div className="pt-9.5 pl-14">
-            <div className="space-y-2">
-                <div className="flex items-center gap-6">
-                    {isLoadingPoolDetail ? (
-                        <>
-                            <Skeleton className="h-9 w-48" />
-                            <Skeleton className="h-9 w-27" />
-                        </>
-                    ) : (
-                        <>
-                            <h2 className="text-3xl font-semibold">
+        <div className="pt-9.5 pl-14 space-y-17.5">
+            <div className="flex items-center gap-10">
+                {isLoadingPoolDetail ? (
+                    <>
+                        <Skeleton className="h-9 w-48" />
+                        <Skeleton className="h-9 w-27" />
+                    </>
+                ) : (
+                    <>
+                        <div className="flex flex-col pl-9 gap-2.5">
+                            <h2 className="text-4xl font-semibold">
                                 {poolDetail?.pool.name}
                             </h2>
-                            <AnimateIconButton
-                                iconLetter={SWAP_POOL_STATUS[safeStatus].letter}
-                                textVariant="text-container-center"
-                                text={formattedStatus}
-                                color={SWAP_POOL_STATUS[safeStatus].color}
-                                hasGroupHover
-                                classNames={{
-                                    btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
-                                    text: "text-2xl font-medium",
-                                    icon: "size-9 text-3xl",
-                                }}
+                            <ScanLink
+                                address={address ?? ""}
+                                chainId={poolDetail?.pool.chainId}
+                                className="font-inter text-2xl"
+                                iconClassName="size-3.5"
                             />
-                        </>
-                    )}
-                </div>
-                <ScanLink address={address ?? ""} chainId={poolDetail?.pool.chainId} />
+                        </div>
+                        <SwapPoolStatusDisplay>
+                            {SWAP_POOL_STATUS[safeStatus].label}
+                        </SwapPoolStatusDisplay>
+                    </>
+                )}
             </div>
             <div className="grid grid-cols-3 gap-x-6">
-                <div className="col-span-2">
+                <div className="col-span-2 space-y-9.5">
                     <PoolOverview poolDetail={poolDetail} />
                     <RewardAmount poolDetail={poolDetail} />
                     <PoolHistory poolDetail={poolDetail} />

@@ -2,7 +2,7 @@ import { useState } from "react";
 import ActivitiesHistory from "./activities-history";
 import TransactionHistoryTable from "./transaction-history";
 import type { PoolDetailResponse } from "@/types/pool";
-import clsx from "clsx";
+import { cn } from "@/lib/utils";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -10,72 +10,45 @@ type Props = {
 
 type TabType = "transactions" | "activity";
 
+const TABS: { id: TabType; label: string }[] = [
+    { id: "transactions", label: "Transactions" },
+    { id: "activity", label: "Pool Activity" },
+];
+
 const PoolHistory = ({ poolDetail }: Props) => {
     const [activeTab, setActiveTab] = useState<TabType>("transactions");
 
     return (
-        <div className="mt-3 w-full py-4">
+        <div className="space-y-3">
             {/* Header */}
-            <div className="flex items-center gap-2 pb-6">
-                <div className="h-1.5 w-1.5 bg-black" />
-                <span className="text-xl font-medium">Pool History</span>
-            </div>
+            <div className="flex items-center justify-between">
+                <p className="font-orbitron text-28px font-semibold">Pool History</p>
 
-            {/* Tabs */}
-            <div className="flex items-end gap-10 border-b border-gray-200">
-                {/* Transactions Tab */}
-                <button
-                    onClick={() => setActiveTab("transactions")}
-                    className="relative pb-1 text-lg font-medium transition-colors"
-                >
-                    <span
-                        className={clsx(
-                            "transition-colors",
-                            activeTab === "transactions"
-                                ? "text-black"
-                                : "text-greyed/50 hover:text-greyed"
-                        )}
-                    >
-                        Transactions
-                    </span>
-
-                    {activeTab === "transactions" && (
-                        <div className="absolute left-0 bottom-0 h-1 w-full rounded-full bg-purple-600" />
-                    )}
-                </button>
-
-                {/* Pool Activity Tab */}
-                <button
-                    onClick={() => setActiveTab("activity")}
-                    className="relative pb-1 text-lg font-medium transition-colors"
-                >
-                    <span
-                        className={clsx(
-                            "transition-colors",
-                            activeTab === "activity"
-                                ? "text-black"
-                                : "text-greyed/50 hover:text-greyed"
-                        )}
-                    >
-                        Pool Activity
-                    </span>
-
-                    {activeTab === "activity" && (
-                        <div className="absolute left-0 bottom-0 h-1 w-full rounded-full bg-active" />
-                    )}
-                </button>
+                {/* Tab switcher */}
+                <div className="flex rounded-3xl border-4 border-swap-border/85 bg-mb-dark-popover-item p-1">
+                    {TABS.map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => setActiveTab(tab.id)}
+                            className={cn(
+                                "rounded-18px px-3 py-2 font-inter text-sm font-semibold transition-colors",
+                                activeTab === tab.id
+                                    ? "border border-swap-border/85 bg-swap-border/85 text-foreground"
+                                    : "text-gray-500",
+                            )}
+                        >
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Content */}
-            <>
-                {activeTab === "transactions" && (
-                    <TransactionHistoryTable poolDetail={poolDetail} />
-                )}
-
-                {activeTab === "activity" && (
-                    <ActivitiesHistory poolDetail={poolDetail} />
-                )}
-            </>
+            {activeTab === "transactions" ? (
+                <TransactionHistoryTable poolDetail={poolDetail} />
+            ) : (
+                <ActivitiesHistory poolDetail={poolDetail} />
+            )}
         </div>
     );
 };
