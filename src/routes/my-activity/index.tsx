@@ -1,3 +1,4 @@
+import MyActivitySearch from "@/views/my-activity/search";
 import ProfileLayout from "@/views/profile/layout";
 import { createFileRoute } from "@tanstack/react-router";
 
@@ -6,5 +7,9 @@ export const Route = createFileRoute("/my-activity/")({
 });
 
 function RouteComponent() {
-  return <ProfileLayout></ProfileLayout>;
+  return (
+    <ProfileLayout>
+      <MyActivitySearch />
+    </ProfileLayout>
+  );
 }

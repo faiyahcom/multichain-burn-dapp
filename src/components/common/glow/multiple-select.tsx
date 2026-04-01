@@ -144,7 +144,7 @@ const MultipleSelect: React.FC<Props> = ({
             variant,
             custom: "rounded-5px border-4",
           }),
-          "bg-mb-dark-popover",
+          "bg-mb-dark-popover thin-transparent-scrollbar",
           classNames?.content,
         )}
         // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
@@ -182,7 +182,10 @@ const MultipleSelect: React.FC<Props> = ({
         </div>
         <div className="pl-3">
           <button
-            className={cn("text-15px font-medium text-mb-clear-blue", classNames?.item)}
+            className={cn(
+              "text-15px font-medium text-mb-clear-blue",
+              classNames?.item,
+            )}
             onClick={handleClearAllCheck}
           >
             Clear All
@@ -226,7 +229,11 @@ const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
         ) : (
           <div className="size-7.75" />
         )}
-        <span className={cn("text-15px font-medium select-none", classNames?.item)}>{label}</span>
+        <span
+          className={cn("text-15px font-medium select-none", classNames?.item)}
+        >
+          {label}
+        </span>
       </div>
       {checked ? (
         <IconCheck className="h-2.5 w-3.75 text-mb-check-blue" />

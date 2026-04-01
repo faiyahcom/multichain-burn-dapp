@@ -148,6 +148,8 @@ export const activityKind = {
     40: "Burn Success",
 } as const;
 
+export type ActivityKindKey = keyof typeof activityKind;
+
 export interface PoolActivitiesResponse {
     page: number;
     total: number;
