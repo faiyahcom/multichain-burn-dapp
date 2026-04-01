@@ -11,7 +11,7 @@ import {
     IconBurnTracker,
     IconSwapStatChart,
 } from "@/assets/react";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 import type { StatsStickerResponse } from "@/services/dashboardService";
 import BurnTrackerImage from "/images/dashboard/burn-tracker.png";
 import SwapChartStatsImage from "/images/dashboard/swap-stats.png";
@@ -23,7 +23,6 @@ import WhitelistTokenSelect, {
 } from "@/components/common/glow/whitelist-token-select";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import TokenDisplay from "@/components/common/token-display";
-import { sumTokenAmounts } from "@/utils/shared-functions/calculate";
 
 // ── Shared stat row ────────────────────────────────────────────────────────────
 
@@ -187,7 +186,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         </p>
                     </div>
                     <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase sm:text-[32px]">
-                        {sumTokenAmounts(data?.burnSection?.volume ?? [], true, 2)}
+                        {formatAmount(data?.burnSection?.volume || "0", 0, 2)}
                     </p>
                     <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
                         Total Burned Volume
@@ -242,7 +241,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     <div className="flex items-center justify-between gap-2">
                         <div className="space-y-2.5">
                             <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase sm:text-[32px]">
-                                {sumTokenAmounts(data?.swapSection?.volume ?? [], true, 2)}
+                                {formatAmount(data?.swapSection?.volume ?? "0", 0, 2)}
                             </p>
                             <p className="text-sm font-medium text-mb-gray-b8/60 lg:text-nowrap 2xl:text-base">
                                 Total Swap Volume

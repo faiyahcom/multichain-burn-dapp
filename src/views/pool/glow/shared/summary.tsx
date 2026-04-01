@@ -2,10 +2,9 @@ import GlowSummaryCard from "@/components/common/glow/summary-card";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
-import { sumTokenAmounts } from "@/utils/shared-functions/calculate";
 import { useQuery } from "@tanstack/react-query";
 import { getPoolGlowVariant } from "./helpers";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 
 interface Props {
   poolKind: PoolKindCode;
@@ -18,11 +17,12 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
   });
   const variant = getPoolGlowVariant(poolKind);
 
-  const totalVolume = sumTokenAmounts(
+  const totalVolume = formatAmount(
     overallStats?.[
-      poolKind === PoolKindCodeEnum.Burn ? "totalBurned" : "totalSwapVolume"
-    ] ?? [],
-    false,
+    poolKind === PoolKindCodeEnum.Burn ? "totalBurned" : "totalSwapVolume"
+    ] ?? "0",
+    0,
+    2,
   );
 
   const cards: { title: string; value: string; valueTitle?: string }[] = [
@@ -31,9 +31,7 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
         poolKind === PoolKindCodeEnum.Burn
           ? "Total Burned"
           : "Total Swap Volume",
-      value: shortenNumber({
-        number: Number(totalVolume ?? 0),
-      }).toLocaleUpperCase(),
+      value: totalVolume,
       valueTitle: Number(totalVolume ?? 0).toLocaleString("en-US"),
     },
     {

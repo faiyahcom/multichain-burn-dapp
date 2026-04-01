@@ -17,8 +17,8 @@ import { dashboardQueryKeys } from "@/services/queries/queryKey";
 import TokenListGlow from "@/components/common/glow/token-list";
 import { useScrollingFeed } from "@/hooks/useScrollingFeed";
 import { useActivityStream } from "@/hooks/useActivityStream";
-import { sumTokenAmounts } from "@/utils/shared-functions/calculate";
 import { searchContainerId } from "../pair-list/glow/search";
+import { formatAmount } from "@/utils/helpers/numbers";
 
 const DEFAULT_POOL_LIMIT = 4;
 
@@ -72,8 +72,8 @@ const HomeDashboard = () => {
 
   const tickerItems = data
     ? [
-        `TVL: ${sumTokenAmounts(data.tvl ?? [])}`,
-        `TOTAL VOLUME: ${sumTokenAmounts(data.volume ?? [])}`,
+        `TVL: ${formatAmount(data.tvl, 0, 2)}`,
+        `TOTAL VOLUME: ${formatAmount(data.volume, 0, 2)}`,
         `TOTAL TRANSACTIONS: ${data.totalTxns?.toLocaleString() ?? "-"}`,
         `TOTAL ACTIVITIES: ${data.totalActivities?.toLocaleString() ?? "-"}`,
         `TOTAL POOLS: ${data.totalPools?.toLocaleString() ?? "-"}`,

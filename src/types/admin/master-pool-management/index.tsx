@@ -142,8 +142,8 @@ export type PoolListStatsResponse = {
   totalTransactions: number;
   totalPools: number;
   totalParticipants: number;
-  totalBurned?: TokenAmount[];
-  totalSwapVolume?: TokenAmount[];
+  totalBurned?: string;
+  totalSwapVolume?: string;
 }
 
 // user view pool list can only see certain statuses
