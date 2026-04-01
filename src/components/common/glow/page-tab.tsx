@@ -11,9 +11,9 @@ const PageTab: React.FC<Props> = ({ navItems }) => {
   const currentPath = location.pathname;
 
   return (
-    <>
+    <div className="px-6 sm:px-12">
       <div
-        className="flex items-center gap-4.25 overflow-x-auto px-6 sm:gap-8.5 sm:px-12"
+        className="flex w-full items-center gap-4.25 overflow-x-auto sm:gap-8.5"
         style={{
           scrollbarWidth: "none",
         }}
@@ -53,7 +53,7 @@ const PageTab: React.FC<Props> = ({ navItems }) => {
           );
         })}
       </div>
-    </>
+    </div>
   );
 };
 
