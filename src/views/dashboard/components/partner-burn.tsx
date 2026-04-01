@@ -27,7 +27,7 @@ const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
                 Live {formatCountdown(remaining)}
             </span>
             <span className="text-xs font-semibold sm:text-tiny 2xl:text-xs">
-                JOIN
+                Join
             </span>
         </div>
     );

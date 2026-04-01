@@ -186,7 +186,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                             BURN
                         </p>
                     </div>
-                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase text-burn-glow sm:text-[32px]">
+                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase sm:text-[32px]">
                         {sumTokenAmounts(data?.burnSection?.volume ?? [], true, 2)}
                     </p>
                     <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
@@ -241,7 +241,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     </div>
                     <div className="flex items-center justify-between gap-2">
                         <div className="space-y-2.5">
-                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase text-swap-glow sm:text-[32px]">
+                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase sm:text-[32px]">
                                 {sumTokenAmounts(data?.swapSection?.volume ?? [], true, 2)}
                             </p>
                             <p className="text-sm font-medium text-mb-gray-b8/60 lg:text-nowrap 2xl:text-base">
