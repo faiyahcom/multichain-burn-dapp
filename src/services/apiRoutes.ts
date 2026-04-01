@@ -9,6 +9,7 @@ export const API_ROUTES = {
     GET_POOL_MERKLE_PROOF: (poolAddress: string) =>
       `/users/pools/${poolAddress}/proof`,
     UPDATE_PROFILE: "/users/profile",
+    ACTIVITIES: "/users/activities",
   },
   POOLS: {
     LIST: "/pools",
@@ -31,14 +32,16 @@ export const API_ROUTES = {
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
     CHECK_USER: "/whitelist-users/check-user",
-    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
+    UPDATE_USER_INFO: (address: string, chainId: string) =>
+      `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },
   ADMINS: {
     LIST: "/admins",
     UPSERT_USER: "/admins/user",
-    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
+    DELETE: (chainId: string, address: string) =>
+      `/admins/${chainId}/${address}`,
   },
   PAIRS: {
     LIST: "/pairs",

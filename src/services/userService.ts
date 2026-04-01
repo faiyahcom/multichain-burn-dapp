@@ -1,11 +1,16 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
-import type { AllPoolStatus } from "@/types/admin/master-pool-management";
+import type {
+  AllPoolStatus,
+  PoolType,
+} from "@/types/admin/master-pool-management";
 import type {
   BooleanString,
+  PaginationRequest,
   PaginationResponse,
   SortOrder,
 } from "@/types/common";
+import type { ActivityKindKey } from "@/types/pool";
 
 const USERS_API_ROUTES = API_ROUTES.USERS;
 
@@ -73,6 +78,30 @@ export interface PoolMerkleProofResponse {
   proofIndex: number;
 }
 
+export interface GetUserActivitiesRequest extends PaginationRequest {
+  search?: string;
+  kinds?: string; // comma separated
+}
+
+export interface UserActivityType {
+  id: string;
+  hash: string;
+  log_ix: number;
+  timestamp: string; // timestamp in seconds
+  actor: string; // address
+  kind: ActivityKindKey;
+  poolAddress: string;
+  poolKind: PoolType;
+  pool: {
+    address: string;
+    name: string;
+  } | null;
+}
+
+export interface GetUserActivitiesResponse extends PaginationResponse {
+  activities: UserActivityType[];
+}
+
 export const userService = {
   getParticipatedPoolsByUser: async (
     params: GetParticipatedPoolsByUserParams,
@@ -87,6 +116,16 @@ export const userService = {
   getPoolMerkleProof: async (poolAddress: string) => {
     const response = await apiClient.get<PoolMerkleProofResponse>(
       USERS_API_ROUTES.GET_POOL_MERKLE_PROOF(poolAddress),
+    );
+    return response;
+  },
+
+  getUserActivities: async (params: GetUserActivitiesRequest) => {
+    const response = await apiClient.get<GetUserActivitiesResponse>(
+      USERS_API_ROUTES.ACTIVITIES,
+      {
+        params,
+      },
     );
     return response;
   },

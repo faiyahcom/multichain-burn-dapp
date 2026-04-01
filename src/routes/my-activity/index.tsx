@@ -1,3 +1,4 @@
+import MyActivityList from "@/views/my-activity/list";
 import MyActivitySearch from "@/views/my-activity/search";
 import ProfileLayout from "@/views/profile/layout";
 import { createFileRoute } from "@tanstack/react-router";
@@ -10,6 +11,7 @@ function RouteComponent() {
   return (
     <ProfileLayout>
       <MyActivitySearch />
+      <MyActivityList />
     </ProfileLayout>
   );
 }
