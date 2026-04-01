@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { useId } from "react";
 
 const ContainerVariants = ["pair", "burn", "swap"] as const;
 
@@ -224,6 +225,7 @@ const GlowContainer = ({
   hasShadow = true,
   hasBg = true,
   onClick,
+  id,
 }: {
   variant: ContainerVariant;
   className?: string;
@@ -232,7 +234,11 @@ const GlowContainer = ({
   hasShadow?: boolean;
   hasBg?: boolean;
   onClick?: () => void;
+  id?: string;
 }) => {
+  const reactId = useId();
+  const containerId = id ?? reactId;
+
   return (
     <div
       className={cn(
@@ -242,6 +248,7 @@ const GlowContainer = ({
         className,
       )}
       onClick={onClick}
+      id={containerId}
     >
       {children}
     </div>
