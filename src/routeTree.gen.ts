@@ -19,6 +19,7 @@ import { Route as PairListIndexRouteImport } from './routes/pair-list/index'
 import { Route as MyParticipatedPoolsIndexRouteImport } from './routes/my-participated-pools/index'
 import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/index'
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
+import { Route as MyActivityIndexRouteImport } from './routes/my-activity/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
@@ -87,6 +88,11 @@ const MyDashboardIndexRoute = MyDashboardIndexRouteImport.update({
 const MyCreatePoolsIndexRoute = MyCreatePoolsIndexRouteImport.update({
   id: '/my-create-pools/',
   path: '/my-create-pools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MyActivityIndexRoute = MyActivityIndexRouteImport.update({
+  id: '/my-activity/',
+  path: '/my-activity/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const BurnIndexRoute = BurnIndexRouteImport.update({
@@ -186,6 +192,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
   '/burn': typeof BurnIndexRoute
+  '/my-activity': typeof MyActivityIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
   '/my-participated-pools': typeof MyParticipatedPoolsIndexRoute
@@ -215,6 +222,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
   '/burn': typeof BurnIndexRoute
+  '/my-activity': typeof MyActivityIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
   '/my-participated-pools': typeof MyParticipatedPoolsIndexRoute
@@ -245,6 +253,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/activity-history/': typeof ActivityHistoryIndexRoute
   '/burn/': typeof BurnIndexRoute
+  '/my-activity/': typeof MyActivityIndexRoute
   '/my-create-pools/': typeof MyCreatePoolsIndexRoute
   '/my-dashboard/': typeof MyDashboardIndexRoute
   '/my-participated-pools/': typeof MyParticipatedPoolsIndexRoute
@@ -276,6 +285,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history'
     | '/burn'
+    | '/my-activity'
     | '/my-create-pools'
     | '/my-dashboard'
     | '/my-participated-pools'
@@ -305,6 +315,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history'
     | '/burn'
+    | '/my-activity'
     | '/my-create-pools'
     | '/my-dashboard'
     | '/my-participated-pools'
@@ -334,6 +345,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history/'
     | '/burn/'
+    | '/my-activity/'
     | '/my-create-pools/'
     | '/my-dashboard/'
     | '/my-participated-pools/'
@@ -364,6 +376,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivityHistoryIndexRoute: typeof ActivityHistoryIndexRoute
   BurnIndexRoute: typeof BurnIndexRoute
+  MyActivityIndexRoute: typeof MyActivityIndexRoute
   MyCreatePoolsIndexRoute: typeof MyCreatePoolsIndexRoute
   MyDashboardIndexRoute: typeof MyDashboardIndexRoute
   MyParticipatedPoolsIndexRoute: typeof MyParticipatedPoolsIndexRoute
@@ -460,6 +473,13 @@ declare module '@tanstack/react-router' {
       path: '/my-create-pools'
       fullPath: '/my-create-pools'
       preLoaderRoute: typeof MyCreatePoolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/my-activity/': {
+      id: '/my-activity/'
+      path: '/my-activity'
+      fullPath: '/my-activity'
+      preLoaderRoute: typeof MyActivityIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/burn/': {
@@ -588,6 +608,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityHistoryIndexRoute: ActivityHistoryIndexRoute,
   BurnIndexRoute: BurnIndexRoute,
+  MyActivityIndexRoute: MyActivityIndexRoute,
   MyCreatePoolsIndexRoute: MyCreatePoolsIndexRoute,
   MyDashboardIndexRoute: MyDashboardIndexRoute,
   MyParticipatedPoolsIndexRoute: MyParticipatedPoolsIndexRoute,
