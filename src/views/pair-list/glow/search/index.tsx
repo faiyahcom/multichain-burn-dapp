@@ -6,6 +6,8 @@ import SortSelect from "@/components/common/glow/sort-select";
 import TokenListGlow from "@/components/common/glow/token-list";
 import { usePairListSearchFilterStore } from "@/stores/pair-list/search-filter-store";
 
+export const searchContainerId = "pair-list-search-container";
+
 const PairListGlowSearch = () => {
   const { filter, setFilter } = usePairListSearchFilterStore();
   return (
@@ -21,6 +23,7 @@ const PairListGlowSearch = () => {
       <GlowContainer
         variant="pair"
         className="flex flex-col gap-3 p-3 md:p-6 xl:flex-row"
+        id={searchContainerId}
       >
         <SearchTextDebouncedInput
           variant="pair"
