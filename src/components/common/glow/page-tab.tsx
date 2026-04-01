@@ -13,7 +13,7 @@ const PageTab: React.FC<Props> = ({ navItems }) => {
   return (
     <>
       <div
-        className="flex items-center gap-4.25 overflow-y-auto px-6 sm:gap-8.5 sm:px-12"
+        className="flex items-center gap-4.25 overflow-x-auto px-6 sm:gap-8.5 sm:px-12"
         style={{
           scrollbarWidth: "none",
         }}

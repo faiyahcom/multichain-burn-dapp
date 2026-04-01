@@ -17,6 +17,6 @@ export const leftSelectedPanelClassName = ({
 }: {
   isSelected: boolean;
 }) =>
-  cn("duration-300 group-hover:bg-mb-btn-swap", {
+  cn("transition-colors duration-300 group-hover:bg-mb-btn-swap", {
     "bg-mb-btn-swap": isSelected,
   });
