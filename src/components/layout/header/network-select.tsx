@@ -1,3 +1,8 @@
+import {
+  contentClassName,
+  itemClassName,
+  leftSelectedPanelClassName,
+} from "@/components/common/glow/dropdown-menu-classnames";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -7,7 +12,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { appKit } from "@/config/appkit";
 import { NETWORK_CONFIGS, type NetworkConfig } from "@/config/networks";
-import { cn } from "@/lib/utils";
 import { useSystemStore } from "@/stores/systemStore";
 import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import NetworkIcon from "./network-icon";
@@ -62,7 +66,7 @@ export default function NetworkSelect() {
       <DropdownMenuContent
         align="end"
         alignOffset={8}
-        className="min-w-56 rounded-lg border-transparent"
+        className={contentClassName()}
       >
         <div className="space-y-1 rounded-sm">
           {NETWORK_CONFIGS.map((network) => {
@@ -71,20 +75,11 @@ export default function NetworkSelect() {
               <DropdownMenuItem
                 key={network.id}
                 onClick={() => handleNetworkChange(network)}
-                className={cn(
-                  "flex items-center gap-3 rounded-5px px-4 py-2",
-                  "transition-colors duration-300",
-                  "border border-mb-dark-popover-item-border bg-mb-dark-popover-item",
-                  "hover:border-transparent hover:bg-mb-btn-swap/50",
-                  { "border-transparent bg-mb-btn-swap/50": isSelected },
-                )}
+                className={itemClassName({ isSelected })}
                 isSelected={isSelected}
-                leftSelectedPanelClassName={cn(
-                  "duration-300 group-hover:bg-mb-btn-swap",
-                  {
-                    "bg-mb-btn-swap": isSelected,
-                  },
-                )}
+                leftSelectedPanelClassName={leftSelectedPanelClassName({
+                  isSelected,
+                })}
               >
                 <NetworkIcon networkId={network.id} />
                 <div className="flex flex-1 justify-center">
