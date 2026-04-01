@@ -9,10 +9,8 @@ export const poolQueryKeys = {
     ["pools", "activities", address, page, excludeKinds] as const,
   list: (params?: Record<string, unknown>) =>
     ["pools", "list", params] as const,
-  stats: (poolKind: PoolKindCode) =>
-    ["pools", "stats", poolKind] as const,
-  recents: (poolKind: PoolKindCode) =>
-    ["pools", "recents", poolKind] as const,
+  stats: (poolKind: PoolKindCode) => ["pools", "stats", poolKind] as const,
+  recents: (poolKind: PoolKindCode) => ["pools", "recents", poolKind] as const,
 };
 
 export const whitelistQueryKeys = {
@@ -23,6 +21,7 @@ export const whitelistQueryKeys = {
 export const userQueryKeys = {
   participatedPools: (params?: unknown) =>
     ["users", "participatedPools", params] as const,
+  activities: (params?: unknown) => ["users", "activities", params] as const,
 };
 
 export const whitelistUserQueryKeys = {
@@ -67,8 +66,7 @@ export const transferHistoryQueryKeys = {
 };
 
 export const feeQueryKeys = {
-  list: (params?: Record<string, unknown>) =>
-    ["fee", "list", params] as const,
+  list: (params?: Record<string, unknown>) => ["fee", "list", params] as const,
   stats: (params?: Record<string, unknown>) =>
     ["fee", "stats", params] as const,
 };

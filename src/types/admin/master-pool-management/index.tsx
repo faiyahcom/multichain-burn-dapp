@@ -1,4 +1,3 @@
-import type { TokenAmount } from "@/services/dashboardService";
 import type {
   BooleanString,
   PaginationRequest,
