@@ -144,7 +144,7 @@ const MultipleSelect: React.FC<Props> = ({
             variant,
             custom: "rounded-5px border-4",
           }),
-          "bg-mb-dark-popover thin-transparent-scrollbar",
+          "bg-mb-dark-popover",
           classNames?.content,
         )}
         // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
@@ -160,7 +160,7 @@ const MultipleSelect: React.FC<Props> = ({
             content max height - padding top (9px) - footer clear all (24px + 24px + 27px) 
             content max height - 84px (21 spacing)
         */}
-        <div className="max-h-[calc(var(--radix-popover-content-available-height)-var(--spacing)*21)] space-y-1 overflow-y-auto">
+        <div className="max-h-[calc(var(--radix-popover-content-available-height)-var(--spacing)*21)] space-y-1 overflow-y-auto thin-transparent-scrollbar">
           <OptionItem
             label={allLabel}
             value=""
