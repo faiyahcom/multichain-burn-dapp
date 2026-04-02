@@ -65,7 +65,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
         placeholder="Status"
         placeholderMultiple="All Statuses"
         classNames={{
-          btn: "xl:max-w-100",
+          btn: "w-full xl:max-w-65",
         }}
       />
       <NetworkMultipleSelect
@@ -74,7 +74,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
         onChange={(value) => setFilter?.({ network: value })}
         otherProps={{
           classNames: {
-            btn: "xl:max-w-[400px]",
+            btn: "w-full xl:max-w-100",
           },
         }}
       />
@@ -86,7 +86,8 @@ const ProfilePoolSearch: React.FC<Props> = ({
         setSortOrder={(sortOrder) => setFilter?.({ sortOrder })}
         variant="pair"
         classNames={{
-          btn: "max-xl:w-full",
+          container: "w-full xl:max-w-100",
+          btn: "w-full",
         }}
       />
     </GlowContainer>

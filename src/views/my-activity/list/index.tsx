@@ -173,7 +173,7 @@ const renderDescription = (activity: UserActivityType) => {
   if ([0, 1, 5].includes(kind)) {
     const poolName = pool?.name;
     return (
-      <p title={poolName} className="min-w-0 truncate">
+      <p title={poolName} className="min-w-0 truncate text-left">
         {poolName}
       </p>
     );
@@ -182,24 +182,37 @@ const renderDescription = (activity: UserActivityType) => {
   // Deposit reward token, Deposit burn token, Claim reward
   if ([10, 30, 31].includes(kind)) {
     return (
-      <MetricNumber number={uiAmountIn} unit={pool?.tokenInSymbol} isShorten />
+      <MetricNumber
+        number={uiAmountIn}
+        unit={pool?.tokenInSymbol}
+        isShorten
+        classNames={{
+          container: "justify-start",
+        }}
+      />
     );
   }
 
   // Swap
   if (kind === 32) {
     return (
-      <div className="flex items-center justify-center gap-1 max-xl:flex-wrap">
+      <div className="flex flex-wrap items-center justify-start gap-1">
         <MetricNumber
           number={uiAmountIn}
           unit={pool?.tokenInSymbol}
           isShorten
+          classNames={{
+            container: "max-w-max",
+          }}
         />
         <ArrowRight className="size-4 shrink-0 sm:size-6" />
         <MetricNumber
           number={uiAmountOut}
           unit={pool?.rewardTokenSymbol}
           isShorten
+          classNames={{
+            container: "max-w-max",
+          }}
         />
       </div>
     );

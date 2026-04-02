@@ -148,6 +148,7 @@ const ProfilePoolListBurn: React.FC<Props> = ({
                       common: "sm:size-7 sm:-ml-[9px] z-10",
                     },
                   }}
+                  className="justify-center"
                 />
               </TableCell>
               <TableCell>
