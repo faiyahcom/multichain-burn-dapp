@@ -154,7 +154,7 @@ const CreateSwapPoolForm = ({
 
   return (
     <form
-      className="w-full max-w-2xl space-y-15 font-inter"
+      className="w-full space-y-4 font-inter md:max-w-lg md:space-y-6 lg:max-w-xl lg:space-y-8 xl:max-w-2xl xl:space-y-12 2xl:space-y-15"
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col gap-2">
@@ -166,7 +166,7 @@ const CreateSwapPoolForm = ({
             getVariantBgClassName({
               variant: "swap",
             }),
-            "border-2 text-[23px] font-medium pl-4",
+            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
           )}
           {...register("poolName", {
             validate: {
@@ -197,10 +197,14 @@ const CreateSwapPoolForm = ({
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <span className="text-3xl font-medium">Pool Info</span>
-        <div className="flex justify-between gap-6">
-          <div className="flex w-md flex-col gap-2">
-            <span className="text-[23px]">Token Burn</span>
+        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          Pool Info
+        </span>
+        <div className="flex">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Token Burn
+            </span>
             <WhitelistTokenSelect
               variant="swap"
               value={selectedTokenBurn}
@@ -210,11 +214,12 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "px-4 py-2 text-[23px] font-medium",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
                   getVariantBorderClassName({ variant: "swap" }),
                 ),
-                triggerContent: "text-[23px] font-medium",
-                icon: "size-5",
+                triggerContent:
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                // icon: "size-3.5 md:size-4 lg:size-5",
               }}
             />
             <input
@@ -229,7 +234,7 @@ const CreateSwapPoolForm = ({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-[23px]">
+          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
             Ratio{" "}
             <InfoTooltip
               variant="swap"
@@ -248,8 +253,8 @@ const CreateSwapPoolForm = ({
               aria-invalid={!!errors.ratio}
               variant="swap"
               className={cn(
-                "border-2 py-1.5 text-[23px] font-medium",
-                "w-20 bg-transparent px-2 text-center placeholder:text-center",
+                "border-2 py-1 text-xs font-medium sm:text-sm md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                "w-10 bg-transparent px-2 text-center placeholder:text-center sm:w-12 md:w-14 lg:w-16 2xl:w-20",
               )}
               {...register("ratio", {
                 required: "Ratio is required",
@@ -272,7 +277,7 @@ const CreateSwapPoolForm = ({
                 },
               })}
             />
-            <RadioGroup value="fixed" asChild>
+            <RadioGroup variant="swap" value="fixed" asChild>
               <RadioGroupItem
                 value="fixed"
                 className={cn(
@@ -281,10 +286,10 @@ const CreateSwapPoolForm = ({
                     custom: "rounded-md border-2",
                   }),
                   getVariantBgClassName({ variant: "swap" }),
-                  "px-3 py-2",
+                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
                 )}
               >
-                <span>Fixed</span>
+                Fixed
               </RadioGroupItem>
             </RadioGroup>
           </div>
@@ -295,10 +300,14 @@ const CreateSwapPoolForm = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-3xl font-medium">Reward Config</span>
-        <div className="flex justify-between gap-6">
-          <div className="flex w-md flex-col gap-2">
-            <span className="text-[23px]">Token Reward</span>
+        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          Reward Config
+        </span>
+        <div className="flex">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Token Reward
+            </span>
             <WhitelistTokenSelect
               value={selectedTokenReward}
               onChange={(token) =>
@@ -309,11 +318,12 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "px-4 py-2 text-[23px] font-medium",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
                   getVariantBorderClassName({ variant: "swap" }),
                 ),
-                triggerContent: "text-[23px] font-medium",
-                icon: "size-5",
+                triggerContent:
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                // icon: "size-3.5 md:size-4 lg:size-5",
               }}
             />
             <input
@@ -330,13 +340,15 @@ const CreateSwapPoolForm = ({
           </div>
         </div>
 
-        <span className="text-[23px]">Budget</span>
+        <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+          Budget
+        </span>
         <Input
           variant="swap"
           placeholder="0.0"
           aria-invalid={!!errors.budget}
           className={cn(
-            "max-w-40 border-2 bg-transparent py-1.5 pl-4 text-[23px] font-medium",
+            "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-52 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
           )}
           type="number"
           step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
@@ -372,30 +384,34 @@ const CreateSwapPoolForm = ({
           <p className="text-xs text-destructive">{errors.budget.message}</p>
         )}
 
-        <div className="flex gap-3.75">
+        <div className="flex flex-wrap gap-2 md:gap-3 2xl:gap-3.75">
           <div className="flex flex-col justify-end gap-2">
-            <span className="text-3xl font-medium">Network</span>
+            <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+              Network
+            </span>
             <div
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex gap-2 px-14 py-2 text-[23px] text-nowrap",
+                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:py-2 2xl:text-[23px]",
                 "rounded-md border-2",
               )}
             >
               <NetworkIcon
                 networkId={network?.id || ("" as NetworkId)}
-                className="absolute left-4 size-5.75"
+                className="size-3.5 md:size-4 2xl:size-5.75"
               />
               <span>{network?.label}</span>
             </div>
           </div>
 
           <div className="flex flex-col justify-end gap-2">
-            <span className="text-[23px]">Burn Method</span>
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Burn Method
+            </span>
             <span
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex gap-2 px-14 py-2 text-[23px] text-nowrap",
+                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:py-2 2xl:text-[23px]",
                 "rounded-md border-2",
               )}
             >
@@ -411,7 +427,7 @@ const CreateSwapPoolForm = ({
           type="submit"
           hasHover
           isLoading={isSubmitting}
-          className="w-76.25 text-center font-orbitron text-2xl font-semibold"
+          className="w-full text-center font-orbitron text-sm font-semibold md:w-64 md:text-base lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </Button>

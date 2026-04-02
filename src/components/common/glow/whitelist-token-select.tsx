@@ -184,15 +184,16 @@ const WhitelistTokenSelect = ({
         )}
       >
         {resolvedValue ? (
-          <div
-            className={cn("flex items-center gap-4", classNames.triggerContent)}
-          >
+          <div className={cn("flex items-center", classNames.triggerContent)}>
             <TokenDisplay
               symbol={resolvedValue.customSymbol ?? resolvedValue.symbol}
               customSymbol={resolvedValue.customSymbol ?? resolvedValue.symbol}
               imageUri={resolvedValue.imageUri ?? undefined}
               classNames={{ img: "size-5", container: "space-x-1" }}
             />
+            <span>
+              &nbsp;{`(${resolvedValue.customName ?? resolvedValue.name})`}
+            </span>
           </div>
         ) : (
           "Select Token"

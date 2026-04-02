@@ -4,7 +4,6 @@ import { cn } from "@/lib/utils";
 import type { ContainerVariant } from "./container";
 import {
     getVariantBorderClassName,
-    getVariantActiveBgGradientClassName,
     getVariantBtnBgClassName,
 } from "./container";
 
@@ -91,7 +90,7 @@ function RadioGroupItem({
                 // Active: variant border + gradient bg + full text
                 isChecked &&
                 getVariantBorderClassName({ variant, custom: "rounded-lg" }),
-                isChecked && getVariantActiveBgGradientClassName({ variant }),
+                // isChecked && getVariantActiveBgGradientClassName({ variant }),
                 isChecked && "text-foreground",
                 className,
             )}
