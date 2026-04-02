@@ -2,18 +2,19 @@ import React from "react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import GlowContainer from "@/components/common/glow/container";
 
 // ─────────────────────────────────────────────────────────────
 // Container
 // ─────────────────────────────────────────────────────────────
 
 export const Container = ({ children }: { children?: React.ReactNode }) => (
-    <div className="mt-3 w-full space-y-3 px-6 py-4">
-        <span className="flex items-center gap-2 text-xl font-medium">
+    <GlowContainer variant="burn" className="w-full space-y-3 px-3 py-4 font-inter md:px-5 md:py-6">
+        <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">
             Amount & Activity
-        </span>
+        </p>
         {children}
-    </div>
+    </GlowContainer>
 );
 
 // ─────────────────────────────────────────────────────────────
@@ -68,7 +69,7 @@ export const StatRow = ({
     valueClassName?: string;
 }) => (
     <div className={`flex items-center justify-between gap-0.5 ${className}`}>
-        <span className="text-sm">{label}</span>
+        <span className="text-sm md:text-base lg:text-lg 2xl:text-xl">{label}</span>
         <span className={valueClassName}>{value}</span>
     </div>
 );

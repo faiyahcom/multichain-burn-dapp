@@ -1,4 +1,3 @@
-import CustomPagination from "@/components/common/pagination";
 import {
     Table,
     TableBody,
@@ -6,26 +5,21 @@ import {
     TableHead,
     TableHeader,
     TableRow,
-} from "@/components/ui/table";
+} from "@/components/common/glow/table";
+import TableNoData from "@/components/common/glow/table-no-data";
+import TableSkeleton from "@/components/common/glow/table-skeleton";
+import { IconGoTo } from "@/assets/react";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { txnKind, type PoolDetailResponse } from "@/types/pool";
 import { formatAmount } from "@/utils/helpers/numbers";
+import { getExplorerTxUrl } from "@/utils/helpers/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-
-function getExplorerTxUrl(chainId: string, hash: string): string {
-    const network = chainIdToNetworkConfig(chainId);
-    const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
-    if (!baseUrl) return "#";
-    // Solana explorer uses different path format
-    if (network?.id === "solanaDevnet") {
-        return `${baseUrl.replace(/\/$/, "")}/tx/${hash}?cluster=devnet`;
-    }
-    return `${baseUrl.replace(/\/$/, "")}/tx/${hash}`;
-}
+import CustomPagination from "@/components/common/glow/glow-pagination";
+import GlowContainer from "@/components/common/glow/container";
 
 export function formatTimestamp(timestamp: string): string {
     const date = new Date(Number(timestamp) * 1000);
@@ -99,93 +93,85 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
 
     const txns = poolTxns?.txns ?? [];
 
-    if (isLoading) {
-        return (
-            <div className="w-full py-8 text-center text-greyed">
-                Loading transactions...
-            </div>
-        );
-    }
-
-    if (txns.length === 0) {
-        return (
-            <div className="w-full py-8 text-center text-greyed">
-                No transactions yet
-            </div>
-        );
-    }
-
     return (
-        <>
-            <Table className="mb-2 border-spacing-y-0 rounded-b-lg border border-progress-bg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Time
-                        </TableHead>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Action
-                        </TableHead>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Amount
-                        </TableHead>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Token
-                        </TableHead>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Tx Hash
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
-                    {txns.map((tx) => {
-                        const hasAmountIn =
-                            tx.amountIn != null &&
-                            tx.amountIn.toString() !== "0" &&
-                            tx.tokenInDecimals != null;
-                        const hasAmountOut =
-                            tx.amountOut != null &&
-                            tx.amountOut.toString() !== "0" &&
-                            tx.tokenOutDecimals != null;
-                        const amount = hasAmountIn
-                            ? formatAmount(tx.amountIn, tx.tokenInDecimals)
-                            : hasAmountOut
-                                ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
-                                : "—";
-                        const token = hasAmountIn
-                            ? resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)
-                            : hasAmountOut
-                                ? resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)
-                                : "—";
-                        const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
+        <div className="space-y-9.5">
+            <GlowContainer
+                variant="burn"
+                className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
+            >
+                <Table className="py-6 sm:border-spacing-y-5">
+                    <TableHeader>
+                        <TableRow>
+                            {["Time", "Action", "Amount", "Token", "Tx Hash"].map((col) => (
+                                <TableHead
+                                    key={col}
+                                    variant="burn"
+                                    className="font-orbitron text-sm md:text-base lg:text-xl 2xl:text-28px"
+                                >
+                                    {col}
+                                </TableHead>
+                            ))}
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        <TableSkeleton colCount={5} rowCount={3} isLoading={isLoading} />
+                        <TableNoData colSpan={5} data={txns} isLoading={isLoading} />
+                        {txns.map((tx) => {
+                            const hasAmountIn =
+                                tx.amountIn != null &&
+                                tx.amountIn.toString() !== "0" &&
+                                tx.tokenInDecimals != null;
+                            const hasAmountOut =
+                                tx.amountOut != null &&
+                                tx.amountOut.toString() !== "0" &&
+                                tx.tokenOutDecimals != null;
+                            const amount = hasAmountIn
+                                ? formatAmount(tx.amountIn, tx.tokenInDecimals)
+                                : hasAmountOut
+                                    ? formatAmount(tx.amountOut, tx.tokenOutDecimals)
+                                    : "—";
+                            const token = hasAmountIn
+                                ? resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)
+                                : hasAmountOut
+                                    ? resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)
+                                    : "—";
+                            const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
-                        return (
-                            <TableRow key={tx.id} className="text-base text-greyed">
-                                <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
-                                <TableCell>{txnKind[tx.kind]}</TableCell>
-                                <TableCell>{amount}</TableCell>
-                                <TableCell>{token}</TableCell>
-                                <TableCell>
-                                    <a
-                                        href={explorerUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                    >
-                                        {`${tx.hash.slice(0, 6)}...${tx.hash.slice(-4)}`}
-                                    </a>
-                                </TableCell>
-                            </TableRow>
-                        );
-                    })}
-                </TableBody>
-            </Table>
+                            return (
+                                <TableRow
+                                    key={tx.id}
+                                    variant="burn"
+                                    className="text-xs md:text-sm lg:text-base 2xl:text-xl"
+                                >
+                                    <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
+                                    <TableCell>{txnKind[tx.kind]}</TableCell>
+                                    <TableCell>{amount}</TableCell>
+                                    <TableCell>{token}</TableCell>
+                                    <TableCell>
+                                        <a
+                                            href={explorerUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-baseline gap-2 transition-colors"
+                                        >
+                                            {`${tx.hash.slice(0, 6)}...${tx.hash.slice(-4)}`}
+                                            <IconGoTo className="size-3.5" />
+                                        </a>
+                                    </TableCell>
+                                </TableRow>
+                            );
+                        })}
+                    </TableBody>
+                </Table>
+            </GlowContainer>
             <CustomPagination
                 currentPage={page}
                 totalCount={poolTxns?.total || 0}
                 pageSize={DEFAULT_PAGE_SIZE}
                 onPageChange={(page) => setPage(page)}
+                variant="burn"
             />
-        </>
+        </div>
     );
 };
 

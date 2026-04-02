@@ -1,5 +1,3 @@
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
@@ -7,16 +5,20 @@ import { useCreateBurnPoolEvmFn } from "../useCreateBurnPoolEvmFn";
 import { useCreateBurnPoolSolFn } from "../useCreateBurnPoolSolFn";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
-import AnimateIconButton from "@/components/common/animate-icon-button";
-import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
-import { DatePicker } from "@/components/ui/date-picker";
 import NetworkIcon from "@/components/layout/header/network-icon";
+import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
+import DatePicker from "@/components/common/date-picker";
+import { cn } from "@/lib/utils";
+import {
+  getVariantBgClassName,
+  getVariantBorderClassName,
+} from "@/components/common/glow/container";
+import { Button } from "@/components/common/glow/button";
+import { Input } from "@/components/common/glow/input";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
   tokenBurn: string;
-  ratio: string;
-  budget: string;
   tokenReward: string;
   startTime: Date;
   endTime: Date;
@@ -112,13 +114,18 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
 
   return (
     <form
-      className="w-full max-w-xl space-y-4"
+      className="w-full space-y-4 font-inter md:max-w-lg md:space-y-6 lg:max-w-xl lg:space-y-8 xl:max-w-2xl xl:space-y-12 2xl:space-y-15"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="mb-8 flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <Input
-          placeholder="Enter Pool Name"
+          placeholder="Enter pool name"
           aria-invalid={!!errors.poolName}
+          variant="burn"
+          className={cn(
+            getVariantBgClassName({ variant: "burn" }),
+            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+          )}
           {...register("poolName", {
             validate: {
               required: (poolName) => {
@@ -147,17 +154,30 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-xl font-medium">Pool Info</span>
-        <div className="flex justify-between gap-6">
-          <div className="flex w-md flex-col gap-2">
-            <span className="text-[13px]">Token Burn</span>
+      <div className="flex flex-col gap-2.5">
+        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          Pool Info
+        </span>
+        <div className="flex">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Token Burn
+            </span>
             <WhitelistTokenSelect
+              variant="burn"
               value={selectedTokenBurn}
-              onChange={(address) =>
-                setValue("tokenBurn", address, { shouldValidate: true })
+              onChange={(token) =>
+                setValue("tokenBurn", token?.address, { shouldValidate: true })
               }
               disabledAddress={selectedTokenReward}
+              classNames={{
+                trigger: cn(
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
+                  getVariantBorderClassName({ variant: "burn" }),
+                ),
+                triggerContent:
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+              }}
             />
             <input
               type="hidden"
@@ -171,18 +191,28 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
           </div>
         </div>
 
-        <div className="flex gap-6">
+        <div className="flex flex-wrap gap-4 md:gap-6">
           <div className="flex flex-col gap-2">
-            <span className="text-[13px]">Start Time</span>
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Start Time
+            </span>
             <DatePicker
               value={startTime}
-              onChange={(date) =>
+              onChange={(date: Date | undefined) =>
                 setValue("startTime", date as Date, { shouldValidate: true })
               }
-              disabled={(date) => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                return date < today || (endTime ? date > endTime : false);
+              classNames={{
+                btn: cn(
+                  getVariantBorderClassName({ variant: "burn" }),
+                  "border-2 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                ),
+              }}
+              calendarProps={{
+                disabled: (date: Date) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return date < today || (endTime ? date > endTime : false);
+                },
               }}
             />
             <input
@@ -205,16 +235,26 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <span className="text-[13px]">End Time</span>
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              End Time
+            </span>
             <DatePicker
               value={endTime}
-              onChange={(date) =>
+              onChange={(date: Date | undefined) =>
                 setValue("endTime", date as Date, { shouldValidate: true })
               }
-              disabled={(date) => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                return date < today || (startTime ? date < startTime : false);
+              classNames={{
+                btn: cn(
+                  getVariantBorderClassName({ variant: "burn" }),
+                  "border-2 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                ),
+              }}
+              calendarProps={{
+                disabled: (date: Date) => {
+                  const today = new Date();
+                  today.setHours(0, 0, 0, 0);
+                  return date < today || (startTime ? date < startTime : false);
+                },
               }}
             />
             <input
@@ -237,92 +277,92 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             )}
           </div>
         </div>
+      </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-[13px]">Ratio</span>
-          <RadioGroup value="dynamic" className="m-0 flex items-center p-0">
-            <RadioGroupItem value="dynamic">
-              <span className="text-[13px] font-normal">Dynamic</span>
-            </RadioGroupItem>
-          </RadioGroup>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          Reward Config
+        </span>
+        <div className="flex">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Token Reward
+            </span>
+            <WhitelistTokenSelect
+              variant="burn"
+              value={selectedTokenReward}
+              onChange={(token) =>
+                setValue("tokenReward", token?.address, { shouldValidate: true })
+              }
+              disabledAddress={selectedTokenBurn}
+              classNames={{
+                trigger: cn(
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
+                  getVariantBorderClassName({ variant: "burn" }),
+                ),
+                triggerContent:
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+              }}
+            />
+            <input
+              type="hidden"
+              {...register("tokenReward", {
+                required: "Reward token is required",
+              })}
+            />
+            {errors.tokenReward && (
+              <p className="text-xs text-destructive">
+                {errors.tokenReward.message}
+              </p>
+            )}
+          </div>
         </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-xl font-medium">Reward Config</span>
-          <div className="flex justify-between gap-6">
-            <div className="flex w-md flex-col gap-2">
-              <span className="text-[13px]">Token Reward</span>
-              <WhitelistTokenSelect
-                value={selectedTokenReward}
-                onChange={(address) =>
-                  setValue("tokenReward", address, { shouldValidate: true })
-                }
-                disabledAddress={selectedTokenBurn}
-              />
-              <input
-                type="hidden"
-                {...register("tokenReward", {
-                  required: "Reward token is required",
-                })}
-              />
-              {errors.tokenReward && (
-                <p className="text-xs text-destructive">
-                  {errors.tokenReward.message}
-                </p>
+        <div className="flex flex-wrap gap-2 md:gap-3 2xl:gap-3.75">
+          <div className="flex flex-col justify-end gap-2">
+            <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+              Network
+            </span>
+            <div
+              className={cn(
+                getVariantBorderClassName({ variant: "burn" }),
+                "relative flex items-center gap-2 rounded-md border-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:py-2 2xl:text-[23px]",
               )}
-            </div>
-          </div>
-
-          {/* <span className="text-[13px]">Budget</span>
-                    <Input
-                        placeholder="0.0"
-                        aria-invalid={!!errors.budget}
-                        {...register("budget", { required: "Budget is required" })}
-                        className="w-full max-w-40"
-                    />
-                    {errors.budget && (
-                        <p className="text-xs text-destructive">{errors.budget.message}</p>
-                    )} */}
-
-          <div className="flex items-end gap-10">
-            <span className="text-xl font-medium">Network</span>
-            <div className="relative flex gap-2 rounded-md-plus bg-inactive px-14 py-1 text-[15px] text-nowrap">
+            >
               <NetworkIcon
                 networkId={network?.id || ("" as NetworkId)}
-                className="absolute left-4"
+                className="size-3.5 md:size-4 2xl:size-5.75"
               />
               <span>{network?.label}</span>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[13px]">Burn Method</span>
-              <span className="flex gap-2 rounded-md-plus bg-inactive px-14 py-1 text-[15px] text-nowrap">
-                Burn
-              </span>
-            </div>
+          <div className="flex flex-col justify-end gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Burn Method
+            </span>
+            <span
+              className={cn(
+                getVariantBorderClassName({ variant: "burn" }),
+                "relative flex gap-2 rounded-md border-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:py-2 2xl:text-[23px]",
+              )}
+            >
+              Burn
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="mt-12 flex justify-center">
-          <AnimateIconButton
-            iconLetter="S"
-            text="Submit"
-            variant="letter-icon"
-            textVariant="text-container-center"
-            classNames={{
-              btn: "w-76.25 text-center after:text-white after:text-xl after:font-semibold after:bg-active",
-              text: "text-xl font-medium",
-              icon: "size-8 text-xl",
-            }}
-            color="#966EFF"
-            isLoading={isSubmitting}
-            isLoadingText="Submitting..."
-            btnProps={{
-              type: "submit",
-              disabled: isSubmitting,
-            }}
-          />
-        </div>
+      <div className="flex justify-center">
+        <Button
+          variant="burn"
+          type="submit"
+          hasHover
+          isLoading={isSubmitting}
+          className="w-full text-center font-orbitron text-sm font-semibold md:w-64 md:text-base lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Button>
       </div>
     </form>
   );
