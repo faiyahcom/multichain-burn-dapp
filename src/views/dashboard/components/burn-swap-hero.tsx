@@ -67,14 +67,14 @@ const HeroSwapMiniForm = () => {
             </div>
 
             {/* Token Select */}
-            <div className="mb-1 flex items-center gap-2 rounded-[6px] border-2 border-[#212C3E] px-3 2xl:mb-2">
+            <div className="mb-1 flex items-center gap-2 rounded-[6px] border-2 border-mb-dark-popover-item-border px-3 2xl:mb-2">
                 <div className="flex-1">
                     <WhitelistTokenSelect
                         value={tokenFrom}
                         onChange={setTokenFrom}
                         disabledAddress={tokenTo?.address}
                         classNames={{
-                            trigger: "w-full",
+                            trigger: "w-full py-2 text-nowrap",
                         }}
                     />
                 </div>
@@ -87,7 +87,7 @@ const HeroSwapMiniForm = () => {
                         onChange={setTokenTo}
                         disabledAddress={tokenFrom?.address}
                         classNames={{
-                            trigger: "w-full justify-end",
+                            trigger: "w-full py-2 text-nowrap justify-end",
                         }}
                     />
                 </div>
@@ -96,7 +96,7 @@ const HeroSwapMiniForm = () => {
             {/* Amount */}
             <div className="flex flex-col gap-1 2xl:gap-2">
                 <span className="text-sm text-mb-gray-b8/60 2xl:text-base">Amount</span>
-                <div className="flex justify-between rounded-[6px] border-2 border-[#212C3E] px-3">
+                <div className="flex justify-between rounded-[6px] border-2 border-mb-dark-popover-item-border px-3">
                     <Input
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
@@ -124,7 +124,7 @@ const HeroSwapMiniForm = () => {
                 className="sm:h-57px sm:w-275px mt-4.5 h-12 w-full font-orbitron text-lg font-medium text-nowrap 2xl:mt-5.5 2xl:text-xl"
                 onClick={() =>
                     navigate({
-                        to: "/swap/create/",
+                        to: "/swap/create",
                         search: {
                             tokenFrom: tokenFrom?.address,
                             tokenTo: tokenTo?.address,

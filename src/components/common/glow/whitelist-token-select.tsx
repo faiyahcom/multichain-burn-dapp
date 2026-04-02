@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,14 +11,13 @@ import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { truncateString } from "@/utils/helpers/string";
-import { useState } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import TokenDisplay from "../token-display";
 import { cn } from "@/lib/utils";
 import {
   getVariantBorderClassName,
   getVariantShadowClassName,
-  getVariantBgClassName,
   getVariantBtnBg50ClassName,
   getVariantBtnBgClassName,
 } from "./container";
@@ -43,10 +41,13 @@ type WhitelistTokenSelectClassNames = {
   item?: string;
   itemSelected?: string;
   itemDisabled?: string;
+  icon?: string;
+  itemIcon?: string;
+  overwriteButtonTrigger?: string;
 };
 
 type Props = {
-  value?: TokenOption;
+  value?: TokenOption | string;
   onChange: (token: TokenOption) => void;
   disabledAddress?: string;
   classNames?: WhitelistTokenSelectClassNames;
@@ -91,15 +92,25 @@ const WhitelistTokenSelect = ({
   };
 
   // ✅ Native token as full object
-  const nativeToken: TokenOption | null = nativeCurrency
-    ? {
-      address: nativeAddress,
-      name: nativeCurrency.name,
-      symbol: nativeCurrency.symbol,
-      imageUri: networkConfig?.iconSrc ?? "",
-      isNative: true,
-    }
-    : null;
+  const nativeToken: TokenOption | null = useMemo(
+    () =>
+      nativeCurrency
+        ? {
+          address: nativeAddress,
+          name: nativeCurrency.name,
+          symbol: nativeCurrency.symbol,
+          imageUri: networkConfig?.iconSrc ?? "",
+          isNative: true,
+        }
+        : null,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [
+      nativeAddress,
+      nativeCurrency?.name,
+      nativeCurrency?.symbol,
+      networkConfig?.iconSrc,
+    ],
+  );
 
   const showNativeToken =
     !!nativeToken &&
@@ -108,15 +119,46 @@ const WhitelistTokenSelect = ({
       textSearch.length === 0);
 
   // ✅ Normalize whitelist tokens into TokenOption
-  const tokens: TokenOption[] =
-    whitelistTokens?.whitelistTokens.map((t) => ({
-      address: t.address,
-      name: t.name,
-      symbol: t.symbol,
-      imageUri: t.imageUri,
-      customName: t.customName,
-      customSymbol: t.customSymbol,
-    })) || [];
+  const allTokens: TokenOption[] = useMemo(
+    () =>
+      whitelistTokens?.whitelistTokens.map((t) => ({
+        address: t.address,
+        name: t.name,
+        symbol: t.symbol,
+        imageUri: t.imageUri,
+        customName: t.customName,
+        customSymbol: t.customSymbol,
+      })) || [],
+    [whitelistTokens],
+  );
+
+  const tokens = allTokens;
+
+  // Resolve a string address to a full TokenOption.
+  // allTokens changes when the user types (search filter), so we cache the last
+  // successfully resolved result so the trigger button always stays populated.
+  const resolvedAddress = typeof value === "string" ? value : undefined;
+  const [resolvedAddressToken, setResolvedAddressToken] =
+    useState<TokenOption>();
+  useEffect(() => {
+    if (!resolvedAddress) {
+      setResolvedAddressToken(undefined);
+      return;
+    }
+    const found =
+      nativeToken?.address === resolvedAddress
+        ? nativeToken
+        : allTokens.find((t) => t.address === resolvedAddress);
+    // Only update state when we actually found a new token — prevents looping
+    if (found) {
+      setResolvedAddressToken((prev) =>
+        prev?.address === found.address ? prev : found,
+      );
+    }
+  }, [resolvedAddress, allTokens, nativeToken]);
+
+  const resolvedValue: TokenOption | undefined =
+    typeof value === "string" ? resolvedAddressToken : value;
 
   const baseItem = "flex items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5";
 
@@ -135,28 +177,26 @@ const WhitelistTokenSelect = ({
 
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="outline"
-          className={`flex items-center justify-between gap-2 rounded-lg bg-transparent p-0 text-sm font-normal text-foreground ${classNames.trigger || ""
-            }`}
-        >
-          {value ? (
-            <div
-              className={`flex items-center gap-4 ${classNames.triggerContent || ""
-                }`}
-            >
-              <TokenDisplay
-                symbol={value.customSymbol ?? value.symbol}
-                customSymbol={value.customSymbol ?? value.symbol}
-                imageUri={value.imageUri ?? undefined}
-                classNames={{ img: "size-5", container: "space-x-1" }}
-              />
-            </div>
-          ) : (
-            "Select Token"
-          )}
-        </Button>
+      <DropdownMenuTrigger
+        className={cn(
+          "flex items-center justify-between gap-2 rounded-lg bg-transparent p-0 text-sm font-normal text-foreground outline-none focus-visible:ring-0 focus-visible:outline-none",
+          classNames.trigger,
+        )}
+      >
+        {resolvedValue ? (
+          <div
+            className={cn("flex items-center gap-4", classNames.triggerContent)}
+          >
+            <TokenDisplay
+              symbol={resolvedValue.customSymbol ?? resolvedValue.symbol}
+              customSymbol={resolvedValue.customSymbol ?? resolvedValue.symbol}
+              imageUri={resolvedValue.imageUri ?? undefined}
+              classNames={{ img: "size-5", container: "space-x-1" }}
+            />
+          </div>
+        ) : (
+          "Select Token"
+        )}
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
@@ -191,7 +231,7 @@ const WhitelistTokenSelect = ({
             {showNativeToken && nativeToken && (
               <DropdownMenuItem
                 className={getItemClass(
-                  value?.address === nativeToken.address,
+                  resolvedValue?.address === nativeToken.address,
                   disabledAddress === nativeToken.address,
                 )}
                 onClick={() => onChange(nativeToken)}
@@ -201,13 +241,18 @@ const WhitelistTokenSelect = ({
                     "absolute top-1/2 left-0 h-full w-1 -translate-y-1/2 rounded-full bg-transparent",
                     getVariantBtnBgClassName({
                       variant,
-                      isGroupHover: !(value?.address === nativeToken.address),
+                      isGroupHover: !(
+                        resolvedValue?.address === nativeToken.address
+                      ),
                     }),
                   )}
                 />
                 <img
                   src={nativeToken.imageUri}
-                  className="size-7.75 rounded-full"
+                  className={cn(
+                    "size-7.75 rounded-full",
+                    classNames.icon || "",
+                  )}
                 />
                 <div className="flex flex-col">
                   <span className="text-xs">{nativeToken.name}</span>
@@ -220,7 +265,7 @@ const WhitelistTokenSelect = ({
 
             {/* List */}
             {tokens.map((token) => {
-              const isSelected = value?.address === token.address;
+              const isSelected = resolvedValue?.address === token.address;
               const isDisabled = disabledAddress === token.address;
 
               return (
@@ -240,7 +285,10 @@ const WhitelistTokenSelect = ({
                   />
                   <img
                     src={token.imageUri}
-                    className="size-7.75 rounded-full"
+                    className={cn(
+                      "size-7.75 rounded-full",
+                      classNames.itemIcon || "",
+                    )}
                   />
                   <div className="flex flex-col">
                     <span className="text-xs">{resolveName(token)}</span>
