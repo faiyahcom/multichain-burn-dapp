@@ -50,7 +50,7 @@ const MyActivityList = () => {
   return (
     <GlowContainer
       variant="pair"
-      className="space-y-5 px-5.75 pb-3 sm:space-y-10 sm:px-11.5 sm:pb-6"
+      className="space-y-5 px-5.75 py-3 sm:space-y-10 sm:px-11.5 sm:py-6"
     >
       <Table className="sm:text-2xl">
         <TableHeader className="sm:text-2xl">

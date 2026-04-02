@@ -203,6 +203,8 @@
   --color-mb-swapper-badge-bg: var(--mb-swapper-badge-bg);
   --color-mb-burn-activity-amount: var(--mb-burn-activity-amount);
   --color-mb-swap-activity-amount: var(--mb-swap-activity-amount);
+  --color-mb-glow-input-bg: var(--mb-glow-input-bg);
+  --color-mb-glow-input-secondary: var(--mb-glow-input-secondary);
   /* END */
 }
 
@@ -332,6 +334,8 @@
   --mb-swapper-badge-bg: #0a1a65;
   --mb-burn-activity-amount: #bf9879;
   --mb-swap-activity-amount: #8288bb;
+  --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
+  --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -459,6 +463,8 @@
   --mb-swapper-badge-bg: #0a1a65;
   --mb-burn-activity-amount: #bf9879;
   --mb-swap-activity-amount: #8288bb;
+  --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
+  --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
   /* END */
 }
 
