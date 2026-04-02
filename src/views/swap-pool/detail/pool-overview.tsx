@@ -80,6 +80,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 side="right"
                 content="Token burn : token reward"
                 variant="swap"
+                classNames={{
+                  icon: "size-3.5 text-xs",
+                  contentContainer: "max-h-fit",
+                  textContainer: "min-h-10 font-inter",
+                }}
               />
             </div>
           ),
