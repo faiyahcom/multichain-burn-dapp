@@ -15,9 +15,11 @@ const SwapRateRow = ({
     rewardDenominator,
     onToggle,
 }: Props) => (
-    <div className="mt-2.5 flex w-full cursor-pointer justify-between rounded-2xl bg-white px-4 text-base transition-all duration-300 hover:bg-inactive">
-        <p>{`1 ${burnSymbol} = ${Number(rewardNumerator) / Number(rewardDenominator)} ${rewardSymbol}`}</p>
-        <ArrowIcon className="rotate-90" onClick={onToggle} />
+    <div className="mt-4 mb-2 flex w-full cursor-pointer items-center justify-between rounded-18px bg-white py-2 pr-3 pl-11 transition-all duration-300">
+        <p className="font-inter text-sm font-medium text-mb-btn-swap/85">
+            {`1 ${burnSymbol} = ${Number(rewardNumerator) / Number(rewardDenominator)} ${rewardSymbol}`}
+        </p>
+        <ArrowIcon className="rotate-90 text-mb-btn-swap/85" onClick={onToggle} />
     </div>
 );
 

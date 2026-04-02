@@ -25,19 +25,22 @@ type CommonProps = {
 
 type Props =
   | {
-      networkId: string;
-      chainId?: never;
-    }
+    networkId: string;
+    chainId?: never;
+    hasLabel?: boolean;
+  }
   | {
-      networkId?: never;
-      chainId: string;
-    };
+    networkId?: never;
+    chainId: string;
+    hasLabel?: boolean;
+  };
 
 const NetworkDisplay: React.FC<Props & CommonProps> = ({
   networkId,
   chainId,
   classNames,
   styles,
+  hasLabel = true,
 }) => {
   let networkConfig: NetworkConfig | undefined = undefined;
   if (networkId) {
@@ -58,9 +61,11 @@ const NetworkDisplay: React.FC<Props & CommonProps> = ({
         className={cn("mr-1.5 inline size-6 sm:size-8", classNames?.img)}
         style={styles?.img}
       />
-      <span className={classNames?.label} style={styles?.label}>
-        {networkConfig.label}
-      </span>
+      {hasLabel && (
+        <span className={classNames?.label} style={styles?.label}>
+          {networkConfig.label}
+        </span>
+      )}
     </span>
   );
 };

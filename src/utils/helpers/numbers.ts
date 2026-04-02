@@ -77,5 +77,5 @@ export const shortenNumber = ({
     mantissa: 2,
     trimMantissa: true,
     ...customFormat,
-  });
+  }).toUpperCase();
 };
