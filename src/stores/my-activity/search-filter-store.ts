@@ -1,4 +1,4 @@
-import { activityKind, type ActivityKindKey } from "@/types/pool";
+import { myActivityActions, type ActivityKindKey } from "@/types/pool";
 import { create } from "zustand";
 
 type MyActivitySearchFilterType = {
@@ -17,7 +17,7 @@ export const useMyActivitySearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      activityKind: Object.keys(activityKind).map(
+      activityKind: Object.keys(myActivityActions).map(
         (key) => Number(key) as ActivityKindKey,
       ),
     },

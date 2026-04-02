@@ -1,3 +1,5 @@
+import type { PoolItemType } from "@/types/admin/master-pool-management";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { format, isValid } from "date-fns";
 
 export const truncateString = ({
@@ -15,7 +17,8 @@ export const truncateString = ({
   if (right === 0) {
     return str.length > left ? `${str.slice(0, left)}...` : str;
   }
-  if (str.length <= left + right + 1) { // 1 for the ... in the middle
+  if (str.length <= left + right + 1) {
+    // 1 for the ... in the middle
     return str;
   }
   return `${str.slice(0, left)}...${str.slice(-right)}`;
@@ -58,4 +61,21 @@ export const formatCountdown = (totalSeconds: number): string => {
   const m = Math.floor((s % 3600) / 60);
   const sec = s % 60;
   return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
+};
+
+export const getPoolHref = (
+  pool: Pick<PoolItemType, "address" | "kind">,
+): string => {
+  const { address, kind } = pool;
+  switch (kind) {
+    case PoolKindCodeEnum.Burn:
+      return `/burn/detail/${address}`;
+
+    case PoolKindCodeEnum.Swap:
+      return `/swap/detail/${address}`;
+
+    default:
+      void (kind satisfies never); // exhaustive check
+      return "";
+  }
 };

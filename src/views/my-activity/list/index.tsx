@@ -1,5 +1,6 @@
 import CopyableText from "@/components/common/copyable-text";
 import GlowContainer from "@/components/common/glow/container";
+import CustomPagination from "@/components/common/glow/glow-pagination";
 import {
   Table,
   TableBody,
@@ -10,25 +11,32 @@ import {
 } from "@/components/common/glow/table";
 import TableNoData from "@/components/common/glow/table-no-data";
 import TableSkeleton from "@/components/common/glow/table-skeleton";
+import MetricNumber from "@/components/common/metric-number";
 import { userQueryKeys } from "@/services/queries/queryKey";
-import { userService } from "@/services/userService";
+import { userService, type UserActivityType } from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
 import { useMyActivitySearchFilterStore } from "@/stores/my-activity/search-filter-store";
 import { getActivityKindLabel } from "@/types/pool";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import {
   formatTimestampSecondsToDate,
+  getPoolHref,
   truncateString,
 } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { ArrowRight } from "lucide-react";
+import { useMediaQuery } from "usehooks-ts";
 
 const MyActivityList = () => {
   const { filter, setFilter } = useMyActivitySearchFilterStore();
   const { user } = useAuthStore();
+  const navigate = useNavigate();
   const limit = 10;
 
   const columns = ["Action", "Pool", "Description", "Tx Hash", "Time"];
   const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const { data: userActivities, isPending: isPendingUserActivities } = useQuery(
     {
@@ -90,8 +98,22 @@ const MyActivityList = () => {
               formatStr: "MMMM d, yyyy. h:mm a",
             });
 
+            const href = getPoolHref({
+              address: poolAddress,
+              kind: activity.poolKind,
+            });
+
             return (
-              <TableRow key={activity.id}>
+              <TableRow
+                key={activity.id}
+                onClick={() => {
+                  navigate({
+                    to: href,
+                  });
+                }}
+                className="cursor-pointer"
+                variant="pair"
+              >
                 <TableCell className="min-w-0 text-left">
                   <p className="min-w-0 truncate" title={activityLabel}>
                     {activityLabel}
@@ -111,7 +133,7 @@ const MyActivityList = () => {
                     }}
                   />
                 </TableCell>
-                <TableCell></TableCell>
+                <TableCell>{renderDescription(activity)}</TableCell>
                 <TableCell>
                   <CopyableText
                     content={hash}
@@ -120,7 +142,6 @@ const MyActivityList = () => {
                     })}
                     classNames={{
                       displayText: "sm:text-2xl",
-                      container: "justify-start",
                     }}
                   />
                 </TableCell>
@@ -132,8 +153,59 @@ const MyActivityList = () => {
           })}
         </TableBody>
       </Table>
+
+      <CustomPagination
+        currentPage={filter.page}
+        onPageChange={(page) => setFilter({ page })}
+        pageSize={limit}
+        totalCount={userActivities?.total ?? 0}
+        variant="pair"
+        onlyShowCurrentPage={!isDesktop}
+      />
     </GlowContainer>
   );
+};
+
+const renderDescription = (activity: UserActivityType) => {
+  const { pool, kind, uiAmountIn, uiAmountOut } = activity;
+
+  // Create swap pool, create burn pool, cancel pool
+  if ([0, 1, 5].includes(kind)) {
+    const poolName = pool?.name;
+    return (
+      <p title={poolName} className="min-w-0 truncate">
+        {poolName}
+      </p>
+    );
+  }
+
+  // Deposit reward token, Deposit burn token, Claim reward
+  if ([10, 30, 31].includes(kind)) {
+    return (
+      <MetricNumber number={uiAmountIn} unit={pool?.tokenInSymbol} isShorten />
+    );
+  }
+
+  // Swap
+  if (kind === 32) {
+    return (
+      <div className="flex items-center justify-center gap-1 max-xl:flex-wrap">
+        <MetricNumber
+          number={uiAmountIn}
+          unit={pool?.tokenInSymbol}
+          isShorten
+        />
+        <ArrowRight className="size-4 shrink-0 sm:size-6" />
+        <MetricNumber
+          number={uiAmountOut}
+          unit={pool?.rewardTokenSymbol}
+          isShorten
+        />
+      </div>
+    );
+  }
+
+  return null;
 };
 
 export default MyActivityList;
