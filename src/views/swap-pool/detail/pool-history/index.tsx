@@ -31,10 +31,10 @@ const PoolHistory = ({ poolDetail }: Props) => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={cn(
-                                "rounded-18px px-3 py-2 font-inter text-sm font-semibold transition-colors",
+                                "rounded-18px px-3 py-2 font-inter text-sm font-semibold text-foreground transition-colors",
                                 activeTab === tab.id
-                                    ? "border border-swap-border/85 bg-swap-border/85 text-foreground"
-                                    : "text-gray-500",
+                                    ? "border border-swap-border/85 bg-swap-border/85"
+                                    : "",
                             )}
                         >
                             {tab.label}
