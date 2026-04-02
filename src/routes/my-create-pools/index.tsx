@@ -5,9 +5,8 @@ import { useMyCreatePoolsSwapSearchFilterStore } from "@/stores/my-create-pools/
 import type { PoolType } from "@/types/admin/master-pool-management";
 import { PoolKindCodeEnum } from "@/types/pool";
 import ProfileLayout from "@/views/profile/layout";
+import ProfileMyCreatePool from "@/views/profile/my-create-pool";
 import ProfilePoolSearch from "@/views/profile/pool/search";
-import UserBurnPools from "@/views/user-pools/burn-pool";
-import UserSwapPools from "@/views/user-pools/swap-pool";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
@@ -63,11 +62,6 @@ function RouteComponent() {
     }
   }, [tab, setFilterBurn, setFilterSwap]);
 
-  // if (tab === 'swap-pool')
-  //   return <UserSwapPools mode="owner" title="My Created Pools" />
-
-  // return <UserBurnPools mode="owner" title="My Created Pools" />
-
   return (
     <ProfileLayout>
       <SearchParamTab
@@ -80,6 +74,7 @@ function RouteComponent() {
         setFilter={setFilter}
         poolType={poolType}
       />
+      <ProfileMyCreatePool poolType={poolType} />
     </ProfileLayout>
   );
 }
