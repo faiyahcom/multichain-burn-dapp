@@ -3,13 +3,13 @@ import type { MultipleSelectOption } from "@/components/common/glow/multiple-sel
 import MultipleSelect from "@/components/common/glow/multiple-select";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
 import { useMyActivitySearchFilterStore } from "@/stores/my-activity/search-filter-store";
-import { activityKind, type ActivityKindKey } from "@/types/pool";
+import { myActivityActions, type ActivityKindKey } from "@/types/pool";
 
 const MyActivitySearch = () => {
   const { filter, setFilter } = useMyActivitySearchFilterStore();
 
   const activityKindOptions: MultipleSelectOption[] = Object.entries(
-    activityKind,
+    myActivityActions,
   ).map(([key, value]) => ({
     label: value,
     value: key,

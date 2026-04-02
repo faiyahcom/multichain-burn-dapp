@@ -92,9 +92,15 @@ export interface UserActivityType {
   kind: ActivityKindKey;
   poolAddress: string;
   poolKind: PoolType;
+  uiAmountIn: string;
+  uiAmountOut: string;
   pool: {
     address: string;
     name: string;
+    tokenIn: string;
+    rewardToken: string;
+    tokenInSymbol: string;
+    rewardTokenSymbol: string;
   } | null;
 }
 

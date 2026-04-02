@@ -124,28 +124,30 @@ export const txnKind = {
 
 export const activityKind = {
   // Pool lifecycle
-  0: "Pool Created",
-  1: "Pool Requested",
-  2: "Pool Approved",
-  3: "Pool Rejected",
-  4: "Pool Canceled",
-  5: "Pool Closed",
-  8: "Pool Updated",
-  9: "Pool Ended",
+  0: "Create burn pool",
+  1: "Create swap pool",
+  2: "Pool Requested",
+  3: "Pool Approved",
+  4: "Pool Rejected",
+  5: "Cancel pool",
+  6: "Pool Closed",
+  7: "Pool Updated",
+  8: "Pool Ended",
 
   // Maker action
-  10: "Reward Deposited",
-  11: "Cancel Approve Request",
+  10: "Deposit reward token",
+  11: "Maker Cancel Approve Request",
 
   // Admin action
   20: "Admin Refund",
 
   // User actions
-  30: "Taker Deposit", //taker deposit to pool
-  31: "Taker Claim", //taker claim reward from burn pool
+  30: "Deposit burn token",
+  31: "Claim reward",
+  32: "Swap",
 
-  // Operator actions
-  40: "Burn Success",
+  // Burn operator actions
+  40: "Burn Success", //burn success
 } as const;
 
 export type ActivityKindKey = keyof typeof activityKind;
@@ -153,6 +155,19 @@ export type ActivityKindKey = keyof typeof activityKind;
 export const getActivityKindLabel = (kind: ActivityKindKey) => {
   return activityKind[kind];
 };
+
+type ActivityKind = typeof activityKind;
+
+export function pickActivityKind<K extends keyof ActivityKind>(
+  keys: K[],
+): Pick<ActivityKind, K> {
+  return Object.fromEntries(keys.map((k) => [k, activityKind[k]])) as Pick<
+    ActivityKind,
+    K
+  >;
+}
+
+export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
 
 export interface PoolActivitiesResponse {
   page: number;
