@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import ProfilePoolListBurn from "../pool/list/burn";
 import { useMediaQuery } from "usehooks-ts";
+import ProfilePoolListSwap from "../pool/list/swap";
 
 interface Props {
   poolType: PoolType;
@@ -81,6 +82,13 @@ const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
     >
       {poolType === PoolKindCodeEnum.Burn && (
         <ProfilePoolListBurn
+          data={ownerPools?.pools}
+          isLoading={isOwnerPoolsPending}
+          limit={limit}
+        />
+      )}
+      {poolType === PoolKindCodeEnum.Swap && (
+        <ProfilePoolListSwap
           data={ownerPools?.pools}
           isLoading={isOwnerPoolsPending}
           limit={limit}
