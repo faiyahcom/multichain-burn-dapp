@@ -83,16 +83,16 @@ const RewardAmount = ({ poolDetail }: Props) => {
     return (
         <GlowContainer
             variant="swap"
-            className="w-full space-y-6 px-5 py-6 font-inter"
+            className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
         >
             <div className="flex items-center justify-between pr-5 font-orbitron">
-                <p className="text-28px font-semibold">Reward Amount</p>
-                <p className="text-2xl font-medium">
+                <p className="text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">Reward Amount</p>
+                <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                     {formattedReward} {rewardTokenDisplay?.symbol}
                 </p>
             </div>
             <div className="space-y-3.75">
-                <p className="flex justify-between pr-5 text-2xl">
+                <p className="flex justify-between pr-2 text-sm md:pr-5 md:text-base lg:text-xl 2xl:text-2xl">
                     <span className="text-mb-gray-b8">
                         Total Burned Amount:
                     </span>{" "}
@@ -101,7 +101,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     </span>
                 </p>
                 <div>
-                    <div className="h-4.5 w-full overflow-hidden rounded-md border border-swap-border/85 bg-mb-dark-popover-item">
+                    <div className="h-2.5 w-full overflow-hidden rounded-md border border-swap-border/85 bg-mb-dark-popover-item md:h-3.5 2xl:h-4.5">
                         <div
                             className="h-full rounded-md bg-swap-border/85"
                             style={{ width: `${burnProgress * 100}%` }}

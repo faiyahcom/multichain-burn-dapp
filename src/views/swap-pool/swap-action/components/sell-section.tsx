@@ -37,18 +37,18 @@ const SellSection = ({
     chainId,
 }: Props) => {
     return (
-        <div className="relative mb-4 flex w-full flex-col rounded-24px border-[2.5px] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-8.75 py-3.75">
+        <div className="relative mb-4 flex w-full flex-col rounded-24px border-[2.5px] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-4 py-3 xl:px-8.75 xl:py-3.75">
             <div className="flex items-center justify-between">
-                <div className="font-inter text-base font-medium text-mb-gray-b8/60">
+                <div className="font-inter text-sm font-medium text-mb-gray-b8/60 xl:text-base">
                     From
                 </div>
-                <div className="flex gap-0.5 py-1.25">
+                <div className="flex gap-0.5 py-1 xl:py-1.25">
                     {[25, 50, 75, 100].map((percent) => (
                         <button
                             type="button"
                             key={percent}
                             onClick={() => onSelectPercent(percent)}
-                            className="rounded-full bg-primary-foreground px-[11.5px] py-1 font-orbitron text-13px font-semibold text-mb-btn-swap transition hover:bg-mb-btn-swap hover:text-white"
+                            className="rounded-full bg-primary-foreground px-2 py-0.5 font-orbitron text-[11px] font-semibold text-mb-btn-swap transition hover:bg-mb-btn-swap hover:text-white xl:px-[11.5px] xl:py-1 xl:text-13px"
                         >
                             {percent === 100 ? "Max" : `${percent}%`}
                         </button>
@@ -56,9 +56,9 @@ const SellSection = ({
                 </div>
             </div>
 
-            <div className="my-4 flex items-center justify-between">
+            <div className="my-2 flex items-center justify-between xl:my-4">
                 <input
-                    className="bg-transparent px-0 font-inter text-40px font-medium text-primary-foreground outline-none"
+                    className="min-w-0 flex-1 bg-transparent px-0 font-inter text-2xl font-medium text-primary-foreground outline-none sm:text-3xl xl:text-40px"
                     aria-invalid={
                         !!errors.burnAmount ||
                         isExceedingMax ||
@@ -94,7 +94,7 @@ const SellSection = ({
             )}
 
             <div className="mt-1 h-0.5 w-full bg-mb-btn-swap/85" />
-            <div className="my-2 flex w-full justify-between font-inter text-base">
+            <div className="my-2 flex w-full flex-wrap justify-between gap-y-0.5 font-inter text-xs sm:text-sm xl:text-base">
                 <p className="flex gap-1">
                     Max swapable: {shortenNumber({ number: Number(maxBurnLeft) })}{" "}
                     {tokenDisplay.symbol ?? ""}

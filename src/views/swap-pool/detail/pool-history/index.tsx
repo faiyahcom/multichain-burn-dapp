@@ -21,17 +21,17 @@ const PoolHistory = ({ poolDetail }: Props) => {
     return (
         <div className="space-y-3">
             {/* Header */}
-            <div className="flex items-center justify-between">
-                <p className="font-orbitron text-28px font-semibold">Pool History</p>
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">Pool History</p>
 
                 {/* Tab switcher */}
-                <div className="flex rounded-3xl border-4 border-swap-border/85 bg-mb-dark-popover-item p-1">
+                <div className="flex rounded-xl border-2 border-swap-border/85 bg-mb-dark-popover-item p-0.5 md:rounded-3xl md:border-4 md:p-1">
                     {TABS.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
                             className={cn(
-                                "rounded-18px px-3 py-2 font-inter text-sm font-semibold text-foreground transition-colors",
+                                "rounded-lg px-2 py-1 font-inter text-xs font-semibold text-foreground transition-colors md:rounded-18px md:px-3 md:py-2 md:text-sm",
                                 activeTab === tab.id
                                     ? "border border-swap-border/85 bg-swap-border/85"
                                     : "",

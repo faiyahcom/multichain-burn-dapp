@@ -51,7 +51,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
         <div className="space-y-9.5">
             <GlowContainer
                 variant="swap"
-                className="w-full space-y-6 px-5 py-6 font-inter"
+                className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
             >
                 <Table className="py-6 sm:border-spacing-y-5">
                     <TableHeader>
@@ -60,7 +60,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
                                 <TableHead
                                     key={col}
                                     variant="swap"
-                                    className="font-orbitron text-28px"
+                                    className="font-orbitron text-sm md:text-base lg:text-xl 2xl:text-28px"
                                 >
                                     {col}
                                 </TableHead>
@@ -71,7 +71,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
                         <TableSkeleton colCount={3} rowCount={3} isLoading={isLoading} />
                         <TableNoData colSpan={3} data={activities} isLoading={isLoading} />
                         {activities.map((activity) => (
-                            <TableRow key={activity.id} variant="swap" className="text-xl">
+                            <TableRow key={activity.id} variant="swap" className="text-xs md:text-sm lg:text-base 2xl:text-xl">
                                 <TableCell>{formatTimestamp(activity.timestamp)}</TableCell>
                                 <TableCell>
                                     <CopyableText
@@ -85,7 +85,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
                                         }
                                         classNames={{
                                             container: "justify-center",
-                                            displayText: "text-primary-foreground text-xl",
+                                            displayText: "text-primary-foreground text-xs md:text-sm lg:text-base 2xl:text-xl",
                                         }}
                                     />
                                 </TableCell>

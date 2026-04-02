@@ -61,7 +61,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
         <div className="space-y-9.5">
             <GlowContainer
                 variant="swap"
-                className="w-full space-y-6 px-5 py-6 font-inter"
+                className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
             >
                 <Table className="py-6 sm:border-spacing-y-5">
                     <TableHeader>
@@ -70,7 +70,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                 <TableHead
                                     key={col}
                                     variant="swap"
-                                    className="font-orbitron text-28px"
+                                    className="font-orbitron text-sm md:text-base lg:text-xl 2xl:text-28px"
                                 >
                                     {col}
                                 </TableHead>
@@ -102,7 +102,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                             const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
                             return (
-                                <TableRow key={tx.id} variant="swap" className="text-xl">
+                                <TableRow key={tx.id} variant="swap" className="text-xs md:text-sm lg:text-base 2xl:text-xl">
                                     <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
                                     <TableCell>{txnKind[tx.kind]}</TableCell>
                                     <TableCell>{amount}</TableCell>

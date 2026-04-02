@@ -117,13 +117,13 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     };
 
     return (
-        <GlowContainer variant="swap" className="w-full px-5 py-6 font-inter">
-            <p className="mb-8 font-orbitron text-28px font-semibold">
+        <GlowContainer variant="swap" className="w-full px-3 py-4 font-inter md:px-5 md:py-6">
+            <p className="mb-4 font-orbitron text-base font-semibold md:mb-8 md:text-xl lg:text-2xl 2xl:text-28px">
                 Amount & Activity
             </p>
             <div className="mb-3 flex items-center justify-between">
-                <span className="text-xl text-mb-gray-b8">Claimed Reward</span>
-                <span className="text-xl font-bold">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-lg 2xl:text-xl">Claimed Reward</span>
+                <span className="text-sm font-bold md:text-base lg:text-lg 2xl:text-xl">
                     {poolDetail ? (
                         <div className="inline-flex items-center gap-2.5">
                             {formattedReward}
@@ -132,7 +132,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                                 customSymbol={poolDetail.tokenOut?.customSymbol}
                                 imageUri={rewardTokenDisplay.imageUri ?? undefined}
                                 classNames={{
-                                    img: "size-5.75",
+                                    img: "size-4 md:size-5 2xl:size-5.75",
                                     container: "inline-flex items-center gap-2.5",
                                 }}
                             />
@@ -143,8 +143,8 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                 </span>
             </div>
             <div className="mb-3 flex items-center justify-between">
-                <span className="text-xl text-mb-gray-b8">Your Burned Amount</span>
-                <span className="text-xl font-bold">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-lg 2xl:text-xl">Your Burned Amount</span>
+                <span className="text-sm font-bold md:text-base lg:text-lg 2xl:text-xl">
                     {poolDetail ? (
                         <div className="inline-flex items-center gap-1.5">
                             {formattedBurned}
@@ -153,7 +153,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                                 customSymbol={poolDetail.tokenIn?.customSymbol}
                                 imageUri={burnTokenDisplay.imageUri ?? undefined}
                                 classNames={{
-                                    img: "size-4.25",
+                                    img: "size-3.5 md:size-4 2xl:size-4.25",
                                     container: "inline-flex items-center gap-1.5",
                                 }}
                             />
@@ -165,10 +165,10 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             </div>
             {poolDetail?.pool.status === "canceled" && isPoolOwner && (
                 <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xl text-mb-gray-b8">
+                    <span className="text-sm text-mb-gray-b8 md:text-base lg:text-lg 2xl:text-xl">
                         Your reward token return
                     </span>
-                    <span className="text-xl font-bold">
+                    <span className="text-sm font-bold md:text-base lg:text-lg 2xl:text-xl">
                         {poolDetail ? (
                             <div className="inline-flex items-center gap-2.5">
                                 {formattedReturning}
@@ -177,7 +177,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                                     customSymbol={poolDetail.tokenOut?.customSymbol}
                                     imageUri={rewardTokenDisplay.imageUri ?? undefined}
                                     classNames={{
-                                        img: "size-4.25",
+                                        img: "size-3.5 md:size-4 2xl:size-4.25",
                                         container: "inline-flex items-center gap-1.5",
                                     }}
                                 />
@@ -211,7 +211,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                         variant="swap"
                         onClick={handleOpenSwapDialog}
                         disabled={isCancelLoading}
-                        className="my-3.25 w-full py-3 font-orbitron text-2xl"
+                        className="my-2 w-full py-2 font-orbitron text-base md:my-3.25 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
                         hasHover
                     >
                         Swap
@@ -227,7 +227,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                             variant="swap"
                             onClick={handleCancelPool}
                             isLoading={isCancelLoading}
-                            className="my-3.25 w-full py-3 font-orbitron text-2xl"
+                            className="my-2 w-full py-2 font-orbitron text-base md:my-3.25 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
                             hasHover
                         >
                             {isCancelLoading ? "Cancelling..." : "Cancel Pool"}

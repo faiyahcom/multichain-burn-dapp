@@ -331,19 +331,19 @@ const SwapDialog = ({
                     className={cn(
                         getVariantBorderClassName({ variant: "swap" }),
                         getVariantShadowClassName({ variant: "swap" }),
-                        "h-fit border-4 bg-mb-dark-popover px-8 py-5 sm:max-w-fit",
+                        "h-fit min-w-0 max-h-[98dvh] border-4 bg-mb-dark-popover px-4 py-4 sm:max-w-fit sm:px-6 sm:py-5 xl:px-8 xl:py-5",
                     )}
                 >
                     <DialogHeader>
-                        <DialogTitle className="text-40px font-bold">
+                        <DialogTitle className="text-xl font-bold sm:text-2xl xl:text-40px">
                             <p className="inline-flex items-center">
-                                <IconSwapCategory className="size-16" />
+                                <IconSwapCategory className="size-8 sm:size-10 xl:size-16" />
                                 TOKEN SWAP
                             </p>
                         </DialogTitle>
                     </DialogHeader>
 
-                    <form onSubmit={handleSubmit(onSubmit)}>
+                    <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
                         <SellSection
                             tokenDisplay={burnTokenDisplay}
                             isLoadingWhitelistTokens={!poolDetail}
@@ -369,7 +369,7 @@ const SwapDialog = ({
                         />
                         <Button
                             variant="swap"
-                            className="mt-4 w-full text-2xl"
+                            className="mt-4 w-full text-base md:text-xl 2xl:text-2xl"
                             hasHover
                             isLoading={isSubmitting}
                             disabled={
