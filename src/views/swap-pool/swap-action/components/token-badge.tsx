@@ -14,7 +14,7 @@ const TokenBadge = ({ isLoading, imageUri, name, symbol, chainId }: Props) => {
     if (isLoading) return <Skeleton className="h-8 w-32 rounded" />;
 
     return (
-        <div className="relative flex h-fit w-28 shrink-0 items-center justify-between gap-2 rounded-13px bg-primary-foreground px-3 py-1.5 sm:w-32 xl:w-40 xl:gap-3 xl:px-6 xl:py-2">
+        <div className="relative flex h-fit w-28 shrink-0 gap-2 rounded-13px bg-primary-foreground px-3 py-1.5 sm:w-32 xl:w-56 xl:gap-6 xl:px-6 xl:py-2">
             <TokenImage
                 src={imageUri}
                 alt={name}
