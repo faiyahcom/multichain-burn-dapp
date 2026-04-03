@@ -173,6 +173,9 @@ function UserClaimablePool() {
                     <Link
                       to="/burn/detail/$address"
                       params={{ address: item.address }}
+                      search={{
+                        depositReward: undefined,
+                      }}
                     >
                       <AnimateIconButton
                         variant="letter-icon"

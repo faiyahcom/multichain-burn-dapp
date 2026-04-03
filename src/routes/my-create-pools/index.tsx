@@ -30,7 +30,7 @@ export const Route = createFileRoute("/my-create-pools/")({
 });
 
 function RouteComponent() {
-  const { tab } = Route.useSearch() as { tab: Tab };
+  const { tab } = Route.useSearch();
   const poolType = TabToPoolType[tab];
   const { filter: filterBurn, setFilter: setFilterBurn } =
     useMyCreatePoolsBurnSearchFilterStore();
@@ -73,6 +73,7 @@ function RouteComponent() {
         filter={filter}
         setFilter={setFilter}
         poolType={poolType}
+        profileType="my-create-pools"
       />
       <ProfileMyCreatePool poolType={poolType} />
     </ProfileLayout>

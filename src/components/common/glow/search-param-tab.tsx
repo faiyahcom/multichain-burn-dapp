@@ -4,6 +4,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 export interface SearchParamTabOption<T extends string = string> {
   label: string;
   value: T;
+  rightAddons?: React.ReactNode;
 }
 
 export interface Props {
@@ -37,12 +38,14 @@ const SearchParamTab: React.FC<Props> = ({
               [searchParamKey]: option.value,
             }}
             className={cn(
+              "flex items-center justify-center gap-1.25",
               "border-b-3 border-transparent py-1.25 text-xl font-bold text-mb-gray-b8 sm:py-2.5 sm:text-2xl",
               "transition-colors duration-300",
               { "border-foreground text-foreground": isActive },
             )}
           >
             {option.label}
+            {option.rightAddons}
           </Link>
         );
       })}
