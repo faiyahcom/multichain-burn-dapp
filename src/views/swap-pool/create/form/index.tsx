@@ -79,6 +79,11 @@ const CreateSwapPoolForm = ({
   const selectedTokenBurn = watch("tokenBurn");
   const selectedTokenReward = watch("tokenReward");
 
+  // Reset form on network change
+  useEffect(() => {
+    reset();
+  }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Pre-fill from navigation search params (once, on mount)
   const prefilledRef = useRef(false);
   useEffect(() => {

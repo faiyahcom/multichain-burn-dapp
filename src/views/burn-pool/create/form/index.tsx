@@ -1,4 +1,5 @@
 import { useAppKitAccount } from "@reown/appkit/react";
+import { useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "@tanstack/react-router";
 import { useCreateBurnPoolEvmFn } from "../useCreateBurnPoolEvmFn";
@@ -63,6 +64,11 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
   const selectedTokenReward = watch("tokenReward");
   const startTime = watch("startTime");
   const endTime = watch("endTime");
+
+  // Reset form on network change
+  useEffect(() => {
+    reset();
+  }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
     if (isSolana && !onSubmitForm) {

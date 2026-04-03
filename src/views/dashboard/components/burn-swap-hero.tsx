@@ -16,11 +16,12 @@ import type { StatsStickerResponse } from "@/services/dashboardService";
 import BurnTrackerImage from "/images/dashboard/burn-tracker.png";
 import SwapChartStatsImage from "/images/dashboard/swap-stats.png";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import WhitelistTokenSelect, {
     type TokenOption,
 } from "@/components/common/glow/whitelist-token-select";
+import { useSystemStore } from "@/stores/systemStore";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import TokenDisplay from "@/components/common/token-display";
 
@@ -58,6 +59,13 @@ const HeroSwapMiniForm = () => {
     const [tokenTo, setTokenTo] = useState<TokenOption>();
     const [amount, setAmount] = useState("");
 
+    const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
+    useEffect(() => {
+        setTokenFrom(undefined);
+        setTokenTo(undefined);
+        setAmount("");
+    }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
+
     return (
         <div className="flex w-full flex-1 flex-col justify-end font-inter">
             {/* From / To */}
@@ -77,6 +85,7 @@ const HeroSwapMiniForm = () => {
                             trigger: "w-full py-2 text-nowrap",
                         }}
                         hasDropdownIcon={false}
+                        showDetail={false}
                     />
                 </div>
 
@@ -91,6 +100,7 @@ const HeroSwapMiniForm = () => {
                             trigger: "w-full py-2 text-nowrap justify-end",
                         }}
                         hasDropdownIcon={false}
+                        showDetail={false}
                     />
                 </div>
             </div>

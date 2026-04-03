@@ -54,6 +54,7 @@ type Props = {
   classNames?: WhitelistTokenSelectClassNames;
   variant?: "pair" | "burn" | "swap";
   hasDropdownIcon?: boolean;
+  showDetail?: boolean;
 };
 
 const resolveSymbol = (token: TokenOption) =>
@@ -69,6 +70,7 @@ const WhitelistTokenSelect = ({
   classNames = {},
   variant = "swap",
   hasDropdownIcon = true,
+  showDetail = true,
 }: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
@@ -194,15 +196,22 @@ const WhitelistTokenSelect = ({
               imageUri={resolvedValue.imageUri ?? undefined}
               classNames={{ img: "size-5", container: "space-x-1" }}
             />
-            <span>
-              &nbsp;{`(${resolvedValue.customName ?? resolvedValue.name})`}
-            </span>
+            {showDetail && (
+              <span>
+                &nbsp;{`(${resolvedValue.customName ?? resolvedValue.name})`}
+              </span>
+            )}
           </div>
         ) : (
           "Select Token"
         )}
         {hasDropdownIcon && (
-          <ChevronDownIcon className={cn("size-4 text-foreground transition-transform duration-300", open && "rotate-180")} />
+          <ChevronDownIcon
+            className={cn(
+              "size-4 text-foreground transition-transform duration-300",
+              open && "rotate-180",
+            )}
+          />
         )}
       </DropdownMenuTrigger>
 
