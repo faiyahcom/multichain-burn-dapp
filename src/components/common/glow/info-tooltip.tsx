@@ -1,8 +1,16 @@
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { IconTooltipInfo } from "@/assets/react";
-import { getVariantBorderClassName, getVariantShadowClassName, type ContainerVariant } from "./container";
+import {
+  getVariantBorderClassName,
+  getVariantShadowClassName,
+  type ContainerVariant,
+} from "./container";
 
 interface Props {
   content?: string;
@@ -37,19 +45,28 @@ const InfoTooltip: React.FC<Props> = ({
       </TooltipTrigger>
       <TooltipContent
         className={cn(
-          getVariantBorderClassName({variant}),
-          getVariantShadowClassName({variant}),
-          "max-w-101.25 bg-mb-dark-popover p-2 rounded-5px",
+          getVariantBorderClassName({ variant }),
+          getVariantShadowClassName({ variant }),
+          "max-w-101.25 rounded-5px bg-mb-dark-popover p-2",
           classNames?.contentContainer,
         )}
         sideOffset={sideOffset}
         side={side}
       >
-        <div className={cn(
-          "rounded-5px bg-mb-dark-popover-item border-mb-dark-popover-item-border py-2 px-3 h-fit",
-          classNames?.textContainer,
-        )}>
-          <p className={cn("text-15px font-normal text-foreground", classNames?.text)}>{content}</p>
+        <div
+          className={cn(
+            "h-fit rounded-5px border-mb-dark-popover-item-border bg-mb-dark-popover-item px-3 py-2 font-inter",
+            classNames?.textContainer,
+          )}
+        >
+          <p
+            className={cn(
+              "text-15px font-normal text-foreground",
+              classNames?.text,
+            )}
+          >
+            {content}
+          </p>
         </div>
       </TooltipContent>
     </Tooltip>

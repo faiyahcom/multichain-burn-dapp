@@ -11,7 +11,7 @@ type Props = {
 const RewardAmount = ({ poolDetail }: Props) => {
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.pool.currentRewardAmount,
+            poolDetail.pool.rewardAmount,
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";
@@ -46,7 +46,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
             variant="burn"
             className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
         >
-            <div className="flex items-center justify-between pr-5 font-orbitron">
+            <div className="flex items-center justify-between font-orbitron">
                 <p className="text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">Reward Amount</p>
                 <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                     {formattedReward} {rewardTokenDisplay.symbol}

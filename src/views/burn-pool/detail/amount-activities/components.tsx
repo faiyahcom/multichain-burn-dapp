@@ -1,15 +1,19 @@
 import React from "react";
-import AnimateIconButton from "@/components/common/animate-icon-button";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/common/glow/button";
+import { Button as UIButton } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import GlowContainer from "@/components/common/glow/container";
+import { cn } from "@/lib/utils";
 
 // ─────────────────────────────────────────────────────────────
 // Container
 // ─────────────────────────────────────────────────────────────
 
 export const Container = ({ children }: { children?: React.ReactNode }) => (
-    <GlowContainer variant="burn" className="w-full space-y-3 px-3 py-4 font-inter md:px-5 md:py-6">
+    <GlowContainer
+        variant="burn"
+        className="w-full space-y-3 px-3 py-4 font-inter md:px-5 md:py-6"
+    >
         <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">
             Amount & Activity
         </p>
@@ -22,35 +26,28 @@ export const Container = ({ children }: { children?: React.ReactNode }) => (
 // ─────────────────────────────────────────────────────────────
 
 export const ActionBtn = ({
-    letter,
     text,
     onClick,
-    color = "#966EFF",
     disabled,
     isLoading,
 }: {
-    letter: string;
+    letter?: string;
     text: string;
     onClick?: () => void;
     color?: string;
     disabled?: boolean;
     isLoading?: boolean;
 }) => (
-    <AnimateIconButton
-        iconLetter={letter}
-        text={text}
-        variant="letter-icon"
-        textVariant="text-container-center"
-        hasGroupHover
-        classNames={{
-            btn: `w-full text-center after:text-sm after:font-medium`,
-            text: "text-sm font-medium",
-            icon: "size-6",
-        }}
-        color={color}
+    <Button
+        variant="burn"
+        hasHover
         isLoading={isLoading}
-        btnProps={{ onClick, disabled }}
-    />
+        disabled={disabled}
+        onClick={onClick}
+        className="my-2 w-full py-2 font-orbitron text-base md:my-3.25 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
+    >
+        {text}
+    </Button>
 );
 
 // ─────────────────────────────────────────────────────────────
@@ -60,15 +57,15 @@ export const ActionBtn = ({
 export const StatRow = ({
     label,
     value,
-    className = "text-greyed",
-    valueClassName = "text-sm",
+    className,
+    valueClassName = "text-sm font-bold md:text-base lg:text-lg 2xl:text-xl",
 }: {
     label: string;
     value: React.ReactNode;
     className?: string;
     valueClassName?: string;
 }) => (
-    <div className={`flex items-center justify-between gap-0.5 ${className}`}>
+    <div className={cn("mb-3 flex items-center justify-between", className)}>
         <span className="text-sm md:text-base lg:text-lg 2xl:text-xl">{label}</span>
         <span className={valueClassName}>{value}</span>
     </div>
@@ -101,9 +98,9 @@ export const AmountInput = ({
                 className="flex-1"
                 onKeyDown={(e) => e.key === "Enter" && onConfirm()}
             />
-            <Button size="sm" onClick={onConfirm}>
+            <UIButton size="sm" onClick={onConfirm}>
                 OK
-            </Button>
+            </UIButton>
         </div>
     );
 };

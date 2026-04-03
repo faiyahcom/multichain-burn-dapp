@@ -9,10 +9,11 @@ import { BurnPoolStatusDisplay } from "@/components/shared/glow/pool/pool-status
 import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import { useState, useEffect, useRef } from "react";
-import InfoTooltip from "@/components/common/info-tooltip";
 import ScanLink from "@/components/common/scan-link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import GlowContainer from "@/components/common/glow/container";
+import InfoTooltip from "@/components/common/glow/info-tooltip";
 
 type Props = {
     address: string;
@@ -90,7 +91,7 @@ const UpcomingCountdown = ({
     if (!remaining) return null;
     return (
         <p className="text-sm md:text-base lg:text-xl">
-            <span className="font-medium">Starts in: </span>
+            <span className="font-bold">Starts in: </span>
             <span>{formatCountdown(remaining)}</span>
         </p>
     );
@@ -113,7 +114,7 @@ const EndingCountdown = ({
     if (!remaining) return null;
     return (
         <p className="text-sm md:text-base lg:text-xl">
-            <span className="font-medium">Ends in: </span>
+            <span className="font-bold">Ends in: </span>
             <span>{formatCountdown(remaining)}</span>
         </p>
     );
@@ -135,9 +136,12 @@ const BurnPoolDetail = ({ address }: Props) => {
         switch (status) {
             case "pending":
                 return (
-                    <p className="ml-auto rounded-md bg-mb-popover px-6 text-xs text-success md:text-sm lg:text-base">
+                    <GlowContainer
+                        variant="green"
+                        className="ml-auto rounded-md bg-mb-popover px-3 py-0.5 md:px-6 md:py-1.5 text-xs text-mb-glow-green md:text-sm lg:text-base"
+                    >
                         This pool is pending approval. It will go live after approval.
-                    </p>
+                    </GlowContainer>
                 );
             case "upcoming":
                 return poolDetail?.pool.timeStart ? (
@@ -147,12 +151,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     />
                 ) : null;
             case "holding":
-                return (
-                    <InfoTooltip
-                        content="This pool reached its start time but has not been approved by admin. It is currently on holding."
-                        side="right"
-                    />
-                );
+                return null;
             case "on_going":
                 return poolDetail?.pool.timeEnd ? (
                     <EndingCountdown
@@ -170,7 +169,7 @@ const BurnPoolDetail = ({ address }: Props) => {
     };
 
     return (
-        <div className="space-y-6 pt-4 pl-4 md:pt-7 md:pl-8 lg:pt-9.5 lg:pl-14 lg:space-y-17.5">
+        <div className="space-y-6 pt-4 pl-4 font-inter md:pt-7 md:pl-8 lg:space-y-17.5 lg:pt-9.5 lg:pl-14">
             <div className="flex flex-wrap items-center gap-3 md:gap-6">
                 {isLoadingPoolDetail ? (
                     <>
@@ -190,10 +189,20 @@ const BurnPoolDetail = ({ address }: Props) => {
                                 iconClassName="size-3.5"
                             />
                         </div>
-                        <BurnPoolStatusDisplay className="min-w-0 px-2 py-1 text-xs md:px-3 md:py-1.5 md:text-sm lg:px-5 lg:py-2 sm:text-base lg:min-w-64 2xl:px-6 2xl:py-3 lg:text-2xl">
+                        <BurnPoolStatusDisplay className="min-w-0 px-2 py-1 text-xs sm:text-base md:px-3 md:py-1.5 md:text-sm lg:min-w-64 lg:px-5 lg:py-2 lg:text-2xl 2xl:px-6 2xl:py-3">
                             {BURN_POOL_STATUS[safeStatus].label}
+                            {
+                                safeStatus === "holding" &&
+                                <InfoTooltip
+                                    content="This pool reached its start time but has not been approved by admin. It is currently on holding."
+                                    side="right"
+                                    variant="burn"
+                                />
+                            }
                         </BurnPoolStatusDisplay>
-                        <div className="flex min-w-0 flex-1 flex-wrap">{renderExtraContent()}</div>
+                        <div className="flex min-w-0 flex-1 flex-wrap">
+                            {renderExtraContent()}
+                        </div>
                     </>
                 )}
             </div>

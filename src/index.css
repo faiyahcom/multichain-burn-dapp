@@ -173,9 +173,11 @@
   --color-pair-border: var(--pair-border);
   --color-burn-border: var(--burn-border);
   --color-swap-border: var(--swap-border);
+  --color-green-border: var(--green-border);
   --shadow-pair-glow: 0 0 20px 5px var(--pair-shadow);
   --shadow-burn-glow: 0 0 10px 5px var(--burn-shadow);
   --shadow-swap-glow: 0 0 20px 5px var(--swap-shadow);
+  --shadow-green-glow: 0 0 10px 5px var(--green-shadow);
 
   --tracking-2-percent: -0.02em;
 
@@ -205,6 +207,7 @@
   --color-mb-swap-activity-amount: var(--mb-swap-activity-amount);
   --color-mb-glow-input-bg: var(--mb-glow-input-bg);
   --color-mb-glow-input-secondary: var(--mb-glow-input-secondary);
+  --color-mb-glow-green: var(--mb-glow-green);
   /* END */
 }
 
@@ -224,6 +227,9 @@
 
   --swap-border: #0285ff;
   --swap-shadow: rgba(2, 133, 255, 0.25);
+
+  --green-border: #06c081;
+  --green-shadow: rgba(6, 192, 129, 0.25);
   /* END */
 
   --sub-bg: #ffffff;
@@ -336,6 +342,7 @@
   --mb-swap-activity-amount: #8288bb;
   --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
   --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
+  --mb-glow-green: #03DB92;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -465,6 +472,7 @@
   --mb-swap-activity-amount: #8288bb;
   --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
   --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
+  --mb-glow-green: #03DB92;
   /* END */
 }
 
@@ -474,12 +482,10 @@
     font-family: var(--font-orbitron);
     line-height: 1;
     letter-spacing: var(--tracking-2-percent);
-    background: linear-gradient(
-      133.54deg,
-      #1d1e3b 9.12%,
-      #0d111a 36.64%,
-      #010101 100%
-    );
+    background: linear-gradient(133.54deg,
+        #1d1e3b 9.12%,
+        #0d111a 36.64%,
+        #010101 100%);
   }
 
   * {
@@ -498,6 +504,7 @@
 
   /* Fix a bug in Safari where the input line-height more than 1 will push the text down */
   @supports (-webkit-hyphens: none) {
+
     input,
     textarea {
       line-height: 1 !important;
@@ -541,127 +548,111 @@
 
 /* NEW DESIGN */
 @utility card-pair-bg {
-  background: linear-gradient(
-    180deg,
-    rgba(46, 0, 148, 0.33) 0%,
-    rgba(46, 0, 148, 0) 25.48%,
-    rgba(46, 0, 148, 0) 75.96%,
-    rgba(59, 8, 173, 0.33) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(46, 0, 148, 0.33) 0%,
+      rgba(46, 0, 148, 0) 25.48%,
+      rgba(46, 0, 148, 0) 75.96%,
+      rgba(59, 8, 173, 0.33) 100%);
 }
 
 @utility card-burn-bg {
-  background: linear-gradient(
-    180deg,
-    rgba(255, 102, 0, 0.33) 0%,
-    rgba(255, 102, 0, 0) 25.48%,
-    rgba(255, 102, 0, 0) 75.96%,
-    rgba(255, 102, 0, 0.33) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(255, 102, 0, 0.33) 0%,
+      rgba(255, 102, 0, 0) 25.48%,
+      rgba(255, 102, 0, 0) 75.96%,
+      rgba(255, 102, 0, 0.33) 100%);
 }
 
 @utility card-swap-bg {
-  background: linear-gradient(
-    180deg,
-    rgba(2, 133, 255, 0.33) 0%,
-    rgba(2, 133, 255, 0) 25.48%,
-    rgba(2, 133, 255, 0) 75.96%,
-    rgba(2, 133, 255, 0.33) 100%
-  );
+  background: linear-gradient(180deg,
+      rgba(2, 133, 255, 0.33) 0%,
+      rgba(2, 133, 255, 0) 25.48%,
+      rgba(2, 133, 255, 0) 75.96%,
+      rgba(2, 133, 255, 0.33) 100%);
+}
+
+@utility card-green-bg {
+  background: linear-gradient(180deg,
+      rgba(3, 219, 146, 0.33) 0%,
+      rgba(3, 219, 146, 0) 25.48%,
+      rgba(3, 219, 146, 0) 75.96%,
+      rgba(3, 219, 146, 0.33) 100%);
 }
 
 @utility card-pair-bold-bottom-bg {
-  background: linear-gradient(
-    168.92deg,
-    rgba(141, 58, 0, 0) -0.14%,
-    rgba(141, 58, 0, 0) 21.08%,
-    rgba(35, 0, 141, 0.3) 61.5%,
-    #9100ff 91.81%
-  );
+  background: linear-gradient(168.92deg,
+      rgba(141, 58, 0, 0) -0.14%,
+      rgba(141, 58, 0, 0) 21.08%,
+      rgba(35, 0, 141, 0.3) 61.5%,
+      #9100ff 91.81%);
 }
 
 @utility card-burn-bold-bottom-bg {
-  background: linear-gradient(
-    168.92deg,
-    rgba(141, 58, 0, 0) -0.14%,
-    rgba(141, 58, 0, 0) 21.08%,
-    rgba(141, 58, 0, 0.3) 61.5%,
-    #ff6800 91.81%
-  );
+  background: linear-gradient(168.92deg,
+      rgba(141, 58, 0, 0) -0.14%,
+      rgba(141, 58, 0, 0) 21.08%,
+      rgba(141, 58, 0, 0.3) 61.5%,
+      #ff6800 91.81%);
 }
 
 @utility card-swap-bold-bottom-bg {
-  background: linear-gradient(
-    168.92deg,
-    rgba(0, 93, 180, 0) -0.14%,
-    rgba(0, 93, 180, 0) 21.08%,
-    rgba(0, 93, 180, 0.3) 61.5%,
-    #0285ff 91.81%
-  );
+  background: linear-gradient(168.92deg,
+      rgba(0, 93, 180, 0) -0.14%,
+      rgba(0, 93, 180, 0) 21.08%,
+      rgba(0, 93, 180, 0.3) 61.5%,
+      #0285ff 91.81%);
 }
 
 @utility grid-pair-bg {
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       rgba(46, 0, 148, 0.7) -4.94%,
       rgba(46, 0, 148, 0) 30.16%,
       rgba(46, 0, 148, 0.7) 74.87%,
-      #2e0094 95.06%
-    ),
+      #2e0094 95.06%),
     linear-gradient(0deg, rgba(42, 31, 82, 0.68), rgba(42, 31, 82, 0.68));
 }
 
 @utility grid-burn-bg {
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       rgba(255, 102, 0, 0.3) -4.94%,
       rgba(255, 102, 0, 0) 23.43%,
       rgba(255, 102, 0, 0) 62.37%,
-      rgba(255, 102, 0, 0.7) 95.06%
-    ),
+      rgba(255, 102, 0, 0.7) 95.06%),
     linear-gradient(0deg, rgba(13, 11, 20, 0.35), rgba(13, 11, 20, 0.35));
 }
 
 @utility grid-swap-bg {
   background:
-    linear-gradient(
-      180deg,
+    linear-gradient(180deg,
       rgba(2, 133, 255, 0.3) -4.94%,
       rgba(2, 133, 255, 0) 23.43%,
       rgba(2, 133, 255, 0) 62.37%,
-      rgba(0, 80, 154, 0.7) 95.06%
-    ),
+      rgba(0, 80, 154, 0.7) 95.06%),
     linear-gradient(0deg, rgba(13, 11, 20, 0.6), rgba(13, 11, 20, 0.6));
 }
 
 @utility grid-pair-btn-bg {
-  background: linear-gradient(
-    0deg,
-    #150043 6.59%,
-    #150043 21.65%,
-    #3500a9 80.33%
-  );
+  background: linear-gradient(0deg,
+      #150043 6.59%,
+      #150043 21.65%,
+      #3500a9 80.33%);
 }
 
 @utility grid-burn-btn-bg {
-  background: linear-gradient(
-    0deg,
-    #8f1d00 3.23%,
-    #c72800 13%,
-    #ff6800 100%,
-    #ff6800 100%
-  );
+  background: linear-gradient(0deg,
+      #8f1d00 3.23%,
+      #c72800 13%,
+      #ff6800 100%,
+      #ff6800 100%);
 }
 
 @utility grid-swap-btn-bg {
-  background: linear-gradient(
-    0deg,
-    #003f79 7.41%,
-    #0173de 46.5%,
-    #0285ff 99.2%
-  );
+  background: linear-gradient(0deg,
+      #003f79 7.41%,
+      #0173de 46.5%,
+      #0285ff 99.2%);
 }
 
 @utility global-grid {
@@ -693,8 +684,7 @@
 
   @media (min-width: 48rem) {
     grid-template-columns:
-      8px minmax(0, 0.5fr) minmax(0, 0.75fr) minmax(0, 0.75fr)
-      80px minmax(0, 0.75fr) minmax(0, 0.4fr);
+      8px minmax(0, 0.5fr) minmax(0, 0.75fr) minmax(0, 0.75fr) 80px minmax(0, 0.75fr) minmax(0, 0.4fr);
   }
 }
 

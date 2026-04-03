@@ -250,7 +250,10 @@ const WhitelistTokenSelect = ({
                   resolvedValue?.address === nativeToken.address,
                   disabledAddress === nativeToken.address,
                 )}
-                onClick={() => onChange(nativeToken)}
+                onClick={() => {
+                  if (disabledAddress === nativeToken.address) return;
+                  onChange(nativeToken);
+                }}
               >
                 <div
                   className={cn(
