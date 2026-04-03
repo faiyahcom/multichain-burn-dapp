@@ -214,8 +214,8 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
-                  getVariantBorderClassName({ variant: "swap" }),
+                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  getVariantBorderClassName({ variant: "swap", custom: "rounded-md" }),
                 ),
                 triggerContent:
                   "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
@@ -286,7 +286,7 @@ const CreateSwapPoolForm = ({
                     custom: "rounded-md border-2",
                   }),
                   getVariantBgClassName({ variant: "swap" }),
-                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
+                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
                 )}
               >
                 Fixed
@@ -318,8 +318,8 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
-                  getVariantBorderClassName({ variant: "swap" }),
+                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  getVariantBorderClassName({ variant: "swap", custom: "rounded-md" }),
                 ),
                 triggerContent:
                   "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
@@ -392,7 +392,7 @@ const CreateSwapPoolForm = ({
             <div
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:py-2 2xl:text-[23px]",
+                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
                 "rounded-md border-2",
               )}
             >
@@ -411,7 +411,7 @@ const CreateSwapPoolForm = ({
             <span
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:py-2 2xl:text-[23px]",
+                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:text-[23px]",
                 "rounded-md border-2",
               )}
             >

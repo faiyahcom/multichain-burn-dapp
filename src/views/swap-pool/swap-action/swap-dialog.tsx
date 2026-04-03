@@ -327,16 +327,22 @@ const SwapDialog = ({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogPortal>
-                <DialogOverlay onClick={() => onOpenChange(false)} />
-                <div className="fixed inset-0 z-50 overflow-y-auto">
-                    <div className="flex min-h-full flex-col items-center justify-center gap-2 p-2 sm:p-4">
-                        <DialogBody
-                            showCloseButton={false}
-                            onInteractOutside={(e) => e.preventDefault()}
+                <DialogOverlay />
+                <DialogBody
+                    showCloseButton={false}
+                    className="fixed inset-0 z-50 overflow-y-auto"
+                >
+                    <div
+                        className="flex min-h-full flex-col items-center justify-center gap-2 p-2 sm:p-4"
+                        onClick={(e) => {
+                            if (e.target === e.currentTarget) onOpenChange(false);
+                        }}
+                    >
+                        <div
                             className={cn(
                                 getVariantBorderClassName({ variant: "swap" }),
                                 getVariantShadowClassName({ variant: "swap" }),
-                                "h-fit min-w-0 w-full border-4 bg-mb-dark-popover px-4 py-4 sm:max-w-fit sm:px-6 sm:py-5 xl:px-8 xl:py-5",
+                                "h-fit w-full min-w-0 border-4 bg-mb-dark-popover px-4 py-4 sm:max-w-fit sm:px-6 sm:py-5 xl:px-8 xl:py-5",
                             )}
                         >
                             <DialogHeader>
@@ -397,14 +403,14 @@ const SwapDialog = ({
                                     onToggle={() => setOpenFeePopUp(!openFeePopUp)}
                                 />
                             </form>
-                        </DialogBody>
+                        </div>
 
                         <FeePanel
                             open={openFeePopUp}
                             settlementFee={poolDetail?.pool?.settlementFee}
                         />
                     </div>
-                </div>
+                </DialogBody>
             </DialogPortal>
         </Dialog>
     );
