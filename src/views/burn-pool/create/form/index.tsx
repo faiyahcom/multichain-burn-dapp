@@ -114,7 +114,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
 
   return (
     <form
-      className="w-full space-y-4 font-inter md:max-w-lg md:space-y-6 lg:max-w-xl lg:space-y-8 xl:max-w-2xl xl:space-y-12 2xl:space-y-15"
+      className="w-full space-y-4 font-inter md:max-w-lg md:space-y-6 lg:max-w-xl lg:space-y-8 xl:max-w-2xl xl:space-y-12 2xl:max-w-4xl 2xl:space-y-15"
       onSubmit={handleSubmit(onSubmit)}
     >
       <div className="flex flex-col gap-2">
@@ -172,8 +172,11 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
-                  getVariantBorderClassName({ variant: "burn" }),
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-64 md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:max-w-100 2xl:px-4 2xl:text-[23px]",
+                  getVariantBorderClassName({
+                    variant: "burn",
+                    custom: "rounded-md",
+                  }),
                 ),
                 triggerContent:
                   "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
@@ -297,8 +300,11 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
-                  getVariantBorderClassName({ variant: "burn" }),
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-64 md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:max-w-100 2xl:px-4 2xl:text-[23px]",
+                  getVariantBorderClassName({
+                    variant: "burn",
+                    custom: "rounded-md",
+                  }),
                 ),
                 triggerContent:
                   "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
@@ -326,7 +332,8 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <div
               className={cn(
                 getVariantBorderClassName({ variant: "burn" }),
-                "relative flex items-center gap-2 rounded-md border-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:py-2 2xl:text-[23px]",
+                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:w-64 md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:w-100 2xl:text-[23px]",
+                "rounded-md border-2",
               )}
             >
               <NetworkIcon
@@ -344,7 +351,8 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <span
               className={cn(
                 getVariantBorderClassName({ variant: "burn" }),
-                "relative flex gap-2 rounded-md border-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:py-2 2xl:text-[23px]",
+                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:text-[23px]",
+                "rounded-md border-2",
               )}
             >
               Burn
