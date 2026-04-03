@@ -8,6 +8,7 @@ import type {
   BooleanString,
   PaginationRequest,
   PaginationResponse,
+  SortBy,
   SortOrder,
 } from "@/types/common";
 import type { ActivityKindKey } from "@/types/pool";
@@ -21,7 +22,7 @@ export interface GetParticipatedPoolsByUserParams {
   chainIds?: string; // comma separated
   kind?: string;
   search?: string;
-  sortBy?: "tvl" | "joinedTime" | "amountBurned" | "claimableReward";
+  sortBy?: SortBy;
   sortDirection?: SortOrder; // default to desc
   tokenIn?: string;
   tokenReward?: string;
@@ -56,15 +57,20 @@ export interface ParticipatedUserPool {
   rewardNumerator: string;
   rewardDenominator: string;
 
-  tokenInSymbolCustom?: string | null;
-  tokenOutSymbolCustom?: string | null;
-  tokenInImageUri?: string | null;
-  tokenOutImageUri?: string | null;
+  tokenInSymbolCustom: string | null;
+  tokenOutSymbolCustom: string | null;
+  tokenInImageUri: string | null;
+  tokenOutImageUri: string | null;
 
   participant: string;
   amountBurned: string;
   claimableReward: string;
   joinedTime: string;
+
+  // Added to match PoolItemType
+  isPartner: boolean;
+  liquidity: string; // string number
+  rewardAmount: string; // string number
 }
 
 export type ParticipatedPoolsResponse = PaginationResponse & {

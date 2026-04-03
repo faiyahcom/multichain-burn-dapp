@@ -1,32 +1,32 @@
 import GlowContainer from "@/components/common/glow/container";
-import CustomPagination from "@/components/common/glow/glow-pagination";
 import { networkIdToChainId } from "@/config/networks";
-import { poolService } from "@/services/poolService";
-import { poolQueryKeys } from "@/services/queries/queryKey";
+import { userQueryKeys } from "@/services/queries/queryKey";
+import {
+  userService,
+  type GetParticipatedPoolsByUserParams,
+} from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
-import { useMyCreatePoolsBurnSearchFilterStore } from "@/stores/my-create-pools/burn/search-filter-store";
-import { useMyCreatePoolsSwapSearchFilterStore } from "@/stores/my-create-pools/swap/search-filter-store";
-import type {
-  PoolListRequest,
-  PoolType,
-} from "@/types/admin/master-pool-management";
+import { useMyParticipatedPoolsBurnSearchFilterStore } from "@/stores/my-participated-pools/burn";
+import { useMyParticipatedPoolsSwapSearchFilterStore } from "@/stores/my-participated-pools/swap";
+import type { PoolType } from "@/types/admin/master-pool-management";
 import { PoolKindCodeEnum } from "@/types/pool";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import ProfilePoolListBurn from "../pool/list/burn";
 import { useMediaQuery } from "usehooks-ts";
+import ProfilePoolListBurn from "../pool/list/burn";
 import ProfilePoolListSwap from "../pool/list/swap";
+import CustomPagination from "@/components/common/glow/glow-pagination";
 
 interface Props {
   poolType: PoolType;
 }
 
-const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
+const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
   const { filter: filterBurn, setFilter: setFilterBurn } =
-    useMyCreatePoolsBurnSearchFilterStore();
+    useMyParticipatedPoolsBurnSearchFilterStore();
   const { filter: filterSwap, setFilter: setFilterSwap } =
-    useMyCreatePoolsSwapSearchFilterStore();
+    useMyParticipatedPoolsSwapSearchFilterStore();
   const { user } = useAuthStore();
   const limit = 10;
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -55,7 +55,7 @@ const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
     }
   }, [poolType, setFilterBurn, setFilterSwap]);
 
-  const ownerQueryParams: PoolListRequest = {
+  const participatedQueryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
     limit: limit,
     kind: poolType.toString(),
@@ -66,14 +66,16 @@ const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
     search: filter?.text || undefined,
     sortBy: filter?.sortBy,
     sortDirection: filter?.sortOrder,
-    owner: user?.address,
   };
 
-  const { data: ownerPools, isPending: isOwnerPoolsPending } = useQuery({
-    queryKey: poolQueryKeys.list(ownerQueryParams),
-    queryFn: () => poolService.getPoolList(ownerQueryParams),
-    enabled: !!user?.address,
-  });
+  const { data: participatedData, isPending: isParticipatedPending } = useQuery(
+    {
+      queryKey: userQueryKeys.participatedPools(participatedQueryParams),
+      queryFn: () =>
+        userService.getParticipatedPoolsByUser(participatedQueryParams),
+      enabled: !!user?.address,
+    },
+  );
 
   return (
     <GlowContainer
@@ -82,15 +84,15 @@ const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
     >
       {poolType === PoolKindCodeEnum.Burn && (
         <ProfilePoolListBurn
-          data={ownerPools?.pools}
-          isLoading={isOwnerPoolsPending}
+          data={participatedData?.pools}
+          isLoading={isParticipatedPending}
           limit={limit}
         />
       )}
       {poolType === PoolKindCodeEnum.Swap && (
         <ProfilePoolListSwap
-          data={ownerPools?.pools}
-          isLoading={isOwnerPoolsPending}
+          data={participatedData?.pools}
+          isLoading={isParticipatedPending}
           limit={limit}
         />
       )}
@@ -98,7 +100,7 @@ const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
         currentPage={filter?.page ?? 1}
         onPageChange={(page) => setFilter?.({ page })}
         pageSize={limit}
-        totalCount={ownerPools?.total ?? 0}
+        totalCount={participatedData?.total ?? 0}
         variant="pair"
         onlyShowCurrentPage={!isDesktop}
       />
@@ -106,4 +108,4 @@ const ProfileMyCreatePool: React.FC<Props> = ({ poolType }) => {
   );
 };
 
-export default ProfileMyCreatePool;
+export default ProfileMyParticipatedPools;

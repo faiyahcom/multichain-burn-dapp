@@ -12,6 +12,10 @@ import { useMemo } from "react";
 
 type Tab = "burn-pool" | "swap-pool";
 
+const validTabs: Tab[] = ["burn-pool", "swap-pool"];
+const isValidTab = (value: unknown): value is Tab =>
+  typeof value === "string" && validTabs.includes(value as Tab);
+
 const tabOptions: SearchParamTabOption<Tab>[] = [
   { label: "Burn Pools", value: "burn-pool" },
   { label: "Swap Pools", value: "swap-pool" },
@@ -24,13 +28,13 @@ const TabToPoolType: Record<Tab, PoolType> = {
 
 export const Route = createFileRoute("/my-create-pools/")({
   validateSearch: (search: Record<string, Tab>) => ({
-    tab: search.tab ?? "burn-pool",
+    tab: isValidTab(search.tab) ? search.tab : "burn-pool",
   }),
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  const { tab } = Route.useSearch() as { tab: Tab };
+  const { tab } = Route.useSearch();
   const poolType = TabToPoolType[tab];
   const { filter: filterBurn, setFilter: setFilterBurn } =
     useMyCreatePoolsBurnSearchFilterStore();
@@ -73,6 +77,7 @@ function RouteComponent() {
         filter={filter}
         setFilter={setFilter}
         poolType={poolType}
+        profileType="my-create-pools"
       />
       <ProfileMyCreatePool poolType={poolType} />
     </ProfileLayout>

@@ -7,8 +7,14 @@ import type {
 } from "@/types/common";
 import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
 
-export const poolTypes = [PoolKindCodeEnum.Burn, PoolKindCodeEnum.Swap] as const;
+export const poolTypes = [
+  PoolKindCodeEnum.Burn,
+  PoolKindCodeEnum.Swap,
+] as const;
 export type PoolType = PoolKindCode;
+export const isPoolType = (value: unknown): value is PoolType =>
+  Object.values(PoolKindCodeEnum).includes(value as PoolKindCodeEnum);
+
 export const poolTypeLabels: Record<PoolType, string> = {
   [PoolKindCodeEnum.Burn]: "Burn pool",
   [PoolKindCodeEnum.Swap]: "Swap pool",
@@ -143,7 +149,7 @@ export type PoolListStatsResponse = {
   totalParticipants: number;
   totalBurned?: string;
   totalSwapVolume?: string;
-}
+};
 
 // user view pool list can only see certain statuses
 export const userViewBurnPoolStatuses = [
