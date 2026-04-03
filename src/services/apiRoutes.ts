@@ -10,6 +10,7 @@ export const API_ROUTES = {
       `/users/pools/${poolAddress}/proof`,
     UPDATE_PROFILE: "/users/profile",
     ACTIVITIES: "/users/activities",
+    CLAIMABLE_COUNT: "/users/pools/claimable-count",
   },
   POOLS: {
     LIST: "/pools",

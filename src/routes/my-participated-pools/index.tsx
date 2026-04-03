@@ -1,5 +1,10 @@
+import { getVariantBtnBgClassName } from "@/components/common/glow/container";
 import type { SearchParamTabOption } from "@/components/common/glow/search-param-tab";
 import SearchParamTab from "@/components/common/glow/search-param-tab";
+import { cn } from "@/lib/utils";
+import { userQueryKeys } from "@/services/queries/queryKey";
+import { userService } from "@/services/userService";
+import { useAuthStore } from "@/stores/authStore";
 import { useMyParticipatedPoolsBurnSearchFilterStore } from "@/stores/my-participated-pools/burn";
 import { useMyParticipatedPoolsClaimableSearchFilterStore } from "@/stores/my-participated-pools/claimable";
 import { useMyParticipatedPoolsSwapSearchFilterStore } from "@/stores/my-participated-pools/swap";
@@ -12,6 +17,7 @@ import ProfileLayout from "@/views/profile/layout";
 import ProfileMyParticipatedPools from "@/views/profile/my-participated-pools";
 import ProfileMyParticipatedPoolsClaimable from "@/views/profile/my-participated-pools/claimable";
 import ProfilePoolSearch from "@/views/profile/pool/search";
+import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
@@ -37,11 +43,7 @@ export const Route = createFileRoute("/my-participated-pools/")({
 function RouteComponent() {
   const { tab } = Route.useSearch();
   const poolType = TabToPoolType[tab];
-  const tabOptions: SearchParamTabOption<Tab>[] = [
-    { label: "Burn Pools", value: "burn-pool" },
-    { label: "Swap Pools", value: "swap-pool" },
-    { label: "Claimable", value: "claimable" },
-  ];
+  const { user, accessToken, _hasHydrated } = useAuthStore();
 
   const { filter: filterBurn, setFilter: setFilterBurn } =
     useMyParticipatedPoolsBurnSearchFilterStore();
@@ -51,6 +53,36 @@ function RouteComponent() {
 
   const { filter: filterClaimable, setFilter: setFilterClaimable } =
     useMyParticipatedPoolsClaimableSearchFilterStore();
+
+  const { data: claimableCount } = useQuery({
+    queryKey: userQueryKeys.claimableCount({
+      id: user?.id,
+    }),
+    queryFn: async () => {
+      return userService.getClaimableCount();
+    },
+    enabled: !!accessToken && _hasHydrated,
+  });
+
+  const tabOptions: SearchParamTabOption<Tab>[] = [
+    { label: "Burn Pools", value: "burn-pool" },
+    { label: "Swap Pools", value: "swap-pool" },
+    {
+      label: "Claimable",
+      value: "claimable",
+      rightAddons: (
+        <div
+          className={cn(
+            "text-xl font-medium text-foreground sm:text-2xl text-center",
+            "rounded-full px-2.5 py-1.25 shrink-0 min-w-9.5 sm:min-w-10.5",
+            getVariantBtnBgClassName({ variant: "pair" }),
+          )}
+        >
+          {claimableCount?.total ?? 0}
+        </div>
+      ),
+    },
+  ];
 
   const filter = useMemo(() => {
     switch (tab) {

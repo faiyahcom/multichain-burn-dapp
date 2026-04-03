@@ -37,14 +37,17 @@ const SearchParamTab: React.FC<Props> = ({
             search={{
               [searchParamKey]: option.value,
             }}
-            className={cn(
-              "flex items-center justify-center gap-1.25",
-              "border-b-3 border-transparent py-1.25 text-xl font-bold text-mb-gray-b8 sm:py-2.5 sm:text-2xl",
-              "transition-colors duration-300",
-              { "border-foreground text-foreground": isActive },
-            )}
+            className={cn("flex items-center justify-center gap-1.25 shrink-0")}
           >
-            {option.label}
+            <span
+              className={cn(
+                "border-b-3 border-transparent py-1.25 text-xl font-bold text-mb-gray-b8 sm:py-2.5 sm:text-2xl",
+                "transition-colors duration-300",
+                { "border-foreground text-foreground": isActive },
+              )}
+            >
+              {option.label}
+            </span>
             {option.rightAddons}
           </Link>
         );

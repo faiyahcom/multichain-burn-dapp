@@ -23,6 +23,8 @@ export const userQueryKeys = {
     ["users", "participatedPools", params] as const,
   activities: (params?: unknown) => ["users", "activities", params] as const,
   pools: (params?: unknown) => ["users", "pools", params] as const,
+  claimableCount: (params?: unknown) =>
+    ["users", "claimableCount", params] as const,
 };
 
 export const whitelistUserQueryKeys = {
