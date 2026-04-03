@@ -202,7 +202,7 @@ const WhitelistTokenSelect = ({
           "Select Token"
         )}
         {hasDropdownIcon && (
-          <ChevronDownIcon className="size-4 text-foreground" />
+          <ChevronDownIcon className={cn("size-4 text-foreground transition-transform duration-300", open && "rotate-180")} />
         )}
       </DropdownMenuTrigger>
 

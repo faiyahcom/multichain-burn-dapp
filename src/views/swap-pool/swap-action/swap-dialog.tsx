@@ -1,7 +1,8 @@
 import {
     Dialog,
-    DialogContent,
+    DialogBody,
     DialogHeader,
+    DialogOverlay,
     DialogPortal,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -326,77 +327,84 @@ const SwapDialog = ({
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogPortal>
-                <DialogContent
-                    showCloseButton={false}
-                    className={cn(
-                        getVariantBorderClassName({ variant: "swap" }),
-                        getVariantShadowClassName({ variant: "swap" }),
-                        "h-fit min-w-0 max-h-[98dvh] border-4 bg-mb-dark-popover px-4 py-4 sm:max-w-fit sm:px-6 sm:py-5 xl:px-8 xl:py-5",
-                    )}
-                >
-                    <DialogHeader>
-                        <DialogTitle className="text-xl font-bold sm:text-2xl xl:text-40px">
-                            <p className="inline-flex items-center">
-                                <IconSwapCategory className="size-8 sm:size-10 xl:size-16" />
-                                TOKEN SWAP
-                            </p>
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-                        <SellSection
-                            tokenDisplay={burnTokenDisplay}
-                            isLoadingWhitelistTokens={!poolDetail}
-                            register={register}
-                            errors={errors}
-                            onSelectPercent={handleSelectPercent}
-                            isLoadingBalance={isLoadingBurnBalance}
-                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted.toUpperCase())} ${burnTokenDisplay?.symbol ?? ""}`}
-                            poolDetail={poolDetail}
-                            maxBurnLeft={maxBurnLeft}
-                            isExceedingMax={isExceedingMax}
-                            insufficientBalanceMessage={insufficientBalanceMessage}
-                            chainId={poolDetail?.pool.chainId}
-                        />
-
-                        <BuySection
-                            tokenDisplay={rewardTokenDisplay}
-                            isLoadingWhitelistTokens={!poolDetail}
-                            estimatedAmount={formattedEstimatedRewardAmount}
-                            isLoadingBalance={isLoadingRewardBalance}
-                            balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardTokenDisplay?.symbol ?? ""}`}
-                            chainId={poolDetail?.pool.chainId}
-                        />
-                        <Button
-                            variant="swap"
-                            className="mt-4 w-full text-base md:text-xl 2xl:text-2xl"
-                            hasHover
-                            isLoading={isSubmitting}
-                            disabled={
-                                isSubmitting ||
-                                isSellAmountDebouncing ||
-                                isExceedingMax ||
-                                isInsufficientBalance
-                            }
-                            type="submit"
+                <DialogOverlay onClick={() => onOpenChange(false)} />
+                <div className="fixed inset-0 z-50 overflow-y-auto">
+                    <div className="flex min-h-full flex-col items-center justify-center gap-2 p-2 sm:p-4">
+                        <DialogBody
+                            showCloseButton={false}
+                            onInteractOutside={(e) => e.preventDefault()}
+                            className={cn(
+                                getVariantBorderClassName({ variant: "swap" }),
+                                getVariantShadowClassName({ variant: "swap" }),
+                                "h-fit min-w-0 w-full border-4 bg-mb-dark-popover px-4 py-4 sm:max-w-fit sm:px-6 sm:py-5 xl:px-8 xl:py-5",
+                            )}
                         >
-                            {isSubmitting ? "Swapping..." : "Swap"}
-                        </Button>
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-bold sm:text-2xl xl:text-40px">
+                                    <p className="inline-flex items-center">
+                                        <IconSwapCategory className="size-8 sm:size-10 xl:size-16" />
+                                        TOKEN SWAP
+                                    </p>
+                                </DialogTitle>
+                            </DialogHeader>
 
-                        <SwapRateRow
-                            burnSymbol={burnTokenDisplay.symbol}
-                            rewardSymbol={rewardTokenDisplay.symbol}
-                            rewardNumerator={poolDetail?.pool?.rewardNumerator}
-                            rewardDenominator={poolDetail?.pool?.rewardDenominator}
-                            onToggle={() => setOpenFeePopUp(!openFeePopUp)}
+                            <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
+                                <SellSection
+                                    tokenDisplay={burnTokenDisplay}
+                                    isLoadingWhitelistTokens={!poolDetail}
+                                    register={register}
+                                    errors={errors}
+                                    onSelectPercent={handleSelectPercent}
+                                    isLoadingBalance={isLoadingBurnBalance}
+                                    balanceText={`${formatBalanceDisplay(burnBalanceFormatted.toUpperCase())} ${burnTokenDisplay?.symbol ?? ""}`}
+                                    poolDetail={poolDetail}
+                                    maxBurnLeft={maxBurnLeft}
+                                    isExceedingMax={isExceedingMax}
+                                    insufficientBalanceMessage={insufficientBalanceMessage}
+                                    chainId={poolDetail?.pool.chainId}
+                                />
+
+                                <BuySection
+                                    tokenDisplay={rewardTokenDisplay}
+                                    isLoadingWhitelistTokens={!poolDetail}
+                                    estimatedAmount={formattedEstimatedRewardAmount}
+                                    isLoadingBalance={isLoadingRewardBalance}
+                                    balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardTokenDisplay?.symbol ?? ""}`}
+                                    chainId={poolDetail?.pool.chainId}
+                                />
+                                <Button
+                                    variant="swap"
+                                    className="mt-4 w-full text-base md:text-xl 2xl:text-2xl"
+                                    hasHover
+                                    isLoading={isSubmitting}
+                                    disabled={
+                                        isSubmitting ||
+                                        isSellAmountDebouncing ||
+                                        isExceedingMax ||
+                                        isInsufficientBalance
+                                    }
+                                    type="submit"
+                                >
+                                    {isSubmitting ? "Swapping..." : "Swap"}
+                                </Button>
+
+                                <SwapRateRow
+                                    burnSymbol={burnTokenDisplay.symbol}
+                                    rewardSymbol={rewardTokenDisplay.symbol}
+                                    rewardNumerator={poolDetail?.pool?.rewardNumerator}
+                                    rewardDenominator={poolDetail?.pool?.rewardDenominator}
+                                    open={openFeePopUp}
+                                    onToggle={() => setOpenFeePopUp(!openFeePopUp)}
+                                />
+                            </form>
+                        </DialogBody>
+
+                        <FeePanel
+                            open={openFeePopUp}
+                            settlementFee={poolDetail?.pool?.settlementFee}
                         />
-                    </form>
-                </DialogContent>
-
-                <FeePanel
-                    open={openFeePopUp}
-                    settlementFee={poolDetail?.pool?.settlementFee}
-                />
+                    </div>
+                </div>
             </DialogPortal>
         </Dialog>
     );

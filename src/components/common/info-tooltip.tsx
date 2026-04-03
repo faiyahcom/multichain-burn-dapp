@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
@@ -19,9 +20,15 @@ const InfoTooltip: React.FC<Props> = ({
   sideOffset = 10,
   classNames,
 }) => {
+  const [open, setOpen] = useState(false);
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
+    <Tooltip open={open} onOpenChange={setOpen}>
+      <TooltipTrigger
+        asChild
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        onClick={() => setOpen((v) => !v)}
+      >
         <span
           className={cn(
             "inline-flex size-5.25 shrink-0 items-center justify-center rounded-full bg-foreground pt-0.5 text-base leading-0 font-bold text-primary-foreground",
