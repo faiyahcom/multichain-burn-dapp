@@ -114,6 +114,10 @@ export interface GetUserActivitiesResponse extends PaginationResponse {
   activities: UserActivityType[];
 }
 
+export interface GetClaimableCountResponse {
+  total: number;
+}
+
 export const userService = {
   getParticipatedPoolsByUser: async (
     params: GetParticipatedPoolsByUserParams,
@@ -138,6 +142,13 @@ export const userService = {
       {
         params,
       },
+    );
+    return response;
+  },
+
+  getClaimableCount: async () => {
+    const response = await apiClient.get<GetClaimableCountResponse>(
+      USERS_API_ROUTES.CLAIMABLE_COUNT,
     );
     return response;
   },
