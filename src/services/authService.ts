@@ -22,10 +22,13 @@ export interface SignInResponse {
   token: string;
 }
 
+export const USER_ROLES = ["normal", "admin", "super_admin"] as const;
+export type UserRole = (typeof USER_ROLES)[number];
+
 export interface UserResponse {
   id: string;
   address: string;
-  role: "normal" | "admin" | "super_admin";
+  role: UserRole;
   avatar: string | null;
   name: string | null; // nickname
 }
