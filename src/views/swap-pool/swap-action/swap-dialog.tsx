@@ -279,7 +279,7 @@ const SwapDialog = ({
 
             const feeBN = rewardBN
                 .mul(new BN(settlementFee ?? "0"))
-                .div(new BN(DECIMAL_FEE_PERCENT));
+                .div(new BN(DECIMAL_FEE_PERCENT * 100));
 
             const finalReward = rewardBN.sub(feeBN);
 

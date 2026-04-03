@@ -1,4 +1,5 @@
 import InfoTooltip from "@/components/common/glow/info-tooltip";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 type Props = {
     open: boolean;
@@ -23,7 +24,7 @@ const FeePanel = ({ open, settlementFee }: Props) => (
                     />
                 </div>
                 <div className="font-semibold text-green-500">
-                    {settlementFee ? `${Number(settlementFee) / 100}%` : "Free"}
+                    {settlementFee ? `${Number(settlementFee) / DECIMAL_FEE_PERCENT}%` : "Free"}
                 </div>
             </div>
             <div className="mt-3 flex items-center justify-between text-sm text-foreground">
