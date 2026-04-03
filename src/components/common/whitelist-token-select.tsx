@@ -14,7 +14,9 @@ import { NETWORK_CONFIGS } from "@/config/networks";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { truncateString } from "@/utils/helpers/string";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 type Props = {
   value?: string;
@@ -32,24 +34,33 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const queryClient = useQueryClient();
 
   const networkConfig = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
   const nativeCurrency = networkConfig?.appKitNetwork.nativeCurrency;
   const isSolana = selectedNetworkId === "solanaDevnet";
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
-  const { data: whitelistTokens, isPending: isLoading } = useGetWhitelistTokens(
-    {
-      search: textSearch || undefined,
-      chainIds: networkConfig?.backendChainId,
-      active: "1",
-      isDropped: "0",
-    },
-  );
+  const {
+    data: whitelistTokens,
+    isPending,
+    isFetching,
+  } = useGetWhitelistTokens({
+    search: textSearch || undefined,
+    chainIds: networkConfig?.backendChainId,
+    active: "1",
+    isDropped: "0",
+  });
+
+  const isLoading = isPending || (open && isFetching);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setTextSearch("");
+    } else {
+      void queryClient.invalidateQueries({
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+      });
     }
     setOpen(open);
   };

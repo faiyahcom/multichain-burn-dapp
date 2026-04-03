@@ -1,4 +1,4 @@
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { chainIdToNetworkConfig, NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 
 export function mapChainToSystemNetwork(
     namespace: string,
@@ -15,4 +15,15 @@ export function mapChainToSystemNetwork(
 
         return false;
     })?.id ?? null;
+}
+
+export function getExplorerTxUrl(chainId: string, hash: string): string {
+    const network = chainIdToNetworkConfig(chainId);
+    const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
+    if (!baseUrl) return "#";
+    // Solana explorer uses different path format
+    if (network?.id === "solanaDevnet") {
+        return `${baseUrl.replace(/\/$/, "")}/tx/${hash}?cluster=devnet`;
+    }
+    return `${baseUrl.replace(/\/$/, "")}/tx/${hash}`;
 }

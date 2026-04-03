@@ -38,6 +38,12 @@ export const whitelistUserQueryKeys = {
     ["whitelist-users", "history", params] as const,
 };
 
+export const adminManagementQueryKeys = {
+  all: ["admin-management"] as const,
+  list: (params?: Record<string, unknown>) =>
+    [...adminManagementQueryKeys.all, "list", params] as const,
+};
+
 export const pairQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["pairs", "list", params] as const,
@@ -49,6 +55,13 @@ export const transferHistoryQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["transfer-history", "list", params] as const,
   analysis: () => ["transfer-history", "analysis"] as const,
+};
+
+export const feeQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["fee", "list", params] as const,
+  stats: (params?: Record<string, unknown>) =>
+    ["fee", "stats", params] as const,
 };
 
 export const authQueryKeys = {

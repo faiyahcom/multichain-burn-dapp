@@ -8,7 +8,6 @@ import {
   whitelistService,
   type ForceUpdateWhitelistTokenStatusRequest,
 } from "@/services/whitelistService";
-import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
 import { useCreateWhitelistTokenSolanaFn } from "../../dialog/create/useCreateWhitelistTokenSolanaFn";
@@ -16,7 +15,7 @@ import { useCreateWhitelistTokenEvmFn } from "../../dialog/create/useCreateWhite
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
-import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 interface Props {
   switchProps?: React.ComponentProps<typeof BlueSwitch>;
@@ -25,7 +24,6 @@ interface Props {
 }
 
 const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
-  const { filter } = useAdminWhitelistTokenSearchFilterStore();
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
   const { caipAddress } = useAppKitAccount();
@@ -57,8 +55,7 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokens(filter),
-        exact: false,
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
     },
     onError: (error) => {

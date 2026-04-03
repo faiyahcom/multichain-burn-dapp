@@ -4,6 +4,7 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { DECIMAL_FEE_PERCENT } from "./useFeeSettings";
 
 export type UpdateFeeConfigEvmParams = {
     treasury: string;
@@ -33,7 +34,7 @@ export const useUpdateFeeConfigEvmFn = () => {
                 // creationFee: human ETH/BNB/XPT → wei
                 const creationFeeWei = ethers.parseEther(creationFee);
                 // settlementFee: percentage → basis points (e.g. 5% → 500)
-                const settlementFeeBps = BigInt(Math.round(parseFloat(settlementFee) * 100));
+                const settlementFeeBps = BigInt(Math.round(parseFloat(settlementFee) * DECIMAL_FEE_PERCENT));
 
                 const tx = await contract.setFeeConfig(
                     treasury,

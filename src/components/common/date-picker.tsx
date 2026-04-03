@@ -21,6 +21,7 @@ interface Props {
     btn?: string;
     content?: string;
   };
+  calendarProps?: Omit<React.ComponentProps<typeof Calendar>, "mode">;
 }
 
 const DatePicker: React.FC<Props> = ({
@@ -28,6 +29,7 @@ const DatePicker: React.FC<Props> = ({
   onChange,
   placeholder = "DD/MM/YY",
   classNames,
+  calendarProps,
 }) => {
   return (
     <Popover>
@@ -38,7 +40,9 @@ const DatePicker: React.FC<Props> = ({
           size={"mb-btn"}
         >
           <CalendarIcon className="size-5 shrink-0" />
-          <span>{value ? format(value, "dd/MM/yy") : placeholder}</span>
+          <span className={cn({ "text-secondary-text": !value })}>
+            {value ? format(value, "dd/MM/yy") : placeholder}
+          </span>
           <ArrowIcon direction="down" />
         </Button>
       </PopoverTrigger>
@@ -59,6 +63,7 @@ const DatePicker: React.FC<Props> = ({
           selected={value}
           onSelect={(d) => onChange?.(d || undefined)}
           defaultMonth={value}
+          {...calendarProps}
         />
       </PopoverContent>
     </Popover>

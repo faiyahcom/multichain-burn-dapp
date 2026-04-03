@@ -28,9 +28,15 @@ export const API_ROUTES = {
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
+    CHECK_USER: "/whitelist-users/check-user",
     UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
+  },
+  ADMINS: {
+    LIST: "/admins",
+    UPSERT_USER: "/admins/user",
+    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
   },
   PAIRS: {
     LIST: "/pairs",
@@ -39,5 +45,9 @@ export const API_ROUTES = {
   TRANSFER_HISTORY: {
     LIST: "/transfers",
     ANALYSIS: "/transfers/analysis",
+  },
+  FEE: {
+    LIST: "/fee",
+    STATS: "/fee/stats",
   },
 } as const;
