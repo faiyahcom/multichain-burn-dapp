@@ -17,6 +17,10 @@ import { useMemo } from "react";
 
 type Tab = "burn-pool" | "swap-pool" | "claimable";
 
+const validTabs: Tab[] = ["burn-pool", "swap-pool", "claimable"];
+const isValidTab = (value: unknown): value is Tab =>
+  typeof value === "string" && validTabs.includes(value as Tab);
+
 const TabToPoolType: Record<Tab, PoolType | "claimable"> = {
   "burn-pool": PoolKindCodeEnum.Burn,
   "swap-pool": PoolKindCodeEnum.Swap,
@@ -24,8 +28,8 @@ const TabToPoolType: Record<Tab, PoolType | "claimable"> = {
 };
 
 export const Route = createFileRoute("/my-participated-pools/")({
-  validateSearch: (search: Record<string, Tab>) => ({
-    tab: search.tab ?? "burn-pool",
+  validateSearch: (search: Record<string, unknown>) => ({
+    tab: isValidTab(search.tab) ? search.tab : "burn-pool",
   }),
   component: RouteComponent,
 });

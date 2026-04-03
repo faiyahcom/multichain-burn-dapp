@@ -54,7 +54,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
   const queryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
     limit: limit,
-    kind: undefined,
+    kind: PoolKindCodeEnum.Burn.toString(),
     includeStatuses: undefined,
     chainIds: convertArrayToStringParam({
       array: filter?.network?.map(networkIdToChainId)?.filter(Boolean) ?? [],
@@ -205,6 +205,9 @@ const ProfileMyParticipatedPoolsClaimable = () => {
                     unit={tokenOutDisplay.symbol}
                     isShorten
                   />
+                </TableCell>
+                <TableCell>
+                  <p>Dynamic</p>
                 </TableCell>
                 <TableCell>
                   <Button
