@@ -214,7 +214,7 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
+                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
                   getVariantBorderClassName({ variant: "swap" }),
                 ),
                 triggerContent:
@@ -318,7 +318,7 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
+                  "w-full md:max-w-64 2xl:max-w-80 px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:py-2 2xl:text-[23px]",
                   getVariantBorderClassName({ variant: "swap" }),
                 ),
                 triggerContent:

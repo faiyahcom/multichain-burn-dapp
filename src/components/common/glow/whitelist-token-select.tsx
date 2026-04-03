@@ -21,6 +21,7 @@ import {
   getVariantBtnBg50ClassName,
   getVariantBtnBgClassName,
 } from "./container";
+import { ChevronDownIcon } from "lucide-react";
 
 export type TokenOption = {
   address: string;
@@ -52,6 +53,7 @@ type Props = {
   disabledAddress?: string;
   classNames?: WhitelistTokenSelectClassNames;
   variant?: "pair" | "burn" | "swap";
+  hasDropdownIcon?: boolean;
 };
 
 const resolveSymbol = (token: TokenOption) =>
@@ -66,6 +68,7 @@ const WhitelistTokenSelect = ({
   disabledAddress,
   classNames = {},
   variant = "swap",
+  hasDropdownIcon = true,
 }: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
@@ -197,6 +200,9 @@ const WhitelistTokenSelect = ({
           </div>
         ) : (
           "Select Token"
+        )}
+        {hasDropdownIcon && (
+          <ChevronDownIcon className="size-4 text-foreground" />
         )}
       </DropdownMenuTrigger>
 

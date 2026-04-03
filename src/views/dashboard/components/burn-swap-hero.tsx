@@ -76,6 +76,7 @@ const HeroSwapMiniForm = () => {
                         classNames={{
                             trigger: "w-full py-2 text-nowrap",
                         }}
+                        hasDropdownIcon={false}
                     />
                 </div>
 
@@ -89,6 +90,7 @@ const HeroSwapMiniForm = () => {
                         classNames={{
                             trigger: "w-full py-2 text-nowrap justify-end",
                         }}
+                        hasDropdownIcon={false}
                     />
                 </div>
             </div>
