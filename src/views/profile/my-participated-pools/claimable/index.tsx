@@ -154,7 +154,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
                 variant="pair"
               >
                 <TableCell className="min-w-0 space-y-1 text-left">
-                  <p className="min-w-0 truncate" title={pool.name}>
+                  <p className="min-w-0 truncate max-w-38.75" title={pool.name}>
                     {pool.name}
                   </p>
                   <CopyableText
