@@ -8,7 +8,6 @@ import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
-import DatePicker from "@/components/common/date-picker";
 import { cn } from "@/lib/utils";
 import {
   getVariantBgClassName,
@@ -16,6 +15,7 @@ import {
 } from "@/components/common/glow/container";
 import { Button } from "@/components/common/glow/button";
 import { Input } from "@/components/common/glow/input";
+import { DatePicker } from "@/components/common/glow/date-picker";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
@@ -156,7 +156,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
           })}
         />
         {errors.poolName && (
-          <p className="text-xs text-destructive">{errors.poolName.message}</p>
+          <p className="font-inter text-xs text-destructive">{errors.poolName.message}</p>
         )}
       </div>
 
@@ -193,7 +193,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               {...register("tokenBurn", { required: "Token burn is required" })}
             />
             {errors.tokenBurn && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.tokenBurn.message}
               </p>
             )}
@@ -206,22 +206,16 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               Start Time
             </span>
             <DatePicker
+              variant="burn"
               value={startTime}
               onChange={(date: Date | undefined) =>
                 setValue("startTime", date as Date, { shouldValidate: true })
               }
-              classNames={{
-                btn: cn(
-                  getVariantBorderClassName({ variant: "burn" }),
-                  "border-2 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
-                ),
-              }}
-              calendarProps={{
-                disabled: (date: Date) => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  return date < today || (endTime ? date > endTime : false);
-                },
+              className="text-xs px-2 py-3 md:px-3 md:py-5 rounded-md sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+              disabled={(date: Date) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return date < today || (endTime ? date > endTime : false);
               }}
             />
             <input
@@ -238,7 +232,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               })}
             />
             {errors.startTime && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.startTime.message}
               </p>
             )}
@@ -248,22 +242,16 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               End Time
             </span>
             <DatePicker
+              variant="burn"
               value={endTime}
               onChange={(date: Date | undefined) =>
                 setValue("endTime", date as Date, { shouldValidate: true })
               }
-              classNames={{
-                btn: cn(
-                  getVariantBorderClassName({ variant: "burn" }),
-                  "border-2 text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
-                ),
-              }}
-              calendarProps={{
-                disabled: (date: Date) => {
-                  const today = new Date();
-                  today.setHours(0, 0, 0, 0);
-                  return date < today || (startTime ? date < startTime : false);
-                },
+              className="text-xs px-2 py-0 md:px-3 md:py-5 rounded-md sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+              disabled={(date: Date) => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                return date < today || (startTime ? date < startTime : false);
               }}
             />
             <input
@@ -280,7 +268,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               })}
             />
             {errors.endTime && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.endTime.message}
               </p>
             )}
@@ -323,7 +311,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               })}
             />
             {errors.tokenReward && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.tokenReward.message}
               </p>
             )}

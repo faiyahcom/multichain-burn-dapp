@@ -429,12 +429,12 @@ const DepositRewardDialog = ({
                 </div>
 
                 {errors.amount && (
-                  <p className="text-xs text-destructive">
+                  <p className="font-inter text-xs text-destructive">
                     {errors.amount.message}
                   </p>
                 )}
                 {insufficientBalanceMessage && (
-                  <p className="text-xs text-destructive">
+                  <p className="font-inter text-xs text-destructive">
                     {insufficientBalanceMessage}
                   </p>
                 )}

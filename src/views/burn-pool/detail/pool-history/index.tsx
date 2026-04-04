@@ -33,7 +33,7 @@ const PoolHistory = ({ poolDetail }: Props) => {
                             className={cn(
                                 "rounded-lg px-2 py-1 font-inter text-xs font-semibold text-foreground transition-colors md:rounded-18px md:px-3 md:py-2 md:text-sm",
                                 activeTab === tab.id
-                                    ? "border border-burn-border/85 bg-burn-border/85"
+                                    ? "border border-mb-btn-burn/85 bg-mb-btn-burn/85"
                                     : "",
                             )}
                         >

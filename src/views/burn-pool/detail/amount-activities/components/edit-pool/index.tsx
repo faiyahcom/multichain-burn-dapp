@@ -115,7 +115,7 @@ const EditPoolDialog = ({
                 {...register("poolName")}
               />
               {errors.poolName && (
-                <p className="text-xs text-destructive">
+                <p className="font-inter text-xs text-destructive">
                   {errors.poolName.message}
                 </p>
               )}
@@ -154,7 +154,7 @@ const EditPoolDialog = ({
                   })}
                 />
                 {errors.startTime && (
-                  <p className="text-xs text-destructive">
+                  <p className="font-inter text-xs text-destructive">
                     {errors.startTime.message}
                   </p>
                 )}
@@ -190,7 +190,7 @@ const EditPoolDialog = ({
                   })}
                 />
                 {errors.endTime && (
-                  <p className="text-xs text-destructive">
+                  <p className="font-inter text-xs text-destructive">
                     {errors.endTime.message}
                   </p>
                 )}

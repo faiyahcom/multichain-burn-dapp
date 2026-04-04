@@ -76,17 +76,17 @@ const SellSection = ({
             </div>
 
             {errors.burnAmount && (
-                <div className="mt-1 text-right text-xs text-destructive">
+                <div className="mt-1 font-inter text-right text-xs text-destructive">
                     {errors.burnAmount.message}
                 </div>
             )}
             {insufficientBalanceMessage && (
-                <div className="mt-1 text-right text-xs text-destructive">
+                <div className="mt-1 font-inter text-right text-xs text-destructive">
                     {insufficientBalanceMessage}
                 </div>
             )}
             {isExceedingMax && (
-                <div className="mt-1 text-right text-xs text-destructive">
+                <div className="mt-1 font-inter text-right text-xs text-destructive">
                     Amount exceeds pool limit (
                     {shortenNumber({ number: Number(maxBurnLeft) })}{" "}
                     {tokenDisplay.symbol ?? ""})

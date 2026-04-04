@@ -197,7 +197,7 @@ const CreateSwapPoolForm = ({
           })}
         />
         {errors.poolName && (
-          <p className="text-xs text-destructive">{errors.poolName.message}</p>
+          <p className="font-inter text-xs text-destructive">{errors.poolName.message}</p>
         )}
       </div>
 
@@ -235,7 +235,7 @@ const CreateSwapPoolForm = ({
               {...register("tokenBurn", { required: "Token burn is required" })}
             />
             {errors.tokenBurn && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.tokenBurn.message}
               </p>
             )}
@@ -302,7 +302,7 @@ const CreateSwapPoolForm = ({
             </RadioGroup>
           </div>
           {errors.ratio && (
-            <p className="text-xs text-destructive">{errors.ratio.message}</p>
+            <p className="font-inter text-xs text-destructive">{errors.ratio.message}</p>
           )}
         </div>
       </div>
@@ -344,7 +344,7 @@ const CreateSwapPoolForm = ({
               })}
             />
             {errors.tokenReward && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.tokenReward.message}
               </p>
             )}
@@ -392,7 +392,7 @@ const CreateSwapPoolForm = ({
           })}
         />
         {errors.budget && (
-          <p className="text-xs text-destructive">{errors.budget.message}</p>
+          <p className="font-inter text-xs text-destructive">{errors.budget.message}</p>
         )}
 
         <div className="flex flex-wrap gap-2 md:gap-3 2xl:gap-3.75">
