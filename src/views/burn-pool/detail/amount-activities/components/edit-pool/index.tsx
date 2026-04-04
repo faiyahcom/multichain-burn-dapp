@@ -9,9 +9,15 @@ import {
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { DatePicker } from "@/components/ui/date-picker";
-import AnimateIconButton from "@/components/common/animate-icon-button";
+import { DatePicker } from "@/components/common/glow/date-picker";
+import { Input } from "@/components/common/glow/input";
+import { Button } from "@/components/common/glow/button";
+import { cn } from "@/lib/utils";
+import {
+  getVariantBgClassName,
+  getVariantBorderClassName,
+  getVariantShadowClassName,
+} from "@/components/common/glow/container";
 import type { PoolDetailResponse } from "@/types/pool";
 
 const editFormSchema = z
@@ -96,146 +102,156 @@ const EditPoolDialog = ({
       <DialogPortal>
         <DialogContent
           showCloseButton={false}
-          className="h-fit w-full bg-primary-foreground px-10 py-6 sm:max-w-2xl"
+          className={cn(
+            "h-fit w-full bg-background p-0 sm:max-w-2xl sm:p-0 sm:px-8 md:p-0 xl:max-w-3xl",
+            getVariantBorderClassName({
+              variant: "burn",
+              custom: "rounded-xl",
+            }),
+            getVariantShadowClassName({ variant: "burn" }),
+          )}
         >
-          <DialogHeader className="mt-4 text-center">
-            <DialogTitle className="text-3xl font-semibold uppercase">
-              Edit Pool
-            </DialogTitle>
-          </DialogHeader>
+          <div
+            className={cn(
+              "h-fit w-full px-6 py-8",
+              getVariantBgClassName({ variant: "burn" }),
+            )}
+          >
+            <DialogHeader className="text-center">
+              <DialogTitle className="mb-4 font-orbitron text-2xl font-semibold uppercase sm:text-3xl xl:text-4xl 2xl:mb-8">
+                Edit Pool
+              </DialogTitle>
+            </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-2">
-            {/* Pool Name */}
-            <div className="space-y-2">
-              <label className="text-sm text-secondary-text">Pool Name</label>
-              <Input
-                className="rounded-xl px-5 py-3 text-base"
-                placeholder="Enter Pool Name"
-                aria-invalid={!!errors.poolName}
-                {...register("poolName")}
-              />
-              {errors.poolName && (
-                <p className="font-inter text-xs text-destructive">
-                  {errors.poolName.message}
-                </p>
-              )}
-            </div>
-
-            {/* Time pickers */}
-            <div className="flex gap-4">
-              <div className="space-y-2">
-                <label className="text-sm text-secondary-text">
-                  Start Time
+            <form
+              onSubmit={handleSubmit(onSubmit)}
+              className="flex flex-col gap-6"
+            >
+              {/* Pool Name */}
+              <div className="flex flex-col gap-2">
+                <label className="font-inter text-sm font-medium">
+                  Pool Name
                 </label>
-                <DatePicker
-                  value={startTime}
-                  onChange={(date) =>
-                    setValue("startTime", date as Date, {
-                      shouldValidate: true,
-                    })
-                  }
-                  disabled={(date) => {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    return date < today;
-                  }}
+                <Input
+                  variant="burn"
+                  placeholder="Enter Pool Name"
+                  aria-invalid={!!errors.poolName}
+                  className="w-full bg-transparent"
+                  {...register("poolName")}
                 />
-                <input
-                  type="hidden"
-                  {...register("startTime", {
-                    required: "Start time is required",
-                    validate: (value) => {
-                      if (value <= new Date())
-                        return "Start time must be in the future";
-                      if (endTime && value >= endTime)
-                        return "Start time must be before end time";
-                      return true;
-                    },
-                  })}
-                />
-                {errors.startTime && (
+                {errors.poolName && (
                   <p className="font-inter text-xs text-destructive">
-                    {errors.startTime.message}
+                    {errors.poolName.message}
                   </p>
                 )}
               </div>
-              <div className="space-y-2">
-                <label className="text-sm text-secondary-text">End Time</label>
-                <DatePicker
-                  value={endTime}
-                  onChange={(date) =>
-                    setValue("endTime", date as Date, {
-                      shouldValidate: true,
-                    })
-                  }
-                  disabled={(date) => {
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    return (
-                      date < today || (startTime ? date < startTime : false)
-                    );
-                  }}
-                />
-                <input
-                  type="hidden"
-                  {...register("endTime", {
-                    required: "End time is required",
-                    validate: (value) => {
-                      if (value <= new Date())
-                        return "End time must be in the future";
-                      if (startTime && value <= startTime)
-                        return "End time must be after start time";
-                      return true;
-                    },
-                  })}
-                />
-                {errors.endTime && (
-                  <p className="font-inter text-xs text-destructive">
-                    {errors.endTime.message}
-                  </p>
-                )}
-              </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-4">
-              <AnimateIconButton
-                iconLetter="C"
-                text="Cancel"
-                variant="letter-icon"
-                textVariant="text-container-center"
-                classNames={{
-                  btn: "w-60 text-center after:text-2xl after:text-primary-foreground after:bg-[#FF8E97]",
-                  text: "text-2xl font-medium",
-                  icon: "size-7.5 text-2xl",
-                }}
-                color="#FF8E97"
-                btnProps={{
-                  type: "button",
-                  onClick: handleCancel,
-                  disabled: isSubmitting,
-                }}
-              />
-              <AnimateIconButton
-                iconLetter="E"
-                text="Edit"
-                variant="letter-icon"
-                textVariant="text-container-center"
-                classNames={{
-                  btn: "w-60 text-center after:text-2xl after:bg-[#966EFF] after:text-primary-foreground border border-active",
-                  text: "text-2xl font-medium",
-                  icon: "size-7.5 text-2xl",
-                }}
-                color="#966EFF"
-                isLoading={isSubmitting}
-                isLoadingText="Editing..."
-                btnProps={{
-                  type: "submit",
-                  disabled: isSubmitting,
-                }}
-              />
-            </div>
-          </form>
+              {/* Time pickers */}
+              <div className="flex flex-col gap-4 sm:flex-row">
+                <div className="flex flex-1 flex-col gap-2">
+                  <label className="font-inter text-sm font-medium">
+                    Start Time
+                  </label>
+                  <DatePicker
+                    variant="burn"
+                    value={startTime}
+                    onChange={(date) =>
+                      setValue("startTime", date as Date, {
+                        shouldValidate: true,
+                      })
+                    }
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return date < today;
+                    }}
+                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+                  />
+                  <input
+                    type="hidden"
+                    {...register("startTime", {
+                      required: "Start time is required",
+                      validate: (value) => {
+                        if (value <= new Date())
+                          return "Start time must be in the future";
+                        if (endTime && value >= endTime)
+                          return "Start time must be before end time";
+                        return true;
+                      },
+                    })}
+                  />
+                  {errors.startTime && (
+                    <p className="font-inter text-xs text-destructive">
+                      {errors.startTime.message}
+                    </p>
+                  )}
+                </div>
+                <div className="flex flex-1 flex-col gap-2">
+                  <label className="font-inter text-sm font-medium">
+                    End Time
+                  </label>
+                  <DatePicker
+                    variant="burn"
+                    value={endTime}
+                    onChange={(date) =>
+                      setValue("endTime", date as Date, {
+                        shouldValidate: true,
+                      })
+                    }
+                    disabled={(date) => {
+                      const today = new Date();
+                      today.setHours(0, 0, 0, 0);
+                      return (
+                        date < today || (startTime ? date < startTime : false)
+                      );
+                    }}
+                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+                  />
+                  <input
+                    type="hidden"
+                    {...register("endTime", {
+                      required: "End time is required",
+                      validate: (value) => {
+                        if (value <= new Date())
+                          return "End time must be in the future";
+                        if (startTime && value <= startTime)
+                          return "End time must be after start time";
+                        return true;
+                      },
+                    })}
+                  />
+                  {errors.endTime && (
+                    <p className="font-inter text-xs text-destructive">
+                      {errors.endTime.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex gap-4 pt-2">
+                <Button
+                  variant="burn-active"
+                  type="button"
+                  onClick={handleCancel}
+                  disabled={isSubmitting}
+                  hasHover
+                  className="flex-1 font-orbitron text-sm font-semibold sm:text-base xl:text-2xl"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  variant="burn"
+                  type="submit"
+                  isLoading={isSubmitting}
+                  hasHover
+                  className="flex-1 font-orbitron text-sm font-semibold sm:text-base xl:text-2xl"
+                >
+                  {isSubmitting ? "Editing..." : "Edit"}
+                </Button>
+              </div>
+            </form>
+          </div>
         </DialogContent>
       </DialogPortal>
     </Dialog>
