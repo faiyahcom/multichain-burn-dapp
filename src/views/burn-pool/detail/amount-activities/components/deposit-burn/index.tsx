@@ -83,8 +83,15 @@ const SummaryRow = ({
   value: React.ReactNode;
   className?: string;
 }) => (
-  <div className={cn("flex flex-col gap-1 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2 2xl:px-6 2xl:py-4", className)}>
-    <div className="text-sm text-nowrap font-medium text-mb-gray-b8 sm:text-base 2xl:text-xl">{label}</div>
+  <div
+    className={cn(
+      "flex flex-col gap-1 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2 2xl:px-6 2xl:py-4",
+      className,
+    )}
+  >
+    <div className="text-sm font-medium text-nowrap text-mb-gray-b8 sm:text-base 2xl:text-xl">
+      {label}
+    </div>
     <div className="text-sm sm:text-base 2xl:text-xl">
       {typeof value === "string" ? (
         <span className="font-semibold">{value}</span>
@@ -133,9 +140,9 @@ const DepositBurnDialog = ({
 
   const formattedReward = poolDetail
     ? formatAmount(
-        poolDetail.pool.currentRewardAmount,
-        poolDetail.pool.rewardTokenDecimals,
-      )
+      poolDetail.pool.currentRewardAmount,
+      poolDetail.pool.rewardTokenDecimals,
+    )
     : "-";
 
   const yourCurrentDepositedAmount = poolDetail?.userAmount?.deposited;
@@ -272,8 +279,11 @@ const DepositBurnDialog = ({
           >
             <div
               className={cn(
-                "h-fit w-full bg-background sm:max-w-2xl xl:max-w-3xl",
-                getVariantBorderClassName({ variant: "burn", custom: "rounded-xl" }),
+                "h-fit w-full bg-background sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-6xl",
+                getVariantBorderClassName({
+                  variant: "burn",
+                  custom: "rounded-xl",
+                }),
                 getVariantShadowClassName({ variant: "burn" }),
               )}
             >
@@ -285,14 +295,18 @@ const DepositBurnDialog = ({
               >
                 <DialogHeader className="mb-4 text-center">
                   <DialogTitle className="mb-2 font-orbitron text-2xl font-semibold uppercase sm:text-3xl xl:text-4xl 2xl:mb-4">
-                    Deposit<br className="sm:hidden" />Token Burn
+                    Deposit <br className="sm:hidden" />
+                    Token Burn
                   </DialogTitle>
                   <p className="font-inter text-sm text-mb-gray-b8 sm:text-base 2xl:text-xl">
                     Burn token to participate in this pool
                   </p>
                 </DialogHeader>
 
-                <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col font-inter gap-2 2xl:gap-6">
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="flex flex-col gap-2 font-inter 2xl:gap-6"
+                >
                   {/* Pool Summary */}
                   <div
                     className={cn(
@@ -312,7 +326,9 @@ const DepositBurnDialog = ({
                     <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l [&>*:nth-child(even)]:border-burn-border [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:border-burn-border">
                       <SummaryRow
                         label="Pool Name"
-                        value={!pool ? <Skeleton className="h-5 w-28" /> : pool.name}
+                        value={
+                          !pool ? <Skeleton className="h-5 w-28" /> : pool.name
+                        }
                       />
                       <SummaryRow
                         label="Ratio"
@@ -348,7 +364,11 @@ const DepositBurnDialog = ({
                       <SummaryRow
                         label="Reward Amount"
                         value={
-                          !pool ? <Skeleton className="h-5 w-24" /> : formattedReward
+                          !pool ? (
+                            <Skeleton className="h-5 w-24" />
+                          ) : (
+                            formattedReward
+                          )
                         }
                       />
                       <SummaryRow
@@ -382,7 +402,7 @@ const DepositBurnDialog = ({
                       <span className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
                         Current Burned Amount
                       </span>
-                      <span className="font-inter text-md text-nowrap font-bold sm:text-lg 2xl:text-2xl">
+                      <span className="font-inter text-md font-bold text-nowrap sm:text-lg 2xl:text-2xl">
                         {!poolDetail ? (
                           <Skeleton className="h-8 w-36" />
                         ) : (
@@ -412,7 +432,7 @@ const DepositBurnDialog = ({
                         <label className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
                           Deposit Burn Amount
                         </label>
-                        <span className="flex items-center gap-2 text-nowrap font-inter text-sm sm:text-base 2xl:text-xl">
+                        <span className="flex items-center gap-2 font-inter text-sm text-nowrap sm:text-base 2xl:text-xl">
                           <IconWallet />
                           {isLoadingBurnBalance
                             ? "Loading..."
@@ -431,7 +451,7 @@ const DepositBurnDialog = ({
                         />
                         <div
                           className={cn(
-                            "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 sm:px-4 text-mb-burn-light",
+                            "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 text-mb-burn-light sm:px-4",
                             getVariantBorderClassName({ variant: "burn" }),
                           )}
                         >
@@ -490,7 +510,7 @@ const DepositBurnDialog = ({
                         <span className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
                           Estimated Reward:
                         </span>
-                        <span className="font-inter text-md text-nowrap font-bold sm:text-lg 2xl:text-2xl">
+                        <span className="font-inter text-md font-bold text-nowrap sm:text-lg 2xl:text-2xl">
                           {!poolDetail ? (
                             <Skeleton className="h-8 w-40" />
                           ) : (
@@ -498,7 +518,7 @@ const DepositBurnDialog = ({
                           )}
                         </span>
                       </div>
-                      <p className="font-inter text-xs sm:text-sm text-secondary-text">
+                      <p className="font-inter text-xs text-secondary-text sm:text-sm">
                         Reward is estimated and not fixed. Final amount will be
                         determined at claim time.
                       </p>

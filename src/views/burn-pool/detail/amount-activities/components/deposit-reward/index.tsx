@@ -268,7 +268,7 @@ const DepositRewardDialog = ({
           >
             <div
               className={cn(
-                "h-fit w-full bg-background sm:max-w-3xl xl:max-w-4xl 2xl:max-w-5xl",
+                "h-fit w-full bg-background sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-6xl",
                 getVariantBorderClassName({
                   variant: "burn",
                   custom: "rounded-xl",
@@ -284,7 +284,7 @@ const DepositRewardDialog = ({
               >
                 <DialogHeader className="mb-4 text-center">
                   <DialogTitle className="mb-2 font-orbitron text-2xl font-semibold uppercase sm:text-3xl xl:text-4xl 2xl:mb-4">
-                    Deposit<br className="sm:hidden" />Reward Token
+                    Deposit <br className="sm:hidden" />Reward Token
                   </DialogTitle>
                   <p className="font-inter text-sm text-mb-gray-b8 sm:text-base 2xl:text-xl">
                     Fund reward tokens for this burn pool
