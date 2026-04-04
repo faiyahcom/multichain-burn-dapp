@@ -33,7 +33,7 @@ const UpcomingStatus = ({ poolDetail }: Props) => {
             <StatRow
                 label="Your Burned Amount"
                 value={
-                    <div className="inline-flex items-center gap-1.5">
+                    <div className="inline-flex items-center gap-1 md:gap-1.5">
                         {formattedBurned}
                         <TokenDisplay
                             symbol={poolDetail?.tokenIn?.symbol}
@@ -41,7 +41,7 @@ const UpcomingStatus = ({ poolDetail }: Props) => {
                             imageUri={burnTokenDisplay.imageUri ?? undefined}
                             classNames={{
                                 img: "size-3.5 md:size-4 2xl:size-4.25",
-                                container: "inline-flex items-center gap-1.5",
+                                container: "inline-flex items-center gap-1 md:gap-1.5",
                             }}
                         />
                     </div>

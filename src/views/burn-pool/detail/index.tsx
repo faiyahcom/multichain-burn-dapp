@@ -178,7 +178,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     </>
                 ) : (
                     <>
-                        <div className="flex flex-col gap-1.5 pl-3 md:gap-2.5 md:pl-6 lg:pl-9">
+                        <div className="flex flex-col gap-1.5 md:gap-2.5 md:pl-6 lg:pl-9">
                             <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl 2xl:text-4xl">
                                 {poolDetail?.pool.name.slice(0, 20)}
                             </h2>
@@ -200,7 +200,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                                 />
                             }
                         </BurnPoolStatusDisplay>
-                        <div className="flex min-w-0 flex-1 flex-wrap">
+                        <div className="w-full md:min-w-0 md:flex-1 flex flex-wrap">
                             {renderExtraContent()}
                         </div>
                     </>

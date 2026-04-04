@@ -84,7 +84,7 @@ const EndStatus = ({ poolDetail }: Props) => {
         <StatRow
           label="Claimable Reward"
           value={
-            <div className="inline-flex items-center gap-2.5">
+            <div className="inline-flex items-center gap-1.5 md:gap-2.5">
               {estimatedRewardNum}
               <TokenDisplay
                 symbol={poolDetail?.tokenOut?.symbol}
@@ -92,7 +92,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 imageUri={rewardTokenDisplay.imageUri ?? undefined}
                 classNames={{
                   img: "size-4 md:size-5 2xl:size-5.75",
-                  container: "inline-flex items-center gap-2.5",
+                  container: "inline-flex items-center gap-1.5 md:gap-2.5",
                 }}
               />
             </div>
@@ -104,7 +104,7 @@ const EndStatus = ({ poolDetail }: Props) => {
         <StatRow
           label={"Claimed Reward"}
           value={
-            <div className="inline-flex items-center gap-2.5">
+            <div className="inline-flex items-center gap-1.5 md:gap-2.5">
               {formattedReward}
               <TokenDisplay
                 symbol={poolDetail?.tokenOut?.symbol}
@@ -112,7 +112,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 imageUri={rewardTokenDisplay.imageUri ?? undefined}
                 classNames={{
                   img: "size-4 md:size-5 2xl:size-5.75",
-                  container: "inline-flex items-center gap-2.5",
+                  container: "inline-flex items-center gap-1.5 md:gap-2.5",
                 }}
               />
             </div>
@@ -124,7 +124,7 @@ const EndStatus = ({ poolDetail }: Props) => {
       <StatRow
         label="Your Burned Amount"
         value={
-          <div className="inline-flex items-center gap-1.5">
+          <div className="inline-flex items-center gap-1 md:gap-1.5">
             {formattedBurned}
             <TokenDisplay
               symbol={poolDetail?.tokenIn?.symbol}
@@ -132,7 +132,7 @@ const EndStatus = ({ poolDetail }: Props) => {
               imageUri={burnTokenDisplay.imageUri ?? undefined}
               classNames={{
                 img: "size-3.5 md:size-4 2xl:size-4.25",
-                container: "inline-flex items-center gap-1.5",
+                container: "inline-flex items-center gap-1 md:gap-1.5",
               }}
             />
           </div>

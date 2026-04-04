@@ -146,7 +146,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
       variant="burn"
       className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
     >
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
         <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">
           Pool Overview
         </p>
