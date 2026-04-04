@@ -79,7 +79,7 @@ const EndStatus = ({ poolDetail }: Props) => {
   }, [poolDetail, rewardBalance]);
 
   return (
-    <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+    <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">
       {canClaim ? (
         <StatRow
           label="Claimable Reward"

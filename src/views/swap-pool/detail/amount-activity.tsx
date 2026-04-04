@@ -206,7 +206,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             )}
 
             {poolDetail?.pool.status === "on_going" && (
-                <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+                <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="swap">
                     <Button
                         variant="swap"
                         onClick={handleOpenSwapDialog}

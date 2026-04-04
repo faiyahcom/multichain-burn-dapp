@@ -50,7 +50,7 @@ const DraftStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">
             <ActionBtn
                 letter="C"
                 text="Cancel Pool"

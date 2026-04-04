@@ -4,14 +4,17 @@ import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
-import AnimateIconButton from "@/components/common/animate-icon-button";
+import { Button } from "@/components/common/glow/button";
 import { cn } from "@/lib/utils";
+
+type PoolChainGuardVariant = "pair" | "burn" | "swap";
 
 type Props = {
   /** Backend chainId of the pool (e.g. "11155111"). */
   chainId?: string;
   children: ReactNode;
-  classNames?: React.ComponentProps<typeof AnimateIconButton>["classNames"];
+  variant?: PoolChainGuardVariant;
+  className?: string;
 };
 
 /**
@@ -22,7 +25,7 @@ type Props = {
  *                            global SwitchNetworkModal via openSwitchNetworkModal.
  * - Correct network        → renders children as-is.
  */
-export function PoolChainGuard({ chainId, children, classNames }: Props) {
+export function PoolChainGuard({ chainId, children, variant = "pair", className }: Props) {
   const { user } = useAuthStore();
   const { open } = useAppKit();
   const { caipAddress } = useAppKitAccount();
@@ -31,26 +34,22 @@ export function PoolChainGuard({ chainId, children, classNames }: Props) {
   const poolNetwork = chainId ? chainIdToNetworkConfig(chainId) : undefined;
   const poolNetworkId = poolNetwork?.id;
 
+  const btnClassName = cn(
+    "my-2 w-full py-2 font-orbitron text-base md:my-3.25 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl",
+    className,
+  );
+
   // Wallet not connected.
   if (!user) {
     return (
-      <AnimateIconButton
-        iconLetter="W"
-        text="Connect Wallet"
-        variant="letter-icon"
-        textVariant="text-container-center"
-        hasGroupHover
-        classNames={{
-          btn: cn(
-            "w-full text-center after:text-sm after:font-medium",
-            classNames?.btn,
-          ),
-          text: cn("text-sm font-medium", classNames?.text),
-          icon: cn("size-6", classNames?.icon),
-        }}
-        color="#966EFF"
-        btnProps={{ onClick: () => open() }}
-      />
+      <Button
+        variant={variant}
+        hasHover
+        className={btnClassName}
+        onClick={() => open()}
+      >
+        Connect Wallet
+      </Button>
     );
   }
 
@@ -62,26 +61,14 @@ export function PoolChainGuard({ chainId, children, classNames }: Props) {
   // Wrong network — show button that opens the global switch modal.
   if (currentNetworkId !== poolNetworkId) {
     return (
-      <AnimateIconButton
-        iconLetter="S"
-        text="Switch Network"
-        variant="letter-icon"
-        textVariant="text-self-center"
-        hasGroupHover
-        classNames={{
-          btn: cn(
-            "w-full text-center after:text-sm after:font-medium",
-            classNames?.btn,
-          ),
-          text: cn("text-sm font-medium", classNames?.text),
-          icon: cn("size-6", classNames?.icon),
-        }}
-        color="#FF8E97"
-        btnProps={{
-          onClick: () =>
-            openSwitchNetworkModal(currentNetworkId, poolNetworkId!),
-        }}
-      />
+      <Button
+        variant={variant}
+        hasHover
+        className={btnClassName}
+        onClick={() => openSwitchNetworkModal(currentNetworkId, poolNetworkId!)}
+      >
+        Switch Network
+      </Button>
     );
   }
 

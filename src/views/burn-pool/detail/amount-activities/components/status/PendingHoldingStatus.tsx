@@ -24,7 +24,7 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">
             <ActionBtn letter="C" text="Cancel Pool" color="#FF8E97"
                 isLoading={activeAction === "cancel"}
                 disabled={isRunning}

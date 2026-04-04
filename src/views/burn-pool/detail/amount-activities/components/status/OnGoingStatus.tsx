@@ -63,7 +63,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
     }, [poolDetail]);
 
     return (
-        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+        <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">
             <StatRow
                 label="Estimated Claimable Reward"
                 value={
