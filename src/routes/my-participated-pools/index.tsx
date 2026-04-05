@@ -65,8 +65,8 @@ function RouteComponent() {
   });
 
   const tabOptions: SearchParamTabOption<Tab>[] = [
-    { label: "Burn Pools", value: "burn-pool" },
-    { label: "Swap Pools", value: "swap-pool" },
+    { label: "Burn Pool", value: "burn-pool" },
+    { label: "Swap Pool", value: "swap-pool" },
     {
       label: "Claimable",
       value: "claimable",
