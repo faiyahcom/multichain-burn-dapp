@@ -189,7 +189,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                                 iconClassName="size-3.5"
                             />
                         </div>
-                        <BurnPoolStatusDisplay className="min-w-0 px-2 py-1 text-xs sm:text-base md:px-3 md:py-1.5 md:text-sm lg:min-w-64 lg:px-5 lg:py-2 lg:text-2xl 2xl:px-6 2xl:py-3">
+                        <BurnPoolStatusDisplay className="min-w-20 px-2 py-1.5 text-sm md:px-3 md:py-2 md:text-sm lg:px-5 sm:text-base lg:min-w-64 2xl:px-6 2xl:py-3 lg:text-2xl">
                             {BURN_POOL_STATUS[safeStatus].label}
                             {
                                 safeStatus === "holding" &&
