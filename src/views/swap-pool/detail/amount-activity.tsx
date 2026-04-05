@@ -137,7 +137,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                                 customSymbol={poolDetail.tokenOut?.customSymbol}
                                 imageUri={rewardTokenDisplay.imageUri ?? undefined}
                                 classNames={{
-                                    img: "size-4 md:size-5 2xl:size-5.75",
+                                    img: "size-4.5 md:size-5 2xl:size-5.75",
                                     container: "inline-flex items-center gap-2.5",
                                 }}
                             />
