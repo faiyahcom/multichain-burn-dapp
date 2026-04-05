@@ -170,7 +170,7 @@ const BurnPoolDetail = ({ address }: Props) => {
 
     return (
         <div className="space-y-6 font-inter md:pt-7 md:pl-8 lg:space-y-17.5 lg:pt-9.5 lg:pl-14">
-            <div className="flex flex-wrap items-center gap-3 md:gap-6">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 lg:gap-10">
                 {isLoadingPoolDetail ? (
                     <>
                         <Skeleton className="h-9 w-48" />
@@ -178,9 +178,9 @@ const BurnPoolDetail = ({ address }: Props) => {
                     </>
                 ) : (
                     <>
-                        <div className="flex flex-col gap-1.5 md:gap-2.5 md:pl-6 lg:pl-9">
-                            <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl 2xl:text-4xl">
-                                {poolDetail?.pool.name.slice(0, 20)}
+                        <div className="flex flex-col sm:pl-3 gap-2.5 md:pl-6 lg:pl-9">
+                            <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl 2xl:text-4xl break-all">
+                                {poolDetail?.pool.name}
                             </h2>
                             <ScanLink
                                 address={poolDetail?.pool.address ?? ""}

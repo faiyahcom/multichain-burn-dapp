@@ -27,7 +27,7 @@ const SwapPoolDetail = ({ address }: Props) => {
 
     return (
         <div className="space-y-6 md:pt-7 md:pl-8 lg:pt-9.5 lg:pl-14 lg:space-y-17.5">
-            <div className="flex items-center gap-3 md:gap-6 lg:gap-10">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 lg:gap-10">
                 {isLoadingPoolDetail ? (
                     <>
                         <Skeleton className="h-9 w-48" />
@@ -35,8 +35,8 @@ const SwapPoolDetail = ({ address }: Props) => {
                     </>
                 ) : (
                     <>
-                        <div className="flex flex-col pl-3 gap-2.5 md:pl-6 lg:pl-9">
-                            <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl 2xl:text-4xl">
+                        <div className="flex flex-col sm:pl-3 gap-2.5 md:pl-6 lg:pl-9">
+                            <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl 2xl:text-4xl break-all">
                                 {poolDetail?.pool.name}
                             </h2>
                             <ScanLink
