@@ -148,10 +148,10 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                 </span>
             </div>
             <div className="mb-3 flex items-center justify-between">
-                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-lg 2xl:text-xl">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">
                     Your Burned Amount
                 </span>
-                <span className="text-sm font-bold md:text-base lg:text-lg 2xl:text-xl">
+                <span className="text-sm font-bold md:text-base lg:text-md 2xl:text-xl">
                     {poolDetail ? (
                         <div className="inline-flex items-center gap-1.5">
                             {formattedBurned}
@@ -172,10 +172,10 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             </div>
             {poolDetail?.pool.status === "canceled" && isPoolOwner && (
                 <div className="mb-3 flex items-center justify-between">
-                    <span className="text-sm text-mb-gray-b8 md:text-base lg:text-lg 2xl:text-xl">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">
                         Your reward token return
                     </span>
-                    <span className="text-sm font-bold md:text-base lg:text-lg 2xl:text-xl">
+                    <span className="text-sm font-bold md:text-base lg:text-md 2xl:text-xl">
                         {poolDetail ? (
                             <div className="inline-flex items-center gap-2.5">
                                 {formattedReturning}
@@ -198,7 +198,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             {Number(poolDetail?.userAmount?.claimed || "0") > 0 && (
                 <div className="inline-flex items-center gap-1.5 py-1.5 md:gap-2.5">
                     <IconTick className="inline size-3 md:size-3.5" />
-                    <span className="text-xs text-mb-gray-b8 md:text-base">
+                    <span className="text-xs text-mb-gray-b8 md:text-sm 2xl:text-base">
                         Reward has been sent to your wallet after swap
                     </span>
                 </div>
@@ -206,7 +206,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             {poolDetail?.pool.status === "closed" && (
                 <div className="inline-flex items-start gap-1.5 py-1.5 md:gap-2.5">
                     <IconExclaimation className="inline size-3 md:size-3.5" />
-                    <span className="text-xs text-mb-gray-b8 md:text-base">
+                    <span className="text-xs text-mb-gray-b8 md:text-sm 2xl:text-base">
                         This pool was emergency closed by admin.
                     </span>
                 </div>
