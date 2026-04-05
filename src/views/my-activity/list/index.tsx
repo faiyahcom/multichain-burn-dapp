@@ -44,13 +44,15 @@ const MyActivityList = () => {
         user: user?.id,
         ...filter,
       }),
-      queryFn: async () =>
-        userService.getUserActivities({
-          page: 1,
+      queryFn: async () => {
+        console.log("filter", filter);
+        return userService.getUserActivities({
+          page: filter.page,
           limit: limit,
           search: filter.text ? filter.text : undefined,
           kinds: convertArrayToStringParam({ array: filter.activityKind }),
-        }),
+        });
+      },
       enabled: !!user,
     },
   );
@@ -120,7 +122,10 @@ const MyActivityList = () => {
                   </p>
                 </TableCell>
                 <TableCell className="min-w-0 space-y-0.5 text-left sm:space-y-1">
-                  <p className="min-w-0 truncate max-w-38.75 sm:max-w-69" title={poolName}>
+                  <p
+                    className="max-w-38.75 min-w-0 truncate sm:max-w-69"
+                    title={poolName}
+                  >
                     {poolName}
                   </p>
                   <CopyableText

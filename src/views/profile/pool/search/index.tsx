@@ -37,7 +37,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
         if (profileType === "my-create-pools")
           statuses = ["draft", ...burnPoolStatuses];
         if (profileType === "my-participated-pools")
-          statuses = [...burnPoolStatuses];
+          statuses = [...swapPoolStatuses]; // For participated pools, user cannot join "pending", "holding" and "upcoming" status, so basically it is the same as swap pool
         break;
       case PoolKindCodeEnum.Swap:
         if (profileType === "my-create-pools")

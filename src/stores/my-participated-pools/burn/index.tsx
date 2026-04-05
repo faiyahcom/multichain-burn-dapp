@@ -1,6 +1,6 @@
 import { NETWORK_CONFIGS } from "@/config/networks";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
-import { burnPoolStatuses } from "@/types/admin/master-pool-management";
+import { swapPoolStatuses } from "@/types/admin/master-pool-management";
 import { create } from "zustand";
 
 type MyParticipatedPoolsBurnSearchFilterState = {
@@ -13,7 +13,7 @@ export const useMyParticipatedPoolsBurnSearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      status: [...burnPoolStatuses],
+      status: [...swapPoolStatuses], // user cannot join "pending", "holding" and "upcoming" status, so basically it is the same as swap pool
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "liquidity",
       sortOrder: "desc",

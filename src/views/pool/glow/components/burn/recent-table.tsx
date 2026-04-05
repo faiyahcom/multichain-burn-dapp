@@ -186,7 +186,7 @@ const BurnRecentPoolsTable = ({}: {}) => {
       </Table>
       <div className="flex justify-end">
         <Link
-          to="/my-participated-pools/"
+          to="/my-participated-pools"
           search={{
             tab: "burn-pool",
           }}

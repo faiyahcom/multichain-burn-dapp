@@ -53,7 +53,7 @@ const PersonalInfoSettingsGlowForm = () => {
     staleTime: Infinity,
   });
 
-  const { control, handleSubmit, setValue } =
+  const { control, handleSubmit, setValue, formState, watch } =
     useForm<PersonalInfoSettingsFormValues>({
       defaultValues: {
         avatar: userApiData?.avatar ?? undefined,
@@ -62,6 +62,27 @@ const PersonalInfoSettingsGlowForm = () => {
       },
       resolver: zodResolver(personalInfoSettingsFormSchema),
     });
+
+  const nickname = watch("nickname");
+  const avatar = watch("avatar");
+
+  const isFormChange = () => {
+    // if the api data is not loaded, it means the form is not changed
+    if (!userApiData || isGetCurrentUserPending) return false;
+
+    // if for is not dirty, it means the form is not changed
+    if (formState.isDirty) {
+      // check if the nickame is changed
+      const isNicknameChanged = nickname !== userApiData?.name;
+
+      // check if the avatar is changed
+      const isAvatarChanged = avatar instanceof File;
+
+      return isNicknameChanged || isAvatarChanged;
+    } else {
+      return false;
+    }
+  };
 
   const {
     mutate: updatePersonalInfoMutation,
@@ -167,7 +188,7 @@ const PersonalInfoSettingsGlowForm = () => {
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid} className="mb-14 gap-4.5">
             <FieldLabel htmlFor={field.name} className={labelClassName}>
-              Address
+              Wallet Address
             </FieldLabel>
             <Input
               {...field}
@@ -188,7 +209,7 @@ const PersonalInfoSettingsGlowForm = () => {
         variant={"pair"}
         hasHover
         className="w-full max-w-63.75"
-        disabled={isGetCurrentUserPending}
+        disabled={isGetCurrentUserPending || !isFormChange()}
         isLoading={isUpdatePersonalInfoPending}
       >
         {isUpdatePersonalInfoPending ? "Saving..." : "Submit"}
