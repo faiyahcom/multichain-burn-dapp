@@ -67,10 +67,10 @@ const PersonalInfoSettingsGlowForm = () => {
   const avatar = watch("avatar");
 
   const isFormChange = () => {
-    // if the api data is not loaded, it means the form is not changed
+    // if the API data is not loaded, it means the form is not changed
     if (!userApiData || isGetCurrentUserPending) return false;
 
-    // if for is not dirty, it means the form is not changed
+    // if form is not dirty, it means the form is not changed
     if (formState.isDirty) {
       // check if the nickame is changed
       const isNicknameChanged = nickname !== userApiData?.name;

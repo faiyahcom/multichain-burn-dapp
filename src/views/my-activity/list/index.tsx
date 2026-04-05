@@ -44,15 +44,13 @@ const MyActivityList = () => {
         user: user?.id,
         ...filter,
       }),
-      queryFn: async () => {
-        console.log("filter", filter);
-        return userService.getUserActivities({
+      queryFn: async () =>
+        userService.getUserActivities({
           page: filter.page,
           limit: limit,
           search: filter.text ? filter.text : undefined,
           kinds: convertArrayToStringParam({ array: filter.activityKind }),
-        });
-      },
+        }),
       enabled: !!user,
     },
   );
