@@ -414,10 +414,10 @@ const DepositBurnDialog = ({
                     {/* Deposit Amount Input */}
                     <div className="space-y-2 2xl:space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="font-inter text-sm text-secondary-text sm:text-base">
+                        <span className="font-inter text-sm text-mb-gray-b8 sm:text-base 2xl:text-xl">
                           Your Deposited Amount
                         </span>
-                        <span className="font-inter text-sm font-medium sm:text-base">
+                        <span className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
                           {!poolDetail ? (
                             <Skeleton className="h-5 w-28" />
                           ) : (
@@ -433,7 +433,7 @@ const DepositBurnDialog = ({
                           Deposit Burn Amount
                         </label>
                         <span className="flex items-center gap-2 font-inter text-sm text-nowrap sm:text-base 2xl:text-xl">
-                          <IconWallet />
+                          <IconWallet className="text-mb-gray-b8"/>
                           {isLoadingBurnBalance
                             ? "Loading..."
                             : `${shortenNumber({ number: Number(burnBalanceFormatted) ?? 0 })} ${burnTokenDisplay?.symbol ?? ""}`}
@@ -518,7 +518,7 @@ const DepositBurnDialog = ({
                           )}
                         </span>
                       </div>
-                      <p className="font-inter text-xs text-secondary-text sm:text-sm">
+                      <p className="font-inter text-xs text-mb-gray-b8 sm:text-sm">
                         Reward is estimated and not fixed. Final amount will be
                         determined at claim time.
                       </p>

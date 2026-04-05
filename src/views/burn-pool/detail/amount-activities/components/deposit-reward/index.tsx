@@ -278,7 +278,7 @@ const DepositRewardDialog = ({
             >
               <div
                 className={cn(
-                  "h-fit w-full px-3 sm:px-6 py-4 2xl:py-8",
+                  "h-fit w-full rounded-xl px-3 sm:px-6 py-4 2xl:py-8",
                   getVariantBgClassName({ variant: "burn" }),
                 )}
               >
@@ -418,10 +418,10 @@ const DepositRewardDialog = ({
                   <div className="space-y-2 2xl:space-y-6">
                     {/* Current Reward Amount */}
                     <div className="flex items-center justify-between text-mb-burn-light">
-                      <span className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
+                      <span className="font-inter text-base font-medium sm:text-xl 2xl:text-2xl">
                         Current Reward Amount
                       </span>
-                      <span className="font-inter text-md text-nowrap font-bold sm:text-lg 2xl:text-2xl">
+                      <span className="font-inter text-base text-nowrap font-bold sm:text-xl 2xl:text-2xl">
                         {!pool ? (
                           <Skeleton className="h-8 w-36" />
                         ) : (
@@ -437,7 +437,7 @@ const DepositRewardDialog = ({
                           Deposit Amount
                         </label>
                         <span className="flex items-center gap-2 font-inter text-nowrap text-sm sm:text-base 2xl:text-xl">
-                          <IconWallet />
+                          <IconWallet className="text-mb-gray-b8"/>
                           {isLoadingRewardBalance
                             ? "Loading..."
                             : `${shortenNumber({ number: Number(rewardBalanceFormatted) }) ?? "0"} ${rewardTokenDisplay?.symbol ?? ""}`}
