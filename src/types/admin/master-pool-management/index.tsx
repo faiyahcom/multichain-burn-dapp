@@ -139,6 +139,12 @@ export type PoolListResponse = PaginationResponse & {
   pools: PoolItemType[];
 };
 
+export type RecentPoolsRequest = {
+  poolKind?: PoolKindCode;
+  user?: string; // address
+  statuses?: string; // comma separated
+};
+
 export type RecentPoolsResponse = {
   pools: PoolItemType[];
 };

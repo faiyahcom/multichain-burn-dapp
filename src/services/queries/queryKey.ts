@@ -10,7 +10,8 @@ export const poolQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["pools", "list", params] as const,
   stats: (poolKind: PoolKindCode) => ["pools", "stats", poolKind] as const,
-  recents: (poolKind: PoolKindCode) => ["pools", "recents", poolKind] as const,
+  recents: (params?: Record<string, unknown>) =>
+    ["pools", "recents", params] as const,
 };
 
 export const whitelistQueryKeys = {
