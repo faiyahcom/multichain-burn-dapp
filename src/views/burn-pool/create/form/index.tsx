@@ -156,7 +156,9 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
           })}
         />
         {errors.poolName && (
-          <p className="font-inter text-xs text-destructive">{errors.poolName.message}</p>
+          <p className="font-inter text-xs text-destructive">
+            {errors.poolName.message}
+          </p>
         )}
       </div>
 
@@ -178,7 +180,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-64 md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:max-w-100 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-2/3 md:px-3 md:py-1.5 md:text-base xl:max-w-1/2 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
                   getVariantBorderClassName({
                     variant: "burn",
                     custom: "rounded-md",
@@ -211,7 +213,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               onChange={(date: Date | undefined) =>
                 setValue("startTime", date as Date, { shouldValidate: true })
               }
-              className="text-xs px-2 py-3 md:px-3 md:py-5 rounded-md sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+              className="rounded-md px-2 py-3 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
               disabled={(date: Date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -247,7 +249,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               onChange={(date: Date | undefined) =>
                 setValue("endTime", date as Date, { shouldValidate: true })
               }
-              className="text-xs px-2 py-0 md:px-3 md:py-5 rounded-md sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+              className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
               disabled={(date: Date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -289,12 +291,14 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               variant="burn"
               value={selectedTokenReward}
               onChange={(token) =>
-                setValue("tokenReward", token?.address, { shouldValidate: true })
+                setValue("tokenReward", token?.address, {
+                  shouldValidate: true,
+                })
               }
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-64 md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:max-w-100 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-2/3 md:px-3 md:py-1.5 md:text-base xl:max-w-1/2 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
                   getVariantBorderClassName({
                     variant: "burn",
                     custom: "rounded-md",

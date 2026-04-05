@@ -197,7 +197,9 @@ const CreateSwapPoolForm = ({
           })}
         />
         {errors.poolName && (
-          <p className="font-inter text-xs text-destructive">{errors.poolName.message}</p>
+          <p className="font-inter text-xs text-destructive">
+            {errors.poolName.message}
+          </p>
         )}
       </div>
 
@@ -219,7 +221,7 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-64 md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:max-w-100 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-2/3 md:px-3 md:text-base xl:max-w-1/2 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
                   getVariantBorderClassName({
                     variant: "swap",
                     custom: "rounded-md",
@@ -302,7 +304,9 @@ const CreateSwapPoolForm = ({
             </RadioGroup>
           </div>
           {errors.ratio && (
-            <p className="font-inter text-xs text-destructive">{errors.ratio.message}</p>
+            <p className="font-inter text-xs text-destructive">
+              {errors.ratio.message}
+            </p>
           )}
         </div>
       </div>
@@ -326,7 +330,7 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-64 md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:max-w-100 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-2/3 md:px-3 md:py-1.5 md:text-base xl:max-w-1/2 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
                   getVariantBorderClassName({
                     variant: "swap",
                     custom: "rounded-md",
@@ -392,7 +396,9 @@ const CreateSwapPoolForm = ({
           })}
         />
         {errors.budget && (
-          <p className="font-inter text-xs text-destructive">{errors.budget.message}</p>
+          <p className="font-inter text-xs text-destructive">
+            {errors.budget.message}
+          </p>
         )}
 
         <div className="flex flex-wrap gap-2 md:gap-3 2xl:gap-3.75">
