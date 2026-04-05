@@ -22,10 +22,14 @@ export interface SignInResponse {
   token: string;
 }
 
+export type UserRole = "normal" | "admin" | "super_admin";
+
 export interface UserResponse {
   id: string;
   address: string;
-  role: "normal" | "admin" | "super_admin";
+  role: UserRole;
+  actualRole?: UserRole;
+  roleEnAble?: boolean;
   avatar: string | null;
   name: string | null; // nickname
 }
@@ -39,6 +43,25 @@ export interface UpdatePersonalInfoResponse {
   name?: string;
   avatar?: string;
 }
+
+export const resolveUserRole = (
+  user?: Pick<UserResponse, "actualRole" | "role"> | null,
+): UserRole | null => user?.actualRole ?? user?.role ?? null;
+
+export const hasEnabledAdminRole = (
+  user?: Pick<UserResponse, "actualRole" | "role" | "roleEnAble"> | null,
+) => {
+  const role = resolveUserRole(user);
+
+  return (
+    (user?.roleEnAble ?? true) &&
+    (role === "admin" || role === "super_admin")
+  );
+};
+
+export const isSuperAdminRole = (
+  user?: Pick<UserResponse, "actualRole" | "role" | "roleEnAble"> | null,
+) => hasEnabledAdminRole(user) && resolveUserRole(user) === "super_admin";
 
 export const authService = {
   requestSigningMessage: async (

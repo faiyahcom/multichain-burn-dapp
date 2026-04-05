@@ -1,13 +1,11 @@
-import { useAuthStore } from "@/stores/authStore";
 import AdminManagementSearch from "@/views/admin/admin-management/search";
 import AdminManagementTable from "@/views/admin/admin-management/table";
-import { createFileRoute, redirect } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { requireLatestAdminAccess } from "@/utils/helpers/admin-access";
 
 export const Route = createFileRoute("/admin/admin-management/")({
-  beforeLoad: () => {
-    if (useAuthStore.getState().user?.role !== "super_admin") {
-      throw redirect({ to: "/" });
-    }
+  beforeLoad: async () => {
+    await requireLatestAdminAccess({ superAdminOnly: true });
   },
   component: RouteComponent,
 });
