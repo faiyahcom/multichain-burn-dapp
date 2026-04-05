@@ -26,7 +26,7 @@ const SwapPoolDetail = ({ address }: Props) => {
     const safeStatus: SwapPoolStatus = (status as SwapPoolStatus) ?? "on_going";
 
     return (
-        <div className="space-y-6 pt-4 pl-4 md:pt-7 md:pl-8 lg:pt-9.5 lg:pl-14 lg:space-y-17.5">
+        <div className="space-y-6 md:pt-7 md:pl-8 lg:pt-9.5 lg:pl-14 lg:space-y-17.5">
             <div className="flex items-center gap-3 md:gap-6 lg:gap-10">
                 {isLoadingPoolDetail ? (
                     <>

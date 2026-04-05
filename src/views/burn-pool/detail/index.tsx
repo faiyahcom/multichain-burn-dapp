@@ -169,7 +169,7 @@ const BurnPoolDetail = ({ address }: Props) => {
     };
 
     return (
-        <div className="space-y-6 pt-4 pl-4 font-inter md:pt-7 md:pl-8 lg:space-y-17.5 lg:pt-9.5 lg:pl-14">
+        <div className="space-y-6 font-inter md:pt-7 md:pl-8 lg:space-y-17.5 lg:pt-9.5 lg:pl-14">
             <div className="flex flex-wrap items-center gap-3 md:gap-6">
                 {isLoadingPoolDetail ? (
                     <>
