@@ -80,6 +80,7 @@ const SwapRecentPoolsTable = ({}: {}) => {
             colSpan={columns.length}
             data={recentPools?.pools}
             isLoading={isRecentPoolsPending}
+            text="No pools found"
           />
           {!isAuthenticated && (
             <TableRow>
