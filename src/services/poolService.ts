@@ -4,6 +4,7 @@ import type {
   PoolListRequest,
   PoolListResponse,
   PoolListStatsResponse,
+  RecentPoolsRequest,
   RecentPoolsResponse,
 } from "@/types/admin/master-pool-management";
 import type {
@@ -86,13 +87,11 @@ export const poolService = {
     );
     return response;
   },
-  getRecentPools: async (poolKind: PoolKindCode) => {
+  getRecentPools: async (request: RecentPoolsRequest) => {
     const response = await apiClient.get<RecentPoolsResponse>(
       `${POOLS_API_ROUTES.RECENT_POOLS}`,
       {
-        params: {
-          poolKind,
-        },
+        params: request,
       },
     );
     return response;
