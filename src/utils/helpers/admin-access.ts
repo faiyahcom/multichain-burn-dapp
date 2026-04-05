@@ -3,7 +3,6 @@ import {
   authService,
   hasEnabledAdminRole,
   isSuperAdminRole,
-  resolveUserRole,
 } from "@/services/authService";
 import { useAuthStore } from "@/stores/authStore";
 
@@ -23,7 +22,7 @@ const syncCurrentUserToStore = async () => {
         ...user,
         id: currentUser.id,
         address: currentUser.address || user.address,
-        role: resolveUserRole(currentUser) ?? undefined,
+        role: currentUser.role,
       },
       accessToken,
     });

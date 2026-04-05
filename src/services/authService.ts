@@ -28,8 +28,6 @@ export interface UserResponse {
   id: string;
   address: string;
   role: UserRole;
-  actualRole?: UserRole;
-  roleEnAble?: boolean;
   avatar: string | null;
   name: string | null; // nickname
 }
@@ -45,22 +43,19 @@ export interface UpdatePersonalInfoResponse {
 }
 
 export const resolveUserRole = (
-  user?: Pick<UserResponse, "actualRole" | "role"> | null,
-): UserRole | null => user?.actualRole ?? user?.role ?? null;
+  user?: Pick<UserResponse, "role"> | null,
+): UserRole | null => user?.role ?? null;
 
 export const hasEnabledAdminRole = (
-  user?: Pick<UserResponse, "actualRole" | "role" | "roleEnAble"> | null,
+  user?: Pick<UserResponse, "role"> | null,
 ) => {
   const role = resolveUserRole(user);
 
-  return (
-    (user?.roleEnAble ?? true) &&
-    (role === "admin" || role === "super_admin")
-  );
+  return role === "admin" || role === "super_admin";
 };
 
 export const isSuperAdminRole = (
-  user?: Pick<UserResponse, "actualRole" | "role" | "roleEnAble"> | null,
+  user?: Pick<UserResponse, "role"> | null,
 ) => hasEnabledAdminRole(user) && resolveUserRole(user) === "super_admin";
 
 export const authService = {
