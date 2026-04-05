@@ -32,7 +32,10 @@ const BurnRecentPoolsTable = ({}: {}) => {
   const isAuthenticated = _hasHydrated && !!user?.address;
 
   const { data: recentPools, isPending: isRecentPoolsPending } = useQuery({
-    queryKey: poolQueryKeys.recents(PoolKindCodeEnum.Burn),
+    queryKey: poolQueryKeys.recents({
+      user: user?.address,
+      poolKind: PoolKindCodeEnum.Burn,
+    }),
     queryFn: () =>
       poolService.getRecentPools({
         poolKind: PoolKindCodeEnum.Burn,
