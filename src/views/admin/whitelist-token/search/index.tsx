@@ -45,7 +45,7 @@ const AdminWhitelistTokenSearch = () => {
   const totalTokens = totalEnable + totalDisable;
 
   return (
-    <div className="space-y-4 pt-12.75 pr-13.5 pl-21">
+    <div className="space-y-4 px-4 pt-4 md:pt-12.75 md:pr-13.5 md:pl-21">
       {/* Header + summary + add button  */}
       <div className="flex items-start justify-between gap-4">
         <div className="space-y-1">
@@ -59,7 +59,7 @@ const AdminWhitelistTokenSearch = () => {
       </div>
 
       {/* status + network + text */}
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
         <AdminWhitelistTokenSearchStatusPicker
           options={statusOptions}
           counts={[totalTokens, totalEnable, totalDisable]}
@@ -69,7 +69,7 @@ const AdminWhitelistTokenSearch = () => {
             setFilter({ status: status as TokenStatus });
           }}
         />
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center">
           <NetworkMultipleSelect
             selected={filter.network}
             onChange={(value) => setFilter({ network: value })}
@@ -80,7 +80,7 @@ const AdminWhitelistTokenSearch = () => {
             }}
             value={filter.text}
             onValueChange={(value) => setFilter({ text: value })}
-            className="sm:max-w-80.75"
+            className="md:max-w-80.75"
           />
         </div>
       </div>

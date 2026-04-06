@@ -24,8 +24,8 @@ const AdminTransferHistorySearch = () => {
   );
 
   return (
-    <div className="mb-4.25 space-y-3.75 px-13.5">
-      <div className="flex items-center justify-end gap-2.75">
+    <div className="mb-4.25 space-y-3.75 px-4 md:px-13.5">
+      <div className="flex flex-col justify-end gap-2.75 md:flex-row md:items-center">
         <SearchTextDebouncedInput
           inputProps={{
             placeholder:
@@ -42,7 +42,7 @@ const AdminTransferHistorySearch = () => {
         />
       </div>
 
-      <div className="flex items-center justify-start gap-2.75">
+      <div className="flex flex-col justify-start gap-2.75 md:flex-row md:items-center">
         <p className="text-13px">Amount</p>
         <SearchTextDebouncedInput
           inputProps={{
@@ -66,7 +66,7 @@ const AdminTransferHistorySearch = () => {
           addons={null}
           value={filter.amountOutMin}
           onValueChange={(amountOutMin) => setFilter({ amountOutMin })}
-          className="max-w-40"
+          className="md:max-w-40"
         />
         <p className="text-13px">to</p>
         <SearchTextDebouncedInput
@@ -91,14 +91,14 @@ const AdminTransferHistorySearch = () => {
           addons={null}
           value={filter.amountOutMax}
           onValueChange={(amountOutMax) => setFilter({ amountOutMax })}
-          className="max-w-40"
+          className="md:max-w-40"
         />
         {errors?.amountOutRange && (
           <em className="text-xs text-error">{errors.amountOutRange}</em>
         )}
       </div>
 
-      <div className="flex items-center justify-start gap-2.75">
+      <div className="flex flex-col justify-start gap-2.75 md:flex-row md:items-center">
         <p className="text-13px">Date</p>
         <DatePicker
           value={filter.dateFrom}

@@ -55,7 +55,7 @@ const CustomPagination: React.FC<Props> = ({
 
   return (
     <Pagination>
-      <PaginationContent>
+      <PaginationContent className="flex-wrap">
         <PaginationItem onClick={onPrevious}>
           <PaginationPrevious
             className={cn("cursor-pointer", {

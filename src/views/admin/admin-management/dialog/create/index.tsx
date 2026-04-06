@@ -45,7 +45,7 @@ const AdminManagementDialogCreate = () => {
         size="mb-square-btn"
         onClick={() => setOpen(true)}
       >
-        Add new Admin
+        <span className="max-md:sr-only">Add new Admin</span>
         <PlusIcon className="size-3.75" />
       </Button>
 
@@ -62,10 +62,11 @@ const AdminManagementDialogCreate = () => {
         isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
           const targetNetworkId = values.networkId;
-          const isExistingAdmin = await adminManagementService.checkExistingAdmin({
-            walletAddress: values.walletAddress,
-            networkId: targetNetworkId,
-          });
+          const isExistingAdmin =
+            await adminManagementService.checkExistingAdmin({
+              walletAddress: values.walletAddress,
+              networkId: targetNetworkId,
+            });
 
           if (isExistingAdmin) {
             toast.error(

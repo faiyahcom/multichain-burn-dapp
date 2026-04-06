@@ -83,7 +83,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
           "--color": config.color,
         } as React.CSSProperties
       }
-      className="relative flex min-w-94.75 items-start gap-2.25 overflow-hidden rounded-[10px] bg-mb-popover px-7.5 py-4"
+      className="relative flex min-w-50 md:min-w-94.75 items-start gap-2.25 overflow-hidden rounded-[10px] bg-mb-popover px-7.5 py-4"
       id={id}
     >
       <div className="absolute top-0 left-0 h-full w-2.25 bg-(--color)" />
