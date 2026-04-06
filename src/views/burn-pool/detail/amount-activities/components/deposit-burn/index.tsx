@@ -399,10 +399,10 @@ const DepositBurnDialog = ({
                   <div className="space-y-2 2xl:space-y-6">
                     {/* Current Burned Amount */}
                     <div className="flex items-center justify-between text-mb-burn-light">
-                      <span className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
+                      <span className="font-inter text-md font-medium sm:text-lg lg:text-xl 2xl:text-2xl">
                         Current Burned Amount
                       </span>
-                      <span className="font-inter text-md font-bold text-nowrap sm:text-lg 2xl:text-2xl">
+                      <span className="font-inter text-md font-bold text-nowrap sm:text-lg lg:text-xl 2xl:text-2xl">
                         {!poolDetail ? (
                           <Skeleton className="h-8 w-36" />
                         ) : (
