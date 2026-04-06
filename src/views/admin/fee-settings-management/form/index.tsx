@@ -177,13 +177,13 @@ const FeeSettingsForm = () => {
     reset({
       creationFee: creationFee
         ? new Decimal(creationFee.toString())
-          .div(new Decimal(10).pow(nativeDecimals))
-          .toString()
+            .div(new Decimal(10).pow(nativeDecimals))
+            .toString()
         : "",
       settlementFee: settlementFee
         ? new Decimal(settlementFee.toString())
-          .div(DECIMAL_FEE_PERCENT)
-          .toString()
+            .div(DECIMAL_FEE_PERCENT)
+            .toString()
         : "",
       treasury: treasury ?? "",
     });
@@ -205,7 +205,9 @@ const FeeSettingsForm = () => {
       const rawAmount = new Decimal(values.creationFee)
         .mul(new Decimal(10).pow(nativeDecimals))
         .toFixed(0);
-      const bps = Math.round(parseFloat(values.settlementFee) * DECIMAL_FEE_PERCENT);
+      const bps = Math.round(
+        parseFloat(values.settlementFee) * DECIMAL_FEE_PERCENT,
+      );
       updateValues(new BN(rawAmount), new BN(bps.toString()), values.treasury);
 
       // Background refetch to confirm from chain once the read node syncs
@@ -216,153 +218,159 @@ const FeeSettingsForm = () => {
   };
 
   return (
-    <form
-      className="w-full max-w-lg space-y-2"
-      onSubmit={handleSubmit(onSubmit)}
-    >
-      <h2 className="text-xl font-semibold">Fee Configuration</h2>
+    <form className="w-full max-w-172.5" onSubmit={handleSubmit(onSubmit)}>
+      <div className="w-full max-w-128.5">
+        <h2 className="mb-0.75 text-xl font-semibold">Fee Configuration</h2>
 
-      <div className="space-y-1.5">
-        <p className="text-sm">Network</p>
+        <div className="mb-6.75 space-y-0.5">
+          <p className="text-base">Network</p>
 
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex w-full max-w-60 items-center justify-between gap-2 rounded-lg bg-inactive text-sm font-normal text-foreground hover:bg-inactive/80"
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="outline"
+                className="flex w-full max-w-60 items-center justify-between gap-2 rounded-lg bg-inactive text-sm font-normal text-foreground hover:bg-inactive/80"
+              >
+                {selectedNetwork && (
+                  <div className="flex items-center gap-2">
+                    <NetworkImgIcon
+                      src={selectedNetwork.iconSrc}
+                      alt={selectedNetwork.label}
+                    />
+                    <span>{selectedNetwork.label}</span>
+                  </div>
+                )}
+                <ArrowIcon direction="down" className="text-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent
+              align="start"
+              sideOffset={6}
+              className="w-(--radix-dropdown-menu-trigger-width) rounded-lg px-3 py-3"
             >
-              {selectedNetwork && (
-                <div className="flex items-center gap-2">
-                  <NetworkImgIcon
-                    src={selectedNetwork.iconSrc}
-                    alt={selectedNetwork.label}
-                  />
-                  <span>{selectedNetwork.label}</span>
-                </div>
-              )}
-              <ArrowIcon direction="down" className="text-foreground" />
-            </Button>
-          </DropdownMenuTrigger>
+              {allNetworks.map((network) => {
+                const isSelected = selectedNetworkId === network.id;
 
-          <DropdownMenuContent
-            align="start"
-            sideOffset={6}
-            className="w-(--radix-dropdown-menu-trigger-width) rounded-lg px-3 py-3"
-          >
-            {allNetworks.map((network) => {
-              const isSelected = selectedNetworkId === network.id;
-
-              return (
-                <DropdownMenuItem
-                  key={network.id}
-                  onClick={() => handleNetworkChange(network)}
-                  className={cn(
-                    "my-2 flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive",
-                    isSelected && "bg-inactive font-semibold text-active",
-                  )}
-                >
-                  <NetworkImgIcon src={network.iconSrc} alt={network.label} />
-                  <span>{network.label}</span>
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
-
-      <div className="space-y-1.5">
-        <p className="text-sm">Creation Fee</p>
-
-        <div
-          className={cn(
-            "relative flex items-center",
-            errors.creationFee && "rounded-md-plus ring-1 ring-destructive",
-          )}
-        >
-          <Input
-            {...register("creationFee")}
-            type="number"
-            min="0"
-            step={DEFAULT_INPUT_NUMBER_STEP}
-            placeholder={`Enter fee amount in ${nativeSymbol}`}
-            className="pr-32"
-          />
-
-          <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
-            <NetworkImgIcon
-              src={selectedNetwork?.iconSrc ?? ""}
-              alt={nativeSymbol}
-              className="size-5"
-            />
-            <span>{nativeSymbol}</span>
-          </div>
+                return (
+                  <DropdownMenuItem
+                    key={network.id}
+                    onClick={() => handleNetworkChange(network)}
+                    className={cn(
+                      "my-2 flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive",
+                      isSelected && "bg-inactive font-semibold text-active",
+                    )}
+                  >
+                    <NetworkImgIcon src={network.iconSrc} alt={network.label} />
+                    <span>{network.label}</span>
+                  </DropdownMenuItem>
+                );
+              })}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
 
-        {isLoading && <p className="text-xs text-primary">Loading...</p>}
-        {!isLoading && currentCreationFee && (
-          <p className="text-xs text-secondary-text">
-            Current creation fee: {currentCreationFee}
-          </p>
-        )}
-        {errors.creationFee && (
-          <p className="text-xs text-destructive">
-            {errors.creationFee.message}
-          </p>
-        )}
+        <div className="mb-5 space-y-0.5">
+          <p className="text-base">Creation Fee</p>
+
+          <div
+            className={cn(
+              "relative mb-1.75 flex items-center",
+              errors.creationFee && "rounded-md-plus ring-1 ring-destructive",
+            )}
+          >
+            <Input
+              {...register("creationFee")}
+              type="number"
+              min="0"
+              step={DEFAULT_INPUT_NUMBER_STEP}
+              placeholder={`Enter fee amount in ${nativeSymbol}`}
+              className="pr-32"
+            />
+
+            <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
+              <NetworkImgIcon
+                src={selectedNetwork?.iconSrc ?? ""}
+                alt={nativeSymbol}
+                className="size-5"
+              />
+              <span>{nativeSymbol}</span>
+            </div>
+          </div>
+
+          {isLoading && <p className="text-xs text-primary">Loading...</p>}
+          {!isLoading && currentCreationFee && (
+            <p className="text-xs text-secondary-text">
+              Current creation fee: {currentCreationFee}
+            </p>
+          )}
+          {errors.creationFee && (
+            <p className="text-xs text-destructive">
+              {errors.creationFee.message}
+            </p>
+          )}
+        </div>
+
+        <div className="mb-5.5 w-full max-w-60 space-y-0.5">
+          <p className="text-base">Settlement Fee (%)</p>
+
+          <Input
+            {...register("settlementFee")}
+            type="number"
+            min="0"
+            max="100"
+            step={DEFAULT_INPUT_NUMBER_STEP}
+            placeholder="Enter settlement fee %"
+            className={cn(
+              "mb-1.75",
+              errors.settlementFee && "ring-1 ring-destructive",
+            )}
+          />
+
+          {isLoading && (
+            <p className="text-xs text-secondary-text">Loading...</p>
+          )}
+          {!isLoading && currentSettlementFee && (
+            <p className="text-xs text-secondary-text">
+              Current settlement fee: {currentSettlementFee}
+            </p>
+          )}
+          {errors.settlementFee && (
+            <p className="text-xs text-destructive">
+              {errors.settlementFee.message}
+            </p>
+          )}
+        </div>
+
+        <div className="mb-6.75 space-y-px">
+          <p className="text-base">Fee Destination</p>
+
+          <RadioGroup defaultValue="treasury" className="p-0">
+            <RadioGroupItem value="treasury">Treasury</RadioGroupItem>
+          </RadioGroup>
+        </div>
+
+        <div className="mb-20.5 space-y-0.5">
+          <p className="text-base">Treasury Address</p>
+
+          <Input
+            {...register("treasury", {
+              onChange: () => clearErrors("treasury"),
+              onBlur: () => trigger("treasury"),
+            })}
+            placeholder="Enter Treasury address"
+            disabled={isLoading}
+            className={cn(errors.treasury && "ring-1 ring-destructive")}
+          />
+          {errors.treasury && (
+            <p className="text-xs text-destructive">
+              {errors.treasury.message}
+            </p>
+          )}
+        </div>
       </div>
 
-      <div className="w-full max-w-60 space-y-1.5">
-        <p className="text-sm">Settlement Fee (%)</p>
-
-        <Input
-          {...register("settlementFee")}
-          type="number"
-          min="0"
-          max="100"
-          step={DEFAULT_INPUT_NUMBER_STEP}
-          placeholder="Enter settlement fee %"
-          className={cn(errors.settlementFee && "ring-1 ring-destructive")}
-        />
-
-        {isLoading && <p className="text-xs text-secondary-text">Loading...</p>}
-        {!isLoading && currentSettlementFee && (
-          <p className="text-xs text-secondary-text">
-            Current settlement fee: {currentSettlementFee}
-          </p>
-        )}
-        {errors.settlementFee && (
-          <p className="text-xs text-destructive">
-            {errors.settlementFee.message}
-          </p>
-        )}
-      </div>
-
-      <div className="space-y-1.5">
-        <p className="text-sm">Fee Destination</p>
-
-        <RadioGroup defaultValue="treasury">
-          <RadioGroupItem value="treasury">Treasury</RadioGroupItem>
-        </RadioGroup>
-      </div>
-
-      <div className="space-y-1.5">
-        <p className="text-sm">Treasury Address</p>
-
-        <Input
-          {...register("treasury", {
-            onChange: () => clearErrors("treasury"),
-            onBlur: () => trigger("treasury"),
-          })}
-          placeholder="Enter Treasury address"
-          disabled={isLoading}
-          className={cn(errors.treasury && "ring-1 ring-destructive")}
-        />
-        {errors.treasury && (
-          <p className="text-xs text-destructive">{errors.treasury.message}</p>
-        )}
-      </div>
-
-      <div className="mt-12 flex justify-center">
+      <div className="flex justify-center">
         <AnimateIconButton
           iconLetter="S"
           text="Save Changes"
