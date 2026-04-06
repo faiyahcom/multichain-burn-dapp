@@ -1,12 +1,8 @@
-import {
-  IconSpinner,
-  IconToastError,
-  IconToastInfo,
-  IconToastSuccess,
-  IconToastWarning,
-} from "@/assets/react";
+import { IconToastWarning } from "@/assets/react";
 import { cn } from "@/lib/utils";
+import { CircleAlertIcon, CircleCheckIcon, CircleXIcon } from "lucide-react";
 import { type ExternalToast, toast as sonnerToast } from "sonner";
+import { Spinner } from "../ui/spinner";
 
 type ToastVariant =
   | "success"
@@ -25,29 +21,27 @@ const variantConfig: Record<
 > = {
   default: {
     icon: ({ className }) => <div className={className} />,
-    color: "transparent",
+    color: "var(--foreground)",
   },
   success: {
-    icon: IconToastSuccess,
-    color: "#01D201",
+    icon: CircleCheckIcon,
+    color: "#03DB92",
   },
   error: {
-    icon: IconToastError,
-    color: "#FF5562",
+    icon: CircleXIcon,
+    color: "#FF0000",
   },
   warning: {
     icon: IconToastWarning,
-    color: "#FFAE00",
+    color: "#FF8800D9",
   },
   info: {
-    icon: IconToastInfo,
-    color: "#016DD2",
+    icon: CircleAlertIcon,
+    color: "#0285FFD9",
   },
   loading: {
-    icon: ({ className }) => (
-      <IconSpinner className={cn("animate-spin", className)} />
-    ),
-    color: "transparent",
+    icon: Spinner,
+    color: "var(--foreground)",
   },
 };
 
@@ -72,7 +66,7 @@ const CustomToast: React.FC<CustomToastProps> = ({
 
   const description = toastProps.data?.description;
   const shortenDescription =
-    (typeof description === "string" && description?.length > 150)
+    typeof description === "string" && description?.length > 150
       ? description.slice(0, 150) + "..."
       : description;
 
@@ -81,19 +75,22 @@ const CustomToast: React.FC<CustomToastProps> = ({
       style={
         {
           "--color": config.color,
+          boxShadow: "0px 0px 20px var(--color)",
         } as React.CSSProperties
       }
-      className="relative flex min-w-94.75 items-start gap-2.25 overflow-hidden rounded-[10px] bg-mb-popover px-7.5 py-4"
+      className={cn(
+        "relative flex min-w-[296px] items-start gap-2.25 overflow-hidden rounded-md bg-mb-dark-popover px-2.5 py-3",
+        "border-l-[6px] border-(--color) font-inter",
+      )}
       id={id}
     >
-      <div className="absolute top-0 left-0 h-full w-2.25 bg-(--color)" />
-      <Icon className="size-5.25 shrink-0 mt-[1.5px]" />
+      <Icon className="mt-[1.5px] size-5 shrink-0 text-(--color)" />
       <div>
         <p className="text-base font-semibold text-(--color)">
           {toastProps.message}
         </p>
         {!!description && (
-          <p className="pl-0.75 text-[13px] font-normal text-[#5B5B5B]">
+          <p className="text-sm font-normal text-foreground">
             {shortenDescription}
           </p>
         )}
