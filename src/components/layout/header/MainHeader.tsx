@@ -8,7 +8,7 @@ import { useSidebarStateStore } from "@/stores/admin/sidebar/sidebar-store";
 
 export function MainHeader() {
   const { isConnected } = useAppKitAccount();
-  const { state, setState } = useSidebarStateStore();
+  const { setState } = useSidebarStateStore();
 
   return (
     <header className="flex items-center justify-between gap-4 bg-background p-4 xl:pt-6 xl:pr-14 xl:pb-9 xl:pl-9">
