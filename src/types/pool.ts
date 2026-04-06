@@ -146,8 +146,7 @@ export const activityKind = {
   31: "Claim reward",
   32: "Swap",
 
-  // Burn operator actions
-  40: "Burn Success", //burn success
+  40: "Pool End",
 } as const;
 
 export type ActivityKindKey = keyof typeof activityKind;
