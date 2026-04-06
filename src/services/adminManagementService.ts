@@ -78,6 +78,12 @@ type AdminManagementApiListResponse = {
   admins: AdminManagementApiItem[];
 };
 
+type FetchAdminManagementPageResponse = ListAdminManagementResponse & {
+  rawCount: number;
+};
+
+const FETCH_ALL_ADMINS_PAGE_SIZE = 100;
+
 const resolveAdminChainId = (networkId: NetworkId) => {
   const chainId = networkIdToChainId(networkId);
 
@@ -154,42 +160,122 @@ const buildUpsertAdminPayload = (request: UpsertAdminManagementRequest) => {
   };
 };
 
+const getListAdminQueryConfig = (params?: ListAdminManagementRequest) => {
+  const selectedRoles = params?.roles;
+  const selectedChainId = buildAdminChainIdQuery(params?.networkIds);
+  const roleQuery =
+    selectedRoles && selectedRoles.length > 0
+      ? selectedRoles.join(",")
+      : undefined;
+
+  return {
+    selectedRoles,
+    requestParams: {
+      page: params?.page ?? 1,
+      limit: params?.limit ?? 20,
+      search: params?.search || undefined,
+      role: roleQuery,
+      chainId: selectedChainId,
+    },
+  };
+};
+
+const mapAdminListResponse = ({
+  response,
+  selectedRoles,
+  fallbackPage,
+}: {
+  response: AdminManagementApiListResponse;
+  selectedRoles?: AdminManagementRole[];
+  fallbackPage?: number;
+}): ListAdminManagementResponse => {
+  const admins = response.admins
+    .map(mapAdminApiItem)
+    .filter(
+      ({ apiRole }) =>
+        apiRole !== "normal" &&
+        (!selectedRoles?.length || selectedRoles.includes(apiRole)),
+    )
+    .map(({ admin }) => admin);
+
+  return {
+    page: response.page ?? fallbackPage ?? 1,
+    total: response.total ?? admins.length,
+    totalEnable: admins.filter((admin) => admin.enabled).length,
+    totalDisable: admins.filter((admin) => !admin.enabled).length,
+    admins,
+  };
+};
+
+const fetchAdminManagementPage = async (
+  params?: ListAdminManagementRequest,
+): Promise<FetchAdminManagementPageResponse> => {
+  const { selectedRoles, requestParams } = getListAdminQueryConfig(params);
+  const response = await apiClient.get<AdminManagementApiListResponse>(
+    ADMINS_API_ROUTES.LIST,
+    {
+      params: requestParams,
+    },
+  );
+
+  return {
+    ...mapAdminListResponse({
+      response,
+      selectedRoles,
+      fallbackPage: params?.page,
+    }),
+    rawCount: response.admins.length,
+  };
+};
+
 export const adminManagementService = {
   getListAdmins: async (
     params?: ListAdminManagementRequest,
   ): Promise<ListAdminManagementResponse> => {
-    const selectedRoles = params?.roles;
-    const selectedChainId = buildAdminChainIdQuery(params?.networkIds);
-    const roleQuery =
-      selectedRoles && selectedRoles.length > 0
-        ? selectedRoles.join(",")
-        : undefined;
-
-    const response = await apiClient.get<AdminManagementApiListResponse>(
-      ADMINS_API_ROUTES.LIST,
-      {
-        params: {
-          page: params?.page ?? 1,
-          limit: params?.limit ?? 20,
-          search: params?.search || undefined,
-          role: roleQuery,
-          chainId: selectedChainId,
-        },
-      },
-    );
-
-    const admins = response.admins
-      .map(mapAdminApiItem)
-      .filter(
-        ({ apiRole }) =>
-          apiRole !== "normal" &&
-          (!selectedRoles?.length || selectedRoles.includes(apiRole)),
-      )
-      .map(({ admin }) => admin);
+    const response = await fetchAdminManagementPage(params);
 
     return {
-      page: response.page ?? params?.page ?? 1,
-      total: response.total ?? admins.length,
+      page: response.page,
+      total: response.total,
+      totalEnable: response.totalEnable,
+      totalDisable: response.totalDisable,
+      admins: response.admins,
+    };
+  },
+
+  getAllAdmins: async (
+    params?: Omit<ListAdminManagementRequest, "page" | "limit" | "search">,
+  ): Promise<ListAdminManagementResponse> => {
+    const admins: AdminManagementAdmin[] = [];
+    const seenAdminIds = new Set<string>();
+    let page = 1;
+
+    while (true) {
+      const response = await fetchAdminManagementPage({
+        ...params,
+        page,
+        limit: FETCH_ALL_ADMINS_PAGE_SIZE,
+      });
+
+      response.admins.forEach((admin) => {
+        if (seenAdminIds.has(admin.id)) {
+          return;
+        }
+
+        seenAdminIds.add(admin.id);
+        admins.push(admin);
+      });
+
+      if (response.rawCount < FETCH_ALL_ADMINS_PAGE_SIZE) {
+        break;
+      }
+
+      page += 1;
+    }
+
+    return {
+      page: 1,
+      total: admins.length,
       totalEnable: admins.filter((admin) => admin.enabled).length,
       totalDisable: admins.filter((admin) => !admin.enabled).length,
       admins,

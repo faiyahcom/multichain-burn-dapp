@@ -34,7 +34,7 @@ import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "@/components/common/custom-toast";
 import AdminManagementDialogEdit from "../dialog/edit";
 import { useToggleAdminRoleEvmFn } from "./useToggleAdminRoleEvmFn";
@@ -62,6 +62,22 @@ const areWalletAddressesEqual = (left?: string, right?: string) => {
 
 const getAdminTargetNetworkId = (admin: AdminManagementAdmin) =>
   admin.networkIds[0] ?? null;
+
+const normalizeSearchValue = (value?: string) =>
+  value?.trim().toLowerCase().replace(/\s+/g, " ") ?? "";
+
+const matchesAdminSearch = (
+  admin: AdminManagementAdmin,
+  searchValue: string,
+) => {
+  if (!searchValue) {
+    return true;
+  }
+
+  return [admin.name, admin.email, admin.walletAddress].some((field) =>
+    normalizeSearchValue(field).includes(searchValue),
+  );
+};
 
 const AdminNetworksCell: React.FC<{
   networkIds: AdminManagementAdmin["networkIds"];
@@ -123,19 +139,51 @@ const AdminManagementTable = () => {
   );
   const [isDeletingOnChain, setIsDeletingOnChain] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const serverFilters = useMemo(
+    () => ({
+      roles: filter.roles,
+      networkIds: filter.network,
+    }),
+    [filter.roles, filter.network],
+  );
 
   const { data, isPending } = useQuery({
-    queryKey: adminManagementQueryKeys.list(filter),
+    queryKey: adminManagementQueryKeys.list(serverFilters),
     enabled: hasHydrated && !!accessToken && user?.role === "super_admin",
     queryFn: () =>
-      adminManagementService.getListAdmins({
-        page: filter.page,
-        limit: PAGE_SIZE,
-        search: filter.text || undefined,
-        roles: filter.roles,
-        networkIds: filter.network,
-      }),
+      adminManagementService.getAllAdmins(serverFilters),
   });
+
+  const normalizedSearchText = useMemo(
+    () => normalizeSearchValue(filter.text),
+    [filter.text],
+  );
+
+  const filteredAdmins = useMemo(
+    () =>
+      data?.admins.filter((admin) =>
+        matchesAdminSearch(admin, normalizedSearchText),
+      ) ?? [],
+    [data?.admins, normalizedSearchText],
+  );
+
+  const paginatedAdmins = useMemo(() => {
+    const startIndex = (filter.page - 1) * PAGE_SIZE;
+
+    return filteredAdmins.slice(startIndex, startIndex + PAGE_SIZE);
+  }, [filter.page, filteredAdmins]);
+
+  useEffect(() => {
+    const maxPage = Math.max(1, Math.ceil(filteredAdmins.length / PAGE_SIZE));
+
+    if (filter.page > maxPage) {
+      setFilter({ page: maxPage });
+    }
+  }, [filter.page, filteredAdmins.length, setFilter]);
+
+  const emptyStateText = normalizedSearchText
+    ? "No admins found matching your search"
+    : "No admins found";
 
   const refetchAdminManagementList = async () => {
     await queryClient.invalidateQueries({
@@ -300,12 +348,12 @@ const AdminManagementTable = () => {
             <TableSpinner isLoading={isPending} colSpan={7} />
             <TableNoData
               colSpan={7}
-              data={data?.admins}
+              data={paginatedAdmins}
               isLoading={isPending}
-              text="No admins found"
+              text={emptyStateText}
             />
 
-            {data?.admins.map((admin, index) => {
+            {paginatedAdmins.map((admin, index) => {
               const status: AdminManagementStatus = admin.enabled
                 ? "enabled"
                 : "disabled";
@@ -429,13 +477,13 @@ const AdminManagementTable = () => {
 
         {!isPending && data ? (
           <p className="pl-4 text-sm text-secondary-text">
-            Showing {data.admins.length} of {data.total} admins
+            Showing {paginatedAdmins.length} of {filteredAdmins.length} admins
           </p>
         ) : null}
 
         <CustomPagination
           currentPage={filter.page}
-          totalCount={data?.total ?? 0}
+          totalCount={filteredAdmins.length}
           pageSize={PAGE_SIZE}
           hideIfLessThanTwoPages
           onPageChange={(page) => setFilter({ page })}
