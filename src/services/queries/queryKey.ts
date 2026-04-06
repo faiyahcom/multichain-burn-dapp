@@ -79,6 +79,11 @@ export const authQueryKeys = {
   me: (params?: Record<string, unknown>) => ["auth", "me", params] as const,
 };
 
+export const notificationQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["notifications", "list", params] as const,
+};
+
 export const dashboardQueryKeys = {
   statsSticker: () => ["dashboard", "stats-sticker"] as const,
   latestActivity: () => ["dashboard", "latest-activity"] as const,

@@ -67,4 +67,9 @@ export const API_ROUTES = {
     LIST: "/fee",
     STATS: "/fee/stats",
   },
+  NOTIFICATIONS: {
+    LIST: "/users/notifications",
+    STREAM: "/users/notifications-stream",
+    MARK_READ: "/users/notifications/mark-read",
+  },
 } as const;
