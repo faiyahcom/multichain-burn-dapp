@@ -16,9 +16,10 @@ export function MainHeader() {
         {/* mobile sidebar button */}
         <button
           className="xl:hidden"
+          aria-label="Open sidebar menu"
           onClick={() => {
-            console.log("click");
-            setState({ isOpen: true })}}
+            setState({ isOpen: true });
+          }}
         >
           <MenuIcon />
         </button>
