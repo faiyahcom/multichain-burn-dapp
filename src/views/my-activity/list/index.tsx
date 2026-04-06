@@ -182,12 +182,26 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Deposit reward token, Deposit burn token, Claim reward
-  if ([10, 30, 31].includes(kind)) {
+  // Deposit reward token, Deposit burn token
+  if ([10, 30].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountIn}
         unit={pool?.tokenInSymbol}
+        isShorten
+        classNames={{
+          container: "justify-start",
+        }}
+      />
+    );
+  }
+
+  // Claim reward
+  if (kind === 31) {
+    return (
+      <MetricNumber
+        number={uiAmountOut}
+        unit={pool?.rewardTokenSymbol}
         isShorten
         classNames={{
           container: "justify-start",
