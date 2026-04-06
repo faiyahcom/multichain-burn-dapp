@@ -118,29 +118,30 @@ export const txnKind = {
 } as const;
 
 export const activityKind = {
-    // Pool lifecycle
-    0: "Pool Created",
-    1: "Pool Requested",
-    2: "Pool Approved",
-    3: "Pool Rejected",
-    4: "Pool Canceled",
-    5: "Pool Closed",
-    8: "Pool Updated",
-    9: "Pool Ended",
+  // Pool lifecycle
+  0: "Create burn pool",
+  1: "Create swap pool",
+  2: "Pool Requested",
+  3: "Pool Approved",
+  4: "Pool Rejected",
+  5: "Cancel pool",
+  6: "Pool Closed",
+  7: "Pool Updated",
+  8: "Pool Ended",
 
-    // Maker action
-    10: "Reward Deposited",
-    11: "Cancel Approve Request",
+  // Maker action
+  10: "Deposit reward token",
+  11: "Maker Cancel Approve Request",
 
-    // Admin action
-    20: "Admin Refund",
+  // Admin action
+  20: "Admin Refund",
 
-    // User actions
-    30: "Taker Deposit", //taker deposit to pool
-    31: "Taker Claim", //taker claim reward from burn pool
+  // User actions
+  30: "Deposit burn token",
+  31: "Claim reward",
+  32: "Swap",
 
-    // Operator actions
-    40: "Burn Success"
+  40: "Pool End",
 } as const;
 
 export interface PoolActivitiesResponse {

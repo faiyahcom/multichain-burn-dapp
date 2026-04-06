@@ -43,6 +43,7 @@ type NavItem = {
   section: NavSection;
   children?: NavChild[];
   allowedRoles?: UserRole[];
+  superAdminOnly?: boolean;
 };
 
 export const navItems: NavItem[] = [
@@ -127,6 +128,7 @@ export const navItems: NavItem[] = [
     label: "Admin Management",
     section: navSection.admin,
     to: "/admin/admin-management",
+    superAdminOnly: true,
   },
   {
     label: "Whitelist Token",
@@ -137,6 +139,7 @@ export const navItems: NavItem[] = [
     label: "Whitelist User",
     section: navSection.admin,
     to: "/admin/whitelist-user",
+    superAdminOnly: true,
   },
   {
     label: "Transfer History",
@@ -159,6 +162,7 @@ export const navItems: NavItem[] = [
     icon: IconFeeSettingsGear,
     section: navSection.admin,
     to: "/admin/fee-settings-management",
+    superAdminOnly: true,
   },
 ];
 
@@ -179,7 +183,7 @@ export const adminNavItems: NavItem[] = [
     label: "Whitelist User",
     section: navSection.admin,
     to: "/admin/whitelist-user",
-    allowedRoles: ["admin", "super_admin"],
+    allowedRoles: ["super_admin"],
   },
   {
     label: "Transfer History",
@@ -205,6 +209,6 @@ export const adminNavItems: NavItem[] = [
     icon: IconFeeSettingsGear,
     section: navSection.admin,
     to: "/admin/fee-settings-management",
-    allowedRoles: ["admin", "super_admin"],
+    allowedRoles: ["super_admin"],
   },
 ];

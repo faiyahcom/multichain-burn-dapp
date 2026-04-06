@@ -43,6 +43,22 @@ export interface UpdatePersonalInfoResponse {
   avatar?: string;
 }
 
+export const resolveUserRole = (
+  user?: Pick<UserResponse, "role"> | null,
+): UserRole | null => user?.role ?? null;
+
+export const hasEnabledAdminRole = (
+  user?: Pick<UserResponse, "role"> | null,
+) => {
+  const role = resolveUserRole(user);
+
+  return role === "admin" || role === "super_admin";
+};
+
+export const isSuperAdminRole = (
+  user?: Pick<UserResponse, "role"> | null,
+) => hasEnabledAdminRole(user) && resolveUserRole(user) === "super_admin";
+
 export const authService = {
   requestSigningMessage: async (
     params: RequestSigningMessageParams,
