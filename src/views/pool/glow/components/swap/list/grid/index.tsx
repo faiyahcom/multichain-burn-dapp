@@ -1,15 +1,27 @@
 import CopyableText from "@/components/common/copyable-text";
+import {
+  Button,
+  getButtonVariantFromContainerVariant,
+} from "@/components/common/glow/button";
+import { getVariantBorderClassName } from "@/components/common/glow/container";
 import GridCard from "@/components/common/glow/grid-card";
 import GridCardSkeleton from "@/components/common/glow/grid-card-skeleton";
 import TokenOutInNetworkDisplay from "@/components/common/glow/token-out-in-network-display";
 import MetricNumber from "@/components/common/metric-number";
 import NoData from "@/components/common/no-data";
 import RatioDisplay from "@/components/common/ratio-display";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { cn } from "@/lib/utils";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { useAuthStore } from "@/stores/authStore";
 import type { PoolItemType } from "@/types/admin/master-pool-management";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
-import { Link } from "@tanstack/react-router";
+import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
+import { useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 
 interface Props {
   data?: PoolItemType[];
@@ -17,6 +29,10 @@ interface Props {
 }
 
 const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
+
   return (
     <>
       <GridCardSkeleton
@@ -49,6 +65,7 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
               customSymbol: pool.tokenInSymbolCustom ?? undefined,
               imageUri: pool.tokenInImageUri ?? undefined,
             });
+
             return (
               // Client wants the order to be token out / token in, refers to MB-415
               <GridCard
@@ -109,8 +126,34 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   </div>
                 }
                 btn={{
+                  asChild: true,
                   children: (
-                    <Link to={`/swap/detail/${pool.address}`}>Swap</Link>
+                    <PoolChainGuard
+                      chainId={pool.chainId}
+                      variant="swap"
+                      className="my-0 md:my-0"
+                    >
+                      <Button
+                        variant={getButtonVariantFromContainerVariant({
+                          containerVariant: "swap",
+                          isGrid: true,
+                        })}
+                        className={cn(
+                          "mx-auto min-w-45 pb-2.75",
+                          getVariantBorderClassName({
+                            variant: "swap",
+                            custom: "rounded-13px border",
+                          }),
+                        )}
+                        hasHover
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSwapPoolAddress(pool.address);
+                        }}
+                      >
+                        Swap
+                      </Button>
+                    </PoolChainGuard>
                   ),
                 }}
                 classNames={{
@@ -123,6 +166,28 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
           })}
         </div>
       )}
+
+      <SwapDialog
+        open={!!swapPoolAddress}
+        onOpenChange={(open) => {
+          if (!open) setSwapPoolAddress(undefined);
+        }}
+        poolAddress={swapPoolAddress}
+        onSuccess={() => {
+          setSwapPoolAddress(undefined);
+          queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.list().filter(Boolean),
+            exact: false,
+          });
+          queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.recents({
+              user: user?.address,
+              poolKind: PoolKindCodeEnum.Swap,
+            }),
+            exact: false,
+          });
+        }}
+      />
     </>
   );
 };

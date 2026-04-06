@@ -15,11 +15,18 @@ import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-in
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import RatioDisplay from "@/components/common/ratio-display";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { useAuthStore } from "@/stores/authStore";
 import type { PoolItemType } from "@/types/admin/master-pool-management";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
+import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
+import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import { useState } from "react";
 
 interface Props {
   data?: PoolItemType[];
@@ -28,6 +35,9 @@ interface Props {
 
 const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   const navigate = useNavigate();
+  const { user } = useAuthStore();
+  const queryClient = useQueryClient();
+  const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
 
   const columns = ["Pool", "Pair", "Ratio", "Liquidity", "Network", "Action"];
 
@@ -35,150 +45,184 @@ const SwapPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   const fixWidth: React.CSSProperties["minWidth"] = `200px`;
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          {columns.map((column, index) => (
-            <TableHead
-              key={index}
-              variant="swap"
-              style={{
-                width: index === 0 ? fixWidth : cellWidth, // 200px for first column
-                minWidth: index === 0 ? fixWidth : "", // 200px for first column
-              }}
-            >
-              {column}
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        <TableSkeleton
-          colCount={columns.length}
-          rowCount={12}
-          isLoading={isLoading}
-        />
-        <TableNoData
-          colSpan={columns.length}
-          data={data}
-          isLoading={isLoading}
-        />
-        {data?.map((pool) => {
-          const network = chainIdToNetworkConfig(pool.chainId);
-
-          const tokenOutDisplay = resolvePoolTokenDisplay({
-            network,
-            tokenAddress: pool.tokenOut,
-            tokenSymbol: pool.tokenOutSymbol,
-            tokenName: pool.tokenOutSymbol,
-            customName: pool.tokenOutSymbolCustom ?? undefined,
-            customSymbol: pool.tokenOutSymbolCustom ?? undefined,
-            imageUri: pool.tokenOutImageUri ?? undefined,
-          });
-
-          const tokenInDisplay = resolvePoolTokenDisplay({
-            network,
-            tokenAddress: pool.tokenIn,
-            tokenSymbol: pool.tokenInSymbol,
-            tokenName: pool.tokenInSymbol,
-            customName: pool.tokenInSymbolCustom ?? undefined,
-            customSymbol: pool.tokenInSymbolCustom ?? undefined,
-            imageUri: pool.tokenInImageUri ?? undefined,
-          });
-
-          const href = `/swap/detail/${pool.address}`;
-
-          return (
-            <TableRow
-              key={pool.address}
-              onClick={() => {
-                navigate({
-                  to: href,
-                });
-              }}
-              className="cursor-pointer font-medium"
-              variant="swap"
-            >
-              <TableCell
-                className="w-(--max-w) min-w-0 text-left"
-                style={
-                  {
-                    "--max-w": fixWidth,
-                  } as React.CSSProperties
-                }
+    <>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {columns.map((column, index) => (
+              <TableHead
+                key={index}
+                variant="swap"
+                style={{
+                  width: index === 0 ? fixWidth : cellWidth, // 200px for first column
+                  minWidth: index === 0 ? fixWidth : "", // 200px for first column
+                }}
               >
-                <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
-                  <IconSwapCategory className="size-10.75 shrink-0" />
-                  {/* max-w - spacing * (10.75 + 3) */}
-                  <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
-                    <p
-                      className="max-w-full min-w-0 truncate font-semibold"
-                      title={pool.name}
-                    >
-                      {pool.name}
-                    </p>
-                    <CopyableText
-                      content={pool.address}
-                      displayText={truncateString({ str: pool.address })}
-                      classNames={{
-                        container: "justify-start",
-                        displayText: "text-base sm:text-xl",
-                      }}
-                    />
-                  </div>
-                </div>
-              </TableCell>
-              <TableCell>
-                <TokenOutInInterceptDisplay
-                  tokenOutProps={{
-                    src: tokenOutDisplay.imageUri,
-                    alt: tokenOutDisplay.symbol,
-                  }}
-                  tokenInProps={{
-                    src: tokenInDisplay.imageUri,
-                    alt: tokenInDisplay.symbol,
-                  }}
-                  className="justify-center"
-                />
-              </TableCell>
-              <TableCell>
-                <RatioDisplay
-                  inValue={pool.rewardDenominator}
-                  outValue={pool.rewardNumerator}
-                  inSymbol={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
-                  outSymbol={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
-                  equalSign="/"
-                />
-              </TableCell>
-              <TableCell>
-                <MetricNumber
-                  number={pool.liquidity}
-                  unit={tokenOutDisplay.symbol}
-                  isShorten
-                />
-              </TableCell>
-              <TableCell>
-                <NetworkDisplay
-                  chainId={pool.chainId}
-                  classNames={{
-                    container: "flex items-center justify-center gap-3",
-                  }}
-                />
-              </TableCell>
-              <TableCell className="w-max max-w-max min-w-max">
-                <Button
-                  variant={"swap"}
-                  hasGroupHover
-                  className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
+                {column}
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          <TableSkeleton
+            colCount={columns.length}
+            rowCount={12}
+            isLoading={isLoading}
+          />
+          <TableNoData
+            colSpan={columns.length}
+            data={data}
+            isLoading={isLoading}
+          />
+          {data?.map((pool) => {
+            const network = chainIdToNetworkConfig(pool.chainId);
+
+            const tokenOutDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: pool.tokenOut,
+              tokenSymbol: pool.tokenOutSymbol,
+              tokenName: pool.tokenOutSymbol,
+              customName: pool.tokenOutSymbolCustom ?? undefined,
+              customSymbol: pool.tokenOutSymbolCustom ?? undefined,
+              imageUri: pool.tokenOutImageUri ?? undefined,
+            });
+
+            const tokenInDisplay = resolvePoolTokenDisplay({
+              network,
+              tokenAddress: pool.tokenIn,
+              tokenSymbol: pool.tokenInSymbol,
+              tokenName: pool.tokenInSymbol,
+              customName: pool.tokenInSymbolCustom ?? undefined,
+              customSymbol: pool.tokenInSymbolCustom ?? undefined,
+              imageUri: pool.tokenInImageUri ?? undefined,
+            });
+
+            const href = `/swap/detail/${pool.address}`;
+
+            return (
+              <TableRow
+                key={pool.address}
+                onClick={() => {
+                  navigate({
+                    to: href,
+                  });
+                }}
+                className="cursor-pointer font-medium"
+                variant="swap"
+              >
+                <TableCell
+                  className="w-(--max-w) min-w-0 text-left"
+                  style={
+                    {
+                      "--max-w": fixWidth,
+                    } as React.CSSProperties
+                  }
                 >
-                  Swap
-                </Button>
-              </TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+                  <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
+                    <IconSwapCategory className="size-10.75 shrink-0" />
+                    {/* max-w - spacing * (10.75 + 3) */}
+                    <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
+                      <p
+                        className="max-w-full min-w-0 truncate font-semibold"
+                        title={pool.name}
+                      >
+                        {pool.name}
+                      </p>
+                      <CopyableText
+                        content={pool.address}
+                        displayText={truncateString({ str: pool.address })}
+                        classNames={{
+                          container: "justify-start",
+                          displayText: "text-base sm:text-xl",
+                        }}
+                      />
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <TokenOutInInterceptDisplay
+                    tokenOutProps={{
+                      src: tokenOutDisplay.imageUri,
+                      alt: tokenOutDisplay.symbol,
+                    }}
+                    tokenInProps={{
+                      src: tokenInDisplay.imageUri,
+                      alt: tokenInDisplay.symbol,
+                    }}
+                    className="justify-center"
+                  />
+                </TableCell>
+                <TableCell>
+                  <RatioDisplay
+                    inValue={pool.rewardDenominator}
+                    outValue={pool.rewardNumerator}
+                    inSymbol={pool.tokenInSymbolCustom ?? pool.tokenInSymbol}
+                    outSymbol={pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol}
+                    equalSign="/"
+                  />
+                </TableCell>
+                <TableCell>
+                  <MetricNumber
+                    number={pool.liquidity}
+                    unit={tokenOutDisplay.symbol}
+                    isShorten
+                  />
+                </TableCell>
+                <TableCell>
+                  <NetworkDisplay
+                    chainId={pool.chainId}
+                    classNames={{
+                      container: "flex items-center justify-center gap-3",
+                    }}
+                  />
+                </TableCell>
+                <TableCell className="w-max max-w-max min-w-max">
+                  <PoolChainGuard
+                    chainId={pool.chainId}
+                    variant="swap"
+                    className="my-0 md:my-0"
+                  >
+                    <Button
+                      variant={"swap"}
+                      hasGroupHover
+                      className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-35"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSwapPoolAddress(pool.address);
+                      }}
+                    >
+                      Swap
+                    </Button>
+                  </PoolChainGuard>
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+
+      <SwapDialog
+        open={!!swapPoolAddress}
+        onOpenChange={(open) => {
+          if (!open) setSwapPoolAddress(undefined);
+        }}
+        poolAddress={swapPoolAddress}
+        onSuccess={() => {
+          setSwapPoolAddress(undefined);
+          queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.list().filter(Boolean),
+            exact: false,
+          });
+          queryClient.invalidateQueries({
+            queryKey: poolQueryKeys.recents({
+              user: user?.address,
+              poolKind: PoolKindCodeEnum.Swap,
+            }),
+            exact: false,
+          });
+        }}
+      />
+    </>
   );
 };
 
