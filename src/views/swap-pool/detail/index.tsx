@@ -26,8 +26,8 @@ const SwapPoolDetail = ({ address }: Props) => {
     const safeStatus: SwapPoolStatus = (status as SwapPoolStatus) ?? "on_going";
 
     return (
-        <div className="space-y-6 md:pt-7 md:pl-8 lg:pt-9.5 lg:pl-14 lg:space-y-17.5">
-            <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-6 lg:gap-10">
+        <div className="space-y-6 md:pt-7 md:pl-8 lg:space-y-17.5 lg:pt-9.5 lg:pl-14">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6 lg:gap-10">
                 {isLoadingPoolDetail ? (
                     <>
                         <Skeleton className="h-9 w-48" />
@@ -35,18 +35,18 @@ const SwapPoolDetail = ({ address }: Props) => {
                     </>
                 ) : (
                     <>
-                        <div className="flex flex-col sm:pl-3 gap-2.5 md:pl-6 lg:pl-9">
-                            <h2 className="text-xl font-semibold md:text-2xl lg:text-3xl 2xl:text-4xl break-all">
+                        <div className="flex flex-col gap-2.5 sm:pl-3 md:pl-6 lg:pl-9">
+                            <h2 className="text-xl font-semibold break-all md:text-2xl lg:text-3xl 2xl:text-4xl">
                                 {poolDetail?.pool.name}
                             </h2>
                             <ScanLink
                                 address={address ?? ""}
                                 chainId={poolDetail?.pool.chainId}
-                                className="font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl"
+                                className="w-fit font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl"
                                 iconClassName="size-3.5"
                             />
                         </div>
-                        <SwapPoolStatusDisplay className="min-w-20 px-2 py-1.5 text-sm md:px-3 md:py-2 md:text-sm lg:px-5 sm:text-base lg:min-w-64 2xl:px-6 2xl:py-3 lg:text-2xl">
+                        <SwapPoolStatusDisplay className="w-3/7 min-w-20 px-2 py-1.5 text-sm sm:w-64 sm:text-base md:px-3 md:py-2 md:text-sm lg:px-5 lg:text-2xl 2xl:px-6 2xl:py-3">
                             {SWAP_POOL_STATUS[safeStatus].label}
                         </SwapPoolStatusDisplay>
                     </>

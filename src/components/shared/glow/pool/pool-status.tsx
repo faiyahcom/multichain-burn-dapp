@@ -12,7 +12,7 @@ function withPoolStatus<T extends ButtonProps>(
     return (
       <WrappedButton
         className={cn(
-          "min-w-64 cursor-default text-2xl font-medium font-orbitron",
+          "cursor-default text-2xl font-medium font-orbitron",
           className,
         )}
         {...(props as T)}
