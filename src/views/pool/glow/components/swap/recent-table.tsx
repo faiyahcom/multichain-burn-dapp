@@ -71,17 +71,21 @@ const SwapRecentPoolsTable = ({}: {}) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          <TableSkeleton
-            colCount={columns.length}
-            rowCount={2}
-            isLoading={isRecentPoolsPending}
-          />
-          <TableNoData
-            colSpan={columns.length}
-            data={recentPools?.pools}
-            isLoading={isRecentPoolsPending}
-            text="No pools found"
-          />
+          {isAuthenticated && (
+            <TableSkeleton
+              colCount={columns.length}
+              rowCount={2}
+              isLoading={isRecentPoolsPending}
+            />
+          )}
+          {isAuthenticated && (
+            <TableNoData
+              colSpan={columns.length}
+              data={recentPools?.pools}
+              isLoading={isRecentPoolsPending}
+              text="No pools found"
+            />
+          )}
           {!isAuthenticated && (
             <TableRow>
               <TableCell colSpan={columns.length}>
