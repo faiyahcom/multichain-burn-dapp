@@ -23,12 +23,14 @@ const CARD_VARIANT_BG_IMG: Record<ContainerVariant, string> = {
   burn: "/images/grid/burn-card-bg.png",
   pair: "/images/grid/pair-card-bg.png",
   swap: "/images/grid/swap-card-bg.png",
+  green: "",
 };
 
 const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
   burn: "grid-burn-bg",
   pair: "grid-pair-bg",
   swap: "grid-swap-bg",
+  green: "",
 };
 
 const GridCard: React.FC<Props> = ({

@@ -25,7 +25,12 @@ type Props = {
  *                            global SwitchNetworkModal via openSwitchNetworkModal.
  * - Correct network        → renders children as-is.
  */
-export function PoolChainGuard({ chainId, children, variant = "pair", className }: Props) {
+export function PoolChainGuard({
+  chainId,
+  children,
+  variant = "pair",
+  className,
+}: Props) {
   const { user } = useAuthStore();
   const { open } = useAppKit();
   const { caipAddress } = useAppKitAccount();
@@ -46,7 +51,10 @@ export function PoolChainGuard({ chainId, children, variant = "pair", className 
         variant={variant}
         hasHover
         className={btnClassName}
-        onClick={() => open()}
+        onClick={(e) => {
+          e.stopPropagation();
+          open();
+        }}
       >
         Connect Wallet
       </Button>
@@ -65,7 +73,10 @@ export function PoolChainGuard({ chainId, children, variant = "pair", className 
         variant={variant}
         hasHover
         className={btnClassName}
-        onClick={() => openSwitchNetworkModal(currentNetworkId, poolNetworkId!)}
+        onClick={(e) => {
+          e.stopPropagation();
+          openSwitchNetworkModal(currentNetworkId, poolNetworkId!);
+        }}
       >
         Switch Network
       </Button>
