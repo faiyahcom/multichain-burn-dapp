@@ -67,3 +67,12 @@ export const feeQueryKeys = {
 export const authQueryKeys = {
   me: (params?: Record<string, unknown>) => ["auth", "me", params] as const,
 };
+
+export const adminNotificationQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["admin-notifications", "list", params] as const,
+};
+
+export const generalQueryKeys = {
+  nativePrices: () => ["general", "native-prices"] as const,
+};

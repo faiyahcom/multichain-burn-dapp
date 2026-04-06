@@ -31,7 +31,7 @@ export type FeeSettingsData = {
     updateValues: (cf: BN, sf: BN, tr: string) => void;
 };
 
-export const DECIMAL_FEE_PERCENT = 10000;
+export const DECIMAL_FEE_PERCENT = 100;
 
 /**
  * Reads the current creation fee, settlement fee, and treasury address

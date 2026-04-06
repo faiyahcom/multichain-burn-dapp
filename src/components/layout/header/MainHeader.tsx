@@ -5,6 +5,7 @@ import ConnectButton from "./connect-button";
 import { Link } from "@tanstack/react-router";
 import { MenuIcon } from "lucide-react";
 import { useSidebarStateStore } from "@/stores/admin/sidebar/sidebar-store";
+import { AdminNotificationBell } from "./admin-notification-bell";
 
 export function MainHeader() {
   const { isConnected } = useAppKitAccount();
@@ -33,6 +34,7 @@ export function MainHeader() {
         <ConnectButton />
       ) : (
         <div className="flex items-center gap-3 sm:gap-8">
+          <AdminNotificationBell />
           <NetworkSelect />
           <ProfileMenu />
         </div>
