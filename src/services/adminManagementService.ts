@@ -75,6 +75,8 @@ type AdminManagementApiItem = {
 type AdminManagementApiListResponse = {
   page?: number;
   total?: number;
+  totalEnable?: number;
+  totalDisable?: number;
   admins: AdminManagementApiItem[];
 };
 
@@ -119,24 +121,21 @@ const buildAdminChainIdQuery = (networkIds?: NetworkId[]) => {
 
 const mapAdminApiItem = (
   item: AdminManagementApiItem,
-): { admin: AdminManagementAdmin; apiRole: AdminManagementApiRole } => {
+): AdminManagementAdmin => {
   const networkId = chainIdToNetworkConfig(String(item.chainId))?.id;
 
   return {
-    apiRole: item.role,
-    admin: {
-      id: `${String(item.chainId)}:${item.address}`,
-      name: item.name ?? "",
-      email: item.email ?? "",
-      walletAddress: item.address,
-      role: item.role === "super_admin" ? "super_admin" : "admin",
-      enabled: item.roleEnable,
-      createdAt:
-        item.createdAt instanceof Date
-          ? item.createdAt.toISOString()
-          : item.createdAt,
-      networkIds: networkId ? [networkId] : [],
-    },
+    id: `${String(item.chainId)}:${item.address}`,
+    name: item.name ?? "",
+    email: item.email ?? "",
+    walletAddress: item.address,
+    role: item.role === "super_admin" ? "super_admin" : "admin",
+    enabled: item.roleEnable,
+    createdAt:
+      item.createdAt instanceof Date
+        ? item.createdAt.toISOString()
+        : item.createdAt,
+    networkIds: networkId ? [networkId] : [],
   };
 };
 
@@ -155,70 +154,19 @@ const buildUpsertAdminPayload = (request: UpsertAdminManagementRequest) => {
 };
 
 const getListAdminQueryConfig = (params?: ListAdminManagementRequest) => {
-  const selectedRoles = params?.roles;
   const selectedChainId = buildAdminChainIdQuery(params?.networkIds);
   const normalizedSearch = params?.search?.trim();
   const roleQuery =
-    selectedRoles && selectedRoles.length > 0
-      ? selectedRoles.join(",")
+    params?.roles && params.roles.length > 0
+      ? params.roles.join(",")
       : undefined;
 
   return {
-    selectedRoles,
-    requestParams: {
-      page: params?.page ?? 1,
-      limit: params?.limit ?? 20,
-      search: normalizedSearch || undefined,
-      role: roleQuery,
-      chainId: selectedChainId,
-    },
-  };
-};
-
-const mapAdminListResponse = ({
-  response,
-  selectedRoles,
-  fallbackPage,
-}: {
-  response: AdminManagementApiListResponse;
-  selectedRoles?: AdminManagementRole[];
-  fallbackPage?: number;
-}): ListAdminManagementResponse => {
-  const admins = response.admins
-    .map(mapAdminApiItem)
-    .filter(
-      ({ apiRole }) =>
-        apiRole !== "normal" &&
-        (!selectedRoles?.length || selectedRoles.includes(apiRole)),
-    )
-    .map(({ admin }) => admin);
-
-  return {
-    page: response.page ?? fallbackPage ?? 1,
-    total: response.total ?? admins.length,
-    totalEnable: admins.filter((admin) => admin.enabled).length,
-    totalDisable: admins.filter((admin) => !admin.enabled).length,
-    admins,
-  };
-};
-
-const fetchAdminManagementPage = async (
-  params?: ListAdminManagementRequest,
-): Promise<ListAdminManagementResponse> => {
-  const { selectedRoles, requestParams } = getListAdminQueryConfig(params);
-  const response = await apiClient.get<AdminManagementApiListResponse>(
-    ADMINS_API_ROUTES.LIST,
-    {
-      params: requestParams,
-    },
-  );
-
-  return {
-    ...mapAdminListResponse({
-      response,
-      selectedRoles,
-      fallbackPage: params?.page,
-    }),
+    page: params?.page ?? 1,
+    limit: params?.limit ?? 20,
+    search: normalizedSearch || undefined,
+    role: roleQuery,
+    chainId: selectedChainId,
   };
 };
 
@@ -226,17 +174,24 @@ export const adminManagementService = {
   getListAdmins: async (
     params?: ListAdminManagementRequest,
   ): Promise<ListAdminManagementResponse> => {
-    const response = await fetchAdminManagementPage(params);
+    
+    const response = await apiClient.get<AdminManagementApiListResponse>(
+      ADMINS_API_ROUTES.LIST,
+      {
+        params: getListAdminQueryConfig(params),
+      },
+    );
+
+    const admins = (response.admins ?? []).map(mapAdminApiItem);
 
     return {
-      page: response.page,
-      total: response.total,
-      totalEnable: response.totalEnable,
-      totalDisable: response.totalDisable,
-      admins: response.admins,
+      page: response.page ?? params?.page ?? 1,
+      total: response.total ?? admins.length,
+      totalEnable: response.totalEnable ?? 0,
+      totalDisable: response.totalDisable ?? 0,
+      admins,
     };
   },
-
 
   checkExistingAdmin: async ({
     walletAddress,
@@ -273,7 +228,7 @@ export const adminManagementService = {
       buildUpsertAdminPayload(request),
     );
 
-    return mapAdminApiItem(response).admin;
+    return mapAdminApiItem(response);
   },
 
   updateAdmin: async (
@@ -284,7 +239,7 @@ export const adminManagementService = {
       buildUpsertAdminPayload(request),
     );
 
-    return mapAdminApiItem(response).admin;
+    return mapAdminApiItem(response);
   },
 
   deleteAdmin: async ({

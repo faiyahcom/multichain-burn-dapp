@@ -66,13 +66,15 @@ const getAdminTargetNetworkId = (admin: AdminManagementAdmin) =>
 const AdminNetworksCell: React.FC<{
   networkIds: AdminManagementAdmin["networkIds"];
 }> = ({ networkIds }) => {
-  if (!networkIds.length) {
+  const resolvedNetworkIds = networkIds ?? [];
+
+  if (!resolvedNetworkIds.length) {
     return <span className="text-xs text-secondary-text">-</span>;
   }
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
-      {networkIds.map((networkId) => (
+      {resolvedNetworkIds.map((networkId) => (
         <NetworkDisplay key={networkId} networkId={networkId} />
       ))}
     </div>
@@ -142,7 +144,7 @@ const AdminManagementTable = () => {
   });
 
   const admins = data?.admins ?? [];
-  const hasSearchText = filter.text.trim().length > 0;
+  const hasSearchText = (filter.text ?? "").trim().length > 0;
   const emptyStateText = hasSearchText
     ? "No admins found matching your search"
     : "No admins found";
