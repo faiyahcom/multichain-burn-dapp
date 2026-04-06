@@ -21,7 +21,9 @@ export default function NetworkSelect() {
     (n) => n.id === selectedNetworkId,
   );
 
-  const setPendingNetworkSwitch = useSystemStore((s) => s.setPendingNetworkSwitch);
+  const setPendingNetworkSwitch = useSystemStore(
+    (s) => s.setPendingNetworkSwitch,
+  );
 
   const handleNetworkChange = async (network: NetworkConfig) => {
     const targetNamespace = network.id === "solanaDevnet" ? "solana" : "eip155";
@@ -33,7 +35,10 @@ export default function NetworkSelect() {
       } else {
         // Not yet connected to the target namespace — open connect modal.
         // The root-level useAppKitEventHandler will finalise the switch on MODAL_CLOSE.
-        setPendingNetworkSwitch({ network: network.appKitNetwork, closeModalOnDone: false });
+        setPendingNetworkSwitch({
+          network: network.appKitNetwork,
+          closeModalOnDone: false,
+        });
         open({ view: "Connect", namespace: targetNamespace });
       }
     } catch {
@@ -49,7 +54,9 @@ export default function NetworkSelect() {
           className="flex items-center gap-2 rounded-lg border-progress-bg/40 bg-sub-bg text-sm font-medium text-foreground hover:bg-inactive/40"
         >
           <NetworkIcon networkId={selectedNetworkId} />
-          <span>{selectedNetwork?.label ?? selectedNetworkId}</span>
+          <span className="max-sm:hidden">
+            {selectedNetwork?.label ?? selectedNetworkId}
+          </span>
           <ArrowIcon direction="down" className="text-foreground" />
         </Button>
       </DropdownMenuTrigger>

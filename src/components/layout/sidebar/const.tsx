@@ -36,7 +36,7 @@ type NavChild = {
   tab: string;
 };
 
-type NavItem = {
+export type NavItem = {
   label: string;
   to?: string;
   icon?: React.ComponentType<{ className?: string }>;

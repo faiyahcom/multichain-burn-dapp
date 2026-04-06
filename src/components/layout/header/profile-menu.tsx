@@ -45,14 +45,13 @@ const ProfileMenu = ({}: Props) => {
   const avatar = userApiData?.avatar ?? walletInfo?.icon;
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
-
   return (
-    <div className="flex w-76.25 items-center justify-between gap-5.5 rounded-md-plus bg-primary-foreground pt-0.5 pr-4.25 pb-0.75 pl-1.75">
+    <div className="flex shrink-0 items-center justify-between gap-5.5 rounded-md-plus bg-primary-foreground pt-0.5 pr-4.25 pb-0.75 pl-1.75 sm:w-76.25">
       {/* 
       100% - spacing * 5.5 - spacing * 4.25 - spacing * 1.75
       = 100% - spacing * 11.5
        */}
-      <div className="flex max-w-[calc(100%-var(--spacing)*11.5)] items-center gap-5.5 text-left">
+      <div className="flex max-w-[calc(100%-var(--spacing)*11.5)] shrink-0 items-center gap-5.5 text-left">
         <TokenImage
           src={avatar}
           alt={name}
@@ -66,7 +65,7 @@ const ProfileMenu = ({}: Props) => {
         100% - spacing * 11.75 - spacing * 5.5
         = 100% - spacing * 17.25
         */}
-        <div className="max-w-[calc(100%-var(--spacing)*17.25)]">
+        <div className="max-w-[calc(100%-var(--spacing)*17.25)] max-sm:hidden">
           <p className="min-w-0 truncate text-13px font-extrabold" title={name}>
             {name}
           </p>
@@ -87,6 +86,21 @@ const ProfileMenu = ({}: Props) => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-44 rounded-lg p-1">
+          <div className="sm:hidden p-2">
+            <p
+              className="min-w-0 truncate text-13px font-extrabold"
+              title={name}
+            >
+              {name}
+            </p>
+            <CopyableText
+              content={user?.address}
+              displayText={truncateString({ str: user?.address ?? "--" })}
+              classNames={{
+                container: "justify-start",
+              }}
+            />
+          </div>
           <DropdownMenuItem onClick={handleLogout}>
             <LogOutIcon className="size-4" />
             <span>Logout</span>
