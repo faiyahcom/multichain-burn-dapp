@@ -24,7 +24,7 @@ const STAT_DIALOG_META: Record<
   },
   settlement: {
     title: "Settlement Fee",
-    description: "Detailed breakdown of all token transfered for this user",
+    description: "Detailed breakdown of all tokens transferred for this user",
   },
 };
 
