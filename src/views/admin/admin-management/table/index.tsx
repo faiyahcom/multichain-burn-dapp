@@ -34,7 +34,7 @@ import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilIcon, Trash2Icon } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { toast } from "@/components/common/custom-toast";
 import AdminManagementDialogEdit from "../dialog/edit";
 import { useToggleAdminRoleEvmFn } from "./useToggleAdminRoleEvmFn";
@@ -66,13 +66,15 @@ const getAdminTargetNetworkId = (admin: AdminManagementAdmin) =>
 const AdminNetworksCell: React.FC<{
   networkIds: AdminManagementAdmin["networkIds"];
 }> = ({ networkIds }) => {
-  if (!networkIds.length) {
+  const resolvedNetworkIds = networkIds ?? [];
+
+  if (!resolvedNetworkIds.length) {
     return <span className="text-xs text-secondary-text">-</span>;
   }
 
   return (
     <div className="flex flex-wrap items-center justify-center gap-2">
-      {networkIds.map((networkId) => (
+      {resolvedNetworkIds.map((networkId) => (
         <NetworkDisplay key={networkId} networkId={networkId} />
       ))}
     </div>
@@ -123,19 +125,29 @@ const AdminManagementTable = () => {
   );
   const [isDeletingOnChain, setIsDeletingOnChain] = useState(false);
   const [statusUpdatingId, setStatusUpdatingId] = useState<string | null>(null);
+  const serverFilters = useMemo(
+    () => ({
+      page: filter.page,
+      limit: PAGE_SIZE,
+      search: filter.text,
+      roles: filter.roles,
+      networkIds: filter.network,
+    }),
+    [filter.network, filter.page, filter.roles, filter.text],
+  );
 
   const { data, isPending } = useQuery({
-    queryKey: adminManagementQueryKeys.list(filter),
+    queryKey: adminManagementQueryKeys.list(serverFilters),
     enabled: hasHydrated && !!accessToken && user?.role === "super_admin",
     queryFn: () =>
-      adminManagementService.getListAdmins({
-        page: filter.page,
-        limit: PAGE_SIZE,
-        search: filter.text || undefined,
-        roles: filter.roles,
-        networkIds: filter.network,
-      }),
+      adminManagementService.getListAdmins(serverFilters),
   });
+
+  const admins = data?.admins ?? [];
+  const hasSearchText = (filter.text ?? "").trim().length > 0;
+  const emptyStateText = hasSearchText
+    ? "No admins found matching your search"
+    : "No admins found";
 
   const refetchAdminManagementList = async () => {
     await queryClient.invalidateQueries({
@@ -300,12 +312,12 @@ const AdminManagementTable = () => {
             <TableSpinner isLoading={isPending} colSpan={7} />
             <TableNoData
               colSpan={7}
-              data={data?.admins}
+              data={admins}
               isLoading={isPending}
-              text="No admins found"
+              text={emptyStateText}
             />
 
-            {data?.admins.map((admin, index) => {
+            {admins.map((admin, index) => {
               const status: AdminManagementStatus = admin.enabled
                 ? "enabled"
                 : "disabled";
@@ -429,7 +441,7 @@ const AdminManagementTable = () => {
 
         {!isPending && data ? (
           <p className="pl-4 text-sm text-secondary-text">
-            Showing {data.admins.length} of {data.total} admins
+            Showing {admins.length} of {data.total} admins
           </p>
         ) : null}
 

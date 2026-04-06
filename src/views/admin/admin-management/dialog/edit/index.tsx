@@ -39,12 +39,13 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     toggleAdminRoles: toggleAdminRolesSolana,
   } =
     useToggleAdminRoleSolanaFn();
+  const adminNetworkIds = admin.networkIds ?? [];
   const targetNetworkId =
-    admin.networkIds.length === 1
-      ? admin.networkIds[0]
-      : currentNetworkId && admin.networkIds.includes(currentNetworkId)
+    adminNetworkIds.length === 1
+      ? adminNetworkIds[0]
+      : currentNetworkId && adminNetworkIds.includes(currentNetworkId)
         ? currentNetworkId
-        : admin.networkIds[0];
+        : adminNetworkIds[0];
 
   // Fetch total super admin count to guard against demoting the last one
   const { data: superAdminData } = useQuery({
