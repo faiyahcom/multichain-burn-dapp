@@ -82,7 +82,6 @@ type FetchAdminManagementPageResponse = ListAdminManagementResponse & {
   rawCount: number;
 };
 
-const FETCH_ALL_ADMINS_PAGE_SIZE = 100;
 
 const resolveAdminChainId = (networkId: NetworkId) => {
   const chainId = networkIdToChainId(networkId);
@@ -244,44 +243,6 @@ export const adminManagementService = {
     };
   },
 
-  getAllAdmins: async (
-    params?: Omit<ListAdminManagementRequest, "page" | "limit" | "search">,
-  ): Promise<ListAdminManagementResponse> => {
-    const admins: AdminManagementAdmin[] = [];
-    const seenAdminIds = new Set<string>();
-    let page = 1;
-
-    while (true) {
-      const response = await fetchAdminManagementPage({
-        ...params,
-        page,
-        limit: FETCH_ALL_ADMINS_PAGE_SIZE,
-      });
-
-      response.admins.forEach((admin) => {
-        if (seenAdminIds.has(admin.id)) {
-          return;
-        }
-
-        seenAdminIds.add(admin.id);
-        admins.push(admin);
-      });
-
-      if (response.rawCount < FETCH_ALL_ADMINS_PAGE_SIZE) {
-        break;
-      }
-
-      page += 1;
-    }
-
-    return {
-      page: 1,
-      total: admins.length,
-      totalEnable: admins.filter((admin) => admin.enabled).length,
-      totalDisable: admins.filter((admin) => !admin.enabled).length,
-      admins,
-    };
-  },
 
   checkExistingAdmin: async ({
     walletAddress,
