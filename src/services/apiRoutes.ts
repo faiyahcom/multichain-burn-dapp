@@ -37,6 +37,11 @@ export const API_ROUTES = {
     LIST: "/admins",
     UPSERT_USER: "/admins/user",
     DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
+    NOTIFICATIONS: {
+      LIST: "/admins/notifications",
+      MARK_READ: "/admins/notifications/mark-read",
+      STREAM: "/admins/notifications-stream",
+    },
   },
   PAIRS: {
     LIST: "/pairs",
