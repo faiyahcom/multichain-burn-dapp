@@ -73,7 +73,6 @@ const AdminManagementSearch = () => {
           inputProps={{
             placeholder: "Search by name, email, or wallet address",
           }}
-          debounceTime={300}
           value={filter.text}
           onValueChange={(value) => setFilter({ text: value })}
           className="sm:max-w-80.75"

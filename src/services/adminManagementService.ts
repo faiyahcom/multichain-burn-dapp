@@ -163,6 +163,7 @@ const buildUpsertAdminPayload = (request: UpsertAdminManagementRequest) => {
 const getListAdminQueryConfig = (params?: ListAdminManagementRequest) => {
   const selectedRoles = params?.roles;
   const selectedChainId = buildAdminChainIdQuery(params?.networkIds);
+  const normalizedSearch = params?.search?.trim();
   const roleQuery =
     selectedRoles && selectedRoles.length > 0
       ? selectedRoles.join(",")
@@ -173,7 +174,7 @@ const getListAdminQueryConfig = (params?: ListAdminManagementRequest) => {
     requestParams: {
       page: params?.page ?? 1,
       limit: params?.limit ?? 20,
-      search: params?.search || undefined,
+      search: normalizedSearch || undefined,
       role: roleQuery,
       chainId: selectedChainId,
     },
