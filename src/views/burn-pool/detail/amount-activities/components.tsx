@@ -58,15 +58,17 @@ export const StatRow = ({
     label,
     value,
     className,
+    labelClassName,
     valueClassName = "text-sm font-bold md:text-base lg:text-lg 2xl:text-xl",
 }: {
     label: string;
     value: React.ReactNode;
     className?: string;
+    labelClassName?: string;
     valueClassName?: string;
 }) => (
     <div className={cn("mb-3 flex items-center justify-between", className)}>
-        <span className="text-sm md:text-base lg:text-lg 2xl:text-xl">{label}</span>
+        <span className={cn("text-sm md:text-base lg:text-lg 2xl:text-xl", labelClassName)}>{label}</span>
         <span className={valueClassName}>{value}</span>
     </div>
 );

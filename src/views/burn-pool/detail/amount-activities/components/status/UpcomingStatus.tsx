@@ -47,7 +47,8 @@ const UpcomingStatus = ({ poolDetail }: Props) => {
                     </div>
                 }
                 className="text-burn-border/85"
-                valueClassName="text-xl font-bold"
+                labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
+                valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
             />
             <StatRow label="Estimated Claimable Reward" value="0" />
             <Button

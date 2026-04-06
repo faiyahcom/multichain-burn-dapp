@@ -13,11 +13,8 @@ type Props = {
 };
 
 const CanceledStatus = ({ poolDetail }: Props) => {
-    const {
-        pool,
-        formattedReward,
-        formattedBurned,
-    } = useAmountActivity(poolDetail);
+    const { pool, formattedReward, formattedBurned } =
+        useAmountActivity(poolDetail);
     const { user } = useAuthStore();
     const isPoolOwner = user?.address === poolDetail?.pool.owner;
     const formattedReturning = poolDetail?.returningAmountOnCanceling
@@ -67,7 +64,8 @@ const CanceledStatus = ({ poolDetail }: Props) => {
                     </div>
                 }
                 className="text-burn-border/85"
-                valueClassName="text-xl font-bold"
+                labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
+                valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
             />
             <StatRow
                 label="Your Burned Amount"
@@ -87,7 +85,7 @@ const CanceledStatus = ({ poolDetail }: Props) => {
                 }
             />
             {poolDetail?.pool.status === "canceled" && isPoolOwner && (
-                <div className="mb-3 flex items-center justify-between text-mb-burn">
+                <div className="text-mb-burn mb-3 flex items-center justify-between">
                     <span className="text-sm font-medium">Your reward token return</span>
                     <span className="text-sm font-bold">
                         {poolDetail ? (
