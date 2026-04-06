@@ -145,6 +145,11 @@ export function useOnChainVaultBalance(params: {
                         // BorshAccountsCoder returns snake_case field names matching the IDL
                         rewardRaw = poolAccount.reward_balance.toString();
                         depositRaw = poolAccount.total_deposited.toString();
+
+                        let isCollected = poolAccount.is_collected;
+                        if (isCollected == true) {
+                            depositRaw = "0";
+                        }
                     }
                 } else {
                     // ── EVM ───────────────────────────────────────────────────

@@ -497,7 +497,7 @@ const TransferTokensDialog = ({
                         isLoadingText="Transferring…"
                         btnProps={{
                             onClick: handleTransfer,
-                            disabled: !canTransfer || isTransferring,
+                            disabled: !canTransfer || isTransferring || displayAvailableAmount === "0",
                         }}
                     />
                 </div>
