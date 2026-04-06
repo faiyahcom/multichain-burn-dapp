@@ -75,7 +75,7 @@ const StatBoxDialog = ({
 
   return (
     <Dialog open={!!type} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="gap-4.25 sm:max-w-154.75">
+      <DialogContent className="gap-4.25 px-4 py-10 sm:max-w-148.25">
         <DialogHeader className="gap-1">
           <DialogTitle>{meta?.title}</DialogTitle>
           <DialogDescription>{meta?.description}</DialogDescription>
@@ -128,10 +128,12 @@ const StatBoxDialog = ({
           </div>
         ) : (
           <div className="w-full space-y-2.25">
-            <div className="grid grid-cols-2 rounded-5px bg-inactive py-1.75 *:text-center *:text-base *:font-bold">
-              <div>Token</div>
-              <div>Amount</div>
-            </div>
+            {settlementBreakdown.length > 0 && (
+              <div className="grid grid-cols-2 rounded-5px bg-inactive py-1.75 *:text-center *:text-base *:font-bold">
+                <div>Token</div>
+                <div>Amount</div>
+              </div>
+            )}
             <div
               className="max-h-[44dvh] space-y-2.25 overflow-y-auto"
               style={{ scrollbarGutter: "stable both-edges" }}
@@ -162,18 +164,20 @@ const StatBoxDialog = ({
                 ))
               )}
             </div>
-            <div
-              // This is meant to make the total box wdith the same as the item boxes, not scrollable
-              className="mt-5 overflow-y-auto"
-              style={{ scrollbarGutter: "stable both-edges" }}
-            >
-              <div className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-base">
-                <div>Total</div>
-                <div className="font-bold">
-                  {settlementTotal.toDecimalPlaces(6).toString()}
+            {settlementBreakdown.length > 0 && (
+              <div
+                // This is meant to make the total box wdith the same as the item boxes, not scrollable
+                className="mt-5 overflow-y-auto"
+                style={{ scrollbarGutter: "stable both-edges" }}
+              >
+                <div className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-base">
+                  <div>Total</div>
+                  <div className="font-bold">
+                    {settlementTotal.toDecimalPlaces(6).toString()}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </DialogContent>
