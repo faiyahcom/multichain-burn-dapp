@@ -78,11 +78,6 @@ type AdminManagementApiListResponse = {
   admins: AdminManagementApiItem[];
 };
 
-type FetchAdminManagementPageResponse = ListAdminManagementResponse & {
-  rawCount: number;
-};
-
-
 const resolveAdminChainId = (networkId: NetworkId) => {
   const chainId = networkIdToChainId(networkId);
 
@@ -209,7 +204,7 @@ const mapAdminListResponse = ({
 
 const fetchAdminManagementPage = async (
   params?: ListAdminManagementRequest,
-): Promise<FetchAdminManagementPageResponse> => {
+): Promise<ListAdminManagementResponse> => {
   const { selectedRoles, requestParams } = getListAdminQueryConfig(params);
   const response = await apiClient.get<AdminManagementApiListResponse>(
     ADMINS_API_ROUTES.LIST,
@@ -224,7 +219,6 @@ const fetchAdminManagementPage = async (
       selectedRoles,
       fallbackPage: params?.page,
     }),
-    rawCount: response.admins.length,
   };
 };
 
