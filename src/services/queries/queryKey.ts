@@ -72,3 +72,7 @@ export const adminNotificationQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["admin-notifications", "list", params] as const,
 };
+
+export const generalQueryKeys = {
+  nativePrices: () => ["general", "native-prices"] as const,
+};

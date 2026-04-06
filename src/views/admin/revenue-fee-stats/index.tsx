@@ -13,7 +13,8 @@ import {
 } from "@/config/networks";
 import { feeService, feeTxnKind } from "@/services/feeService";
 import { feeQueryKeys } from "@/services/queries/queryKey";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, formatNativeWithUsd } from "@/utils/helpers/numbers";
+import { useNativePrices } from "@/hooks/useNativePrices";
 import StatBox from "./components/stat-box";
 import StatBoxDialog, { type TabType } from "./components/stat-box-dialog";
 import FeeTable, { LIMIT, type FeeRow } from "./components/fee-table";
@@ -65,6 +66,11 @@ const AdminRevenueFeeStats = () => {
     kinds: kindsParam,
   };
 
+  const { data: nativePricesData } = useNativePrices();
+
+  const nativePriceForChain = (cid: string): number | undefined =>
+    nativePricesData?.natives.find((n) => n.chainId === cid)?.price;
+
   const { data: statsData } = useQuery({
     queryKey: feeQueryKeys.stats(statsParams as Record<string, unknown>),
     queryFn: () => feeService.getStats(statsParams),
@@ -89,13 +95,23 @@ const AdminRevenueFeeStats = () => {
         userAddress: record.executorAddress,
         chainId: record.chainId,
         txHash: record.hash,
-        feeAmount: `${formatAmount(record.amount, record.tokenDecimals)} ${record.tokenSymbol}`,
+        feeAmount: formatNativeWithUsd(
+          record.amount,
+          record.tokenDecimals,
+          record.tokenSymbol,
+          nativePriceForChain(record.chainId),
+        ),
       })),
     [listData],
   );
 
   const creationFeeDisplay = statsData?.create_fee
-    ? `${formatAmount(statsData.create_fee, nativeDecimals)} ${nativeSymbol}`
+    ? formatNativeWithUsd(
+        statsData.create_fee,
+        nativeDecimals,
+        nativeSymbol,
+        nativePriceForChain(chainId),
+      )
     : "—";
   const settlementFeesCount = statsData?.settlement_fees.length ?? 0;
 

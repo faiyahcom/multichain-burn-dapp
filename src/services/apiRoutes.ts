@@ -55,4 +55,7 @@ export const API_ROUTES = {
     LIST: "/fee",
     STATS: "/fee/stats",
   },
+  GENERAL: {
+    NATIVE_PRICES: "/general/native-prices",
+  },
 } as const;

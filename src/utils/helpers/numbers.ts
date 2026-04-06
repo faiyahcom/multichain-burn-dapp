@@ -68,3 +68,26 @@ export const shortenNumber = ({
     ...customFormat,
   });
 };
+
+function formatUsd(usd: number): string {
+  if (usd === 0) return "$0.00";
+  if (usd < 0.01) return `$${usd.toPrecision(2)}`;
+  return `$${usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Formats a raw (big-integer) native amount as "{humanAmount} {symbol} ~ ${usd}".
+ * If `price` is undefined the USD suffix is omitted.
+ */
+export function formatNativeWithUsd(
+  rawAmount: string,
+  decimals: number,
+  symbol: string,
+  price: number | undefined,
+): string {
+  const humanAmt = Number(rawAmount) / Math.pow(10, decimals);
+  const nativePart = `${shortenNumber({ number: humanAmt })} ${symbol}`;
+  if (price == null || isNaN(humanAmt)) return nativePart;
+  return `${nativePart} ~ ${formatUsd(humanAmt * price)}`;
+}
+

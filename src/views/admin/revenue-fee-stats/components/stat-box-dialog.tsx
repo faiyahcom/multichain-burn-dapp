@@ -11,6 +11,7 @@ import {
 import { formatAmount } from "@/utils/helpers/numbers";
 import type { GetFeeStatsResponse } from "@/services/feeService";
 import type { FeeRow } from "./fee-table";
+import TokenDisplay from "@/components/common/token-display";
 
 export type TabType = "creation" | "settlement";
 
@@ -146,13 +147,14 @@ const StatBoxDialog = ({
                     className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-15px"
                   >
                     <div className="flex items-center justify-center gap-2">
-                      {item.image_uri && (
-                        <img
-                          src={item.image_uri}
-                          alt={item.symbol}
-                          className="size-5 rounded-full object-cover"
-                        />
-                      )}
+                      <TokenDisplay
+                        symbol={item.custom_symbol ?? item.symbol}
+                        imageUri={item.image_uri ?? undefined}
+                        classNames={{
+                          img: "size-5 rounded-full object-cover",
+                        }}
+                        hasSymbol={false}
+                      />
                       <span>{item.custom_symbol ?? item.symbol}</span>
                     </div>
                     <div>{formatAmount(item.amount, item.decimals)}</div>
