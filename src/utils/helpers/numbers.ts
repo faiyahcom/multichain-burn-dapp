@@ -149,7 +149,7 @@ export const shortenNumber = ({
 
   for (const { value, symbol } of NUMBER_SUFFIXES) {
     if (abs.gte(value)) {
-      return `${sign}${formatDecimalDisplay(abs.div(value), decimalPlaces)}${symbol}`;
+      return `${sign}${formatDecimalDisplay(abs.div(value), 2)}${symbol}`;
     }
   }
 
