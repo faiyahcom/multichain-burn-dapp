@@ -1,28 +1,29 @@
 # Branches
-- main: for development
-- beta: for beta testing (with mapped domain)
-- prod: for production (with mapped domain)
+- main: for development, all logic and sc changes should be made here
 - main-admin: for admin development
-- beta-admin: for admin beta testing (with mapped domain)
-- prod-admin: for admin production (with mapped domain)
-
-## Middle branches (for verified PRs)
-- main-to-beta: for verified PRs from main to beta
-- main-admin-to-beta-admin: for verified PRs from main-admin to beta-admin
+- CR/convert-design: for user development (since user version uses the new design)
+- beta-admin: for admin beta (with mapped domain)
+- staging/new-design: for user beta (with mapped domain)
+- there are no production branches yet, they are expected to be called prod-user, prod-admin
 
 ## Workflow
-- Checkout from middle branch (this ensures that all PRs code is verified)
-- Name the checkout branch with the task code (e.g. fix/mb-123)
-- For dev testing and proofs, PR the new branch to the development branch (e.g. main, main-admin)
-- If the task is verified, merge the PR to the middle branch (e.g. main-to-beta, main-admin-to-beta-admin)
-- When requested, create a PR from the middle branch to the beta branch (e.g. beta, beta-admin)
+- if there are any changes related to common, global Ui, logic, SC, please checkout from main branch and make PR to main branch
+- any UI changes that are specific to user or admin, please checkout from the role-related branch and make PR to that branch
+- all changes in main will be merge to main-admin and CR/convert-design
+- all changes in main-admin will be merge to beta-admin
+- all changes in CR/convert-design will be merge to staging/new-design
+- beta/staging branches will be pushed to role-related production branches
 
 ## The PR flow:
 ```mermaid
 graph LR;
-  checkout["&lt;checkout branch&gt;"] -->|dev testing and proof| main;
-  checkout["&lt;checkout branch&gt;"] -->|verified| main-to-beta;
-  main-to-beta -->|requested| beta;
+  checkout["&lt;checkout branch&gt;"] -->|common, global Ui, logic, SC| main;
+  checkout["&lt;checkout branch&gt;"] -->|user only UI| CR/convert-design;
+  checkout["&lt;checkout branch&gt;"] -->|admin only UI| main-admin;
+  main --> CR/convert-design;
+  main --> main-admin;
+  CR/convert-design --> staging/new-design;
+  main-admin --> beta-admin;
 ```
 Same for admin branches, with the exception that PRs directly from main to main-admin are allowed, no middle branch is needed.
 
