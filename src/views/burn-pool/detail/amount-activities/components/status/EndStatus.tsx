@@ -78,8 +78,14 @@ const EndStatus = ({ poolDetail }: Props) => {
     )
       return "0";
     const reward = (yourCurrentDeposited / totalDeposited) * rewardBalanceNum;
+    console.log("estimatedRewardNum", {
+      yourCurrentDeposited,
+      totalDeposited,
+      rewardBalanceNum,
+    });
     return shortenNumber({ number: reward })?.toUpperCase() ?? "0";
   }, [poolDetail, rewardBalance]);
+
 
   return (
     <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">

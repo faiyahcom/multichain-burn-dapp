@@ -50,19 +50,20 @@ async function fetchEvmBalance(
 ): Promise<string> {
     const provider = new ethers.JsonRpcProvider(rpcUrl);
 
-    if (isNativeEvm(tokenAddress)) {
-        // Pool holds native ETH/BNB → query contract balance
-        const bal = await provider.getBalance(poolAddress);
-        return bal.toString();
-    }
+    // if (isNativeEvm(tokenAddress)) {
+    //     // Pool holds native ETH/BNB → query contract balance
+    //     const bal = await provider.getBalance(poolAddress);
+    //     return bal.toString();
+    // }
 
     // Pool holds ERC20 → balanceOf(poolAddress)
-    const erc20 = new ethers.Contract(
-        tokenAddress,
-        ["function balanceOf(address) view returns (uint256)"],
+    const balance_erc20 = new ethers.Contract(
+        poolAddress,
+        ["function totalReward() view returns (uint256)"],
         provider,
     );
-    const bal: bigint = await erc20.balanceOf(poolAddress);
+
+    const bal: bigint = await balance_erc20.totalReward();
     return bal.toString();
 }
 
@@ -143,7 +144,7 @@ export function useOnChainVaultBalance(params: {
 
                         // rewardBalance and totalDeposited are BN instances (u64)
                         // BorshAccountsCoder returns snake_case field names matching the IDL
-                        rewardRaw = poolAccount.reward_balance.toString();
+                        rewardRaw = poolAccount.reward_cap.toString();
                         depositRaw = poolAccount.total_deposited.toString();
                     }
                 } else {
