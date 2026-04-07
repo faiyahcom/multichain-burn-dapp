@@ -9,7 +9,6 @@ import {
 } from "@/services/dashboardService";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { Link } from "@tanstack/react-router";
 
 interface PairCardProps {
@@ -40,10 +39,6 @@ const PairCard = ({ pair }: PairCardProps) => {
     });
 
     const pairLabel = `${tokenOutDisplay.symbol} / ${tokenInDisplay.symbol}`;
-    const liquidityFormatted = sciToFormatted(
-        pair.liquidity,
-        pair.tokenOutDecimals,
-    );
 
     return (
         /* Only change: flex-col for mobile, flex-row for md: up */
@@ -89,7 +84,7 @@ const PairCard = ({ pair }: PairCardProps) => {
                     <div className="grid grid-cols-[80px_1fr] items-center font-space-mono sm:grid-cols-[160px_1fr] md:grid-cols-[100px_1fr] 2xl:grid-cols-[80px_1fr]">
                         <span className="text-slate-400">Liquidity</span>
                         <MetricNumber
-                            number={liquidityFormatted}
+                            number={pair.liquidity}
                             unit={tokenOutDisplay.symbol}
                             isShorten
                             classNames={{
