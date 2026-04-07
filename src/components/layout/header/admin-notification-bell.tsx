@@ -70,9 +70,9 @@ function NotiItemRow({ item, onNavigate, onMarkRead }: NotiItemRowProps) {
       </div>
 
       <div className="flex items-center justify-between gap-2">
-        <span className="rounded border border-foreground/20 px-1.5 py-0.5 text-xs text-foreground/60">
+        {/* <span className="rounded border border-foreground/20 px-1.5 py-0.5 text-xs text-foreground/60">
           {poolName}
-        </span>
+        </span> */}
         <span className="text-xs text-foreground/40">
           {formatRelativeTime(item.timestamp)}
         </span>
