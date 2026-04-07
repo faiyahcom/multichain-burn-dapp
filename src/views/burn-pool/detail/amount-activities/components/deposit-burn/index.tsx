@@ -159,26 +159,26 @@ const DepositBurnDialog = ({
     }
   };
 
-  const network = poolDetail?.pool.chainId
+  const network = poolDetail?.pool?.chainId
     ? chainIdToNetworkConfig(poolDetail.pool.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,
-    tokenAddress: poolDetail?.pool.tokenIn,
-    tokenSymbol: poolDetail?.tokenIn.symbol,
-    tokenName: poolDetail?.tokenIn.name,
-    customName: poolDetail?.tokenIn.customName,
-    customSymbol: poolDetail?.tokenIn.customSymbol,
-    imageUri: poolDetail?.tokenIn.imageUri,
+    tokenAddress: poolDetail?.pool?.tokenIn,
+    tokenSymbol: poolDetail?.tokenIn?.symbol,
+    tokenName: poolDetail?.tokenIn?.name,
+    customName: poolDetail?.tokenIn?.customName,
+    customSymbol: poolDetail?.tokenIn?.customSymbol,
+    imageUri: poolDetail?.tokenIn?.imageUri,
   });
   const rewardTokenDisplay = resolvePoolTokenDisplay({
     network,
-    tokenAddress: poolDetail?.pool.rewardToken,
-    tokenSymbol: poolDetail?.tokenOut.symbol,
-    tokenName: poolDetail?.tokenOut.name,
-    customName: poolDetail?.tokenOut.customName,
-    customSymbol: poolDetail?.tokenOut.customSymbol,
-    imageUri: poolDetail?.tokenOut.imageUri,
+    tokenAddress: poolDetail?.pool?.rewardToken,
+    tokenSymbol: poolDetail?.tokenOut?.symbol,
+    tokenName: poolDetail?.tokenOut?.name,
+    customName: poolDetail?.tokenOut?.customName,
+    customSymbol: poolDetail?.tokenOut?.customSymbol,
+    imageUri: poolDetail?.tokenOut?.imageUri,
   });
 
   const ratio = useMemo(() => {

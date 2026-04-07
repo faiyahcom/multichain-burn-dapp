@@ -105,27 +105,27 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     const isSellAmountDebouncing =
         !!burnAmount && burnAmount !== derivedBurnAmount;
 
-    const network = poolDetail?.pool.chainId
+    const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
 
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     const {
@@ -134,9 +134,9 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         isLoading: isLoadingBurnBalance,
         refetch: refetchBurnBalance,
     } = useTokenBalance({
-        tokenAddress: poolDetail?.pool.tokenIn,
-        decimals: poolDetail?.pool.tokenInDecimals,
-        symbol: poolDetail?.pool.tokenInSymbol,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        decimals: poolDetail?.pool?.tokenInDecimals,
+        symbol: poolDetail?.pool?.tokenInSymbol,
     });
 
     const {
@@ -145,13 +145,13 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         isLoading: isLoadingRewardBalance,
         refetch: refetchRewardBalance,
     } = useTokenBalance({
-        tokenAddress: poolDetail?.pool.rewardToken,
-        decimals: poolDetail?.pool.rewardTokenDecimals,
-        symbol: poolDetail?.pool.rewardTokenSymbol,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        decimals: poolDetail?.pool?.rewardTokenDecimals,
+        symbol: poolDetail?.pool?.rewardTokenSymbol,
     });
 
     const handleSelectPercent = (percent: number) => {
-        if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null)
+        if (!burnBalanceFormatted || poolDetail?.pool?.tokenInDecimals == null)
             return;
         try {
             const decimals = poolDetail.pool.tokenInDecimals;

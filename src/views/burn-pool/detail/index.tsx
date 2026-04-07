@@ -126,7 +126,7 @@ const BurnPoolDetail = ({ address }: Props) => {
         refetchInterval: 2_500, // Poll every 2.5s to update countdown and status
     });
 
-    const status = poolDetail?.pool.status;
+    const status = poolDetail?.pool?.status;
     const safeStatus: BurnPoolStatus = status ?? "on_going";
 
     const renderExtraContent = () => {
@@ -140,7 +140,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     </p>
                 );
             case "upcoming":
-                return poolDetail?.pool.timeStart ? (
+                return poolDetail?.pool?.timeStart ? (
                     <UpcomingCountdown
                         startTime={poolDetail.pool.timeStart}
                         poolAddress={address}
@@ -154,7 +154,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     />
                 );
             case "on_going":
-                return poolDetail?.pool.timeEnd ? (
+                return poolDetail?.pool?.timeEnd ? (
                     <EndingCountdown
                         endTime={poolDetail.pool.timeEnd}
                         poolAddress={address}
@@ -181,7 +181,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     ) : (
                         <>
                             <h2 className="text-3xl font-semibold">
-                                {poolDetail?.pool.name.slice(0, 20)}
+                                {poolDetail?.pool?.name.slice(0, 20)}
                             </h2>
                             <AnimateIconButton
                                 iconLetter={BURN_POOL_STATUS[safeStatus].letter}
@@ -200,8 +200,8 @@ const BurnPoolDetail = ({ address }: Props) => {
                     )}
                 </div>
                 <ScanLink
-                    address={poolDetail?.pool.address ?? ""}
-                    chainId={poolDetail?.pool.chainId}
+                    address={poolDetail?.pool?.address ?? ""}
+                    chainId={poolDetail?.pool?.chainId}
                 />
             </div>
             <div className="grid grid-cols-3 gap-x-6">

@@ -1,25 +1,25 @@
-import { useState, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
-import clsx from "clsx";
 import DatePicker from "@/components/common/date-picker";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import type { SingleSelectOption } from "@/components/common/single-select";
 import SingleSelect from "@/components/common/single-select";
 import {
+  chainIdToNetworkConfig,
   NETWORK_CONFIGS,
   networkIdToChainId,
-  chainIdToNetworkConfig,
   type nativeCurrency,
 } from "@/config/networks";
+import { useNativePrices } from "@/hooks/useNativePrices";
 import { feeService, feeTxnKind } from "@/services/feeService";
 import { feeQueryKeys } from "@/services/queries/queryKey";
-import { formatAmount, formatNativeWithUsd } from "@/utils/helpers/numbers";
-import { useNativePrices } from "@/hooks/useNativePrices";
+import { formatNativeWithUsd } from "@/utils/helpers/numbers";
+import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
+import { useQuery } from "@tanstack/react-query";
+import clsx from "clsx";
+import { endOfDay, startOfDay } from "date-fns";
+import { useMemo, useState } from "react";
+import FeeTable, { LIMIT, type FeeRow } from "./components/fee-table";
 import StatBox from "./components/stat-box";
 import StatBoxDialog, { type TabType } from "./components/stat-box-dialog";
-import FeeTable, { LIMIT, type FeeRow } from "./components/fee-table";
-import { endOfDay, startOfDay } from "date-fns";
-import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 
@@ -131,14 +131,14 @@ const AdminRevenueFeeStats = () => {
   );
 
   return (
-    <div className="relative flex w-full flex-col px-13.5 pb-10">
+    <div className="relative flex w-full flex-col px-4 pb-10 md:px-13.5">
       {/* Title */}
       <h1 className="pt-4 pb-8 text-3xl font-semibold">
         Revenue &amp; Fee Statistics
       </h1>
 
       {/* Stats + Filters row */}
-      <div className="mb-8 flex flex-wrap items-start justify-between gap-4">
+      <div className="mb-8 flex flex-col flex-wrap items-start justify-between gap-4 md:flex-row">
         {/* Stat boxes */}
         <div className="flex flex-wrap gap-4">
           <StatBox
@@ -166,7 +166,7 @@ const AdminRevenueFeeStats = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col items-end gap-2.75">
+        <div className="flex flex-col items-end gap-2.75 max-md:w-full">
           <SingleSelect
             options={networkOptions}
             selected={networkId}
@@ -177,8 +177,11 @@ const AdminRevenueFeeStats = () => {
               setNetworkSelectOpen(false);
             }}
             placeholder="Network"
+            classNames={{
+              btn: "max-md:w-full",
+            }}
           />
-          <div className="flex items-center gap-2.75">
+          <div className="flex flex-col gap-2.75 max-md:w-full md:flex-row md:items-center">
             <p className="text-13px">Date</p>
             <DatePicker
               value={dateFrom}

@@ -27,37 +27,37 @@ const EndStatus = ({ poolDetail }: Props) => {
     }
   };
 
-  const network = poolDetail?.pool.chainId
+  const network = poolDetail?.pool?.chainId
     ? chainIdToNetworkConfig(poolDetail.pool.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,
-    tokenAddress: poolDetail?.pool.tokenIn,
-    tokenSymbol: poolDetail?.tokenIn.symbol,
-    tokenName: poolDetail?.tokenIn.name,
-    customName: poolDetail?.tokenIn.customName,
-    customSymbol: poolDetail?.tokenIn.customSymbol,
-    imageUri: poolDetail?.tokenIn.imageUri,
+    tokenAddress: poolDetail?.pool?.tokenIn,
+    tokenSymbol: poolDetail?.tokenIn?.symbol,
+    tokenName: poolDetail?.tokenIn?.name,
+    customName: poolDetail?.tokenIn?.customName,
+    customSymbol: poolDetail?.tokenIn?.customSymbol,
+    imageUri: poolDetail?.tokenIn?.imageUri,
   });
   const rewardTokenDisplay = resolvePoolTokenDisplay({
     network,
-    tokenAddress: poolDetail?.pool.rewardToken,
-    tokenSymbol: poolDetail?.tokenOut.symbol,
-    tokenName: poolDetail?.tokenOut.name,
-    customName: poolDetail?.tokenOut.customName,
-    customSymbol: poolDetail?.tokenOut.customSymbol,
-    imageUri: poolDetail?.tokenOut.imageUri,
+    tokenAddress: poolDetail?.pool?.rewardToken,
+    tokenSymbol: poolDetail?.tokenOut?.symbol,
+    tokenName: poolDetail?.tokenOut?.name,
+    customName: poolDetail?.tokenOut?.customName,
+    customSymbol: poolDetail?.tokenOut?.customSymbol,
+    imageUri: poolDetail?.tokenOut?.imageUri,
   });
 
   const { rewardBalance } = useOnChainVaultBalance({
-    poolAddress: poolDetail?.pool.address,
-    chainId: poolDetail?.pool.chainId,
-    rewardToken: poolDetail?.pool.rewardToken,
-    tokenIn: poolDetail?.pool.tokenIn,
-    rewardTokenDecimals: poolDetail?.pool.rewardTokenDecimals,
-    tokenInDecimals: poolDetail?.pool.tokenInDecimals,
-    assetTypeReward: poolDetail?.pool.assetTypeReward,
-    assetTypeIn: poolDetail?.pool.assetTypeIn,
+    poolAddress: poolDetail?.pool?.address,
+    chainId: poolDetail?.pool?.chainId,
+    rewardToken: poolDetail?.pool?.rewardToken,
+    tokenIn: poolDetail?.pool?.tokenIn,
+    rewardTokenDecimals: poolDetail?.pool?.rewardTokenDecimals,
+    tokenInDecimals: poolDetail?.pool?.tokenInDecimals,
+    assetTypeReward: poolDetail?.pool?.assetTypeReward,
+    assetTypeIn: poolDetail?.pool?.assetTypeIn,
   });
 
   const estmatedReward = useMemo(() => {
@@ -81,7 +81,7 @@ const EndStatus = ({ poolDetail }: Props) => {
   }, [poolDetail, rewardTokenDisplay, rewardBalance]);
 
   return (
-    <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+    <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
       {canClaim ? (
         <StatRow
           label="Claimable Reward"

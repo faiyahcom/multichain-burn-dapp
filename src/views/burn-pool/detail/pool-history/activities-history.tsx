@@ -26,7 +26,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
     const excludeKinds = [20].join(",");
     const { data: poolActivities, isLoading } = useQuery({
         queryKey: poolQueryKeys.activities(
-            poolDetail?.pool.address || "",
+            poolDetail?.pool?.address || "",
             page,
             excludeKinds,
         ),
@@ -34,10 +34,10 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
             poolService.getPoolActivities(
                 page,
                 DEFAULT_PAGE_SIZE,
-                poolDetail?.pool.address || "",
+                poolDetail?.pool?.address || "",
                 excludeKinds,
             ),
-        enabled: !!poolDetail?.pool.address,
+        enabled: !!poolDetail?.pool?.address,
         refetchInterval: 2_500, // Poll every 2.5s to update activities
     });
 

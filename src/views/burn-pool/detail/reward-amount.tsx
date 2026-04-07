@@ -18,26 +18,26 @@ const RewardAmount = ({ poolDetail }: Props) => {
         ? formatAmount(poolDetail.depositedAmount, poolDetail.pool.tokenInDecimals)
         : "-";
 
-    const network = poolDetail?.pool.chainId
+    const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     return (
@@ -51,7 +51,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     {formattedReward} {rewardTokenDisplay.symbol}
                 </p>
             </div>
-            {poolDetail?.pool.status &&
+            {poolDetail?.pool?.status &&
                 ["on_going", "ended", "closed"].includes(poolDetail.pool.status) && (
                     <div>
                         <p className="text-base text-greyed">
