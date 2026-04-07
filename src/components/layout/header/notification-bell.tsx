@@ -51,7 +51,7 @@ function NotiItemRow({
     }, []);
     const text = item.content ?? item.title;
     const meta = item.meta as NotiMeta | null;
-    const poolName = meta?.poolName || "Unknown Pool";
+    const poolName = meta?.poolName;
     const href = getPoolHref({
         address: meta?.poolAddress || "",
         kind: meta?.poolKind,
