@@ -30,15 +30,17 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
 
     return (
         <GlowContainer
-            className="relative aspect-square overflow-hidden p-1.5 sm:p-1.5 2xl:p-3"
+            className="relative aspect-square p-1.5 sm:p-1.5 2xl:p-3"
             variant="swap"
         >
-            {/* Background */}
-            <img
-                src={TopSwapperBgImage}
-                alt=""
-                className="object-fit pointer-events-none absolute inset-0 h-full w-full"
-            />
+            {/* Background — overflow-hidden scoped here so content is never clipped */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+                <img
+                    src={TopSwapperBgImage}
+                    alt=""
+                    className="object-fit absolute inset-0 h-full w-full"
+                />
+            </div>
 
             {/* Medal */}
             {medal &&
@@ -55,7 +57,7 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
                 </p>
 
                 {/* Avatar */}
-                <div className="size-9.5 overflow-hidden rounded-full bg-mb-gray-b8/20 md:size-7.5 2xl:size-9.5">
+                <div className="size-8 overflow-hidden rounded-full bg-mb-gray-b8/20 lg:size-7 2xl:size-9.5">
                     {swapper?.avatar ? (
                         <img
                             src={swapper.avatar}
@@ -108,9 +110,9 @@ export const TopSwapperSection = ({ data }: Props) => {
         <GlowContainer className="px-5 py-6.25" variant="swap">
             <div className="mb-6 flex items-center gap-3">
                 <IconSwapCategory className="size-10.75" />
-                <p className="text-2xl font-medium">TOP SWAPPER</p>
+                <p className="text-2xl font-medium text-nowrap">TOP SWAPPER</p>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {slots.map((swapper, i) => (
                     <SwapperCard key={i} swapper={swapper} rank={i} />
                 ))}
