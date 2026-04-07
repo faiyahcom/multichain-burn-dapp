@@ -142,7 +142,7 @@ const BurnPoolDetail = ({ address }: Props) => {
             case "upcoming":
                 return poolDetail?.pool?.timeStart ? (
                     <UpcomingCountdown
-                        startTime={poolDetail.pool.timeStart}
+                        startTime={poolDetail?.pool?.timeStart}
                         poolAddress={address}
                     />
                 ) : null;
@@ -156,7 +156,7 @@ const BurnPoolDetail = ({ address }: Props) => {
             case "on_going":
                 return poolDetail?.pool?.timeEnd ? (
                     <EndingCountdown
-                        endTime={poolDetail.pool.timeEnd}
+                        endTime={poolDetail?.pool?.timeEnd}
                         poolAddress={address}
                     />
                 ) : null;
@@ -181,7 +181,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     ) : (
                         <>
                             <h2 className="text-3xl font-semibold">
-                                {poolDetail?.pool?.name.slice(0, 20)}
+                                {poolDetail?.pool?.name?.slice(0, 20)}
                             </h2>
                             <AnimateIconButton
                                 iconLetter={BURN_POOL_STATUS[safeStatus].letter}

@@ -134,7 +134,7 @@ const DepositRewardDialog = ({
   );
 
   const network = poolDetail?.pool?.chainId
-    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,

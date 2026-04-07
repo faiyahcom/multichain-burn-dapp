@@ -10,16 +10,16 @@ type Props = {
 const RewardAmount = ({ poolDetail }: Props) => {
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.pool.currentRewardAmount,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.currentRewardAmount,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
     const formattedBurned = poolDetail
-        ? formatAmount(poolDetail.depositedAmount, poolDetail.pool.tokenInDecimals)
+        ? formatAmount(poolDetail.depositedAmount, poolDetail?.pool?.tokenInDecimals)
         : "-";
 
     const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -52,7 +52,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 </p>
             </div>
             {poolDetail?.pool?.status &&
-                ["on_going", "ended", "closed"].includes(poolDetail.pool.status) && (
+                ["on_going", "ended", "closed"].includes(poolDetail?.pool?.status) && (
                     <div>
                         <p className="text-base text-greyed">
                             <span>Total Burned Amount:</span>{" "}

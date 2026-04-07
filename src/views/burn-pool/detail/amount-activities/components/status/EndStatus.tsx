@@ -28,7 +28,7 @@ const EndStatus = ({ poolDetail }: Props) => {
   };
 
   const network = poolDetail?.pool?.chainId
-    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,
@@ -63,14 +63,14 @@ const EndStatus = ({ poolDetail }: Props) => {
   const estmatedReward = useMemo(() => {
     if (!poolDetail) return "-";
     const rewardSymbol =
-      rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+      rewardTokenDisplay?.symbol ?? poolDetail?.pool?.rewardTokenSymbol;
     const totalDeposited =
       Number(poolDetail.depositedAmount) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
+      Math.pow(10, poolDetail?.pool?.tokenInDecimals);
 
     const yourCurrentDeposited =
       Number(poolDetail?.userAmount?.deposited) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
+      Math.pow(10, poolDetail?.pool?.tokenInDecimals);
     const rewardBalanceNum = rewardBalance !== undefined
       ? Number(rewardBalance.replace(/,/g, ""))
       : 0;

@@ -29,7 +29,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
   const isMobile = useMediaQuery("(max-width: 640px)");
 
   const network = poolDetail?.pool?.chainId
-    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
     : undefined;
   const nativeCurrencyInfo = network?.appKitNetwork.nativeCurrency as
     | nativeCurrency
@@ -53,7 +53,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
   const creationFee =
     poolDetail?.pool?.poolCreationFee !== undefined ? (
       <span className="inline-flex items-center gap-1">
-        {formatAmount(poolDetail.pool.poolCreationFee, nativeDecimals)}
+        {formatAmount(poolDetail?.pool?.poolCreationFee, nativeDecimals)}
         {network && (
           <NetworkImgIcon
             src={network.iconSrc}

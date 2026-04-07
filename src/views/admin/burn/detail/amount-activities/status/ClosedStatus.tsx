@@ -151,7 +151,7 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
                     <span className="font-medium text-foreground">
                         Reason close pool:{" "}
                     </span>
-                    <p className="text-greyed">{poolDetail.pool.adminCloseReason}</p>
+                    <p className="text-greyed">{poolDetail?.pool?.adminCloseReason}</p>
                 </div>
             )}
         </PoolChainGuard>

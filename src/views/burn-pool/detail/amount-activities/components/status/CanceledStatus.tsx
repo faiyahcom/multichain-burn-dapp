@@ -22,12 +22,12 @@ const CanceledStatus = ({ poolDetail }: Props) => {
     const formattedReturning = poolDetail?.returningAmountOnCanceling
         ? formatAmount(
             poolDetail.returningAmountOnCanceling.amount,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
 
     const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,

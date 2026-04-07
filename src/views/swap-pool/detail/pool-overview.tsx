@@ -28,7 +28,7 @@ export function toCleanRatio(numerator?: string, denominator?: string): string {
 
 const PoolOverview = ({ poolDetail }: Props) => {
     const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -52,8 +52,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
         if (!poolDetail) return [];
 
         const cleanRatio = toCleanRatio(
-            poolDetail.pool.rewardDenominator,
-            poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
+            poolDetail?.pool?.rewardDenominator,
+            poolDetail?.pool?.rewardNumerator, // It's reward num and dem, not ratio on onchain
         );
 
         return [
@@ -73,7 +73,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 { label: "Ratio", value: cleanRatio },
                 {
                     label: "Burn Token",
-                    // value: `${poolDetail.pool.tokenInSymbol}`,
+                    // value: `${poolDetail?.pool?.tokenInSymbol}`,
                     value: (
                         <div className="flex items-center gap-2">
                             <TokenImage

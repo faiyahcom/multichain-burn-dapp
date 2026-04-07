@@ -117,8 +117,8 @@ export const useBatchTransferSolFn = () => {
                 const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
                 const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
 
-                const rewardMint = new PublicKey(poolDetail.pool.rewardToken);
-                const depositMint = new PublicKey(poolDetail.pool.tokenIn);
+                const rewardMint = new PublicKey(poolDetail?.pool?.rewardToken);
+                const depositMint = new PublicKey(poolDetail?.pool?.tokenIn);
 
                 const rewardAssetType = await detectAssetType(connection, rewardMint);
                 const depositAssetType = await detectAssetType(connection, depositMint);

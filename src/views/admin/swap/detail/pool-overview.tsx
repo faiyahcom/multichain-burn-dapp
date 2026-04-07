@@ -17,7 +17,7 @@ type Props = {
 const PoolOverview = ({ poolDetail }: Props) => {
   const isMobile = useMediaQuery("(max-width: 640px)");
   const network = poolDetail?.pool?.chainId
-    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,
@@ -38,11 +38,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
     imageUri: poolDetail?.tokenOut?.imageUri,
   });
   const rows = useMemo(() => {
-    if (!poolDetail) return [];
+    if (!poolDetail?.pool) return [];
 
     const cleanRatio = toCleanRatio(
-      poolDetail.pool.rewardDenominator,
-      poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
+      poolDetail?.pool?.rewardDenominator,
+      poolDetail?.pool?.rewardNumerator, // It's reward num and dem, not ratio on onchain
     );
 
     return [
@@ -79,7 +79,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         { label: "Ratio", value: cleanRatio },
         {
           label: "Burn Token",
-          // value: `${poolDetail.pool.tokenInSymbol}`,
+          // value: `${poolDetail?.pool?.tokenInSymbol}`,
           value: (
             <div className="flex items-center gap-2 max-sm:justify-end">
               <TokenImage
@@ -128,8 +128,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
         </div>
         {/* <p className="text-[13px] text-greyed">
                     {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
-                        ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
-                            Number(poolDetail.pool.timeEnd) * 1000,
+                        ? `${new Date(Number(poolDetail?.pool?.timeStart) * 1000).toLocaleDateString()} - ${new Date(
+                            Number(poolDetail?.pool?.timeEnd) * 1000,
                         ).toLocaleDateString()}`
                         : "No time limit"}
                 </p> */}

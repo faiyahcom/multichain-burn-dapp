@@ -37,8 +37,8 @@ export default function EditPoolScreen({
 
   React.useEffect(() => {
     if (poolDetail?.pool) {
-      setStartTime(new Date(Number(poolDetail.pool.timeStart) * 1000));
-      setEndTime(new Date(Number(poolDetail.pool.timeEnd) * 1000));
+      setStartTime(new Date(Number(poolDetail?.pool?.timeStart) * 1000));
+      setEndTime(new Date(Number(poolDetail?.pool?.timeEnd) * 1000));
     }
   }, [poolDetail]);
 

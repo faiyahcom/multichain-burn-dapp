@@ -58,8 +58,8 @@ export const useCancelBurnPoolSolFn = () => {
                 const program = getMultichainBurnProgram(connection, anchorWallet);
 
                 // ── 1. Resolve mints ───────────────────────────────────────
-                const rewardMint = new PublicKey(poolDetail.pool.rewardToken);
-                const depositMint = new PublicKey(poolDetail.pool.tokenIn);
+                const rewardMint = new PublicKey(poolDetail?.pool?.rewardToken);
+                const depositMint = new PublicKey(poolDetail?.pool?.tokenIn);
 
                 // ── 2. Detect token programs ───────────────────────────────
                 const rewardAssetType = await detectAssetType(connection, rewardMint);

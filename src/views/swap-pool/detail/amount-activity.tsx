@@ -31,24 +31,24 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     const formattedBurned = poolDetail
         ? formatAmount(
             poolDetail?.userAmount?.deposited || "0",
-            poolDetail.pool.tokenInDecimals,
+            poolDetail?.pool?.tokenInDecimals,
         )
         : "-";
     const formattedReward = poolDetail
         ? formatAmount(
             poolDetail?.userAmount?.claimed || "0",
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
     const formattedReturning = poolDetail?.returningAmountOnCanceling
         ? formatAmount(
             poolDetail.returningAmountOnCanceling.amount,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
 
     const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -97,16 +97,16 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
         try {
             if (isSolana) {
                 await cancelPoolSol({
-                    poolAddress: poolDetail.pool.address,
+                    poolAddress: poolDetail?.pool?.address,
                     poolDetail,
                 });
             } else {
                 await cancelPoolEvm({
-                    poolAddress: poolDetail.pool.address,
+                    poolAddress: poolDetail?.pool?.address,
                 });
             }
             queryClient.invalidateQueries({
-                queryKey: poolQueryKeys.detail(poolDetail.pool.address),
+                queryKey: poolQueryKeys.detail(poolDetail?.pool?.address),
                 exact: false,
             });
         } finally {

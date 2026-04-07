@@ -91,7 +91,7 @@ export const useClaimBurnSolFn = () => {
                 const indexBN = new BN(proofIndex);
 
                 const isNativeReward =
-                    poolDetail.pool.assetTypeReward === AssetTypeEnum.NATIVE;
+                    poolDetail?.pool?.assetTypeReward === AssetTypeEnum.NATIVE;
 
                 let signature: string;
 
@@ -124,7 +124,7 @@ export const useClaimBurnSolFn = () => {
                     });
                 } else {
                     // ── claim_reward_spl ────────────────────────────────────
-                    const rewardMint = new PublicKey(poolDetail.pool.rewardToken);
+                    const rewardMint = new PublicKey(poolDetail?.pool?.rewardToken);
                     const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
 
                     const rewardAssetType = await detectAssetType(

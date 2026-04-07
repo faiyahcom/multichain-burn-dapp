@@ -65,7 +65,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
 
     // Resolve custom token symbols from pool detail
     const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,

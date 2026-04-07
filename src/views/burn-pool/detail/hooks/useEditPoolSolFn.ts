@@ -43,7 +43,7 @@ export const useEditPoolSolFn = () => {
                     .updatePool({
                         timeStart: new BN(startTime),
                         timeEnd: new BN(endTime),
-                        targetAddress: new PublicKey(poolDetail.pool.targetAddress),
+                        targetAddress: new PublicKey(poolDetail?.pool?.targetAddress),
                         name: name,
                     })
                     .accounts({

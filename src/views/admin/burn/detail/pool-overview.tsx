@@ -18,7 +18,7 @@ type Props = {
 const PoolOverview = ({ poolDetail, onPartnerToggleSuccess }: Props) => {
   const isMobile = useMediaQuery("(max-width: 640px)");
   const network = poolDetail?.pool?.chainId
-    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,
@@ -88,7 +88,7 @@ const PoolOverview = ({ poolDetail, onPartnerToggleSuccess }: Props) => {
         { label: "Ratio", value: "Dynamic" },
         {
           label: "Burn Token",
-          // value: `${poolDetail.pool.tokenInSymbol}`,
+          // value: `${poolDetail?.pool?.tokenInSymbol}`,
           value: (
             <div className="flex items-center gap-2 max-sm:justify-end">
               <TokenImage
@@ -144,8 +144,8 @@ const PoolOverview = ({ poolDetail, onPartnerToggleSuccess }: Props) => {
         </div>
         <p className="text-[13px] text-greyed">
           {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
-            ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
-                Number(poolDetail.pool.timeEnd) * 1000,
+            ? `${new Date(Number(poolDetail?.pool?.timeStart) * 1000).toLocaleDateString()} - ${new Date(
+                Number(poolDetail?.pool?.timeEnd) * 1000,
               ).toLocaleDateString()}`
             : "No time limit"}
         </p>

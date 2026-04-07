@@ -12,15 +12,15 @@ type Props = {
 const RewardAmount = ({ poolDetail }: Props) => {
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.pool.rewardAmount,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.rewardAmount,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
     const formattedBurned = poolDetail
-        ? formatAmount(poolDetail.depositedAmount, poolDetail.pool.tokenInDecimals)
+        ? formatAmount(poolDetail.depositedAmount, poolDetail?.pool?.tokenInDecimals)
         : "-";
     const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -44,14 +44,14 @@ const RewardAmount = ({ poolDetail }: Props) => {
     const maxBurn = useMemo(() => {
         if (!poolDetail) return new Decimal(0);
 
-        const num = new Decimal(poolDetail.pool.rewardNumerator ?? 0); // N
-        const den = new Decimal(poolDetail.pool.rewardDenominator ?? 0); // D
+        const num = new Decimal(poolDetail?.pool?.rewardNumerator ?? 0); // N
+        const den = new Decimal(poolDetail?.pool?.rewardDenominator ?? 0); // D
 
         if (num.isZero() || den.isZero()) return new Decimal(0);
 
         // Raw reward amount (in base units)
         const rewardRaw = new Decimal(poolDetail.rewardAmount ?? 0);
-        const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
+        const rewardDecimals = poolDetail?.pool?.rewardTokenDecimals;
 
         // Convert reward to human-readable
         const rewardHuman = rewardRaw.div(new Decimal(10).pow(rewardDecimals));
