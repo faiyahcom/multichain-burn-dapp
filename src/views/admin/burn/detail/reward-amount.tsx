@@ -1,4 +1,4 @@
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import type { BurnPoolStatus, PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
