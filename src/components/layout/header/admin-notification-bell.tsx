@@ -12,7 +12,7 @@ import { adminNotificationService } from "@/services/adminNotificationService";
 import { adminNotificationQueryKeys } from "@/services/queries/queryKey";
 import { useAdminNotificationStream } from "@/hooks/useAdminNotificationStream";
 import { formatRelativeTime, getAdminPoolHref } from "@/utils/helpers/string";
-import type { NotiItem, NotiMeta } from "@/types/notification";
+import { RedirectEnum, type NotiItem, type NotiMeta } from "@/types/notification";
 
 const PAGE_LIMIT = 20;
 
@@ -37,8 +37,16 @@ function NotiItemRow({ item, onNavigate, onMarkRead }: NotiItemRowProps) {
 
   const text = item.content ?? item.title;
   const meta = item.meta as NotiMeta | null;
-  const poolName = meta?.poolName ?? "Unknown Pool";
-  const href = getAdminPoolHref({ address: meta?.poolAddress ?? "", kind: meta?.poolKind });
+  const href = (() => {
+    switch (meta?.redirect) {
+      case RedirectEnum.PoolDetail:
+        return getAdminPoolHref({ address: meta?.poolAddress ?? "", kind: meta?.poolKind });
+      case RedirectEnum.FeeRevenue:
+        return "/admin/revenue-fee-stats";
+      default:
+        return null;
+    }
+  })();
 
   const handleClick = () => {
     if (!item.is_read) onMarkRead(item.id);

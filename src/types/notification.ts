@@ -1,5 +1,3 @@
-import type { PoolKind } from "./pool";
-
 export interface NotiItem {
   id: string;
   timestamp: string;
@@ -10,12 +8,18 @@ export interface NotiItem {
   meta: NotiMeta | null;
 }
 
+export const RedirectEnum = {
+  PoolDetail: "pool_detail",
+  FeeRevenue: "fee_revenue",
+} as const;
+
 export interface NotiMeta {
   poolName?: string;
   poolAddress?: string;
   user?: string;
   txHash?: string;
   poolKind?: 0 | 1;
+  redirect?: (typeof RedirectEnum)[keyof typeof RedirectEnum];
   [key: string]: unknown;
 }
 
