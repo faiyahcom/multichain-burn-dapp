@@ -25,7 +25,9 @@ export function getMultichainBurnProgram(
     { preflightCommitment: "processed" },
   );
 
-  // In current Anchor versions the Program constructor signature is (idl, provider?)
-  // and programId is read from idl.metadata.address.
-  return new Program(idl as MultichainBurnProgramIdl, provider);
+  const idlWithAddress = {
+    ...idl,
+    address: MULTICHAIN_BURN_PROGRAM_SOLANA_ADDRESS,
+  } as MultichainBurnProgramIdl;
+  return new Program(idlWithAddress, provider);
 }
