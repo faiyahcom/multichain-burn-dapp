@@ -15,7 +15,7 @@ export interface NotiMeta {
   poolAddress?: string;
   user?: string;
   txHash?: string;
-  poolKind?: PoolKind;
+  poolKind?: 0 | 1;
   [key: string]: unknown;
 }
 

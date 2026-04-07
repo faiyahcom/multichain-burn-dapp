@@ -38,10 +38,7 @@ function NotiItemRow({ item, onNavigate, onMarkRead }: NotiItemRowProps) {
   const text = item.content ?? item.title;
   const meta = item.meta as NotiMeta | null;
   const poolName = meta?.poolName ?? "Unknown Pool";
-  const href =
-    meta?.poolAddress && meta?.poolKind
-      ? getAdminPoolHref({ address: meta.poolAddress, kind: meta.poolKind })
-      : null;
+  const href = getAdminPoolHref({ address: meta?.poolAddress ?? "", kind: meta?.poolKind });
 
   const handleClick = () => {
     if (!item.is_read) onMarkRead(item.id);
