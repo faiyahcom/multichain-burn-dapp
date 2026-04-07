@@ -66,6 +66,9 @@ export { default as IconTwoDArrow } from "./icons/glow/two-d-arrow.svg?react";
 export { default as IconBurnTracker } from "./icons/glow/burn-tracker.svg?react";
 export { default as IconSwapStatChart} from "./icons/glow/swap-stat-chart.svg?react";
 export { default as IconTooltipInfo } from "./icons/glow/info.svg?react";
+export { default as IconMedal1 } from "./icons/glow/medal-1.svg?react";
+export { default as IconMedal2 } from "./icons/glow/medal-2.svg?react";
+export { default as IconMedal3 } from "./icons/glow/medal-3.svg?react";
 
 export { default as IconDownTriangle } from "./icons/down-triangle.svg?react";
 

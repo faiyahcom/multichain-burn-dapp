@@ -1,16 +1,19 @@
 import GlowContainer from "@/components/common/glow/container";
-import { IconSwapCategory } from "@/assets/react";
+import {
+    IconMedal1,
+    IconMedal2,
+    IconMedal3,
+    IconSwapCategory,
+} from "@/assets/react";
 import type {
     TopSwapper,
     TopSwapperResponse,
 } from "@/services/dashboardService";
 import { truncateString } from "@/utils/helpers/string";
 import TopSwapperBgImage from "/images/dashboard/top-swapper-bg.png";
-import Medal1Image from "/images/dashboard/medal-1.png";
-import Medal2Image from "/images/dashboard/medal-2.png";
-import Medal3Image from "/images/dashboard/medal-3.png";
+import React from "react";
 
-const MEDALS = [Medal1Image, Medal2Image, Medal3Image];
+const MEDALS = [IconMedal1, IconMedal2, IconMedal3];
 
 interface SwapperCardProps {
     swapper: TopSwapper | undefined;
@@ -38,16 +41,14 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
             />
 
             {/* Medal */}
-            {medal && (
-                <img
-                    src={medal}
-                    alt={`Rank ${rank + 1}`}
-                    className="absolute top-2 left-2 z-10 size-7 md:top-1 md:left-1 md:size-5 2xl:top-2 2xl:left-2 2xl:size-7"
-                />
-            )}
+            {medal &&
+                React.createElement(medal, {
+                    className:
+                        "absolute top-2 left-2 z-10 size-7 md:top-1 md:left-1 md:size-5 2xl:top-2 2xl:left-2 2xl:size-7",
+                })}
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 sm:py-px font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 2xl:gap-[8.5px] 2xl:text-tiny">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 sm:py-px 2xl:gap-[8.5px] 2xl:text-tiny">
                 {/* Name */}
                 <p className="max-w-full truncate text-center text-[9px] 2xl:text-xs">
                     {displayName}
