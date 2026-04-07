@@ -61,22 +61,25 @@ const EndStatus = ({ poolDetail }: Props) => {
     assetTypeIn: poolDetail?.pool.assetTypeIn,
   });
 
-  // const estimatedRewardNum = useMemo(() => {
-  //   if (!poolDetail) return "-";
-  //   const totalDeposited =
-  //     Number(poolDetail.depositedAmount) /
-  //     Math.pow(10, poolDetail.pool.tokenInDecimals);
-  //   const yourCurrentDeposited =
-  //     Number(poolDetail?.userAmount?.deposited) /
-  //     Math.pow(10, poolDetail.pool.tokenInDecimals);
-  //   const rewardBalanceNum = rewardBalance !== undefined
-  //     ? Number(rewardBalance.replace(/,/g, ""))
-  //     : 0;
-  //   if (totalDeposited === 0 || rewardBalanceNum === 0 || yourCurrentDeposited === 0)
-  //     return "0";
-  //   const reward = (yourCurrentDeposited / totalDeposited) * rewardBalanceNum;
-  //   return shortenNumber({ number: reward })?.toUpperCase() ?? "0";
-  // }, [poolDetail, rewardBalance]);
+  const estimatedRewardNum = useMemo(() => {
+    if (!poolDetail) return "-";
+    const totalDeposited =
+      Number(poolDetail.depositedAmount) /
+      Math.pow(10, poolDetail.pool.tokenInDecimals);
+    const yourCurrentDeposited =
+      Number(poolDetail?.userAmount?.deposited) /
+      Math.pow(10, poolDetail.pool.tokenInDecimals);
+    const rewardBalanceNum =
+      rewardBalance !== undefined ? Number(rewardBalance.replace(/,/g, "")) : 0;
+    if (
+      totalDeposited === 0 ||
+      rewardBalanceNum === 0 ||
+      yourCurrentDeposited === 0
+    )
+      return "0";
+    const reward = (yourCurrentDeposited / totalDeposited) * rewardBalanceNum;
+    return shortenNumber({ number: reward })?.toUpperCase() ?? "0";
+  }, [poolDetail, rewardBalance]);
 
   return (
     <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">
@@ -85,9 +88,7 @@ const EndStatus = ({ poolDetail }: Props) => {
           label="Claimable Reward"
           value={
             <div className="inline-flex items-center gap-1.5 md:gap-2.5">
-              {shortenNumber({
-                number: Number(rewardBalance) || 0,
-              })?.toUpperCase() ?? "0"}
+              {estimatedRewardNum?.toUpperCase() ?? "0"}
               <TokenDisplay
                 symbol={poolDetail?.tokenOut?.symbol}
                 customSymbol={poolDetail?.tokenOut?.customSymbol}
