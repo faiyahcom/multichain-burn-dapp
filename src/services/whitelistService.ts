@@ -17,6 +17,7 @@ export interface WhitelistToken {
   homepage: string;
   whitepaper: string;
   createdAt: string;
+  kind: number;
 }
 
 export interface ListTokensRequest {
@@ -51,6 +52,13 @@ export interface ForceUpdateWhitelistTokenStatusResponse {
 export interface DeleteWhitelistTokenRequest {
   chainId: string;
   address: string;
+}
+
+export interface UpdateWhitelistTokenRequest {
+  chainId: string;
+  address: string;
+  kind: number;
+  data: FormData;
 }
 
 export const whitelistService = {
@@ -109,6 +117,24 @@ export const whitelistService = {
         request.chainId,
         request.address,
       )}`,
+    );
+
+    return response;
+  },
+
+  updateWhitelistToken: async (request: UpdateWhitelistTokenRequest) => {
+    const response = await apiClient.patch<WhitelistToken>(
+      `${WHITELIST_API_ROUTES.UPDATE_WHITELIST_TOKEN(
+        request.chainId,
+        request.address,
+        request.kind,
+      )}`,
+      request.data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
 
     return response;

@@ -4,6 +4,7 @@ import {
   IconSquareArrowTopRightOut,
   IconTrashCan,
 } from "@/assets/react";
+import { PencilIcon } from "lucide-react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import ConfirmDialog from "@/components/common/confirm-dialog";
 import CopyableText from "@/components/common/copyable-text";
@@ -41,6 +42,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "@/components/common/custom-toast";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
+import AdminWhitelistTokenDialogEdit from "../dialog/edit";
 import StatusSwitch from "./status-switch";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
@@ -54,6 +56,9 @@ type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
 const AdminWhitelistTokenTable = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
   const [detailToken, setDetailToken] = useState<WhitelistToken | undefined>(
+    undefined,
+  );
+  const [editToken, setEditToken] = useState<WhitelistToken | undefined>(
     undefined,
   );
   const [isScDeleting, setIsScDeleting] = useState<boolean>(false);
@@ -281,6 +286,9 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
+                      <button onClick={() => setEditToken(item)}>
+                        <PencilIcon className="size-4" />
+                      </button>
                       <button onClick={() => setDetailToken(item)}>
                         <IconEye className="[&>path]:group-hover:stroke-[1.5px]" />
                       </button>
@@ -315,6 +323,18 @@ const AdminWhitelistTokenTable = () => {
         data={detailToken}
         setData={setDetailToken}
       />
+
+      {editToken && (
+        <AdminWhitelistTokenDialogEdit
+          token={editToken}
+          open={!!editToken}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditToken(undefined);
+            }
+          }}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteRequest}
