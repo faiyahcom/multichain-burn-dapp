@@ -3,7 +3,11 @@ import { useState, useEffect } from "react";
 import { ModeToggle } from "../../shared/theme/mode-toggle";
 import { navItems, navSection, NavSectionLabel } from "./const";
 import { useAuthStore } from "@/stores/authStore";
-import { authService } from "@/services/authService";
+import {
+  authService,
+  hasEnabledAdminRole,
+  isSuperAdminRole,
+} from "@/services/authService";
 import { authQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
 
@@ -18,21 +22,8 @@ export function Sidebar() {
     },
     enabled: !!user?.address,
   });
-  const resolvedRole =
-    ((userApiData as
-      | {
-          actualRole?: "normal" | "admin" | "super_admin";
-          role?: "normal" | "admin" | "super_admin";
-          roleEnAble?: boolean;
-        }
-      | undefined)?.actualRole ??
-      userApiData?.role) ?? null;
-  const hasEnabledAdminRole =
-    ((userApiData as { roleEnAble?: boolean } | undefined)?.roleEnAble ?? true) &&
-    (resolvedRole === "admin" || resolvedRole === "super_admin");
-  const isAdmin = hasEnabledAdminRole;
-  const isSuperAdmin =
-    hasEnabledAdminRole && resolvedRole === "super_admin";
+  const isAdmin = hasEnabledAdminRole(userApiData);
+  const isSuperAdmin = isSuperAdminRole(userApiData);
   const { pathname, searchStr } = useLocation({
     select: (location) => ({
       pathname: location.pathname,
@@ -93,7 +84,7 @@ export function Sidebar() {
                   .filter(
                     (item) =>
                       item.section === section &&
-                      (item.label !== "Admin Management" || isSuperAdmin),
+                      (!item.superAdminOnly || isSuperAdmin),
                   )
                   .map((item, itemIndex) => {
                     const Icon = item.icon;
@@ -119,8 +110,8 @@ export function Sidebar() {
                             <span className="flex-1 text-sm font-normal tracking-2-percent transition-colors group-data-[active='true']:font-bold group-data-[active='true']:text-active">
                               {hasChildren ? (
                                 <Link
-                                  to={item.to! as any}
-                                  search={{ tab: item.children![0].tab } as any}
+                                  to={item.to! as never}
+                                  search={{ tab: item.children![0].tab } as never}
                                   className="flex w-full items-center justify-between"
                                   onClick={() => toggleItem(item.label)}
                                 >
@@ -149,8 +140,8 @@ export function Sidebar() {
                               return (
                                 <li key={childIndex}>
                                   <Link
-                                    to={item.to! as any}
-                                    search={{ tab: child.tab } as any}
+                                    to={item.to! as never}
+                                    search={{ tab: child.tab } as never}
                                     className={`block py-1.5 pl-2 text-sm tracking-2-percent transition-colors hover:text-active ${
                                       isChildActive
                                         ? "font-bold text-active"

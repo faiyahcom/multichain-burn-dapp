@@ -45,6 +45,33 @@ import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 
 const MAX_VISIBLE_TOKENS = 3;
 
+const normalizeSearchValue = (value?: string) =>
+    value?.trim().toLowerCase().replace(/\s+/g, " ") ?? "";
+
+const matchesWhitelistUserSearch = (
+    user: WhitelistUser,
+    searchValue: string,
+) => {
+    if (!searchValue) {
+        return true;
+    }
+
+    return [user.name, user.email, user.address].some((field) =>
+        normalizeSearchValue(field).includes(searchValue),
+    );
+};
+
+const matchesWhitelistUserStatus = (
+    user: WhitelistUser,
+    status: UserStatus,
+) => {
+    if (status === "all") {
+        return true;
+    }
+
+    return status === "enabled" ? user.enable : !user.enable;
+};
+
 /** Maps a chainId string back to the NetworkConfig */
 const getNetworkByChainId = (chainId: string) => {
     return chainIdToNetworkConfig(chainId);
@@ -179,21 +206,28 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
     const currentNetworkId =
         namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
 
+    // Map single NetworkId → numeric chainId for the API (-1 for Solana)
+    const chainIds = useMemo(() => {
+        if (!filter.network) return undefined;
+        const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
+        return cfg ? [Number(cfg.backendChainId)] : undefined;
+    }, [filter.network]);
+
+    const tokenAddresses = filter.tokens.length > 0 ? filter.tokens : undefined;
+    const serverParams = useMemo(
+        () => ({
+            chainIds,
+            tokenAddresses,
+        }),
+        [chainIds, tokenAddresses],
+    );
+
     const refetchUsers = useCallback(async () => {
         await new Promise((res) => setTimeout(res, 500));
         queryClient.invalidateQueries({
-            queryKey: whitelistUserQueryKeys.listUsers({
-                search: filter.text || undefined,
-                chainIds: filter.network
-                    ? (() => {
-                        const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
-                        return cfg ? [Number(cfg.backendChainId)] : undefined;
-                    })()
-                    : undefined,
-                tokenAddresses: filter.tokens.length > 0 ? filter.tokens : undefined,
-            }),
+            queryKey: whitelistUserQueryKeys.listUsers(serverParams),
         });
-    }, [queryClient, filter]);
+    }, [queryClient, serverParams]);
 
     const handleToggleRow = useCallback(
         async (user: WhitelistUser, chainId: string) => {
@@ -223,25 +257,30 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                 });
             }
         },
-        [disableEvm, disableSolana, refetchUsers, namespace, currentNetworkId, openSwitchNetworkModal],
+        [disableEvm, disableSolana, refetchUsers, currentNetworkId, openSwitchNetworkModal],
     );
 
-    // Map single NetworkId → numeric chainId for the API (-1 for Solana)
-    const chainIds = useMemo(() => {
-        if (!filter.network) return undefined;
-        const cfg = NETWORK_CONFIGS.find((n) => n.id === filter.network);
-        return cfg ? [Number(cfg.backendChainId)] : undefined;
-    }, [filter.network]);
-
-    const tokenAddresses = filter.tokens.length > 0 ? filter.tokens : undefined;
-
-    const { data: apiData, isLoading } = useGetWhitelistUsers({
-        search: filter.text || undefined,
-        chainIds,
-        tokenAddresses,
-    });
-
-    const users = data ?? apiData?.users ?? [];
+    const { data: apiData, isLoading } = useGetWhitelistUsers(serverParams);
+    const normalizedSearchText = useMemo(
+        () => normalizeSearchValue(filter.text),
+        [filter.text],
+    );
+    const allUsers = useMemo(
+        () => data ?? apiData?.users ?? [],
+        [data, apiData?.users],
+    );
+    const users = useMemo(
+        () =>
+            allUsers.filter(
+                (user) =>
+                    matchesWhitelistUserStatus(user, filter.status) &&
+                    matchesWhitelistUserSearch(user, normalizedSearchText),
+            ),
+        [allUsers, filter.status, normalizedSearchText],
+    );
+    const emptyStateText = normalizedSearchText
+        ? "No users found matching your search."
+        : "No users found.";
 
     // Each user now has a single chainId from the API
     const expandedRows: ExpandedRow[] = useMemo(() => {
@@ -276,7 +315,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                     {!isLoading && users.length === 0 && (
                         <TableRow>
                             <TableCell colSpan={7} className="py-10 text-center text-secondary-text">
-                                No users found.
+                                {emptyStateText}
                             </TableCell>
                         </TableRow>
                     )}
