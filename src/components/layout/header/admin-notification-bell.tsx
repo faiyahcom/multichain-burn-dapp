@@ -91,9 +91,6 @@ export function AdminNotificationBell() {
   const [open, setOpen] = useState(false);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const isAdmin =
-    user?.role === "admin" || user?.role === "super_admin";
-
   // ------------------------------------------------------------------
   // Infinite query
   // ------------------------------------------------------------------
@@ -110,7 +107,7 @@ export function AdminNotificationBell() {
         const loaded = allPages.flatMap((p) => p.notis).length;
         return loaded < lastPage.total ? allPages.length + 1 : undefined;
       },
-      enabled: isAdmin && !!accessToken,
+      enabled: !!accessToken,
     });
 
   const allItems = data?.pages.flatMap((p) => p.notis) ?? [];
@@ -143,7 +140,7 @@ export function AdminNotificationBell() {
     [queryClient],
   );
 
-  useAdminNotificationStream(isAdmin ? accessToken : null, {
+  useAdminNotificationStream(!!accessToken ? accessToken : null, {
     onNotification: prependItem,
   });
 
@@ -195,8 +192,6 @@ export function AdminNotificationBell() {
       void fetchNextPage();
     }
   }, [isFetching, hasNextPage, fetchNextPage]);
-
-  if (!isAdmin) return null;
 
   const badgeLabel = unread > 99 ? "99+" : String(unread);
 
