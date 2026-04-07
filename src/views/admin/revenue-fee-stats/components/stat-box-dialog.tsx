@@ -171,8 +171,17 @@ const StatBoxDialog = ({
               >
                 <div className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-base">
                   <div>Total</div>
-                  <div className="font-bold">
-                    {settlementTotal.toDecimalPlaces(6).toString()}
+                  <div
+                    className="min-w-0 truncate font-bold"
+                    title={settlementTotal.toNumber().toLocaleString("en-US", {
+                      maximumFractionDigits: 6,
+                      minimumFractionDigits: 0,
+                    })}
+                  >
+                    {settlementTotal.toNumber().toLocaleString("en-US", {
+                      maximumFractionDigits: 6,
+                      minimumFractionDigits: 0,
+                    })}
                   </div>
                 </div>
               </div>
