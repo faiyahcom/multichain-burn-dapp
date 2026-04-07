@@ -46,8 +46,14 @@ export const getAdminPoolHref = ({
   kind,
 }: {
   address: string;
-  kind: PoolKind;
+  kind: 0 | 1;
 }): string => {
-  if (kind === "swap_pool") return `/admin/swap/detail/${address}`;
-  return `/admin/burn/detail/${address}`;
+  switch (kind) {
+    case 0:
+      return `/admin/burn/detail/${address}`;
+    case 1:
+      return `/admin/swap/detail/${address}`;
+    default:
+      return "#";
+  }
 };
