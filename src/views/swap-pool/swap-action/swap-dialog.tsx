@@ -29,7 +29,7 @@ import { parseUnits } from "ethers";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
-import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
+import { safeDecimalParse, shortenNumber, parseToBN } from "@/utils/helpers/numbers";
 import { useDebounceValue } from "usehooks-ts";
 import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 import { cn } from "@/lib/utils";
@@ -201,19 +201,19 @@ const SwapDialog = ({
     const maxBurnLeft = useMemo(() => {
         if (!poolDetail) return "0";
         try {
-            const numeratorBN = new BN(poolDetail.pool.rewardNumerator ?? "0");
-            const denominatorBN = new BN(poolDetail.pool.rewardDenominator ?? "0");
+            const numeratorBN = parseToBN(poolDetail.pool.rewardNumerator);
+            const denominatorBN = parseToBN(poolDetail.pool.rewardDenominator);
             if (numeratorBN.isZero() || denominatorBN.isZero()) return "0";
             const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
             const burnDecimals = poolDetail.pool.tokenInDecimals;
-            const rewardAmountBN = new BN(poolDetail.rewardAmount ?? "0");
+            const rewardAmountBN = parseToBN(poolDetail.rewardAmount);
             const rewardDecimalsBN = new BN(10).pow(new BN(rewardDecimals));
             const burnDecimalsBN = new BN(10).pow(new BN(burnDecimals));
             const maxBurnRaw = rewardAmountBN
                 .mul(denominatorBN)
                 .mul(burnDecimalsBN)
                 .div(numeratorBN.mul(rewardDecimalsBN));
-            const depositedBN = new BN(poolDetail.depositedAmount ?? "0");
+            const depositedBN = parseToBN(poolDetail.depositedAmount);
             const remaining = maxBurnRaw.sub(depositedBN);
             if (remaining.isNeg()) return "0";
             return formatUnits(BigInt(remaining.toString()), burnDecimals);
@@ -272,8 +272,8 @@ const SwapDialog = ({
 
             if (amountInBN.isZero()) return "0";
 
-            const numeratorBN = new BN(rewardNumerator);
-            const denominatorBN = new BN(rewardDenominator);
+            const numeratorBN = parseToBN(rewardNumerator);
+            const denominatorBN = parseToBN(rewardDenominator);
 
             const rewardDecimalsBN = new BN(10).pow(new BN(rewardTokenDecimals));
             const tokenDecimalsBN = new BN(10).pow(new BN(tokenInDecimals));
@@ -284,7 +284,7 @@ const SwapDialog = ({
                 .div(denominatorBN.mul(tokenDecimalsBN));
 
             const feeBN = rewardBN
-                .mul(new BN(settlementFee ?? "0"))
+                .mul(parseToBN(settlementFee))
                 .div(new BN(DECIMAL_FEE_PERCENT * 100));
 
             const finalReward = rewardBN.sub(feeBN);

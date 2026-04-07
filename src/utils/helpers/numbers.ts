@@ -9,6 +9,20 @@ export function toBaseUnits(amount: string, decimals: number): BN {
   return new BN(whole + paddedFraction);
 }
 
+/**
+ * Safely parse any numeric value — including scientific notation like "2e+21"
+ * that BN.js cannot handle natively — into a BN integer.
+ * Returns BN(0) for null / undefined / empty / non-numeric input.
+ */
+export function parseToBN(value: string | number | null | undefined): BN {
+  if (value == null || value === "") return new BN(0);
+  try {
+    return new BN(new Decimal(value).toFixed(0));
+  } catch {
+    return new BN(0);
+  }
+}
+
 export function formatAmount(
   amount: string,
   decimals: number,
