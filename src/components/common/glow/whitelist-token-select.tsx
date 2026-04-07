@@ -22,6 +22,7 @@ import {
   getVariantBtnBgClassName,
 } from "./container";
 import { ChevronDownIcon } from "lucide-react";
+import TokenImage from "../token-image";
 
 export type TokenOption = {
   address: string;
@@ -101,12 +102,12 @@ const WhitelistTokenSelect = ({
     () =>
       nativeCurrency
         ? {
-          address: nativeAddress,
-          name: nativeCurrency.name,
-          symbol: nativeCurrency.symbol,
-          imageUri: networkConfig?.iconSrc ?? "",
-          isNative: true,
-        }
+            address: nativeAddress,
+            name: nativeCurrency.name,
+            symbol: nativeCurrency.symbol,
+            imageUri: networkConfig?.iconSrc ?? "",
+            isNative: true,
+          }
         : null,
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [
@@ -174,9 +175,10 @@ const WhitelistTokenSelect = ({
     ${getVariantBtnBg50ClassName({ variant, isHover: true })}
     ${isSelected ? getVariantBtnBg50ClassName({ variant }) : ""}
     ${isSelected ? `bg- ${classNames.itemSelected || ""}` : ""}
-    ${isDisabled
-      ? `cursor-not-allowed opacity-40 ${classNames.itemDisabled || ""}`
-      : ""
+    ${
+      isDisabled
+        ? `cursor-not-allowed opacity-40 ${classNames.itemDisabled || ""}`
+        : ""
     }
   `;
 
@@ -240,8 +242,10 @@ const WhitelistTokenSelect = ({
           </div>
         ) : (
           <div
-            className={`mt-2 max-h-[300px] space-y-1 overflow-y-auto ${classNames.list || ""
-              }`}
+            className={cn(
+              "mt-2 max-h-75 space-y-1 overflow-y-auto thin-transparent-scrollbar",
+              classNames.list,
+            )}
           >
             {/* Native */}
             {showNativeToken && nativeToken && (
@@ -302,12 +306,12 @@ const WhitelistTokenSelect = ({
                       }),
                     )}
                   />
-                  <img
+                  <TokenImage
                     src={token.imageUri}
-                    className={cn(
-                      "size-7.75 rounded-full",
-                      classNames.itemIcon || "",
-                    )}
+                    alt={token.customSymbol ?? token.symbol}
+                    classNames={{
+                      common: "size-7.75",
+                    }}
                   />
                   <div className="flex flex-col">
                     <span className="text-xs">{resolveName(token)}</span>
