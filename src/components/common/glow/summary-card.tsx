@@ -36,10 +36,12 @@ const GlowSummaryCard: React.FC<Props> = ({
 }) => {
   return (
     <div className={cn("relative rounded-24px", classNames?.container)}>
-      <div
-        className="pointer-events-none absolute inset-0 z-0 rounded-24px bg-cover bg-center bg-no-repeat opacity-30"
-        style={{ backgroundImage: `url(${CARD_VARIANT_BG_IMG[variant]})` }}
-      />
+      {CARD_VARIANT_BG_IMG[variant] && (
+        <div
+          className="pointer-events-none absolute inset-0 z-0 rounded-24px bg-cover bg-center bg-no-repeat opacity-30"
+          style={{ backgroundImage: `url(${CARD_VARIANT_BG_IMG[variant]})` }}
+        />
+      )}
       <GlowContainer
         variant={variant}
         className={cn(

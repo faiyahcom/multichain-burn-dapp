@@ -94,7 +94,7 @@ const buttonVariants = ({
                 hasGroupHover,
             },
           ),
-          green: "",
+          green: "", // left for type safety
         },
         size: {
           default: "py-3 px-6 text-base md:text-2xl",
