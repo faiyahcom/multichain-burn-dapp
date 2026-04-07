@@ -17,12 +17,14 @@ const CARD_VARIANT_BG_IMG: Record<ContainerVariant, string> = {
   burn: "/images/summary/burn-card-bg.png",
   pair: "/images/summary/pair-card-bg.png",
   swap: "/images/summary/swap-card-bg.png",
+  green: "",
 };
 
 const CARD_VARIANT_BG: Record<ContainerVariant, string> = {
   burn: "card-burn-bold-bottom-bg",
   pair: "card-pair-bold-bottom-bg",
   swap: "card-swap-bold-bottom-bg",
+  green: "",
 };
 
 const GlowSummaryCard: React.FC<Props> = ({

@@ -5,6 +5,7 @@ import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
 import { useQuery } from "@tanstack/react-query";
 import { getPoolGlowVariant } from "./helpers";
 import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
+import { useMemo } from "react";
 
 interface Props {
   poolKind: PoolKindCode;
@@ -17,13 +18,24 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
   });
   const variant = getPoolGlowVariant(poolKind);
 
-  const totalVolume = formatAmount(
-    overallStats?.[
-    poolKind === PoolKindCodeEnum.Burn ? "totalBurned" : "totalSwapVolume"
-    ] ?? "0",
-    0,
-    2,
-  );
+  const totalVolume = useMemo(() => {
+    let totalVolume = "";
+    switch (poolKind) {
+      case PoolKindCodeEnum.Burn:
+        totalVolume = overallStats?.totalBurned ?? "0";
+        break;
+
+      case PoolKindCodeEnum.Swap:
+        totalVolume = overallStats?.totalSwapVolume ?? "0";
+        break;
+
+      default:
+        void (poolKind satisfies never);
+        break;
+    }
+
+    return totalVolume;
+  }, [overallStats, poolKind]);
 
   const cards: { title: string; value: string; valueTitle?: string }[] = [
     {
@@ -31,8 +43,8 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
         poolKind === PoolKindCodeEnum.Burn
           ? "Total Burned"
           : "Total Swap Volume",
-      value: totalVolume,
-      valueTitle: Number(totalVolume ?? 0).toLocaleString("en-US"),
+      value: formatAmount(totalVolume, 0, 2),
+      valueTitle: Number(totalVolume).toLocaleString("en-US"),
     },
     {
       title: "Total Transactions",

@@ -94,6 +94,7 @@ const buttonVariants = ({
                 hasGroupHover,
             },
           ),
+          green: "",
         },
         size: {
           default: "py-3 px-6 text-base md:text-2xl",
@@ -129,6 +130,7 @@ const BUTTON_VARIANT_CONTAINER_VARIANT_MAP: Record<
   "pair-grid": "pair",
   "burn-grid": "burn",
   "swap-grid": "swap",
+  green: "green",
 };
 
 // Mutually exclusive: can pass isActive OR isGrid, but not both
