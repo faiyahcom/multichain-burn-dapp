@@ -1,5 +1,3 @@
-import { Input } from "@/components/ui/input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { PublicKey } from "@solana/web3.js";
 import { useEffect, useRef } from "react";
@@ -10,12 +8,22 @@ import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import { toast } from "@/components/common/custom-toast";
-import AnimateIconButton from "@/components/common/animate-icon-button";
-import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
-import InfoTooltip from "@/components/common/info-tooltip";
+import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { safeDecimalParse } from "@/utils/helpers/numbers";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
+import { cn } from "@/lib/utils";
+import {
+  getVariantBgClassName,
+  getVariantBorderClassName,
+} from "@/components/common/glow/container";
+import InfoTooltip from "@/components/common/glow/info-tooltip";
+import { Button } from "@/components/common/glow/button";
+import { Input } from "@/components/common/glow/input";
+import {
+  RadioGroup,
+  RadioGroupItem,
+} from "@/components/common/glow/radio-group";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
@@ -32,7 +40,12 @@ type Props = {
   initialBudget?: string;
 };
 
-const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward, initialBudget }: Props) => {
+const CreateSwapPoolForm = ({
+  onSubmitForm,
+  initialTokenBurn,
+  initialTokenReward,
+  initialBudget,
+}: Props) => {
   const { caipAddress } = useAppKitAccount();
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
 
@@ -66,6 +79,11 @@ const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward
   const selectedTokenBurn = watch("tokenBurn");
   const selectedTokenReward = watch("tokenReward");
 
+  // Reset form on network change
+  useEffect(() => {
+    reset();
+  }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
+
   // Pre-fill from navigation search params (once, on mount)
   const prefilledRef = useRef(false);
   useEffect(() => {
@@ -77,7 +95,7 @@ const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward
       setValue("tokenReward", initialTokenReward, { shouldValidate: false });
     if (initialBudget)
       setValue("budget", initialBudget, { shouldValidate: false });
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
@@ -141,13 +159,20 @@ const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward
 
   return (
     <form
-      className="w-full max-w-xl space-y-4"
+      className="w-full space-y-4 font-inter md:max-w-lg md:space-y-6 lg:max-w-xl lg:space-y-8 xl:max-w-2xl xl:space-y-12 2xl:max-w-4xl 2xl:space-y-15"
       onSubmit={handleSubmit(onSubmit)}
     >
-      <div className="mb-8 flex flex-col gap-2">
+      <div className="flex flex-col gap-2">
         <Input
-          placeholder="Enter Pool Name"
+          placeholder="Enter pool name"
           aria-invalid={!!errors.poolName}
+          variant="swap"
+          className={cn(
+            getVariantBgClassName({
+              variant: "swap",
+            }),
+            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+          )}
           {...register("poolName", {
             validate: {
               required: (poolName) => {
@@ -172,42 +197,61 @@ const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward
           })}
         />
         {errors.poolName && (
-          <p className="text-xs text-destructive">{errors.poolName.message}</p>
+          <p className="font-inter text-xs text-destructive">
+            {errors.poolName.message}
+          </p>
         )}
       </div>
 
-      <div className="flex flex-col gap-2">
-        <span className="text-xl font-medium">Pool Info</span>
-        <div className="flex justify-between gap-6">
-          <div className="flex w-md flex-col gap-2">
-            <span className="text-[13px]">Token Burn</span>
+      <div className="flex flex-col gap-2.5">
+        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          Pool Info
+        </span>
+        <div className="flex">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Token Burn
+            </span>
             <WhitelistTokenSelect
+              variant="swap"
               value={selectedTokenBurn}
-              onChange={(address) =>
-                setValue("tokenBurn", address, { shouldValidate: true })
+              onChange={(token) =>
+                setValue("tokenBurn", token?.address, { shouldValidate: true })
               }
               disabledAddress={selectedTokenReward}
+              classNames={{
+                trigger: cn(
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-2/3 md:px-3 md:text-base xl:max-w-1/2 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  getVariantBorderClassName({
+                    variant: "swap",
+                    custom: "rounded-md",
+                  }),
+                ),
+                triggerContent:
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                // icon: "size-3.5 md:size-4 lg:size-5",
+              }}
             />
             <input
               type="hidden"
               {...register("tokenBurn", { required: "Token burn is required" })}
             />
             {errors.tokenBurn && (
-              <p className="text-xs text-destructive">
+              <p className="font-inter text-xs text-destructive">
                 {errors.tokenBurn.message}
               </p>
             )}
           </div>
         </div>
-
         <div className="flex flex-col gap-2">
-          <span className="text-[13px]">
+          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
             Ratio{" "}
             <InfoTooltip
+              variant="swap"
               classNames={{
                 icon: "size-3.5 text-xs",
                 contentContainer: "max-h-fit",
-                textContainer: "min-h-10",
+                textContainer: "min-h-10 font-inter",
               }}
               side="right"
               content="Token burn : token reward"
@@ -217,6 +261,11 @@ const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward
             <Input
               placeholder="1:1"
               aria-invalid={!!errors.ratio}
+              variant="swap"
+              className={cn(
+                "border-2 py-1 text-xs font-medium sm:text-sm md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                "w-10 bg-transparent px-2 text-center placeholder:text-center sm:w-12 md:w-14 lg:w-16 2xl:w-20",
+              )}
               {...register("ratio", {
                 required: "Ratio is required",
                 validate: (value) => {
@@ -237,125 +286,168 @@ const CreateSwapPoolForm = ({ onSubmitForm, initialTokenBurn, initialTokenReward
                   return true;
                 },
               })}
-              className="w-20 px-2 text-center placeholder:text-center"
             />
-            <RadioGroup value="fixed" className="flex items-center gap-2">
-              <RadioGroupItem value="fixed">
-                <span>Fixed</span>
+            <RadioGroup variant="swap" value="fixed" asChild>
+              <RadioGroupItem
+                value="fixed"
+                className={cn(
+                  getVariantBorderClassName({
+                    variant: "swap",
+                    custom: "rounded-md border-2",
+                  }),
+                  getVariantBgClassName({ variant: "swap" }),
+                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                )}
+              >
+                Fixed
               </RadioGroupItem>
             </RadioGroup>
           </div>
           {errors.ratio && (
-            <p className="text-xs text-destructive">{errors.ratio.message}</p>
+            <p className="font-inter text-xs text-destructive">
+              {errors.ratio.message}
+            </p>
           )}
         </div>
+      </div>
 
-        <div className="flex flex-col gap-2">
-          <span className="text-xl font-medium">Reward Config</span>
-          <div className="flex justify-between gap-6">
-            <div className="flex w-md flex-col gap-2">
-              <span className="text-[13px]">Token Reward</span>
-              <WhitelistTokenSelect
-                value={selectedTokenReward}
-                onChange={(address) =>
-                  setValue("tokenReward", address, { shouldValidate: true })
-                }
-                disabledAddress={selectedTokenBurn}
-              />
-              <input
-                type="hidden"
-                {...register("tokenReward", {
-                  required: "Reward token is required",
-                })}
-              />
-              {errors.tokenReward && (
-                <p className="text-xs text-destructive">
-                  {errors.tokenReward.message}
-                </p>
-              )}
-            </div>
+      <div className="flex flex-col gap-2">
+        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          Reward Config
+        </span>
+        <div className="flex">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Token Reward
+            </span>
+            <WhitelistTokenSelect
+              value={selectedTokenReward}
+              onChange={(token) =>
+                setValue("tokenReward", token?.address, {
+                  shouldValidate: true,
+                })
+              }
+              disabledAddress={selectedTokenBurn}
+              classNames={{
+                trigger: cn(
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:max-w-2/3 md:px-3 md:py-1.5 md:text-base xl:max-w-1/2 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  getVariantBorderClassName({
+                    variant: "swap",
+                    custom: "rounded-md",
+                  }),
+                ),
+                triggerContent:
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                // icon: "size-3.5 md:size-4 lg:size-5",
+              }}
+            />
+            <input
+              type="hidden"
+              {...register("tokenReward", {
+                required: "Reward token is required",
+              })}
+            />
+            {errors.tokenReward && (
+              <p className="font-inter text-xs text-destructive">
+                {errors.tokenReward.message}
+              </p>
+            )}
           </div>
+        </div>
 
-          <span className="text-[13px]">Budget</span>
-          <Input
-            placeholder="0.0"
-            aria-invalid={!!errors.budget}
-            className="w-full max-w-40"
-            type="number"
-            step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-            {...register("budget", {
-              required: "Budget is required",
-              validate: {
-                validNumber: (value) => {
-                  const decimal = safeDecimalParse({ value });
-                  return decimal?.isFinite()
-                    ? true
-                    : "Budget must be a valid number";
-                },
-                moreThanZero: (value) => {
-                  const decimal = safeDecimalParse({ value });
-                  return decimal?.isZero()
-                    ? "Budget must be greater than zero"
-                    : true;
-                },
-                notNegative: (value) => {
-                  const decimal = safeDecimalParse({ value });
-                  return decimal?.isNegative()
-                    ? "Budget must be positive"
-                    : true;
-                },
-                maxDecimals: (value) => {
-                  const decimal = safeDecimalParse({ value });
-                  return decimal && decimal.decimalPlaces() <= 6
-                    ? true
-                    : "Budget must have 6 decimals or less";
-                },
-              },
-            })}
-          />
-          {errors.budget && (
-            <p className="text-xs text-destructive">{errors.budget.message}</p>
+        <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+          Budget
+        </span>
+        <Input
+          variant="swap"
+          placeholder="0.0"
+          aria-invalid={!!errors.budget}
+          className={cn(
+            "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-[23px]",
           )}
+          type="number"
+          step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
+          {...register("budget", {
+            required: "Budget is required",
+            validate: {
+              validNumber: (value) => {
+                const decimal = safeDecimalParse({ value });
+                return decimal?.isFinite()
+                  ? true
+                  : "Budget must be a valid number";
+              },
+              moreThanZero: (value) => {
+                const decimal = safeDecimalParse({ value });
+                return decimal?.isZero()
+                  ? "Budget must be greater than zero"
+                  : true;
+              },
+              notNegative: (value) => {
+                const decimal = safeDecimalParse({ value });
+                return decimal?.isNegative() ? "Budget must be positive" : true;
+              },
+              maxDecimals: (value) => {
+                const decimal = safeDecimalParse({ value });
+                return decimal && decimal.decimalPlaces() <= 6
+                  ? true
+                  : "Budget must have 6 decimals or less";
+              },
+            },
+          })}
+        />
+        {errors.budget && (
+          <p className="font-inter text-xs text-destructive">
+            {errors.budget.message}
+          </p>
+        )}
 
-          <div className="flex items-end gap-10">
-            <span className="text-xl font-medium">Network</span>
-            <div className="relative flex gap-2 rounded-md-plus bg-inactive px-14 py-1 text-[15px] text-nowrap">
+        <div className="flex flex-wrap gap-2 md:gap-3 2xl:gap-3.75">
+          <div className="flex flex-col justify-end gap-2">
+            <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+              Network
+            </span>
+            <div
+              className={cn(
+                getVariantBorderClassName({ variant: "swap" }),
+                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:w-64 md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:w-100 2xl:text-[23px]",
+                "rounded-md border-2",
+              )}
+            >
               <NetworkIcon
                 networkId={network?.id || ("" as NetworkId)}
-                className="absolute left-4"
+                className="size-3.5 md:size-4 2xl:size-5.75"
               />
               <span>{network?.label}</span>
             </div>
+          </div>
 
-            <div className="flex flex-col gap-1.5">
-              <span className="text-[13px]">Burn Method</span>
-              <span className="flex gap-2 rounded-md-plus bg-inactive px-14 py-1 text-[15px] text-nowrap">
-                Transfer to Maker
-              </span>
-            </div>
+          <div className="flex flex-col justify-end gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+              Burn Method
+            </span>
+            <span
+              className={cn(
+                getVariantBorderClassName({ variant: "swap" }),
+                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:text-[23px]",
+                "rounded-md border-2",
+              )}
+            >
+              Transfer to Maker
+            </span>
           </div>
         </div>
+      </div>
 
-        <div className="mt-12 flex justify-center">
-          <AnimateIconButton
-            iconLetter="S"
-            text="Submit"
-            variant="letter-icon"
-            textVariant="text-container-center"
-            classNames={{
-              btn: "w-76.25 text-center after:text-white after:text-xl after:font-semibold after:bg-active",
-              text: "text-xl font-medium",
-              icon: "size-8 text-xl",
-            }}
-            color="#966EFF"
-            isLoading={isSubmitting}
-            isLoadingText="Submitting..."
-            btnProps={{
-              type: "submit",
-              disabled: isSubmitting,
-            }}
-          />
-        </div>
+      <div className="flex justify-center">
+        <Button
+          variant="swap"
+          type="submit"
+          hasHover
+          isLoading={isSubmitting}
+          className="w-full text-center font-orbitron text-sm font-semibold md:w-64 md:text-base lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
+        >
+          {isSubmitting ? "Submitting..." : "Submit"}
+        </Button>
       </div>
     </form>
   );

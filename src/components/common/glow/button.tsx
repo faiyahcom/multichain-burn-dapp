@@ -4,6 +4,7 @@ import { Slot } from "radix-ui";
 
 import { cn } from "@/lib/utils";
 import { getVariantShadowClassName, type ContainerVariant } from "./container";
+import { Spinner } from "@/components/ui/spinner";
 
 const buttonVariants = ({
   hasHover = false,
@@ -13,7 +14,7 @@ const buttonVariants = ({
   hasGroupHover?: boolean;
 }) =>
   cva(
-    "transition-all duration-300 inline-flex items-center justify-center gap-2 md:gap-3 rounded-md disabled:opacity-50",
+    "transition-all duration-300 inline-flex items-center justify-center gap-2 md:gap-3 rounded-md disabled:opacity-50 font-semibold",
     {
       variants: {
         variant: {
@@ -93,6 +94,7 @@ const buttonVariants = ({
                 hasGroupHover,
             },
           ),
+          green: "", // left for type safety
         },
         size: {
           default: "py-3 px-6 text-base md:text-2xl",
@@ -128,6 +130,7 @@ const BUTTON_VARIANT_CONTAINER_VARIANT_MAP: Record<
   "pair-grid": "pair",
   "burn-grid": "burn",
   "swap-grid": "swap",
+  green: "green",
 };
 
 // Mutually exclusive: can pass isActive OR isGrid, but not both
@@ -159,14 +162,20 @@ function Button({
   asChild = false,
   hasHover = false,
   hasGroupHover = false,
+  disabled,
+  isLoading,
+  children,
   ...props
 }: React.ComponentProps<"button"> &
   VariantProps<ReturnType<typeof buttonVariants>> & {
     hasHover?: boolean;
     hasGroupHover?: boolean;
     asChild?: boolean;
+    isLoading?: boolean;
   }) {
   const Comp = asChild ? Slot.Root : "button";
+
+  const isDisabled = disabled || isLoading;
 
   return (
     <Comp
@@ -174,14 +183,23 @@ function Button({
       data-variant={variant}
       data-size={size}
       className={cn(
-        buttonVariants({ hasHover, hasGroupHover })({
+        buttonVariants({
+          hasHover: hasHover && !isDisabled,
+          hasGroupHover: hasGroupHover && !isDisabled,
+        })({
           variant,
           size,
           className,
         }),
       )}
+      disabled={isDisabled}
       {...props}
-    />
+    >
+      <>
+        {isLoading && <Spinner />}
+        {children}
+      </>
+    </Comp>
   );
 }
 

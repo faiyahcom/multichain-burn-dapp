@@ -4,6 +4,7 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import Decimal from "decimal.js";
+import GlowContainer from "@/components/common/glow/container";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -17,7 +18,10 @@ const RewardAmount = ({ poolDetail }: Props) => {
         )
         : "-";
     const formattedBurned = poolDetail
-        ? formatAmount(poolDetail.depositedAmount, poolDetail?.pool?.tokenInDecimals)
+        ? formatAmount(
+            poolDetail.depositedAmount,
+            poolDetail?.pool?.tokenInDecimals,
+        )
         : "-";
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
@@ -69,7 +73,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 .mul(new Decimal(10).pow(poolDetail!.pool.tokenInDecimals))
                 .toFixed(0),
             poolDetail!.pool.tokenInDecimals,
-          );
+        );
 
     const burnProgress = maxBurn.isZero()
         ? 0
@@ -77,33 +81,35 @@ const RewardAmount = ({ poolDetail }: Props) => {
             .div(maxBurn.mul(new Decimal(10).pow(poolDetail!.pool.tokenInDecimals)))
             .toNumber();
     return (
-        <div className="mt-3 w-full py-4">
-            <div className="flex items-center gap-14 pb-4 text-xl font-medium">
-                <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 bg-black" />
-                    <span>Reward Amount</span>
-                </div>
-                <p>
+        <GlowContainer
+            variant="swap"
+            className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
+        >
+            <div className="flex items-center justify-between pr-5 font-orbitron">
+                <p className="text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">Reward Amount</p>
+                <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                     {formattedReward} {rewardTokenDisplay?.symbol}
                 </p>
             </div>
-            <div>
-                <p className="text-base text-greyed">
-                    <span>Total Burned Amount:</span>{" "}
-                    <span className="ml-14">
+            <div className="space-y-3.75">
+                <p className="flex justify-between pr-2 text-sm md:pr-5 md:text-base lg:text-xl 2xl:text-2xl">
+                    <span className="text-mb-gray-b8">
+                        Total Burned Amount:
+                    </span>{" "}
+                    <span className="">
                         {formattedBurned} / {formattedMaxBurn} {burnTokenDisplay?.symbol}
                     </span>
                 </p>
                 <div>
-                    <div className="h-3.25 w-full rounded-[9.5px] bg-progress-bg">
+                    <div className="h-2.5 w-full overflow-hidden rounded-md border border-swap-border/85 bg-mb-dark-popover-item md:h-3.5 2xl:h-4.5">
                         <div
-                            className="h-full rounded-[9.5px] bg-progress"
+                            className="h-full rounded-md bg-swap-border/85"
                             style={{ width: `${burnProgress * 100}%` }}
                         ></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </GlowContainer>
     );
 };
 

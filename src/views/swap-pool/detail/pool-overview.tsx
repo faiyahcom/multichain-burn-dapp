@@ -5,6 +5,8 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
+import GlowContainer from "@/components/common/glow/container";
+import InfoTooltip from "@/components/common/glow/info-tooltip";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -63,14 +65,31 @@ const PoolOverview = ({ poolDetail }: Props) => {
           label: "Network",
           value: (
             <div className="flex items-center gap-2">
-              <NetworkIcon networkId={network?.id || ("" as NetworkId)} />
+              <NetworkIcon networkId={network?.id || ("" as NetworkId)} className="size-4 md:size-5 2xl:size-6" />
               <span>{network?.label}</span>
             </div>
           ),
         },
       ],
       [
-        { label: "Ratio", value: cleanRatio },
+        {
+          label: (
+            <div className="flex items-center gap-1">
+              <span>Ratio</span>
+              <InfoTooltip
+                side="right"
+                content="Token burn : token reward"
+                variant="swap"
+                classNames={{
+                  icon: "size-3.5 text-xs",
+                  contentContainer: "max-h-fit",
+                  textContainer: "min-h-10 font-inter",
+                }}
+              />
+            </div>
+          ),
+          value: cleanRatio,
+        },
         {
           label: "Burn Token",
           // value: `${poolDetail?.pool?.tokenInSymbol}`,
@@ -80,9 +99,9 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 src={burnTokenDisplay.imageUri}
                 alt={burnTokenDisplay.name}
                 classNames={{
-                  common: "size-6",
-                  img: "size-6",
-                  placeholder: "size-6",
+                  common: "size-4 md:size-5 2xl:size-6",
+                  img: "size-4 md:size-5 2xl:size-6",
+                  placeholder: "size-4 md:size-5 2xl:size-6",
                 }}
               />
               <span>{burnTokenDisplay.symbol}</span>
@@ -100,9 +119,9 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 src={rewardTokenDisplay.imageUri}
                 alt={rewardTokenDisplay.name}
                 classNames={{
-                  common: "size-6",
-                  img: "size-6",
-                  placeholder: "size-6",
+                  common: "size-4 md:size-5 2xl:size-6",
+                  img: "size-4 md:size-5 2xl:size-6",
+                  placeholder: "size-4 md:size-5 2xl:size-6",
                 }}
               />
               <span>{rewardTokenDisplay.symbol}</span>
@@ -114,11 +133,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
   }, [burnTokenDisplay, network, poolDetail, rewardTokenDisplay]);
 
   return (
-    <div className="mt-3 w-full py-4">
-      <div className="flex items-center gap-2 pb-4">
-        <div className="h-1.5 w-1.5 bg-black" />
-        <span className="text-xl font-medium">Pool Overview</span>
-      </div>
+    <GlowContainer
+      variant="swap"
+      className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
+    >
+      <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">Pool Overview</p>
 
       {!poolDetail && !rows.length ? (
         <div className="space-y-2">
@@ -138,16 +157,18 @@ const PoolOverview = ({ poolDetail }: Props) => {
       ) : (
         <div className="space-y-2">
           {rows.map((row, rowIndex) => (
-            <div className="grid grid-cols-2 space-x-2" key={rowIndex}>
+            <div className="grid grid-cols-1 gap-y-1 md:grid-cols-2 md:space-x-2" key={rowIndex}>
               <div className="grid grid-cols-2">
-                <span className="text-xl text-greyed">{row[0].label}:</span>
-                <span className="text-xl break-all text-black">
-                  {row[0].value}
+                <span className="inline-flex items-center gap-1 text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
+                  {row[0].label}:
                 </span>
+                <span className="text-sm break-all md:text-base lg:text-xl 2xl:text-2xl">{row[0].value}</span>
               </div>
               <div className="grid grid-cols-2">
-                <span className="text-xl text-greyed">{row[1].label}:</span>
-                <span className="text-xl break-all text-black">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
+                  {row[1].label}:
+                </span>
+                <span className="text-sm font-medium break-all md:text-base lg:text-xl 2xl:text-2xl">
                   {row[1].value}
                 </span>
               </div>
@@ -155,7 +176,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
           ))}
         </div>
       )}
-    </div>
+    </GlowContainer>
   );
 };
 

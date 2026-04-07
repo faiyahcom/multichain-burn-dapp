@@ -43,7 +43,7 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   ];
 
   const cellWidth: React.CSSProperties["width"] = `${100 / columns.length}%`;
-  const fixWidth: React.CSSProperties["minWidth"] = `200px`;
+  const fixWidth: React.CSSProperties["minWidth"] = `220px`;
 
   return (
     <Table>
@@ -54,8 +54,8 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="burn"
               style={{
-                width: index === 0 ? fixWidth : cellWidth, // 200px for first column
-                minWidth: index === 0 ? fixWidth : "", // 200px for first column
+                width: index === 0 ? fixWidth : cellWidth, // 220px for first column
+                minWidth: index === 0 ? fixWidth : "", // 220px for first column
               }}
             >
               {column}
@@ -176,7 +176,7 @@ const BurnPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                 <Button
                   variant={"burn"}
                   hasGroupHover
-                  className="sm:text-24px min-w-28 rounded-13px px-6 py-2 font-orbitron text-xl font-semibold sm:min-w-46.5"
+                  className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
                 >
                   {statusLabel}
                 </Button>

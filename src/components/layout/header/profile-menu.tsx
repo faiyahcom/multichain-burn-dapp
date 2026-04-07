@@ -1,4 +1,9 @@
 import CopyableText from "@/components/common/copyable-text";
+import {
+  contentClassName,
+  itemClassName,
+  leftSelectedPanelClassName,
+} from "@/components/common/glow/dropdown-menu-classnames";
 import TokenImage from "@/components/common/token-image";
 import {
   DropdownMenu,
@@ -12,8 +17,10 @@ import { useAuthStore } from "@/stores/authStore";
 import { truncateString } from "@/utils/helpers/string";
 import { useDisconnect, useWalletInfo } from "@reown/appkit/react";
 import { useQuery } from "@tanstack/react-query";
+import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
+import { PROFILE_NAV_ITEMS } from "./glow/header-nav/const";
 
 type Props = {};
 
@@ -22,6 +29,9 @@ const ProfileMenu = ({}: Props) => {
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
   const isMobile = useMediaQuery("(max-width: 640px)");
+  const location = useLocation();
+  const currentPath = location.pathname;
+  const navigate = useNavigate();
 
   const {
     data: userApiData,
@@ -45,7 +55,6 @@ const ProfileMenu = ({}: Props) => {
 
   const avatar = userApiData?.avatar ?? walletInfo?.icon;
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
-
 
   return (
     <DropdownMenu>
@@ -90,7 +99,8 @@ const ProfileMenu = ({}: Props) => {
           align="center"
           side="bottom"
           sideOffset={isMobile ? 20 : 40}
-          className="min-w-44 rounded-lg border-transparent bg-mb-dark-profile-btn p-3"
+          // className="min-w-44 rounded-lg border-transparent bg-mb-dark-profile-btn p-3"
+          className={contentClassName("min-w-[320px]")}
         >
           <div className="px-2 py-1.5 sm:hidden">
             <p
@@ -109,13 +119,44 @@ const ProfileMenu = ({}: Props) => {
               }}
             />
           </div>
-          <DropdownMenuItem
-            onClick={handleLogout}
-            className="cursor-pointer bg-mb-dark-profile-btn"
-          >
-            <LogOutIcon className="size-4" />
-            <span>Logout</span>
-          </DropdownMenuItem>
+          <div className="space-y-1 rounded-sm">
+            {PROFILE_NAV_ITEMS.map((item) => {
+              const isActive =
+                item.activeRegexMatch &&
+                currentPath.match(item.activeRegexMatch);
+
+              const Icon = item.icon;
+
+              return (
+                <DropdownMenuItem
+                  key={item.href}
+                  onClick={() => {
+                    navigate({
+                      to: item.href,
+                    });
+                  }}
+                  className={itemClassName({ isSelected: !!isActive })}
+                  isSelected={!!isActive}
+                  leftSelectedPanelClassName={leftSelectedPanelClassName({
+                    isSelected: !!isActive,
+                  })}
+                >
+                  {!!Icon && <Icon className="size-4" />}
+                  <p>{item.title}</p>
+                </DropdownMenuItem>
+              );
+            })}
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className={itemClassName({ isSelected: false })}
+              leftSelectedPanelClassName={leftSelectedPanelClassName({
+                isSelected: false,
+              })}
+            >
+              <LogOutIcon className="size-4" />
+              <span>Logout</span>
+            </DropdownMenuItem>
+          </div>
         </DropdownMenuContent>
       </div>
     </DropdownMenu>

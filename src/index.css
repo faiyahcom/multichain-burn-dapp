@@ -1,7 +1,7 @@
 /* @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"); */
-@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap");
 @import url("https://fonts.cdnfonts.com/css/ds-digital");
+/* Inter + Space Mono combined in one request — avoids a duplicate Inter download */
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap");
 @import url("https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&display=swap");
 @import "tailwindcss";
@@ -173,9 +173,11 @@
   --color-pair-border: var(--pair-border);
   --color-burn-border: var(--burn-border);
   --color-swap-border: var(--swap-border);
+  --color-green-border: var(--green-border);
   --shadow-pair-glow: 0 0 20px 5px var(--pair-shadow);
   --shadow-burn-glow: 0 0 10px 5px var(--burn-shadow);
   --shadow-swap-glow: 0 0 20px 5px var(--swap-shadow);
+  --shadow-green-glow: 0 0 10px 5px var(--green-shadow);
 
   --tracking-2-percent: -0.02em;
 
@@ -203,6 +205,9 @@
   --color-mb-swapper-badge-bg: var(--mb-swapper-badge-bg);
   --color-mb-burn-activity-amount: var(--mb-burn-activity-amount);
   --color-mb-swap-activity-amount: var(--mb-swap-activity-amount);
+  --color-mb-glow-input-bg: var(--mb-glow-input-bg);
+  --color-mb-glow-input-secondary: var(--mb-glow-input-secondary);
+  --color-mb-glow-green: var(--mb-glow-green);
   /* END */
 }
 
@@ -218,10 +223,13 @@
   --pair-shadow: rgba(137, 112, 255, 0.25);
 
   --burn-border: #ff8800;
-  --burn-shadow: #e85f00;
+  --burn-shadow: rgba(232, 95, 0, 0.25);
 
   --swap-border: #0285ff;
-  --swap-shadow: rgba(2, 133, 255, 0.878431);
+  --swap-shadow: rgba(2, 133, 255, 0.25);
+
+  --green-border: #06c081;
+  --green-shadow: rgba(6, 192, 129, 0.25);
   /* END */
 
   --sub-bg: #ffffff;
@@ -332,6 +340,9 @@
   --mb-swapper-badge-bg: #0a1a65;
   --mb-burn-activity-amount: #bf9879;
   --mb-swap-activity-amount: #8288bb;
+  --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
+  --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
+  --mb-glow-green: #03DB92;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -343,13 +354,13 @@
   --foreground: #ffffff;
 
   --pair-border: #8970ff;
-  --pair-shadow: rgba(0, 0, 0, 0.25);
+  --pair-shadow: rgba(137, 112, 255, 0.25);
 
   --burn-border: #ff8800;
-  --burn-shadow: #e85f00;
+  --burn-shadow: rgba(255, 133, 0, 0.25);
 
   --swap-border: #0285ff;
-  --swap-shadow: rgba(2, 133, 255, 0.878431);
+  --swap-shadow: rgba(2, 133, 255, 0.25);
   /* END */
 
   --sub-bg: #ffffff;
@@ -459,6 +470,9 @@
   --mb-swapper-badge-bg: #0a1a65;
   --mb-burn-activity-amount: #bf9879;
   --mb-swap-activity-amount: #8288bb;
+  --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
+  --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
+  --mb-glow-green: #03DB92;
   /* END */
 }
 
@@ -520,57 +534,26 @@
 
 @utility animate-marquee {
   animation: marquee 25s linear infinite;
+  /* tell the GPU to promote this element to its own compositing layer so the
+     continuous translate does not trigger repaints on sibling elements —
+     critical on Safari / WebKit (M1) where translateX without a compositing
+     hint causes neighbouring raster images to repaint every frame */
+  will-change: transform;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @keyframes marquee {
   from {
-    transform: translateX(0);
+    transform: translate3d(0, 0, 0);
   }
 
   to {
-    transform: translateX(-50%);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
 /* NEW DESIGN */
-/**
- * card-swap-glow
- * Combines the swap-card linear gradient, 9px inner border, and blue glow.
- * Usage: <div class="card-swap-glow">
- */
-@utility card-pair-glow {
-  background: linear-gradient(180deg,
-      rgba(42, 31, 82, 0) 0%,
-      rgba(42, 31, 82, 0) 35.1%,
-      rgba(94, 70, 184, 0) 79.81%,
-      #5e46b8 100%);
-  box-shadow:
-    inset 0 0 0 9px var(--pair-border),
-    0 0 6px 20px var(--pair-shadow);
-}
-
-@utility card-burn-glow {
-  background: linear-gradient(168.92deg,
-      rgba(141, 58, 0, 0) -0.14%,
-      rgba(141, 58, 0, 0) 21.08%,
-      rgba(141, 58, 0, 0.3) 61.5%,
-      #ff6800 91.81%);
-  box-shadow:
-    inset 0 0 0 9px var(--burn-border),
-    0 0 20px 5px var(--burn-shadow);
-}
-
-@utility card-swap-glow {
-  background: linear-gradient(168.92deg,
-      rgba(0, 93, 180, 0) -0.14%,
-      rgba(0, 93, 180, 0) 21.08%,
-      rgba(0, 93, 180, 0.3) 61.5%,
-      #0285ff 91.81%);
-  box-shadow:
-    inset 0 0 0 9px var(--swap-border),
-    0 0 20px 5px var(--swap-border);
-}
-
 @utility card-pair-bg {
   background: linear-gradient(180deg,
       rgba(46, 0, 148, 0.33) 0%,
@@ -582,17 +565,25 @@
 @utility card-burn-bg {
   background: linear-gradient(180deg,
       rgba(255, 102, 0, 0.33) 0%,
-      rgba(255, 102, 0, 0) 31.25%,
-      rgba(255, 102, 0, 0) 65.38%,
+      rgba(255, 102, 0, 0) 25.48%,
+      rgba(255, 102, 0, 0) 75.96%,
       rgba(255, 102, 0, 0.33) 100%);
 }
 
 @utility card-swap-bg {
   background: linear-gradient(180deg,
       rgba(2, 133, 255, 0.33) 0%,
-      rgba(2, 133, 255, 0) 31.25%,
-      rgba(2, 133, 255, 0) 65.38%,
+      rgba(2, 133, 255, 0) 25.48%,
+      rgba(2, 133, 255, 0) 75.96%,
       rgba(2, 133, 255, 0.33) 100%);
+}
+
+@utility card-green-bg {
+  background: linear-gradient(180deg,
+      rgba(3, 219, 146, 0.33) 0%,
+      rgba(3, 219, 146, 0) 25.48%,
+      rgba(3, 219, 146, 0) 75.96%,
+      rgba(3, 219, 146, 0.33) 100%);
 }
 
 @utility card-pair-bold-bottom-bg {
@@ -679,17 +670,23 @@
 @keyframes feedJumpIn {
   from {
     opacity: 0;
-    transform: translateY(50px);
+    /* translate3d instead of translateY so Safari promotes the element to its
+       own compositing layer, preventing opacity repaints from bleeding into
+       sibling image elements on WebKit / M1 */
+    transform: translate3d(0, 50px, 0);
   }
 
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0);
   }
 }
 
 @utility animate-feed-jump-in {
   animation: feedJumpIn 0.75s ease-out both;
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 @utility txn-grid {
@@ -702,6 +699,11 @@
     grid-template-columns:
       8px minmax(0, 0.5fr) minmax(0, 0.75fr) minmax(0, 0.75fr) 80px minmax(0, 0.75fr) minmax(0, 0.4fr);
   }
+}
+
+@utility thin-transparent-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
 }
 
 /* END */

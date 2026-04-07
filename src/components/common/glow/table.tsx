@@ -97,7 +97,7 @@ function TableHead({
     <th
       data-slot="table-head"
       className={cn(
-        "px-2 py-3 text-center align-middle font-semibold whitespace-nowrap sm:py-6 [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
+        "px-2 pb-6 text-center align-middle font-semibold whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
         variant &&
           getVariantBorderClassName({
             variant: variant,

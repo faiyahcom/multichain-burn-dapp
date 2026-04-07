@@ -31,7 +31,7 @@ const ScanLink = ({ address, chainId, className, iconClassName }: Props) => {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-baseline gap-3.5 text-base text-greyed hover:text-foreground transition-colors ${className ?? ""}`}
+                className={`flex items-baseline gap-3.5 text-base transition-colors ${className ?? ""}`}
             >
                 {content}
             </a>
@@ -39,7 +39,7 @@ const ScanLink = ({ address, chainId, className, iconClassName }: Props) => {
     }
 
     return (
-        <span className={`flex items-baseline gap-3.5 text-base text-greyed ${className ?? ""}`}>
+        <span className={`flex items-baseline gap-3.5 text-base ${className ?? ""}`}>
             {content}
         </span>
     );

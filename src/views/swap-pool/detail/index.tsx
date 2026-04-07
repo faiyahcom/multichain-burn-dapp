@@ -5,11 +5,11 @@ import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
 import AmountAndActivity from "./amount-activity";
 import { SWAP_POOL_STATUS } from "@/types/admin/whitelist-token";
-import AnimateIconButton from "@/components/common/animate-icon-button";
 import type { SwapPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import ScanLink from "@/components/common/scan-link";
 import { Skeleton } from "@/components/ui/skeleton";
+import { SwapPoolStatusDisplay } from "@/components/shared/glow/pool/pool-status";
 
 type Props = {
     address: string;
@@ -24,49 +24,46 @@ const SwapPoolDetail = ({ address }: Props) => {
 
     const status = poolDetail?.pool.status;
     const safeStatus: SwapPoolStatus = (status as SwapPoolStatus) ?? "on_going";
-    const formattedStatus =
-        safeStatus.charAt(0).toUpperCase() +
-        safeStatus.slice(1).split("_").join("");
 
     return (
-        <div className="pt-9.5 pl-14">
-            <div className="space-y-2">
-                <div className="flex items-center gap-6">
-                    {isLoadingPoolDetail ? (
-                        <>
-                            <Skeleton className="h-9 w-48" />
-                            <Skeleton className="h-9 w-27" />
-                        </>
-                    ) : (
-                        <>
-                            <h2 className="text-3xl font-semibold">
+        <div className="space-y-6 lg:space-y-17.5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6 lg:gap-10">
+                {isLoadingPoolDetail ? (
+                    <>
+                        <Skeleton className="h-9 w-48" />
+                        <Skeleton className="h-9 w-27" />
+                    </>
+                ) : (
+                    <>
+                        <div className="flex flex-col gap-2.5 sm:pl-3 md:pl-6 lg:pl-9">
+                            <h2 className="text-xl font-semibold break-all md:text-2xl lg:text-3xl 2xl:text-4xl">
                                 {poolDetail?.pool.name}
                             </h2>
-                            <AnimateIconButton
-                                iconLetter={SWAP_POOL_STATUS[safeStatus].letter}
-                                textVariant="text-container-center"
-                                text={formattedStatus}
-                                color={SWAP_POOL_STATUS[safeStatus].color}
-                                hasGroupHover
-                                classNames={{
-                                    btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
-                                    text: "text-2xl font-medium",
-                                    icon: "size-9 text-3xl",
-                                }}
+                            <ScanLink
+                                address={address ?? ""}
+                                chainId={poolDetail?.pool.chainId}
+                                className="w-fit font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl"
+                                iconClassName="size-3.5"
                             />
-                        </>
-                    )}
-                </div>
-                <ScanLink address={address ?? ""} chainId={poolDetail?.pool.chainId} />
+                        </div>
+                        <SwapPoolStatusDisplay className="w-3/7 min-w-20 px-2 py-1.5 text-sm sm:w-64 sm:text-base md:px-3 md:py-2 md:text-sm lg:px-5 lg:text-2xl 2xl:px-6 2xl:py-3">
+                            {SWAP_POOL_STATUS[safeStatus].label}
+                        </SwapPoolStatusDisplay>
+                    </>
+                )}
             </div>
-            <div className="grid grid-cols-3 gap-x-6">
-                <div className="col-span-2">
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-9.5">
+                <div className="order-1 lg:col-span-2">
                     <PoolOverview poolDetail={poolDetail} />
-                    <RewardAmount poolDetail={poolDetail} />
-                    <PoolHistory poolDetail={poolDetail} />
                 </div>
-                <div className="col-span-1">
+                <div className="order-2 lg:col-span-1 lg:row-span-3">
                     <AmountAndActivity poolDetail={poolDetail} />
+                </div>
+                <div className="order-3 lg:col-span-2">
+                    <RewardAmount poolDetail={poolDetail} />
+                </div>
+                <div className="order-4 lg:col-span-2">
+                    <PoolHistory poolDetail={poolDetail} />
                 </div>
             </div>
         </div>

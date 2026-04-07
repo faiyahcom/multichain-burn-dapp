@@ -23,7 +23,7 @@ export const booleanToTokenStatus = (value: boolean): TokenStatus =>
 export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
   // "on_going" | "canceled" | "closed"
   on_going: {
-    label: "Ongoing",
+    label: "Live",
     color: "#7af4cb",
     letter: "O",
   },

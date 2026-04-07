@@ -14,12 +14,9 @@ const PairListGlowSummary = () => {
     {
       title: "Total Volume",
       value: shortenNumber({
-        // number: Number(overallStats?.stats?.totalVolume ?? 0),
-        number: 381570000000000, //TODO: map real data here
+        number: Number(overallStats?.stats?.totalVolume ?? 0),
       }).toLocaleUpperCase(),
-      // valueTitle: Number(overallStats?.stats?.totalVolume ?? 0).toLocaleString(
-      // 381.57T
-      valueTitle: Number(381570000000000).toLocaleString(
+      valueTitle: Number(overallStats?.stats?.totalVolume ?? 0).toLocaleString(
         "en-US",
       ),
     },

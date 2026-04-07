@@ -160,7 +160,7 @@ const MultipleSelect: React.FC<Props> = ({
             content max height - padding top (9px) - footer clear all (24px + 24px + 27px) 
             content max height - 84px (21 spacing)
         */}
-        <div className="max-h-[calc(var(--radix-popover-content-available-height)-var(--spacing)*21)] space-y-1 overflow-y-auto">
+        <div className="max-h-[calc(var(--radix-popover-content-available-height)-var(--spacing)*21)] space-y-1 overflow-y-auto thin-transparent-scrollbar">
           <OptionItem
             label={allLabel}
             value=""
@@ -182,7 +182,10 @@ const MultipleSelect: React.FC<Props> = ({
         </div>
         <div className="pl-3">
           <button
-            className={cn("text-15px font-medium text-mb-clear-blue", classNames?.item)}
+            className={cn(
+              "text-15px font-medium text-mb-clear-blue",
+              classNames?.item,
+            )}
             onClick={handleClearAllCheck}
           >
             Clear All
@@ -226,7 +229,11 @@ const OptionItem: React.FC<MultipleSelectOption & OptionItemProps> = ({
         ) : (
           <div className="size-7.75" />
         )}
-        <span className={cn("text-15px font-medium select-none", classNames?.item)}>{label}</span>
+        <span
+          className={cn("text-15px font-medium select-none", classNames?.item)}
+        >
+          {label}
+        </span>
       </div>
       {checked ? (
         <IconCheck className="h-2.5 w-3.75 text-mb-check-blue" />

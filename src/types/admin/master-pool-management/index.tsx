@@ -1,4 +1,3 @@
-import type { TokenAmount } from "@/services/dashboardService";
 import type {
   BooleanString,
   PaginationRequest,
@@ -8,8 +7,14 @@ import type {
 } from "@/types/common";
 import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
 
-export const poolTypes = [PoolKindCodeEnum.Burn, PoolKindCodeEnum.Swap] as const;
+export const poolTypes = [
+  PoolKindCodeEnum.Burn,
+  PoolKindCodeEnum.Swap,
+] as const;
 export type PoolType = PoolKindCode;
+export const isPoolType = (value: unknown): value is PoolType =>
+  Object.values(PoolKindCodeEnum).includes(value as PoolKindCodeEnum);
+
 export const poolTypeLabels: Record<PoolType, string> = {
   [PoolKindCodeEnum.Burn]: "Burn pool",
   [PoolKindCodeEnum.Swap]: "Swap pool",
@@ -134,6 +139,12 @@ export type PoolListResponse = PaginationResponse & {
   pools: PoolItemType[];
 };
 
+export type RecentPoolsRequest = {
+  poolKind?: PoolKindCode;
+  user?: string; // address
+  statuses?: string; // comma separated
+};
+
 export type RecentPoolsResponse = {
   pools: PoolItemType[];
 };
@@ -142,9 +153,9 @@ export type PoolListStatsResponse = {
   totalTransactions: number;
   totalPools: number;
   totalParticipants: number;
-  totalBurned?: TokenAmount[];
-  totalSwapVolume?: TokenAmount[];
-}
+  totalBurned?: string;
+  totalSwapVolume?: string;
+};
 
 // user view pool list can only see certain statuses
 export const userViewBurnPoolStatuses = [

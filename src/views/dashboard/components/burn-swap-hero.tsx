@@ -11,19 +11,19 @@ import {
     IconBurnTracker,
     IconSwapStatChart,
 } from "@/assets/react";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 import type { StatsStickerResponse } from "@/services/dashboardService";
 import BurnTrackerImage from "/images/dashboard/burn-tracker.png";
 import SwapChartStatsImage from "/images/dashboard/swap-stats.png";
 import { useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import WhitelistTokenSelect, {
     type TokenOption,
 } from "@/components/common/glow/whitelist-token-select";
+import { useSystemStore } from "@/stores/systemStore";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import TokenDisplay from "@/components/common/token-display";
-import { sumTokenAmounts } from "@/utils/shared-functions/calculate";
 
 // ── Shared stat row ────────────────────────────────────────────────────────────
 
@@ -59,6 +59,13 @@ const HeroSwapMiniForm = () => {
     const [tokenTo, setTokenTo] = useState<TokenOption>();
     const [amount, setAmount] = useState("");
 
+    const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
+    useEffect(() => {
+        setTokenFrom(undefined);
+        setTokenTo(undefined);
+        setAmount("");
+    }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
+
     return (
         <div className="flex w-full flex-1 flex-col justify-end font-inter">
             {/* From / To */}
@@ -68,15 +75,17 @@ const HeroSwapMiniForm = () => {
             </div>
 
             {/* Token Select */}
-            <div className="mb-1 flex items-center gap-2 rounded-[6px] border-2 border-[#212C3E] px-3 2xl:mb-2">
+            <div className="mb-1 flex items-center gap-2 rounded-[6px] border-2 border-mb-dark-popover-item-border px-3 2xl:mb-2">
                 <div className="flex-1">
                     <WhitelistTokenSelect
                         value={tokenFrom}
                         onChange={setTokenFrom}
                         disabledAddress={tokenTo?.address}
                         classNames={{
-                            trigger: "w-full",
+                            trigger: "w-full py-2 text-nowrap",
                         }}
+                        hasDropdownIcon={false}
+                        showDetail={false}
                     />
                 </div>
 
@@ -88,8 +97,10 @@ const HeroSwapMiniForm = () => {
                         onChange={setTokenTo}
                         disabledAddress={tokenFrom?.address}
                         classNames={{
-                            trigger: "w-full justify-end",
+                            trigger: "w-full py-2 text-nowrap justify-end",
                         }}
+                        hasDropdownIcon={false}
+                        showDetail={false}
                     />
                 </div>
             </div>
@@ -97,7 +108,7 @@ const HeroSwapMiniForm = () => {
             {/* Amount */}
             <div className="flex flex-col gap-1 2xl:gap-2">
                 <span className="text-sm text-mb-gray-b8/60 2xl:text-base">Amount</span>
-                <div className="flex justify-between rounded-[6px] border-2 border-[#212C3E] px-3">
+                <div className="flex justify-between rounded-[6px] border-2 border-mb-dark-popover-item-border px-3">
                     <Input
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
@@ -125,7 +136,7 @@ const HeroSwapMiniForm = () => {
                 className="sm:h-57px sm:w-275px mt-4.5 h-12 w-full font-orbitron text-lg font-medium text-nowrap 2xl:mt-5.5 2xl:text-xl"
                 onClick={() =>
                     navigate({
-                        to: "/swap/create/",
+                        to: "/swap/create",
                         search: {
                             tokenFrom: tokenFrom?.address,
                             tokenTo: tokenTo?.address,
@@ -186,8 +197,8 @@ export const BurnSwapHero = ({ data }: Props) => {
                             BURN
                         </p>
                     </div>
-                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase text-burn-glow sm:text-[32px]">
-                        {sumTokenAmounts(data?.burnSection?.volume ?? [], true, 2)}
+                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase sm:text-[32px]">
+                        {formatAmount(data?.burnSection?.volume || "0", 0, 2)}
                     </p>
                     <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
                         Total Burned Volume
@@ -241,8 +252,8 @@ export const BurnSwapHero = ({ data }: Props) => {
                     </div>
                     <div className="flex items-center justify-between gap-2">
                         <div className="space-y-2.5">
-                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase text-swap-glow sm:text-[32px]">
-                                {sumTokenAmounts(data?.swapSection?.volume ?? [], true, 2)}
+                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase sm:text-[32px]">
+                                {formatAmount(data?.swapSection?.volume ?? "0", 0, 2)}
                             </p>
                             <p className="text-sm font-medium text-mb-gray-b8/60 lg:text-nowrap 2xl:text-base">
                                 Total Swap Volume

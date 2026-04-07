@@ -41,6 +41,7 @@ type NavItem = {
   icon?: React.ComponentType<{ className?: string }>;
   section: NavSection;
   children?: NavChild[];
+  superAdminOnly?: boolean;
 };
 
 export const navItems: NavItem[] = [
@@ -125,6 +126,7 @@ export const navItems: NavItem[] = [
     label: "Admin Management",
     section: navSection.admin,
     to: "/admin/admin-management",
+    superAdminOnly: true,
   },
   {
     label: "Whitelist Token",
@@ -135,6 +137,7 @@ export const navItems: NavItem[] = [
     label: "Whitelist User",
     section: navSection.admin,
     to: "/admin/whitelist-user",
+    superAdminOnly: true,
   },
   {
     label: "Transfer History",
@@ -157,5 +160,6 @@ export const navItems: NavItem[] = [
     icon: IconFeeSettingsGear,
     section: navSection.admin,
     to: "/admin/fee-settings-management",
+    superAdminOnly: true,
   },
 ];

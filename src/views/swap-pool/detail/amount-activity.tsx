@@ -1,4 +1,3 @@
-import AnimateIconButton from "@/components/common/animate-icon-button";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import type { PoolDetailResponse } from "@/types/pool";
 import { formatAmount } from "@/utils/helpers/numbers";
@@ -14,6 +13,9 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import GlowContainer from "@/components/common/glow/container";
+import TokenDisplay from "@/components/common/token-display";
+import { Button } from "@/components/common/glow/button";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -115,85 +117,112 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     };
 
     return (
-        <div className="mt-3 w-full space-y-3 px-6 py-4">
-            <span className="flex items-center gap-2 text-xl font-medium">
+        <GlowContainer
+            variant="swap"
+            className="w-full px-3 py-4 font-inter md:px-5 md:py-6"
+        >
+            <p className="mb-4 font-orbitron text-base font-semibold md:mb-8 md:text-xl lg:text-2xl 2xl:text-28px">
                 Amount & Activity
-            </span>
-            <div className="flex items-center justify-between text-active">
-                <span className="text-sm font-medium">Claimed Reward</span>
-                <span className="text-2xl font-bold">
+            </p>
+            <div className="mb-3 flex items-center justify-between">
+                <span className="text-base text-mb-gray-b8 md:text-lg lg:text-xl 2xl:text-2xl">
+                    Claimed Reward
+                </span>
+                <span className="text-base font-bold md:text-lg lg:text-xl 2xl:text-2xl">
                     {poolDetail ? (
-                        <>
-                            {formattedReward} {rewardTokenDisplay.symbol}
-                        </>
+                        <div className="inline-flex items-center gap-2.5">
+                            {formattedReward}
+                            <TokenDisplay
+                                symbol={poolDetail.tokenOut?.symbol}
+                                customSymbol={poolDetail.tokenOut?.customSymbol}
+                                imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                                classNames={{
+                                    img: "size-4.5 md:size-5 2xl:size-5.75",
+                                    container: "inline-flex items-center gap-2.5",
+                                }}
+                            />
+                        </div>
                     ) : (
                         <Skeleton className="h-7 w-32" />
                     )}
                 </span>
             </div>
-            <div className="flex items-center justify-between text-greyed">
-                <span className="text-sm">Your Burned Amount</span>
-                <span className="text-sm">
+            <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">
+                    Your Burned Amount
+                </span>
+                <span className="text-sm font-bold md:text-base lg:text-md 2xl:text-xl">
                     {poolDetail ? (
-                        <>
-                            {formattedBurned} {burnTokenDisplay.symbol}
-                        </>
+                        <div className="inline-flex items-center gap-1.5">
+                            {formattedBurned}
+                            <TokenDisplay
+                                symbol={poolDetail.tokenIn?.symbol}
+                                customSymbol={poolDetail.tokenIn?.customSymbol}
+                                imageUri={burnTokenDisplay.imageUri ?? undefined}
+                                classNames={{
+                                    img: "size-3.5 md:size-4 2xl:size-4.25",
+                                    container: "inline-flex items-center gap-1.5",
+                                }}
+                            />
+                        </div>
                     ) : (
                         <Skeleton className="h-4 w-24" />
                     )}
                 </span>
             </div>
-            {Number(poolDetail?.userAmount?.claimed || "0") > 0 && (
-                <div className="mx-6 inline-flex items-start gap-1">
-                    <IconTick className="inline size-3.5 translate-y-0.5" />
-                    <span className="text-sm text-greyed">
-                        Reward has been sent to your wallet after swap
-                    </span>
-                </div>
-            )}
-            {poolDetail?.pool.status === "closed" && (
-                <div className="mx-6 inline-flex items-start gap-1">
-                    <IconExclaimation className="inline size-5 translate-y-0.5" />
-                    <span className="text-sm text-greyed">
-                        This pool was emergency closed by admin.
-                    </span>
-                </div>
-            )}
             {poolDetail?.pool.status === "canceled" && isPoolOwner && (
-                <div className="flex items-center justify-between text-active">
-                    <span className="text-sm font-medium">Your reward token return</span>
-                    <span className="text-sm font-bold">
+                <div className="mb-3 flex items-center justify-between">
+                <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">
+                        Your reward token return
+                    </span>
+                    <span className="text-sm font-bold md:text-base lg:text-md 2xl:text-xl">
                         {poolDetail ? (
-                            <>
-                                {formattedReturning} {rewardTokenDisplay.symbol}
-                            </>
+                            <div className="inline-flex items-center gap-2.5">
+                                {formattedReturning}
+                                <TokenDisplay
+                                    symbol={poolDetail.tokenOut?.symbol}
+                                    customSymbol={poolDetail.tokenOut?.customSymbol}
+                                    imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                                    classNames={{
+                                        img: "size-3.5 md:size-4 2xl:size-4.25",
+                                        container: "inline-flex items-center gap-1.5",
+                                    }}
+                                />
+                            </div>
                         ) : (
                             <Skeleton className="h-7 w-32" />
                         )}
                     </span>
                 </div>
             )}
+            {Number(poolDetail?.userAmount?.claimed || "0") > 0 && (
+                <div className="inline-flex items-center gap-1.5 py-1.5 md:gap-2.5">
+                    <IconTick className="inline size-3 md:size-3.5" />
+                    <span className="text-xs text-mb-gray-b8 md:text-sm 2xl:text-base">
+                        Reward has been sent to your wallet after swap
+                    </span>
+                </div>
+            )}
+            {poolDetail?.pool.status === "closed" && (
+                <div className="inline-flex items-start gap-1.5 py-1.5 md:gap-2.5">
+                    <IconExclaimation className="inline size-3 md:size-3.5" />
+                    <span className="text-xs text-mb-gray-b8 md:text-sm 2xl:text-base">
+                        This pool was emergency closed by admin.
+                    </span>
+                </div>
+            )}
 
             {poolDetail?.pool.status === "on_going" && (
-                <PoolChainGuard chainId={poolDetail?.pool.chainId}>
-                    <div className="mx-2">
-                        <AnimateIconButton
-                            iconLetter="S"
-                            text="Swap"
-                            variant="letter-icon"
-                            textVariant="text-container-center"
-                            classNames={{
-                                btn: "w-full text-center after:text-white after:text-sm after:font-semibold after:bg-active",
-                                text: "text-sm font-medium",
-                                icon: "size-6",
-                            }}
-                            color="#966EFF"
-                            btnProps={{
-                                onClick: handleOpenSwapDialog,
-                                disabled: isCancelLoading
-                            }}
-                        />
-                    </div>
+                <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="swap">
+                    <Button
+                        variant="swap"
+                        onClick={handleOpenSwapDialog}
+                        disabled={isCancelLoading}
+                        className="my-2 w-full py-2 font-orbitron text-base md:my-3.25 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
+                        hasHover
+                    >
+                        Swap
+                    </Button>
                     <SwapDialog
                         open={openSwapDialog}
                         onOpenChange={handleCloseSwapDialog}
@@ -201,29 +230,19 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                         onSuccess={handleSuccessSwap}
                     />
                     {isPoolOwner && (
-                        <div className="relative -top-2 mx-2">
-                            <AnimateIconButton
-                                iconLetter="C"
-                                text="Cancel Pool"
-                                variant="letter-icon"
-                                textVariant="text-container-center"
-                                classNames={{
-                                    btn: "w-full text-center after:text-white after:text-sm after:font-semibold after:bg-active",
-                                    text: "text-sm font-medium",
-                                    icon: "size-6",
-                                }}
-                                color="#966EFF"
-                                isLoading={isCancelLoading}
-                                isLoadingText="Cancelling..."
-                                btnProps={{
-                                    onClick: handleCancelPool,
-                                }}
-                            />
-                        </div>
+                        <Button
+                            variant="swap"
+                            onClick={handleCancelPool}
+                            isLoading={isCancelLoading}
+                            className="my-2 w-full py-2 font-orbitron text-base md:my-3.25 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
+                            hasHover
+                        >
+                            {isCancelLoading ? "Cancelling..." : "Cancel Pool"}
+                        </Button>
                     )}
                 </PoolChainGuard>
             )}
-        </div>
+        </GlowContainer>
     );
 };
 

@@ -1,13 +1,21 @@
 import { IconWallet } from "@/assets/react";
-import AnimateIconButton from "@/components/common/animate-icon-button";
 import TokenImage from "@/components/common/token-image";
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
   DialogHeader,
+  DialogOverlay,
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import {
+  getVariantBgClassName,
+  getVariantBorderClassName,
+  getVariantShadowClassName,
+} from "@/components/common/glow/container";
+import { Input } from "@/components/common/glow/input";
+import { Button } from "@/components/common/glow/button";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { useMemo } from "react";
@@ -21,7 +29,6 @@ import {
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { AssetTypeEnum } from "@/web3/helpers";
 import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
@@ -73,13 +80,15 @@ type Props = {
 const SummaryRow = ({
   label,
   value,
+  className,
 }: {
   label: string;
   value: React.ReactNode;
+  className?: string;
 }) => (
-  <div className="flex items-center justify-between px-6 py-4">
-    <div className="text-base text-secondary-text">{label}</div>
-    <div>
+  <div className={cn("flex flex-col gap-1 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2 2xl:px-6 2xl:py-4", className)}>
+    <div className="text-sm font-medium text-mb-gray-b8 sm:text-base 2xl:text-xl">{label}</div>
+    <div className="text-sm sm:text-base 2xl:text-xl">
       {typeof value === "string" ? (
         <span className="font-semibold">{value}</span>
       ) : (
@@ -246,254 +255,291 @@ const DepositRewardDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogContent
+        <DialogOverlay />
+        <DialogBody
           showCloseButton={false}
-          className="h-fit w-full bg-primary-foreground px-10 py-6 sm:max-w-4xl"
+          className="fixed inset-0 z-50 overflow-y-auto"
         >
-          <DialogHeader className="mt-4 text-center">
-            <DialogTitle className="text-3xl font-semibold uppercase">
-              Deposit Reward Token
-            </DialogTitle>
-            <p className="text-[15px] text-secondary-text">
-              Fund reward tokens for this burn pool
-            </p>
-          </DialogHeader>
+          <div
+            className="flex min-h-full flex-col items-center justify-center p-2 sm:p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) onOpenChange(false);
+            }}
+          >
+            <div
+              className={cn(
+                "h-fit w-full bg-background sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-6xl",
+                getVariantBorderClassName({
+                  variant: "burn",
+                  custom: "rounded-xl",
+                }),
+                getVariantShadowClassName({ variant: "burn" }),
+              )}
+            >
+              <div
+                className={cn(
+                  "h-fit w-full rounded-xl px-3 sm:px-6 py-4 2xl:py-8",
+                  getVariantBgClassName({ variant: "burn" }),
+                )}
+              >
+                <DialogHeader className="mb-4 text-center">
+                  <DialogTitle className="mb-2 font-orbitron text-2xl font-semibold uppercase sm:text-3xl xl:text-4xl 2xl:mb-4">
+                    Deposit <br className="sm:hidden" />Reward Token
+                  </DialogTitle>
+                  <p className="font-inter text-sm text-mb-gray-b8 sm:text-base 2xl:text-xl">
+                    Fund reward tokens for this burn pool
+                  </p>
+                </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            {/* Pool Summary */}
-            <div className="rounded-xl bg-mb-summary-form">
-              <div className="rounded-t-xl bg-inactive px-5 py-3 text-center font-medium">
-                Pool Summary
-              </div>
-              <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l-4 [&>*:nth-child(even)]:border-inactive [&>*:nth-child(n+3)]:border-t-4 [&>*:nth-child(n+3)]:border-inactive">
-                <SummaryRow
-                  label="Pool Name"
-                  value={!pool ? <Skeleton className="h-5 w-28" /> : pool.name}
-                />
-                <SummaryRow
-                  label="Duration"
-                  value={!pool ? <Skeleton className="h-5 w-36" /> : duration}
-                />
-                <SummaryRow
-                  label="Reward Token"
-                  value={
-                    !pool || isLoadingTokenOut ? (
-                      <Skeleton className="h-5 w-28" />
-                    ) : (
-                      <span className="flex items-center gap-2 font-semibold">
-                        <TokenImage
-                          src={rewardTokenDisplay?.imageUri}
-                          alt={rewardTokenDisplay?.symbol}
-                          classNames={{
-                            common: "size-5",
-                            img: "size-5",
-                            placeholder: "size-5",
-                          }}
-                        />
-                        {rewardTokenDisplay?.symbol ??
-                          pool.rewardTokenSymbol ??
-                          "-"}
-                      </span>
-                    )
-                  }
-                />
-                <SummaryRow
-                  label="Burn token"
-                  value={
-                    !pool || isLoadingTokenIn ? (
-                      <Skeleton className="h-5 w-28" />
-                    ) : (
-                      <span className="flex items-center gap-2 font-semibold">
-                        <TokenImage
-                          src={burnTokenDisplay?.imageUri}
-                          alt={burnTokenDisplay?.symbol}
-                          classNames={{
-                            common: "size-5",
-                            img: "size-5",
-                            placeholder: "size-5",
-                          }}
-                        />
-                        {burnTokenDisplay?.symbol ?? pool.tokenInSymbol ?? "-"}
-                      </span>
-                    )
-                  }
-                />
-                <SummaryRow
-                  label="Ratio"
-                  value={
-                    !pool ? (
-                      <Skeleton className="h-5 w-16" />
-                    ) : (
-                      <span className="font-semibold">{ratio}</span>
-                    )
-                  }
-                />
-                <SummaryRow
-                  label="Network"
-                  value={
-                    !pool ? (
-                      <Skeleton className="h-5 w-24" />
-                    ) : (
-                      <span className="flex items-center gap-2 font-semibold">
-                        <TokenImage
-                          src={networkConfig?.iconSrc}
-                          alt={networkConfig?.label}
-                          classNames={{
-                            common: "size-5",
-                            img: "size-5",
-                            placeholder: "size-5",
-                          }}
-                        />
-                        {networkConfig?.label ?? "-"}
-                      </span>
-                    )
-                  }
-                />
-                <div className="col-span-2">
-                  <SummaryRow
-                    label="Burn Method"
-                    value={
-                      <span className="font-semibold text-active">Burn</span>
-                    }
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-9 px-12">
-              {/* Current Reward Amount */}
-              <div className="flex items-center justify-between">
-                <span className="text-xl font-medium text-active">
-                  Current Reward Amount
-                </span>
-                <span className="text-2xl font-bold text-active">
-                  {!pool ? (
-                    <Skeleton className="h-8 w-36" />
-                  ) : (
-                    currentRewardFormatted
-                  )}
-                </span>
-              </div>
-
-              {/* Deposit Amount Input */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <span>Deposit Amount</span>
-                  <span className="flex items-center space-x-2 text-secondary-text">
-                    <IconWallet />
-                    <span>
-                      {isLoadingRewardBalance
-                        ? "Loading..."
-                        : `${rewardBalanceFormatted ?? "0"} ${rewardTokenDisplay?.symbol ?? ""}`}
-                    </span>
-                  </span>
-                </div>
-
-                <div
-                  className={`relative flex items-center ${
-                    errors.amount ? "ring-1 ring-destructive" : ""
-                  }`}
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="flex flex-col font-inter gap-2 2xl:gap-6"
                 >
-                  <Input
-                    {...register("amount")}
-                    type="number"
-                    step={DEFAULT_INPUT_NUMBER_STEP}
-                    placeholder="Enter amount"
-                    className="h-full flex-1 px-10 py-2 text-base"
-                  />
-                  <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
-                    {!pool || isLoadingTokenOut ? (
-                      <>
-                        <Skeleton className="size-5 rounded-full" />
-                        <Skeleton className="h-5 w-12" />
-                      </>
-                    ) : (
-                      <>
-                        <TokenImage
-                          src={rewardTokenDisplay?.imageUri}
-                          alt={rewardTokenDisplay?.symbol}
-                          classNames={{
-                            common: "size-5",
-                            img: "size-5",
-                            placeholder: "size-5",
-                          }}
-                        />
-                        <span className="">
-                          {rewardTokenDisplay?.symbol ??
-                            pool.rewardTokenSymbol ??
-                            ""}
-                        </span>
-                      </>
+                  {/* Pool Summary */}
+                  <div
+                    className={cn(
+                      "rounded-xl",
+                      getVariantShadowClassName({ variant: "burn" }),
+                      getVariantBorderClassName({ variant: "burn" }),
                     )}
-                  </div>
-                </div>
-
-                {errors.amount && (
-                  <p className="text-xs text-destructive">
-                    {errors.amount.message}
-                  </p>
-                )}
-                {insufficientBalanceMessage && (
-                  <p className="text-xs text-destructive">
-                    {insufficientBalanceMessage}
-                  </p>
-                )}
-
-                <div className="flex gap-2">
-                  {[25, 50, 100].map((percent) => (
-                    <button
-                      type="button"
-                      key={percent}
-                      onClick={() => handleSelectPercent(percent)}
-                      className="rounded-full border border-border px-4 py-1 text-sm font-medium transition hover:border-active hover:bg-active hover:text-white"
+                  >
+                    <div
+                      className={cn(
+                        "rounded-t-xl px-5 py-3 text-center font-orbitron font-semibold sm:text-lg 2xl:text-2xl",
+                        getVariantBgClassName({ variant: "burn" }),
+                      )}
                     >
-                      {percent === 100 ? "Max" : `${percent}%`}
-                    </button>
-                  ))}
-                </div>
+                      Pool Summary
+                    </div>
+                    <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l [&>*:nth-child(even)]:border-burn-border [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:border-burn-border">
+                      <SummaryRow
+                        label="Pool Name"
+                        value={
+                          !pool ? <Skeleton className="h-5 w-28" /> : pool.name
+                        }
+                      />
+                      <SummaryRow
+                        label="Duration"
+                        value={
+                          !pool ? <Skeleton className="h-5 w-36" /> : duration
+                        }
+                      />
+                      <SummaryRow
+                        label="Reward Token"
+                        value={
+                          !pool || isLoadingTokenOut ? (
+                            <Skeleton className="h-5 w-28" />
+                          ) : (
+                            <span className="flex items-center gap-2 font-semibold">
+                              <TokenImage
+                                src={rewardTokenDisplay?.imageUri}
+                                alt={rewardTokenDisplay?.symbol}
+                                classNames={{
+                                  common: "size-5",
+                                  img: "size-5",
+                                  placeholder: "size-5",
+                                }}
+                              />
+                              {rewardTokenDisplay?.symbol ??
+                                pool.rewardTokenSymbol ??
+                                "-"}
+                            </span>
+                          )
+                        }
+                      />
+                      <SummaryRow
+                        label="Burn token"
+                        value={
+                          !pool || isLoadingTokenIn ? (
+                            <Skeleton className="h-5 w-28" />
+                          ) : (
+                            <span className="flex items-center gap-2 font-semibold">
+                              <TokenImage
+                                src={burnTokenDisplay?.imageUri}
+                                alt={burnTokenDisplay?.symbol}
+                                classNames={{
+                                  common: "size-5",
+                                  img: "size-5",
+                                  placeholder: "size-5",
+                                }}
+                              />
+                              {burnTokenDisplay?.symbol ??
+                                pool.tokenInSymbol ??
+                                "-"}
+                            </span>
+                          )
+                        }
+                      />
+                      <SummaryRow
+                        label="Ratio"
+                        value={
+                          !pool ? (
+                            <Skeleton className="h-5 w-16" />
+                          ) : (
+                            <span className="font-semibold">{ratio}</span>
+                          )
+                        }
+                      />
+                      <SummaryRow
+                        label="Network"
+                        value={
+                          !pool ? (
+                            <Skeleton className="h-5 w-24" />
+                          ) : (
+                            <span className="flex items-center gap-2 font-semibold">
+                              <TokenImage
+                                src={networkConfig?.iconSrc}
+                                alt={networkConfig?.label}
+                                classNames={{
+                                  common: "size-5",
+                                  img: "size-5",
+                                  placeholder: "size-5",
+                                }}
+                              />
+                              {networkConfig?.label ?? "-"}
+                            </span>
+                          )
+                        }
+                      />
+                      <div className="col-span-2">
+                        <SummaryRow
+                          label="Burn Method"
+                          value={
+                            <span className="text-mb-burn font-semibold">
+                              Burn
+                            </span>
+                          }
+                          className="flex-row items-center justify-between"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-2 2xl:space-y-6">
+                    {/* Current Reward Amount */}
+                    <div className="flex items-center justify-between text-mb-burn-light">
+                      <span className="font-inter text-base font-medium sm:text-xl 2xl:text-2xl">
+                        Current Reward Amount
+                      </span>
+                      <span className="font-inter text-base text-nowrap font-bold sm:text-xl 2xl:text-2xl">
+                        {!pool ? (
+                          <Skeleton className="h-8 w-36" />
+                        ) : (
+                          currentRewardFormatted
+                        )}
+                      </span>
+                    </div>
+
+                    {/* Deposit Amount Input */}
+                    <div className="space-y-2 2xl:space-y-4">
+                      <div className="flex items-center justify-between">
+                        <label className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
+                          Deposit Amount
+                        </label>
+                        <span className="flex items-center gap-2 font-inter text-nowrap text-sm sm:text-base 2xl:text-xl">
+                          <IconWallet className="text-mb-gray-b8"/>
+                          {isLoadingRewardBalance
+                            ? "Loading..."
+                            : `${shortenNumber({ number: Number(rewardBalanceFormatted) }) ?? "0"} ${rewardTokenDisplay?.symbol ?? ""}`}
+                        </span>
+                      </div>
+                      <div className="flex gap-3">
+                        <Input
+                          {...register("amount")}
+                          variant="burn"
+                          type="number"
+                          step={DEFAULT_INPUT_NUMBER_STEP}
+                          placeholder="Enter amount"
+                          className="w-full border-2 bg-transparent"
+                          aria-invalid={!!errors.amount}
+                        />
+                        <div
+                          className={cn(
+                            "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 sm:px-4 text-mb-burn-light",
+                            getVariantBorderClassName({ variant: "burn" }),
+                          )}
+                        >
+                          {!pool || isLoadingTokenOut ? (
+                            <>
+                              <Skeleton className="size-5 rounded-full" />
+                              <Skeleton className="h-5 w-12" />
+                            </>
+                          ) : (
+                            <>
+                              <TokenImage
+                                src={rewardTokenDisplay?.imageUri}
+                                alt={rewardTokenDisplay?.symbol}
+                                classNames={{
+                                  common: "size-5",
+                                  img: "size-5",
+                                  placeholder: "size-5",
+                                }}
+                              />
+                              <span className="font-inter text-sm font-medium sm:text-base">
+                                {rewardTokenDisplay?.symbol ??
+                                  pool.rewardTokenSymbol ??
+                                  ""}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                      {errors.amount && (
+                        <p className="font-inter text-xs text-destructive">
+                          {errors.amount.message}
+                        </p>
+                      )}
+                      {insufficientBalanceMessage && (
+                        <p className="font-inter text-xs text-destructive">
+                          {insufficientBalanceMessage}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap gap-2">
+                        {[25, 50, 100].map((percent) => (
+                          <button
+                            type="button"
+                            key={percent}
+                            onClick={() => handleSelectPercent(percent)}
+                            className={cn(
+                              "rounded-full bg-mb-dark-popover px-2.5 py-1 font-inter text-sm font-medium text-mb-burn-light transition hover:bg-mb-burn-light hover:text-white",
+                              getVariantBorderClassName({ variant: "burn" }),
+                            )}
+                          >
+                            {percent === 100 ? "Max" : `${percent}%`}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 pt-2">
+                    <Button
+                      variant="burn-active"
+                      type="button"
+                      onClick={handleCancel}
+                      disabled={isSubmitting}
+                      hasHover
+                      className="flex-1 font-orbitron font-semibold sm:text-xl xl:text-2xl"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="burn"
+                      type="submit"
+                      isLoading={isSubmitting}
+                      disabled={!isValid || !!insufficientBalanceMessage}
+                      hasHover
+                      className="flex-1 font-orbitron font-semibold sm:text-xl xl:text-2xl"
+                    >
+                      {isSubmitting ? "Depositing..." : "Deposit"}
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex justify-end gap-3 pt-2">
-              <AnimateIconButton
-                iconLetter="C"
-                text="Cancel"
-                variant="letter-icon"
-                textVariant="text-container-center"
-                classNames={{
-                  btn: "w-60 text-center after:text-2xl after:text-primary-foreground after:bg-[#FF8E97]",
-                  text: "text-2xl font-medium",
-                  icon: "size-7.5 text-2xl",
-                }}
-                color="#FF8E97"
-                btnProps={{
-                  type: "button",
-                  onClick: handleCancel,
-                  disabled: isSubmitting,
-                }}
-              />
-              <AnimateIconButton
-                iconLetter="D"
-                text="Deposit"
-                variant="letter-icon"
-                textVariant="text-container-center"
-                classNames={{
-                  btn: "w-60 text-center after:text-2xl after:bg-[#966EFF] after:text-primary-foreground border border-active",
-                  text: "text-2xl font-medium",
-                  icon: "size-7.5 text-2xl",
-                }}
-                color="#966EFF"
-                isLoading={isSubmitting}
-                isLoadingText="Depositing..."
-                btnProps={{
-                  type: "submit",
-                  disabled: !isValid || !!insufficientBalanceMessage,
-                }}
-              />
-            </div>
-          </form>
-        </DialogContent>
+          </div>
+        </DialogBody>
       </DialogPortal>
     </Dialog>
   );

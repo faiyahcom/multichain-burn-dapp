@@ -1,7 +1,8 @@
 import {
     Dialog,
-    DialogContent,
+    DialogBody,
     DialogHeader,
+    DialogOverlay,
     DialogPortal,
     DialogTitle,
 } from "@/components/ui/dialog";
@@ -9,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { PoolDetailResponse } from "@/types/pool";
-import AnimateIconButton from "@/components/common/animate-icon-button";
 import { toast } from "@/components/common/custom-toast";
 import { useTokenBalance } from "../../../hooks/useTokenBalance";
 import { useSystemStore } from "@/stores/systemStore";
@@ -29,9 +29,16 @@ import { parseUnits } from "ethers";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
-import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
+import { safeDecimalParse, shortenNumber, parseToBN } from "@/utils/helpers/numbers";
 import { useDebounceValue } from "usehooks-ts";
 import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
+import { cn } from "@/lib/utils";
+import {
+    getVariantBorderClassName,
+    getVariantShadowClassName,
+} from "@/components/common/glow/container";
+import { IconSwapCategory } from "@/assets/react";
+import { Button } from "@/components/common/glow/button";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -40,12 +47,15 @@ const swapFormSchema = z.object({
         .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
             message: "Burn amount must be a positive number",
         })
-        .refine((value) => {
-            const decimal = safeDecimalParse({ value });
-            return decimal && decimal?.decimalPlaces() <= 6;
-        }, {
-            message: "Burn amount must have 6 decimals or less",
-        }),
+        .refine(
+            (value) => {
+                const decimal = safeDecimalParse({ value });
+                return decimal && decimal?.decimalPlaces() <= 6;
+            },
+            {
+                message: "Burn amount must have 6 decimals or less",
+            },
+        ),
 });
 
 export type SwapFormValues = z.infer<typeof swapFormSchema>;
@@ -67,7 +77,13 @@ type Props = {
     onSuccess: () => void;
 };
 
-const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddress, onSuccess }: Props) => {
+const SwapDialog = ({
+    open,
+    onOpenChange,
+    poolDetail: poolDetailProp,
+    poolAddress,
+    onSuccess,
+}: Props) => {
     const { data: fetchedPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(poolAddress!),
         queryFn: () => poolService.getPoolDetail(poolAddress!),
@@ -169,11 +185,14 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                     amountBN = maxBurnRawBN;
                 }
             }
-            const formatted = formatUnits(
-                BigInt(amountBN.toString()),
-                decimals,
-            );
-            setValue("burnAmount", formatted, { shouldValidate: true });
+            const formatted = formatUnits(BigInt(amountBN.toString()), decimals);
+            // Keep max decimal part 6 digits
+            const [integer, decimal] = formatted.split(".");
+            const newFormattedAmount =
+                decimal && decimal.length > 0
+                    ? `${integer}.${decimal.slice(0, 6)}`
+                    : integer;
+            setValue("burnAmount", newFormattedAmount, { shouldValidate: true });
         } catch {
             return;
         }
@@ -182,19 +201,19 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     const maxBurnLeft = useMemo(() => {
         if (!poolDetail) return "0";
         try {
-            const numeratorBN = new BN(poolDetail.pool.rewardNumerator ?? "0");
-            const denominatorBN = new BN(poolDetail.pool.rewardDenominator ?? "0");
+            const numeratorBN = parseToBN(poolDetail.pool.rewardNumerator);
+            const denominatorBN = parseToBN(poolDetail.pool.rewardDenominator);
             if (numeratorBN.isZero() || denominatorBN.isZero()) return "0";
             const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
             const burnDecimals = poolDetail.pool.tokenInDecimals;
-            const rewardAmountBN = new BN(poolDetail.rewardAmount ?? "0");
+            const rewardAmountBN = parseToBN(poolDetail.rewardAmount);
             const rewardDecimalsBN = new BN(10).pow(new BN(rewardDecimals));
             const burnDecimalsBN = new BN(10).pow(new BN(burnDecimals));
             const maxBurnRaw = rewardAmountBN
                 .mul(denominatorBN)
                 .mul(burnDecimalsBN)
                 .div(numeratorBN.mul(rewardDecimalsBN));
-            const depositedBN = new BN(poolDetail.depositedAmount ?? "0");
+            const depositedBN = parseToBN(poolDetail.depositedAmount);
             const remaining = maxBurnRaw.sub(depositedBN);
             if (remaining.isNeg()) return "0";
             return formatUnits(BigInt(remaining.toString()), burnDecimals);
@@ -215,7 +234,9 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
         }
 
         const burnAmountDecimal = safeDecimalParse({ value: derivedBurnAmount });
-        const burnBalanceDecimal = safeDecimalParse({ value: burnBalanceFormatted });
+        const burnBalanceDecimal = safeDecimalParse({
+            value: burnBalanceFormatted,
+        });
 
         if (!burnAmountDecimal || !burnBalanceDecimal) return undefined;
         if (burnAmountDecimal.lte(0) || burnAmountDecimal.lte(burnBalanceDecimal)) {
@@ -251,8 +272,8 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
 
             if (amountInBN.isZero()) return "0";
 
-            const numeratorBN = new BN(rewardNumerator);
-            const denominatorBN = new BN(rewardDenominator);
+            const numeratorBN = parseToBN(rewardNumerator);
+            const denominatorBN = parseToBN(rewardDenominator);
 
             const rewardDecimalsBN = new BN(10).pow(new BN(rewardTokenDecimals));
             const tokenDecimalsBN = new BN(10).pow(new BN(tokenInDecimals));
@@ -263,12 +284,15 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                 .div(denominatorBN.mul(tokenDecimalsBN));
 
             const feeBN = rewardBN
-                .mul(new BN(settlementFee ?? "0"))
-                .div(new BN(DECIMAL_FEE_PERCENT));
+                .mul(parseToBN(settlementFee))
+                .div(new BN(DECIMAL_FEE_PERCENT * 100));
 
             const finalReward = rewardBN.sub(feeBN);
 
-            const formatted = formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
+            const formatted = formatUnits(
+                BigInt(finalReward.toString()),
+                rewardTokenDecimals,
+            );
             const num = Number(formatted);
             if (!Number.isFinite(num)) return formatted;
             return String(shortenNumber({ number: num }));
@@ -309,74 +333,90 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
             <DialogPortal>
-                <DialogContent
+                <DialogOverlay />
+                <DialogBody
                     showCloseButton={false}
-                    className="h-fit bg-mb-popover px-8 py-5 sm:max-w-fit"
+                    className="fixed inset-0 z-50 overflow-y-auto"
                 >
-                    <DialogHeader>
-                        <DialogTitle className="text-5xl font-semibold">SWAP</DialogTitle>
-                    </DialogHeader>
+                    <div
+                        className="flex min-h-full flex-col items-center justify-center gap-2 p-2 sm:p-4"
+                        onClick={(e) => {
+                            if (e.target === e.currentTarget) onOpenChange(false);
+                        }}
+                    >
+                        <div
+                            className={cn(
+                                getVariantBorderClassName({ variant: "swap" }),
+                                getVariantShadowClassName({ variant: "swap" }),
+                                "h-fit w-full min-w-0 border-4 bg-mb-dark-popover px-4 py-4 sm:max-w-fit sm:px-6 sm:py-5 xl:px-8 xl:py-5",
+                            )}
+                        >
+                            <DialogHeader>
+                                <DialogTitle className="text-xl font-bold sm:text-2xl xl:text-40px">
+                                    <p className="inline-flex items-center">
+                                        <IconSwapCategory className="size-8 sm:size-10 xl:size-16" />
+                                        TOKEN SWAP
+                                    </p>
+                                </DialogTitle>
+                            </DialogHeader>
 
-                    <form onSubmit={handleSubmit(onSubmit)}>
-                        <SellSection
-                            tokenDisplay={burnTokenDisplay}
-                            isLoadingWhitelistTokens={!poolDetail}
-                            register={register}
-                            errors={errors}
-                            onSelectPercent={handleSelectPercent}
-                            isLoadingBalance={isLoadingBurnBalance}
-                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""}`}
-                            poolDetail={poolDetail}
-                            maxBurnLeft={maxBurnLeft}
-                            isExceedingMax={isExceedingMax}
-                            insufficientBalanceMessage={insufficientBalanceMessage}
+                            <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
+                                <SellSection
+                                    tokenDisplay={burnTokenDisplay}
+                                    isLoadingWhitelistTokens={!poolDetail}
+                                    register={register}
+                                    errors={errors}
+                                    onSelectPercent={handleSelectPercent}
+                                    isLoadingBalance={isLoadingBurnBalance}
+                                    balanceText={`${formatBalanceDisplay(burnBalanceFormatted.toUpperCase())} ${burnTokenDisplay?.symbol ?? ""}`}
+                                    poolDetail={poolDetail}
+                                    maxBurnLeft={maxBurnLeft}
+                                    isExceedingMax={isExceedingMax}
+                                    insufficientBalanceMessage={insufficientBalanceMessage}
+                                    chainId={poolDetail?.pool.chainId}
+                                />
+
+                                <BuySection
+                                    tokenDisplay={rewardTokenDisplay}
+                                    isLoadingWhitelistTokens={!poolDetail}
+                                    estimatedAmount={formattedEstimatedRewardAmount}
+                                    isLoadingBalance={isLoadingRewardBalance}
+                                    balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardTokenDisplay?.symbol ?? ""}`}
+                                    chainId={poolDetail?.pool.chainId}
+                                />
+                                <Button
+                                    variant="swap"
+                                    className="mt-4 w-full text-base md:text-xl 2xl:text-2xl"
+                                    hasHover
+                                    isLoading={isSubmitting}
+                                    disabled={
+                                        isSubmitting ||
+                                        isSellAmountDebouncing ||
+                                        isExceedingMax ||
+                                        isInsufficientBalance
+                                    }
+                                    type="submit"
+                                >
+                                    {isSubmitting ? "Swapping..." : "Swap"}
+                                </Button>
+
+                                <SwapRateRow
+                                    burnSymbol={burnTokenDisplay.symbol}
+                                    rewardSymbol={rewardTokenDisplay.symbol}
+                                    rewardNumerator={poolDetail?.pool?.rewardNumerator}
+                                    rewardDenominator={poolDetail?.pool?.rewardDenominator}
+                                    open={openFeePopUp}
+                                    onToggle={() => setOpenFeePopUp(!openFeePopUp)}
+                                />
+                            </form>
+                        </div>
+
+                        <FeePanel
+                            open={openFeePopUp}
+                            settlementFee={poolDetail?.pool?.settlementFee}
                         />
-
-                        <BuySection
-                            tokenDisplay={rewardTokenDisplay}
-                            isLoadingWhitelistTokens={!poolDetail}
-                            estimatedAmount={formattedEstimatedRewardAmount}
-                            isLoadingBalance={isLoadingRewardBalance}
-                            balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardTokenDisplay?.symbol ?? ""}`}
-                        />
-
-                        <AnimateIconButton
-                            iconLetter="S"
-                            text="SWAP"
-                            variant="letter-icon"
-                            textVariant="text-container-center"
-                            classNames={{
-                                btn: "mt-3 bg-white w-full text-center after:text-white after:text-sm after:font-semibold after:bg-active",
-                                text: "text-xl font-medium",
-                                icon: "size-7.5",
-                            }}
-                            color="#966EFF"
-                            isLoading={isSubmitting}
-                            isLoadingText="Swapping..."
-                            btnProps={{
-                                type: "submit",
-                                disabled:
-                                    isSubmitting ||
-                                    isSellAmountDebouncing ||
-                                    isExceedingMax ||
-                                    isInsufficientBalance,
-                            }}
-                        />
-
-                        <SwapRateRow
-                            burnSymbol={burnTokenDisplay.symbol}
-                            rewardSymbol={rewardTokenDisplay.symbol}
-                            rewardNumerator={poolDetail?.pool?.rewardNumerator}
-                            rewardDenominator={poolDetail?.pool?.rewardDenominator}
-                            onToggle={() => setOpenFeePopUp(!openFeePopUp)}
-                        />
-                    </form>
-                </DialogContent>
-
-                <FeePanel
-                    open={openFeePopUp}
-                    settlementFee={poolDetail?.pool?.settlementFee}
-                />
+                    </div>
+                </DialogBody>
             </DialogPortal>
         </Dialog>
     );

@@ -4,7 +4,7 @@ import ProfileMenu from "./profile-menu";
 import ConnectButton from "./connect-button";
 import { Link } from "@tanstack/react-router";
 import { HeaderNav, HeaderNavMobile } from "./glow/header-nav";
-import { IconBell } from "@/assets/react";
+import { NotificationBell } from "./notification-bell";
 
 export function MainHeader() {
   const { isConnected } = useAppKitAccount();
@@ -34,9 +34,7 @@ export function MainHeader() {
         <ConnectButton />
       ) : (
         <div className="flex items-center gap-3 sm:gap-2.5">
-          <button className="rounded-full bg-mb-dark-profile-btn p-2 sm:p-5">
-            <IconBell className="size-6 sm:size-7.25" />
-          </button>
+          <NotificationBell />
           <NetworkSelect />
           <ProfileMenu />
         </div>

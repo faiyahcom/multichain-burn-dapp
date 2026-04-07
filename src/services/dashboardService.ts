@@ -11,15 +11,15 @@ export interface TokenAmount {
 }
 
 export interface SectionStats {
-  volume: TokenAmount[];
+  volume: string;
   totalTxns: number;
   totalParticipants: number;
   totalPools: number;
 }
 
 export interface StatsStickerResponse {
-  tvl: TokenAmount[];
-  volume: TokenAmount[];
+  tvl: string;
+  volume: string;
   totalTxns: number;
   totalActivities: number;
   totalPools: number;

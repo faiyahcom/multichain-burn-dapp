@@ -5,14 +5,15 @@ import PoolOverview from "./pool-overview";
 import RewardAmount from "./reward-amount";
 import AmountAndActivity from "./amount-activities";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
-import AnimateIconButton from "@/components/common/animate-icon-button";
+import { BurnPoolStatusDisplay } from "@/components/shared/glow/pool/pool-status";
 import type { BurnPoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import { useState, useEffect, useRef } from "react";
-import InfoTooltip from "@/components/common/info-tooltip";
 import ScanLink from "@/components/common/scan-link";
 import { useQueryClient } from "@tanstack/react-query";
 import { Skeleton } from "@/components/ui/skeleton";
+import GlowContainer from "@/components/common/glow/container";
+import InfoTooltip from "@/components/common/glow/info-tooltip";
 
 type Props = {
     address: string;
@@ -89,8 +90,8 @@ const UpcomingCountdown = ({
     });
     if (!remaining) return null;
     return (
-        <p className="text-xl">
-            <span className="font-medium">Starts in: </span>
+        <p className="text-sm md:text-base lg:text-xl">
+            <span className="font-bold">Starts in: </span>
             <span>{formatCountdown(remaining)}</span>
         </p>
     );
@@ -112,8 +113,8 @@ const EndingCountdown = ({
     });
     if (!remaining) return null;
     return (
-        <p className="text-xl">
-            <span className="font-medium">Ends in: </span>
+        <p className="text-sm md:text-base lg:text-xl">
+            <span className="font-bold">Ends in: </span>
             <span>{formatCountdown(remaining)}</span>
         </p>
     );
@@ -135,9 +136,12 @@ const BurnPoolDetail = ({ address }: Props) => {
         switch (status) {
             case "pending":
                 return (
-                    <p className="ml-auto rounded-md bg-mb-popover px-6 text-base text-success">
+                    <GlowContainer
+                        variant="green"
+                        className="ml-auto rounded-md bg-mb-popover px-3 py-0.5 text-xs text-mb-glow-green md:px-6 md:py-1.5 md:text-sm lg:text-base"
+                    >
                         This pool is pending approval. It will go live after approval.
-                    </p>
+                    </GlowContainer>
                 );
             case "upcoming":
                 return poolDetail?.pool.timeStart ? (
@@ -147,12 +151,7 @@ const BurnPoolDetail = ({ address }: Props) => {
                     />
                 ) : null;
             case "holding":
-                return (
-                    <InfoTooltip
-                        content="This pool reached its start time but has not been approved by admin. It is currently on holding."
-                        side="right"
-                    />
-                );
+                return null;
             case "on_going":
                 return poolDetail?.pool.timeEnd ? (
                     <EndingCountdown
@@ -170,48 +169,54 @@ const BurnPoolDetail = ({ address }: Props) => {
     };
 
     return (
-        <div className="pt-9.5 pl-14">
-            <div className="space-y-2">
-                <div className="flex items-center gap-6">
-                    {isLoadingPoolDetail ? (
-                        <>
-                            <Skeleton className="h-9 w-48" />
-                            <Skeleton className="h-9 w-27" />
-                        </>
-                    ) : (
-                        <>
-                            <h2 className="text-3xl font-semibold">
-                                {poolDetail?.pool.name.slice(0, 20)}
+        <div className="space-y-6 font-inter lg:space-y-17.5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:gap-6 lg:gap-10">
+                {isLoadingPoolDetail ? (
+                    <>
+                        <Skeleton className="h-9 w-48" />
+                        <Skeleton className="h-9 w-27" />
+                    </>
+                ) : (
+                    <>
+                        <div className="flex flex-col gap-2.5 sm:pl-3 md:pl-6 lg:pl-9">
+                            <h2 className="text-xl font-semibold break-all md:text-2xl lg:text-3xl 2xl:text-4xl">
+                                {poolDetail?.pool.name}
                             </h2>
-                            <AnimateIconButton
-                                iconLetter={BURN_POOL_STATUS[safeStatus].letter}
-                                textVariant="text-container-center"
-                                text={BURN_POOL_STATUS[safeStatus]?.label}
-                                color={BURN_POOL_STATUS[safeStatus].color}
-                                hasGroupHover
-                                classNames={{
-                                    btn: "min-w-27 cursor-default after:text-2xl after:font-medium",
-                                    text: "text-2xl font-medium",
-                                    icon: "size-9 text-3xl",
-                                }}
+                            <ScanLink
+                                address={poolDetail?.pool.address ?? ""}
+                                chainId={poolDetail?.pool.chainId}
+                                className="font-inter w-fit text-sm md:text-base lg:text-xl 2xl:text-2xl"
+                                iconClassName="size-3.5"
                             />
-                            <div className="flex flex-1">{renderExtraContent()}</div>
-                        </>
-                    )}
-                </div>
-                <ScanLink
-                    address={poolDetail?.pool.address ?? ""}
-                    chainId={poolDetail?.pool.chainId}
-                />
+                        </div>
+                        <BurnPoolStatusDisplay className="w-3/7 min-w-20 px-2 py-1.5 text-sm sm:w-64 sm:text-base md:px-3 md:py-2 md:text-sm lg:px-5 lg:text-2xl 2xl:px-6 2xl:py-3">
+                            {BURN_POOL_STATUS[safeStatus].label}
+                            {safeStatus === "holding" && (
+                                <InfoTooltip
+                                    content="This pool reached its start time but has not been approved by admin. It is currently on holding."
+                                    side="right"
+                                    variant="burn"
+                                />
+                            )}
+                        </BurnPoolStatusDisplay>
+                        <div className="flex w-full flex-wrap md:min-w-0 md:flex-1">
+                            {renderExtraContent()}
+                        </div>
+                    </>
+                )}
             </div>
-            <div className="grid grid-cols-3 gap-x-6">
-                <div className="col-span-2">
+            <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:gap-x-6 lg:gap-y-9.5">
+                <div className="order-1 lg:col-span-2">
                     <PoolOverview poolDetail={poolDetail} />
-                    <RewardAmount poolDetail={poolDetail} />
-                    <PoolHistory poolDetail={poolDetail} />
                 </div>
-                <div className="col-span-1">
+                <div className="order-2 lg:col-span-1 lg:row-span-3">
                     <AmountAndActivity poolDetail={poolDetail} />
+                </div>
+                <div className="order-3 lg:col-span-2">
+                    <RewardAmount poolDetail={poolDetail} />
+                </div>
+                <div className="order-4 lg:col-span-2">
+                    <PoolHistory poolDetail={poolDetail} />
                 </div>
             </div>
         </div>

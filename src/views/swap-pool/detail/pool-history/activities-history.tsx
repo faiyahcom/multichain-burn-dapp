@@ -1,16 +1,27 @@
-import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
-import { poolService } from '@/services/poolService';
-import { poolQueryKeys } from '@/services/queries/queryKey';
-import { activityKind, type PoolDetailResponse } from '@/types/pool';
-import { useQuery } from '@tanstack/react-query';
-import { formatTimestamp } from './transaction-history';
-import { truncateString } from '@/utils/helpers/string';
-import CustomPagination from '@/components/common/pagination';
-import { useState } from 'react';
+import {
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableHeader,
+    TableRow,
+} from "@/components/common/glow/table";
+import TableNoData from "@/components/common/glow/table-no-data";
+import TableSkeleton from "@/components/common/glow/table-skeleton";
+import CopyableText from "@/components/common/copyable-text";
+import { poolService } from "@/services/poolService";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { activityKind, type PoolDetailResponse } from "@/types/pool";
+import { truncateString } from "@/utils/helpers/string";
+import { useQuery } from "@tanstack/react-query";
+import { formatTimestamp } from "./transaction-history";
+import { useState } from "react";
+import CustomPagination from "@/components/common/glow/glow-pagination";
+import GlowContainer from "@/components/common/glow/container";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
-}
+};
 
 const DEFAULT_PAGE_SIZE = 5;
 
@@ -36,56 +47,63 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
 
     const activities = poolActivities?.activities ?? [];
 
-    if (isLoading) {
-        return (
-            <div className="w-full py-8 text-center text-greyed">
-                Loading transactions...
-            </div>
-        );
-    }
-
-    if (activities.length === 0) {
-        return (
-            <div className="w-full py-8 text-center text-greyed">
-                No activities yet
-            </div>
-        );
-    }
-
     return (
-        <>
-            <Table className="border-spacing-y-0 mb-2 rounded-b-lg border border-progress-bg">
-                <TableHeader>
-                    <TableRow>
-                        <TableHead className="w-40 h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Time
-                        </TableHead>
-                        <TableHead className="w-40 h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Actor
-                        </TableHead>
-                        <TableHead className="text-right pr-20 w-auto h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Description
-                        </TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
-                    {activities.map((activity) => (
-                        <TableRow key={activity.id} className="text-base text-greyed">
-                            <TableCell className="w-40">{formatTimestamp(activity.timestamp)}</TableCell>
-                            <TableCell className="w-40">{truncateString({ str: activity.actor, left: 4, right: 4 }) || '—'}</TableCell>
-                            <TableCell className="text-right pr-20 w-auto">{activityKind[activity.kind]}</TableCell>
+        <div className="space-y-9.5">
+            <GlowContainer
+                variant="swap"
+                className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
+            >
+                <Table className="py-6 sm:border-spacing-y-5">
+                    <TableHeader>
+                        <TableRow>
+                            {["Time", "Actor", "Description"].map((col) => (
+                                <TableHead
+                                    key={col}
+                                    variant="swap"
+                                    className="font-orbitron text-sm md:text-base lg:text-xl 2xl:text-28px"
+                                >
+                                    {col}
+                                </TableHead>
+                            ))}
                         </TableRow>
-                    ))}
-                </TableBody>
-            </Table>
+                    </TableHeader>
+                    <TableBody>
+                        <TableSkeleton colCount={3} rowCount={3} isLoading={isLoading} />
+                        <TableNoData colSpan={3} data={activities} isLoading={isLoading} />
+                        {activities.map((activity) => (
+                            <TableRow key={activity.id} variant="swap" className="text-xs md:text-sm lg:text-base 2xl:text-xl">
+                                <TableCell>{formatTimestamp(activity.timestamp)}</TableCell>
+                                <TableCell>
+                                    <CopyableText
+                                        content={activity.actor}
+                                        displayText={
+                                            truncateString({
+                                                str: activity.actor,
+                                                left: 4,
+                                                right: 4,
+                                            }) || "—"
+                                        }
+                                        classNames={{
+                                            container: "justify-center",
+                                            displayText: "text-primary-foreground text-xs md:text-sm lg:text-base 2xl:text-xl",
+                                        }}
+                                    />
+                                </TableCell>
+                                <TableCell>{activityKind[activity.kind]}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </GlowContainer>
             <CustomPagination
                 currentPage={page}
                 totalCount={poolActivities?.total || 0}
                 pageSize={DEFAULT_PAGE_SIZE}
                 onPageChange={(page) => setPage(page)}
+                variant="swap"
             />
-        </>
+        </div>
     );
-}
+};
 
-export default ActivitiesHistory
+export default ActivitiesHistory;

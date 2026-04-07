@@ -1,11 +1,17 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
-import type { AllPoolStatus } from "@/types/admin/master-pool-management";
+import type {
+  AllPoolStatus,
+  PoolType,
+} from "@/types/admin/master-pool-management";
 import type {
   BooleanString,
+  PaginationRequest,
   PaginationResponse,
+  SortBy,
   SortOrder,
 } from "@/types/common";
+import type { ActivityKindKey } from "@/types/pool";
 
 const USERS_API_ROUTES = API_ROUTES.USERS;
 
@@ -16,7 +22,7 @@ export interface GetParticipatedPoolsByUserParams {
   chainIds?: string; // comma separated
   kind?: string;
   search?: string;
-  sortBy?: "tvl" | "joinedTime" | "amountBurned" | "claimableReward";
+  sortBy?: SortBy;
   sortDirection?: SortOrder; // default to desc
   tokenIn?: string;
   tokenReward?: string;
@@ -51,15 +57,20 @@ export interface ParticipatedUserPool {
   rewardNumerator: string;
   rewardDenominator: string;
 
-  tokenInSymbolCustom?: string | null;
-  tokenOutSymbolCustom?: string | null;
-  tokenInImageUri?: string | null;
-  tokenOutImageUri?: string | null;
+  tokenInSymbolCustom: string | null;
+  tokenOutSymbolCustom: string | null;
+  tokenInImageUri: string | null;
+  tokenOutImageUri: string | null;
 
   participant: string;
   amountBurned: string;
   claimableReward: string;
   joinedTime: string;
+
+  // Added to match PoolItemType
+  isPartner: boolean;
+  liquidity: string; // string number
+  rewardAmount: string; // string number
 }
 
 export type ParticipatedPoolsResponse = PaginationResponse & {
@@ -71,6 +82,40 @@ export interface PoolMerkleProofResponse {
   to: string;
   merkleProof: string[];
   proofIndex: number;
+}
+
+export interface GetUserActivitiesRequest extends PaginationRequest {
+  search?: string;
+  kinds?: string; // comma separated
+}
+
+export interface UserActivityType {
+  id: string;
+  hash: string;
+  log_ix: number;
+  timestamp: string; // timestamp in seconds
+  actor: string; // address
+  kind: ActivityKindKey;
+  poolAddress: string;
+  poolKind: PoolType;
+  uiAmountIn: string;
+  uiAmountOut: string;
+  pool: {
+    address: string;
+    name: string;
+    tokenIn: string;
+    rewardToken: string;
+    tokenInSymbol: string;
+    rewardTokenSymbol: string;
+  } | null;
+}
+
+export interface GetUserActivitiesResponse extends PaginationResponse {
+  activities: UserActivityType[];
+}
+
+export interface GetClaimableCountResponse {
+  total: number;
 }
 
 export const userService = {
@@ -87,6 +132,23 @@ export const userService = {
   getPoolMerkleProof: async (poolAddress: string) => {
     const response = await apiClient.get<PoolMerkleProofResponse>(
       USERS_API_ROUTES.GET_POOL_MERKLE_PROOF(poolAddress),
+    );
+    return response;
+  },
+
+  getUserActivities: async (params: GetUserActivitiesRequest) => {
+    const response = await apiClient.get<GetUserActivitiesResponse>(
+      USERS_API_ROUTES.ACTIVITIES,
+      {
+        params,
+      },
+    );
+    return response;
+  },
+
+  getClaimableCount: async () => {
+    const response = await apiClient.get<GetClaimableCountResponse>(
+      USERS_API_ROUTES.CLAIMABLE_COUNT,
     );
     return response;
   },

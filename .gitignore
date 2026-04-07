@@ -30,3 +30,4 @@ dist-ssr
 .cursor
 .shared
 .vercel
+.env*.local

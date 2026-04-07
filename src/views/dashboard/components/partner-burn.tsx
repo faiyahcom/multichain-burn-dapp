@@ -27,7 +27,7 @@ const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
                 Live {formatCountdown(remaining)}
             </span>
             <span className="text-xs font-semibold sm:text-tiny 2xl:text-xs">
-                JOIN
+                Join
             </span>
         </div>
     );
@@ -49,20 +49,22 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
     return (
         <GlowContainer
             variant="burn"
-            className="relative flex aspect-square cursor-pointer flex-col items-center justify-around overflow-hidden"
+            className="relative flex aspect-square cursor-pointer flex-col items-center justify-around"
             onClick={() => {
                 navigate({
                     to: `/burn/detail/${pool.address}`,
                 });
             }}
         >
-            {/* Fire background */}
-            <img
-                src={PartnerBurnBgImage}
-                alt=""
-                className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-            />
-            <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
+            {/* Fire background — overflow-hidden scoped here so content is never clipped */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+                <img
+                    src={PartnerBurnBgImage}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                />
+                <div className="absolute inset-0 bg-mb-burn-overlay/72" />
+            </div>
 
             {/* Content */}
             <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 p-1.5 text-center font-inter sm:gap-0 sm:px-1 sm:py-1.5 2xl:gap-1 2xl:px-2 2xl:py-2">
@@ -77,7 +79,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                     customSymbol={pool.tokenInSymbolCustom ?? undefined}
                     imageUri={pool.tokenInImageUri ?? undefined}
                     classNames={{
-                        img: "size-11 sm:size-7.5 2xl:size-11",
+                        img: "size-8.5 lg:size-7 2xl:size-11",
                     }}
                     hasSymbol={false}
                 />
@@ -105,14 +107,16 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
 const ComingSoonCard = () => (
     <GlowContainer
         variant="burn"
-        className="relative flex aspect-square flex-col items-center justify-center overflow-hidden"
+        className="relative flex aspect-square flex-col items-center justify-center"
     >
-        <img
-            src={PartnerBurnBgImage}
-            alt=""
-            className="pointer-events-none absolute inset-0 h-full w-full object-cover"
-        />
-        <div className="pointer-events-none absolute inset-0 bg-mb-burn-overlay/72" />
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+            <img
+                src={PartnerBurnBgImage}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover"
+            />
+            <div className="absolute inset-0 bg-mb-burn-overlay/72" />
+        </div>
         {/* make the icon absolute centered */}
         <IconBurnCategory className="absolute top-1/2 left-1/2 size-18 -translate-x-1/2 -translate-y-1/2 transform opacity-80 sm:size-9 2xl:size-18" />
         <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform font-inter text-[15px] font-medium text-nowrap sm:text-tiny 2xl:text-[15px]">
@@ -177,7 +181,7 @@ const PoolCarousel = ({
                     {pools.map((pool) => (
                         <div
                             key={`${pool.chainId}-${pool.address}`}
-                            className="w-1/2 min-w-0 shrink-0 pl-4 sm:w-1/4"
+                            className="w-1/2 min-w-0 shrink-0 pl-4"
                         >
                             <PartnerPoolCard pool={pool} />
                         </div>
@@ -214,7 +218,7 @@ export const PartnerBurnSection = () => {
         <GlowContainer className="px-5 py-6.25" variant="burn">
             <div className="mb-6 flex items-center gap-3">
                 <IconBurnCategory className="size-10.75" />
-                <p className="text-2xl font-medium">PARTNER BURN</p>
+                <p className="text-2xl font-medium text-nowrap">PARTNER BURN</p>
             </div>
 
             {showCarousel ? (
@@ -225,7 +229,7 @@ export const PartnerBurnSection = () => {
                     fetchNextPage={fetchNextPage}
                 />
             ) : (
-                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                     {Array.from({ length: POOL_LIMIT }, (_, i) => {
                         const pool = allPools[i];
                         return pool ? (

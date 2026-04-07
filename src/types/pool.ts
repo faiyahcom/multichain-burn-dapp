@@ -1,163 +1,183 @@
 export type SwapPoolStatus =
-    | "on_going"
-    | "canceled"
-    | "closed"
-    | "draft"
-    | "ended";
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "ended";
 export type BurnPoolStatus =
-    | "on_going"
-    | "canceled"
-    | "closed"
-    | "draft"
-    | "pending"
-    | "upcoming"
-    | "holding"
-    | "ended";
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "pending"
+  | "upcoming"
+  | "holding"
+  | "ended";
 export enum PoolKindCodeEnum {
-    Burn = 0,
-    Swap = 1,
+  Burn = 0,
+  Swap = 1,
 }
 export type PoolKindCode = PoolKindCodeEnum.Burn | PoolKindCodeEnum.Swap;
 export type PoolKind = "burn_pool" | "swap_pool";
 export const POOL_KIND: Record<PoolKindCode, PoolKind> = {
-    [PoolKindCodeEnum.Burn]: "burn_pool",
-    [PoolKindCodeEnum.Swap]: "swap_pool",
+  [PoolKindCodeEnum.Burn]: "burn_pool",
+  [PoolKindCodeEnum.Swap]: "swap_pool",
 };
 interface TokenInfo {
-    address: string;
-    createdAt: string;
-    name: string;
-    symbol: string;
-    decimals: number;
-    enable: boolean;
-    chainId: string;
-    isDropped: boolean;
-    imageUri: string;
-    customName: string;
-    customSymbol: string;
-    description: string;
-    homepage: string;
-    whitepaper: string;
+  address: string;
+  createdAt: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  enable: boolean;
+  chainId: string;
+  isDropped: boolean;
+  imageUri: string;
+  customName: string;
+  customSymbol: string;
+  description: string;
+  homepage: string;
+  whitepaper: string;
 }
 
 export interface PoolDetailResponse {
-    userAmount?: {
-        address: string;
-        deposited: string;
-        claimed: string;
-        canClaim: boolean;
-    };
-    depositedAmount: string;
-    claimedRewardAmount: string;
+  userAmount?: {
+    address: string;
+    deposited: string;
+    claimed: string;
+    canClaim: boolean;
+  };
+  depositedAmount: string;
+  claimedRewardAmount: string;
+  rewardAmount: string;
+  tokenIn: TokenInfo;
+  tokenOut: TokenInfo;
+  pool: {
+    address: string;
+    name: string;
+    owner: string;
+    rewardToken: string;
+    tokenIn: string;
+    pool_id: string;
+    kind: PoolKindCode;
+    chainId: string;
+    timestamp: string;
+    status: SwapPoolStatus | BurnPoolStatus;
+    currentRewardAmount: string;
+    merkleRootStatus: string;
+    merkleRoot: string | null;
+    adminCloseReason: string;
+    rewardTokenSymbol: string;
+    rewardTokenDecimals: number;
+    tokenInSymbol: string;
+    tokenInDecimals: number;
+    burnToken?: string;
+    targetVault?: string;
+    timeStart: string;
+    timeEnd: string;
+    targetAddress: string;
+    assetTypeReward: number;
+    assetTypeIn: number;
+    rewardNumerator: string;
+    rewardDenominator: string;
     rewardAmount: string;
-    tokenIn: TokenInfo;
-    tokenOut: TokenInfo;
-    pool: {
-        address: string;
-        name: string;
-        owner: string;
-        rewardToken: string;
-        tokenIn: string;
-        pool_id: string;
-        kind: PoolKindCode;
-        chainId: string;
-        timestamp: string;
-        status: SwapPoolStatus | BurnPoolStatus;
-        currentRewardAmount: string;
-        merkleRootStatus: string;
-        merkleRoot: string | null;
-        adminCloseReason: string;
-        rewardTokenSymbol: string;
-        rewardTokenDecimals: number;
-        tokenInSymbol: string;
-        tokenInDecimals: number;
-        burnToken?: string;
-        targetVault?: string;
-        timeStart: string;
-        timeEnd: string;
-        targetAddress: string;
-        assetTypeReward: number;
-        assetTypeIn: number;
-        rewardNumerator: string;
-        rewardDenominator: string;
-        rewardAmount: string;
-        settlementFee: string;
-        poolCreationFee: string;
-        isPartner?: boolean;
-    };
-    returningAmountOnCanceling?: {
-        amount: string;
-        to: string;
-    };
+    settlementFee: string;
+    poolCreationFee: string;
+    isPartner?: boolean;
+  };
+  returningAmountOnCanceling?: {
+    amount: string;
+    to: string;
+  };
 }
 
 export interface PoolTxnsResponse {
-    page: number;
-    total: number;
-    txns: {
-        id: string;
-        hash: string;
-        log_ix: number;
-        kind: keyof typeof txnKind;
-        timestamp: string;
-        tokenIn: string;
-        tokenInSymbol: string;
-        tokenInDecimals: number;
-        amountIn: string;
-        tokenOut: string;
-        tokenOutSymbol: string;
-        tokenOutDecimals: number;
-        amountOut: string;
-        chainId: string;
-        poolAddress: string;
-    }[];
+  page: number;
+  total: number;
+  txns: {
+    id: string;
+    hash: string;
+    log_ix: number;
+    kind: keyof typeof txnKind;
+    timestamp: string;
+    tokenIn: string;
+    tokenInSymbol: string;
+    tokenInDecimals: number;
+    amountIn: string;
+    tokenOut: string;
+    tokenOutSymbol: string;
+    tokenOutDecimals: number;
+    amountOut: string;
+    chainId: string;
+    poolAddress: string;
+  }[];
 }
 
 export const txnKind = {
-    1: "Taker Deposit",
-    2: "Refund to Whitelist User",
-    3: "Maker Deposit Reward",
-    4: "Taker Claim Reward",
-    5: "Refund to Maker",
-    6: "Burn Success",
+  1: "Taker Deposit",
+  2: "Refund to Whitelist User",
+  3: "Maker Deposit Reward",
+  4: "Taker Claim Reward",
+  5: "Refund to Maker",
+  6: "Burn Success",
 } as const;
 
 export const activityKind = {
-    // Pool lifecycle
-    0: "Pool Created",
-    1: "Pool Requested",
-    2: "Pool Approved",
-    3: "Pool Rejected",
-    4: "Pool Canceled",
-    5: "Pool Closed",
-    8: "Pool Updated",
-    9: "Pool Ended",
+  // Pool lifecycle
+  0: "Create burn pool",
+  1: "Create swap pool",
+  2: "Pool Requested",
+  3: "Pool Approved",
+  4: "Pool Rejected",
+  5: "Cancel pool",
+  6: "Pool Closed",
+  7: "Pool Updated",
+  8: "Pool Ended",
 
-    // Maker action
-    10: "Reward Deposited",
-    11: "Cancel Approve Request",
+  // Maker action
+  10: "Deposit reward token",
+  11: "Maker Cancel Approve Request",
 
-    // Admin action
-    20: "Admin Refund",
+  // Admin action
+  20: "Admin Refund",
 
-    // User actions
-    30: "Taker Deposit", //taker deposit to pool
-    31: "Taker Claim", //taker claim reward from burn pool
+  // User actions
+  30: "Deposit burn token",
+  31: "Claim reward",
+  32: "Swap",
 
-    // Operator actions
-    40: "Burn Success",
+  40: "Pool End",
 } as const;
 
+export type ActivityKindKey = keyof typeof activityKind;
+
+export const getActivityKindLabel = (kind: ActivityKindKey) => {
+  return activityKind[kind];
+};
+
+type ActivityKind = typeof activityKind;
+
+export function pickActivityKind<K extends keyof ActivityKind>(
+  keys: K[],
+): Pick<ActivityKind, K> {
+  return Object.fromEntries(keys.map((k) => [k, activityKind[k]])) as Pick<
+    ActivityKind,
+    K
+  >;
+}
+
+export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
+
 export interface PoolActivitiesResponse {
-    page: number;
-    total: number;
-    activities: {
-        id: string;
-        hash: string;
-        log_ix: number;
-        timestamp: string;
-        actor: string;
-        kind: keyof typeof activityKind;
-        poolAddress: string;
-    }[];
+  page: number;
+  total: number;
+  activities: {
+    id: string;
+    hash: string;
+    log_ix: number;
+    timestamp: string;
+    actor: string;
+    kind: keyof typeof activityKind;
+    poolAddress: string;
+  }[];
 }

@@ -2,6 +2,7 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import GlowContainer from "@/components/common/glow/container";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -10,7 +11,7 @@ type Props = {
 const RewardAmount = ({ poolDetail }: Props) => {
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.pool.currentRewardAmount,
+            poolDetail.pool.rewardAmount,
             poolDetail.pool.rewardTokenDecimals,
         )
         : "-";
@@ -41,28 +42,26 @@ const RewardAmount = ({ poolDetail }: Props) => {
     });
 
     return (
-        <div className="mt-3 w-full py-4">
-            <div className="flex items-center gap-14 pb-4 text-xl font-medium">
-                <div className="flex items-center gap-2">
-                    <div className="h-1.5 w-1.5 bg-black" />
-                    <span>Reward Amount</span>
-                </div>
-                <p>
+        <GlowContainer
+            variant="burn"
+            className="w-full space-y-4 px-3 py-4 font-inter md:space-y-6 md:px-5 md:py-6"
+        >
+            <div className="flex items-center justify-between font-orbitron">
+                <p className="text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">Reward Amount</p>
+                <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                     {formattedReward} {rewardTokenDisplay.symbol}
                 </p>
             </div>
             {poolDetail?.pool.status &&
                 ["on_going", "ended", "closed"].includes(poolDetail.pool.status) && (
-                    <div>
-                        <p className="text-base text-greyed">
-                            <span>Total Burned Amount:</span>{" "}
-                            <span className="ml-14">
-                                {formattedBurned} {burnTokenDisplay.symbol}
-                            </span>
-                        </p>
-                    </div>
+                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                        <span className="text-mb-gray-b8">Total Burned Amount:</span>
+                        <span>
+                            {formattedBurned} {burnTokenDisplay.symbol}
+                        </span>
+                    </p>
                 )}
-        </div>
+        </GlowContainer>
     );
 };
 

@@ -1,16 +1,19 @@
 import GlowContainer from "@/components/common/glow/container";
-import { IconSwapCategory } from "@/assets/react";
+import {
+    IconMedal1,
+    IconMedal2,
+    IconMedal3,
+    IconSwapCategory,
+} from "@/assets/react";
 import type {
     TopSwapper,
     TopSwapperResponse,
 } from "@/services/dashboardService";
 import { truncateString } from "@/utils/helpers/string";
 import TopSwapperBgImage from "/images/dashboard/top-swapper-bg.png";
-import Medal1Image from "/images/dashboard/medal-1.png";
-import Medal2Image from "/images/dashboard/medal-2.png";
-import Medal3Image from "/images/dashboard/medal-3.png";
+import React from "react";
 
-const MEDALS = [Medal1Image, Medal2Image, Medal3Image];
+const MEDALS = [IconMedal1, IconMedal2, IconMedal3];
 
 interface SwapperCardProps {
     swapper: TopSwapper | undefined;
@@ -27,34 +30,34 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
 
     return (
         <GlowContainer
-            className="relative aspect-square overflow-hidden p-1.5 sm:p-1.5 2xl:p-3"
+            className="relative aspect-square p-1.5 sm:p-1.5 2xl:p-3"
             variant="swap"
         >
-            {/* Background */}
-            <img
-                src={TopSwapperBgImage}
-                alt=""
-                className="object-fit pointer-events-none absolute inset-0 h-full w-full"
-            />
+            {/* Background — overflow-hidden scoped here so content is never clipped */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[inherit]">
+                <img
+                    src={TopSwapperBgImage}
+                    alt=""
+                    className="object-fit absolute inset-0 h-full w-full"
+                />
+            </div>
 
             {/* Medal */}
-            {medal && (
-                <img
-                    src={medal}
-                    alt={`Rank ${rank + 1}`}
-                    className="absolute top-2 left-2 z-10 size-7 md:top-1 md:left-1 md:size-5 2xl:top-2 2xl:left-2 2xl:size-7"
-                />
-            )}
+            {medal &&
+                React.createElement(medal, {
+                    className:
+                        "absolute top-2 left-2 z-10 size-7 md:top-1 md:left-1 md:size-5 2xl:top-2 2xl:left-2 2xl:size-7",
+                })}
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 sm:py-px font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 2xl:gap-[8.5px] 2xl:text-tiny">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 sm:py-px 2xl:gap-[8.5px] 2xl:text-tiny">
                 {/* Name */}
                 <p className="max-w-full truncate text-center text-[9px] 2xl:text-xs">
                     {displayName}
                 </p>
 
                 {/* Avatar */}
-                <div className="size-9.5 overflow-hidden rounded-full bg-mb-gray-b8/20 md:size-7.5 2xl:size-9.5">
+                <div className="size-8 overflow-hidden rounded-full bg-mb-gray-b8/20 lg:size-7 2xl:size-9.5">
                     {swapper?.avatar ? (
                         <img
                             src={swapper.avatar}
@@ -107,9 +110,9 @@ export const TopSwapperSection = ({ data }: Props) => {
         <GlowContainer className="px-5 py-6.25" variant="swap">
             <div className="mb-6 flex items-center gap-3">
                 <IconSwapCategory className="size-10.75" />
-                <p className="text-2xl font-medium">TOP SWAPPER</p>
+                <p className="text-2xl font-medium text-nowrap">TOP SWAPPER</p>
             </div>
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
                 {slots.map((swapper, i) => (
                     <SwapperCard key={i} swapper={swapper} rank={i} />
                 ))}

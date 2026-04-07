@@ -7,6 +7,7 @@ import { useMemo, useState } from "react";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import { shortenNumber } from "@/utils/helpers/numbers";
+import TokenDisplay from "@/components/common/token-display";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -60,46 +61,93 @@ const EndStatus = ({ poolDetail }: Props) => {
     assetTypeIn: poolDetail?.pool.assetTypeIn,
   });
 
-  const estmatedReward = useMemo(() => {
+  const estimatedRewardNum = useMemo(() => {
     if (!poolDetail) return "-";
-    const rewardSymbol =
-      rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
     const totalDeposited =
       Number(poolDetail.depositedAmount) /
       Math.pow(10, poolDetail.pool.tokenInDecimals);
-
     const yourCurrentDeposited =
       Number(poolDetail?.userAmount?.deposited) /
       Math.pow(10, poolDetail.pool.tokenInDecimals);
-    const rewardBalanceNum = rewardBalance !== undefined
-      ? Number(rewardBalance.replace(/,/g, ""))
-      : 0;
-    if (totalDeposited === 0 || rewardBalanceNum === 0 || yourCurrentDeposited === 0)
-      return `0 ${rewardSymbol}`;
+    const rewardBalanceNum =
+      rewardBalance !== undefined ? Number(rewardBalance.replace(/,/g, "")) : 0;
+    if (
+      totalDeposited === 0 ||
+      rewardBalanceNum === 0 ||
+      yourCurrentDeposited === 0
+    )
+      return "0";
     const reward = (yourCurrentDeposited / totalDeposited) * rewardBalanceNum;
-    return `${shortenNumber({ number: reward })?.toUpperCase()} ${rewardSymbol}`;
-  }, [poolDetail, rewardTokenDisplay, rewardBalance]);
+    console.log("estimatedRewardNum", {
+      yourCurrentDeposited,
+      totalDeposited,
+      rewardBalanceNum,
+    });
+    return shortenNumber({ number: reward })?.toUpperCase() ?? "0";
+  }, [poolDetail, rewardBalance]);
+
 
   return (
-    <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+    <PoolChainGuard chainId={poolDetail?.pool.chainId} variant="burn">
       {canClaim ? (
         <StatRow
           label="Claimable Reward"
-          value={`${estmatedReward}`}
-          className="font-medium text-active"
-          valueClassName="text-2xl font-bold"
+          value={
+            <div className="inline-flex items-center gap-1.5 md:gap-2.5">
+              {estimatedRewardNum?.toUpperCase() ?? "0"}
+              <TokenDisplay
+                symbol={poolDetail?.tokenOut?.symbol}
+                customSymbol={poolDetail?.tokenOut?.customSymbol}
+                imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                classNames={{
+                  img: "size-4 md:size-5 2xl:size-5.75",
+                  container: "inline-flex items-center gap-1.5 md:gap-2.5",
+                }}
+              />
+            </div>
+          }
+          className="text-burn-border/85"
+          labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
+          valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
         />
       ) : (
         <StatRow
           label={"Claimed Reward"}
-          value={`${formattedReward} ${rewardTokenDisplay?.symbol ?? ""}`}
-          className="font-medium text-active"
-          valueClassName="text-2xl font-bold"
+          value={
+            <div className="inline-flex items-center gap-1.5 md:gap-2.5">
+              {formattedReward}
+              <TokenDisplay
+                symbol={poolDetail?.tokenOut?.symbol}
+                customSymbol={poolDetail?.tokenOut?.customSymbol}
+                imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                classNames={{
+                  img: "size-4 md:size-5 2xl:size-5.75",
+                  container: "inline-flex items-center gap-1.5 md:gap-2.5",
+                }}
+              />
+            </div>
+          }
+          className="text-burn-border/85"
+          labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
+          valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
         />
       )}
       <StatRow
         label="Your Burned Amount"
-        value={`${formattedBurned} ${burnTokenDisplay?.symbol ?? ""}`}
+        value={
+          <div className="inline-flex items-center gap-1 md:gap-1.5">
+            {formattedBurned}
+            <TokenDisplay
+              symbol={poolDetail?.tokenIn?.symbol}
+              customSymbol={poolDetail?.tokenIn?.customSymbol}
+              imageUri={burnTokenDisplay.imageUri ?? undefined}
+              classNames={{
+                img: "size-3.5 md:size-4 2xl:size-4.25",
+                container: "inline-flex items-center gap-1 md:gap-1.5",
+              }}
+            />
+          </div>
+        }
       />
       <ActionBtn
         letter="C"
