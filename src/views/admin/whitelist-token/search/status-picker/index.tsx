@@ -16,7 +16,7 @@ const AdminWhitelistTokenSearchStatusPicker: React.FC<Props> = ({
   const hasCounts = counts && counts.length > 0;
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex flex-wrap items-center gap-2">
       {options?.map((option, index) => {
         const isActive = option?.value === selected;
         return (

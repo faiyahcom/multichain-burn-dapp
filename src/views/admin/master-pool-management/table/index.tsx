@@ -59,7 +59,7 @@ const AdminMasterPoolManagementTable = () => {
 
   const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Partner Burn", "Status"];
   return (
-    <div className="space-y-10 pb-10 pl-14">
+    <div className="space-y-10 pb-10 md:pl-14">
       <Table>
         <TableHeader>
           <TableRow>

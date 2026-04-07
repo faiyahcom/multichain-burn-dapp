@@ -38,21 +38,21 @@ const ClosedStatus = ({ poolDetail }: Props) => {
     );
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network: networkConfig,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network: networkConfig,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
     const tokenInSymbolDisplay = burnTokenDisplay.symbol;
     const rewardTokenSymbolDisplay = rewardTokenDisplay.symbol;
@@ -161,7 +161,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                     <span className="font-medium text-foreground">
                         Reason close pool:{" "}
                     </span>
-                    <p className="text-greyed">{poolDetail.pool.adminCloseReason}</p>
+                    <p className="text-greyed">{poolDetail?.pool?.adminCloseReason}</p>
                 </div>
             )}
         </PoolChainGuard>

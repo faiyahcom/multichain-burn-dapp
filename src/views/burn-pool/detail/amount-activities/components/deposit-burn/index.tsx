@@ -124,14 +124,14 @@ const DepositBurnDialog = ({
 
   const formattedReward = poolDetail
     ? formatAmount(
-        poolDetail.pool.currentRewardAmount,
-        poolDetail.pool.rewardTokenDecimals,
+        poolDetail?.pool?.currentRewardAmount,
+        poolDetail?.pool?.rewardTokenDecimals,
       )
     : "-";
 
   const yourCurrentDepositedAmount = poolDetail?.userAmount?.deposited;
   const formattedCurrentDepositedAmount = yourCurrentDepositedAmount
-    ? formatAmount(yourCurrentDepositedAmount, poolDetail.pool.tokenInDecimals)
+    ? formatAmount(yourCurrentDepositedAmount, poolDetail?.pool?.tokenInDecimals)
     : "0";
 
   const handleSelectPercent = (percent: number) => {
@@ -159,26 +159,26 @@ const DepositBurnDialog = ({
     }
   };
 
-  const network = poolDetail?.pool.chainId
-    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+  const network = poolDetail?.pool?.chainId
+    ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
     : undefined;
   const burnTokenDisplay = resolvePoolTokenDisplay({
     network,
-    tokenAddress: poolDetail?.pool.tokenIn,
-    tokenSymbol: poolDetail?.tokenIn.symbol,
-    tokenName: poolDetail?.tokenIn.name,
-    customName: poolDetail?.tokenIn.customName,
-    customSymbol: poolDetail?.tokenIn.customSymbol,
-    imageUri: poolDetail?.tokenIn.imageUri,
+    tokenAddress: poolDetail?.pool?.tokenIn,
+    tokenSymbol: poolDetail?.tokenIn?.symbol,
+    tokenName: poolDetail?.tokenIn?.name,
+    customName: poolDetail?.tokenIn?.customName,
+    customSymbol: poolDetail?.tokenIn?.customSymbol,
+    imageUri: poolDetail?.tokenIn?.imageUri,
   });
   const rewardTokenDisplay = resolvePoolTokenDisplay({
     network,
-    tokenAddress: poolDetail?.pool.rewardToken,
-    tokenSymbol: poolDetail?.tokenOut.symbol,
-    tokenName: poolDetail?.tokenOut.name,
-    customName: poolDetail?.tokenOut.customName,
-    customSymbol: poolDetail?.tokenOut.customSymbol,
-    imageUri: poolDetail?.tokenOut.imageUri,
+    tokenAddress: poolDetail?.pool?.rewardToken,
+    tokenSymbol: poolDetail?.tokenOut?.symbol,
+    tokenName: poolDetail?.tokenOut?.name,
+    customName: poolDetail?.tokenOut?.customName,
+    customSymbol: poolDetail?.tokenOut?.customSymbol,
+    imageUri: poolDetail?.tokenOut?.imageUri,
   });
 
   const ratio = useMemo(() => {
@@ -193,26 +193,26 @@ const DepositBurnDialog = ({
     if (!poolDetail) return "-";
     const raw =
       Number(poolDetail.depositedAmount) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
-    return `${shortenNumber({ number: raw })} ${burnTokenDisplay?.symbol ?? poolDetail.pool.tokenInSymbol}`;
+      Math.pow(10, poolDetail?.pool?.tokenInDecimals);
+    return `${shortenNumber({ number: raw })} ${burnTokenDisplay?.symbol ?? poolDetail?.pool?.tokenInSymbol}`;
   }, [poolDetail, burnTokenDisplay]);
 
   const estmatedReward = useMemo(() => {
     if (!poolDetail) return "-";
     const rewardSymbol =
-      rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
-    const decimals = poolDetail.pool.rewardTokenDecimals;
+      rewardTokenDisplay?.symbol ?? poolDetail?.pool?.rewardTokenSymbol;
+    const decimals = poolDetail?.pool?.rewardTokenDecimals;
     if (!amountStr) return `0 ${rewardSymbol}`;
     const amount = Number(amountStr);
     if (isNaN(amount) || amount <= 0) return `0 ${rewardSymbol}`;
     const totalDeposited =
       Number(poolDetail.depositedAmount) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
+      Math.pow(10, poolDetail?.pool?.tokenInDecimals);
     const rewardPool =
-      Number(poolDetail.pool.rewardAmount) / Math.pow(10, decimals);
+      Number(poolDetail?.pool?.rewardAmount) / Math.pow(10, decimals);
     const yourCurrentDeposited =
       Number(poolDetail?.userAmount?.deposited) /
-      Math.pow(10, poolDetail.pool.tokenInDecimals);
+      Math.pow(10, poolDetail?.pool?.tokenInDecimals);
     const reward =
       ((amount + yourCurrentDeposited) / (totalDeposited + amount)) *
       rewardPool;

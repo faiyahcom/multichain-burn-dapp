@@ -42,7 +42,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+        <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
             <ActionBtn
                 letter="C"
                 text="Close Pool"

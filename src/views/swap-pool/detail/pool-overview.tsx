@@ -27,33 +27,33 @@ export function toCleanRatio(numerator?: string, denominator?: string): string {
 }
 
 const PoolOverview = ({ poolDetail }: Props) => {
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
         const cleanRatio = toCleanRatio(
-            poolDetail.pool.rewardDenominator,
-            poolDetail.pool.rewardNumerator, // It's reward num and dem, not ratio on onchain
+            poolDetail?.pool?.rewardDenominator,
+            poolDetail?.pool?.rewardNumerator, // It's reward num and dem, not ratio on onchain
         );
 
         return [
@@ -73,7 +73,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 { label: "Ratio", value: cleanRatio },
                 {
                     label: "Burn Token",
-                    // value: `${poolDetail.pool.tokenInSymbol}`,
+                    // value: `${poolDetail?.pool?.tokenInSymbol}`,
                     value: (
                         <div className="flex items-center gap-2">
                             <TokenImage

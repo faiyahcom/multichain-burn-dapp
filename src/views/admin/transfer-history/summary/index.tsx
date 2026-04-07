@@ -47,7 +47,7 @@ const AdminTransferHistorySummary = () => {
 
   return (
     <>
-      <div className="mb-8.75 space-y-4.25 px-13.5 pt-12.75">
+      <div className="mb-8.75 space-y-4.25 pt-4 px-4 md:px-13.5 md:pt-12.75">
         <div className="space-y-1 pl-7.5">
           <h1 className="text-3xl font-semibold">Transfer History</h1>
           <p className="text-base text-secondary-text">

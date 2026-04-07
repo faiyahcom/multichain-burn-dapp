@@ -48,7 +48,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const excludeKinds = [2].join(",");
     const { data: poolTxns, isLoading } = useQuery({
         queryKey: poolQueryKeys.txns(
-            poolDetail?.pool.address || "",
+            poolDetail?.pool?.address || "",
             page,
             excludeKinds,
         ),
@@ -56,42 +56,42 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
             poolService.getPoolTxns(
                 page,
                 DEFAULT_PAGE_SIZE,
-                poolDetail?.pool.address || "",
+                poolDetail?.pool?.address || "",
                 excludeKinds,
             ),
-        enabled: !!poolDetail?.pool.address,
+        enabled: !!poolDetail?.pool?.address,
         refetchInterval: 2_500, // Poll every 2.5s to update transactions
     });
 
     // Resolve custom token symbols from pool detail
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     // Map a transaction's raw token address to the pool's custom display symbol
     const resolveTokenSymbol = (txTokenAddress: string, fallbackSymbol: string) => {
-        if (txTokenAddress?.toLowerCase() === poolDetail?.pool.tokenIn?.toLowerCase()) {
+        if (txTokenAddress?.toLowerCase() === poolDetail?.pool?.tokenIn?.toLowerCase()) {
             return burnTokenDisplay.symbol;
         }
-        if (txTokenAddress?.toLowerCase() === poolDetail?.pool.rewardToken?.toLowerCase()) {
+        if (txTokenAddress?.toLowerCase() === poolDetail?.pool?.rewardToken?.toLowerCase()) {
             return rewardTokenDisplay.symbol;
         }
         return fallbackSymbol;

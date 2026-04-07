@@ -82,9 +82,9 @@ const AdminMasterPoolManagementSearch = () => {
   };
 
   return (
-    <div className="space-y-9.5 pt-12.75 pr-12.75 pl-21">
+    <div className="space-y-9.5 px-4 pt-4 md:pt-12.75 md:pr-12.75 md:pl-21">
       <h1 className="text-3xl font-semibold">Master Pool Management</h1>
-      <div className="flex items-center justify-between gap-2.5">
+      <div className="flex flex-col justify-between gap-2.5 md:flex-row md:items-center">
         <SingleSelect
           options={poolTypeOptions}
           selected={filter.type}
@@ -95,7 +95,7 @@ const AdminMasterPoolManagementSearch = () => {
           }}
         />
 
-        <div className="flex items-center gap-2.5">
+        <div className="flex flex-col gap-2.5 md:flex-row md:items-center">
           <MultipleSelect
             options={statusOptions}
             selected={filter.status}
@@ -108,7 +108,7 @@ const AdminMasterPoolManagementSearch = () => {
             placeholder="Status"
             placeholderMultiple="Status"
             classNames={{
-              btn: "max-w-50",
+              btn: "md:max-w-50",
             }}
           />
           <NetworkMultipleSelect
@@ -121,7 +121,7 @@ const AdminMasterPoolManagementSearch = () => {
             }}
             value={filter.text}
             onValueChange={(value) => setFilter({ text: value })}
-            className="sm:max-w-62.5"
+            className="md:max-w-62.5"
           />
         </div>
       </div>

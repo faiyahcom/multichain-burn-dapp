@@ -42,7 +42,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const excludeKinds = [2].join(",");
     const { data: poolTxns, isLoading } = useQuery({
         queryKey: poolQueryKeys.txns(
-            poolDetail?.pool.address || "",
+            poolDetail?.pool?.address || "",
             page,
             excludeKinds,
         ),
@@ -50,10 +50,10 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
             poolService.getPoolTxns(
                 page,
                 DEFAULT_PAGE_SIZE,
-                poolDetail?.pool.address || "",
+                poolDetail?.pool?.address || "",
                 excludeKinds,
             ),
-        enabled: !!poolDetail?.pool.address,
+        enabled: !!poolDetail?.pool?.address,
         refetchInterval: 2_500, // Poll every 2.5s to update transactions
     });
 

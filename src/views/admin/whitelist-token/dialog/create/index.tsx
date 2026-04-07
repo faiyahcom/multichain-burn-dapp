@@ -178,7 +178,8 @@ const AdminWhitelistTokenDialogCreate = () => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant={"mb-primary"} size={"mb-square-btn"}>
-          Add Token <PlusIcon className="size-3.75" />
+          <span className="max-md:sr-only">Add Token</span>{" "}
+          <PlusIcon className="size-3.75" />
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -270,7 +271,7 @@ const AdminWhitelistTokenDialogCreate = () => {
                   <FieldLabel htmlFor={field.name}>
                     Network<span className="text-md-required-red">*</span>
                   </FieldLabel>
-                  <div className="flex items-center gap-2.25">
+                  <div className="flex flex-wrap items-center gap-2.25">
                     {NETWORK_CONFIGS.map((network, index) => (
                       <AnimateIconButton
                         key={index}
@@ -392,7 +393,7 @@ const AdminWhitelistTokenDialogCreate = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-4.5">
+          <div className="flex flex-col-reverse justify-end gap-4.5 md:flex-row md:items-center">
             <AnimateIconButton
               variant="letter-icon"
               iconLetter="C"

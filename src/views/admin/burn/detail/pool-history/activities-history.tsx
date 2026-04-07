@@ -18,10 +18,10 @@ const DEFAULT_PAGE_SIZE = 5;
 const ActivitiesHistory = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
     const { data: poolActivities, isLoading } = useQuery({
-        queryKey: poolQueryKeys.activities(poolDetail?.pool.address || "", page),
+        queryKey: poolQueryKeys.activities(poolDetail?.pool?.address || "", page),
         queryFn: () =>
-            poolService.getPoolActivities(page, DEFAULT_PAGE_SIZE, poolDetail?.pool.address || ""),
-        enabled: !!poolDetail?.pool.address,
+            poolService.getPoolActivities(page, DEFAULT_PAGE_SIZE, poolDetail?.pool?.address || ""),
+        enabled: !!poolDetail?.pool?.address,
     });
 
     const activities = poolActivities?.activities ?? [];

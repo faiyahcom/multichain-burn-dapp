@@ -22,7 +22,7 @@ const SwapPoolDetail = ({ address }: Props) => {
         refetchInterval: 2_500, // Poll every 2.5s to update countdown and status
     });
 
-    const status = poolDetail?.pool.status;
+    const status = poolDetail?.pool?.status;
     const safeStatus: SwapPoolStatus = (status as SwapPoolStatus) ?? "on_going";
     const formattedStatus =
         safeStatus.charAt(0).toUpperCase() +
@@ -40,7 +40,7 @@ const SwapPoolDetail = ({ address }: Props) => {
                     ) : (
                         <>
                             <h2 className="text-3xl font-semibold">
-                                {poolDetail?.pool.name}
+                                {poolDetail?.pool?.name}
                             </h2>
                             <AnimateIconButton
                                 iconLetter={SWAP_POOL_STATUS[safeStatus].letter}
@@ -57,7 +57,7 @@ const SwapPoolDetail = ({ address }: Props) => {
                         </>
                     )}
                 </div>
-                <ScanLink address={address ?? ""} chainId={poolDetail?.pool.chainId} />
+                <ScanLink address={address ?? ""} chainId={poolDetail?.pool?.chainId} />
             </div>
             <div className="grid grid-cols-3 gap-x-6">
                 <div className="col-span-2">

@@ -27,7 +27,7 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
     };
 
     return (
-        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+        <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
             <ActionBtn
                 letter="U"
                 text="Update Pool"
@@ -35,7 +35,7 @@ const PendingHoldingStatus = ({ poolDetail }: Props) => {
                 disabled={isRunning}
                 onClick={handleEdit}
             />
-            {poolDetail?.pool.status === "pending" && (
+            {poolDetail?.pool?.status === "pending" && (
                 <ActionBtn
                     letter="A"
                     text="Approve Pool"

@@ -67,7 +67,7 @@ export const useSwapPoolSOL = () => {
 
                 const treasuryPubkey = factory.treasury as PublicKey;
 
-                const poolPDA = new PublicKey(poolDetail.pool.address);
+                const poolPDA = new PublicKey(poolDetail?.pool?.address);
 
                 const userDepositPDA = getUserDepositPDA(
                     poolPDA,
@@ -75,14 +75,14 @@ export const useSwapPoolSOL = () => {
                     program.programId,
                 );
 
-                const depositMintPubkey = new PublicKey(poolDetail.pool.tokenIn);
-                const rewardMintPubkey = new PublicKey(poolDetail.pool.rewardToken);
+                const depositMintPubkey = new PublicKey(poolDetail?.pool?.tokenIn);
+                const rewardMintPubkey = new PublicKey(poolDetail?.pool?.rewardToken);
 
                 const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
                 const depositVaultPDA = getDepositVaultPDA(poolPDA, program.programId);
 
                 const targetAddressPubkey = new PublicKey(
-                    poolDetail.pool.targetAddress,
+                    poolDetail?.pool?.targetAddress,
                 );
 
                 // ===============================
@@ -92,8 +92,8 @@ export const useSwapPoolSOL = () => {
 
                 // Use the on-chain asset_reward_type from pool data directly
                 // (avoids potential PublicKey comparison issues with detectAssetType)
-                const isNativeReward = poolDetail.pool.assetTypeReward === AssetTypeEnum.NATIVE;
-                console.log('[useSwapPoolSOL] isNativeReward:', isNativeReward, 'assetTypeReward:', poolDetail.pool.assetTypeReward);
+                const isNativeReward = poolDetail?.pool?.assetTypeReward === AssetTypeEnum.NATIVE;
+                console.log('[useSwapPoolSOL] isNativeReward:', isNativeReward, 'assetTypeReward:', poolDetail?.pool?.assetTypeReward);
 
                 const depositTokenProgram = getTokenProgramFromAssetType(depositAssetType)!;
 
@@ -187,7 +187,7 @@ export const useSwapPoolSOL = () => {
                 if (isNativeDeposit) {
                     depositIx = await program.methods
                         .depositToPoolNative(
-                            toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals),
+                            toBaseUnits(amountIn, poolDetail?.pool?.tokenInDecimals),
                         )
                         .accounts({
                             user: walletPublicKey,
@@ -205,8 +205,8 @@ export const useSwapPoolSOL = () => {
                         } as any)
                         .instruction();
                 } else {
-                    const depositAmount = toBaseUnits(amountIn, poolDetail.pool.tokenInDecimals);
-                    console.log('[useSwapPoolSOL] depositAmount (base units):', depositAmount.toString(), 'decimals:', poolDetail.pool.tokenInDecimals);
+                    const depositAmount = toBaseUnits(amountIn, poolDetail?.pool?.tokenInDecimals);
+                    console.log('[useSwapPoolSOL] depositAmount (base units):', depositAmount.toString(), 'decimals:', poolDetail?.pool?.tokenInDecimals);
                     depositIx = await program.methods
                         .depositToPoolSpl(depositAmount)
                         .accounts({

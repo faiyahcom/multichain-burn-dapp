@@ -37,8 +37,8 @@ export default function EditPoolScreen({
 
   React.useEffect(() => {
     if (poolDetail?.pool) {
-      setStartTime(new Date(Number(poolDetail.pool.timeStart) * 1000));
-      setEndTime(new Date(Number(poolDetail.pool.timeEnd) * 1000));
+      setStartTime(new Date(Number(poolDetail?.pool?.timeStart) * 1000));
+      setEndTime(new Date(Number(poolDetail?.pool?.timeEnd) * 1000));
     }
   }, [poolDetail]);
 
@@ -86,9 +86,9 @@ export default function EditPoolScreen({
     saving || !startTime || !endTime || startTime >= endTime;
 
   return (
-    <div className="pt-9.5 pr-14 pl-14">
+    <div className="p-4 pb-10 md:pt-9.5 md:pr-14 md:pl-14">
       {/* Header */}
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col items-start justify-between gap-1 lg:flex-row">
         <div className="space-y-1">
           <h2 className="text-3xl font-semibold">Update Pool</h2>
           <p className="text-base text-greyed">
@@ -113,7 +113,7 @@ export default function EditPoolScreen({
       <PoolOverview poolDetail={poolDetail} />
 
       {/* Schedule */}
-      <div className="mt-3 grid grid-cols-2 gap-x-6">
+      <div className="mt-3 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
         {/* Current Schedule */}
         <div className="py-4">
           <div className="flex items-center gap-2 pb-4">
@@ -123,13 +123,13 @@ export default function EditPoolScreen({
           <div className="space-y-3">
             <div className="grid grid-cols-2">
               <span className="text-xl text-greyed">Start Time:</span>
-              <span className="text-xl text-black">
+              <span className="text-xl text-black max-sm:text-right">
                 {formatScheduleTime(pool.timeStart)}
               </span>
             </div>
             <div className="grid grid-cols-2">
               <span className="text-xl text-greyed">End Time:</span>
-              <span className="text-xl text-black">
+              <span className="text-xl text-black max-sm:text-right">
                 {formatScheduleTime(pool.timeEnd)}
               </span>
             </div>
@@ -142,7 +142,7 @@ export default function EditPoolScreen({
             <div className="h-1.5 w-1.5 bg-black" />
             <span className="text-xl font-medium">Update Schedule</span>
           </div>
-          <div className="grid grid-cols-2 gap-x-4">
+          <div className="grid grid-cols-1 gap-x-4 max-md:gap-y-2 md:grid-cols-2">
             <div className="space-y-1">
               <span className="text-base text-greyed">Start Time:</span>
               <DatePicker
@@ -171,14 +171,14 @@ export default function EditPoolScreen({
       </div>
 
       {/* Footer */}
-      <div className="mt-8 flex justify-end gap-4">
+      <div className="mt-8 flex flex-col-reverse justify-end gap-4 sm:flex-row">
         <AnimateIconButton
           iconLetter="C"
           text="Cancel"
           variant="letter-icon"
           textVariant="text-container-center"
           classNames={{
-            btn: "w-60 text-center after:text-xl after:text-primary-foreground after:bg-[#FF8E97]",
+            btn: "sm:w-60 text-center after:text-xl after:text-primary-foreground after:bg-[#FF8E97]",
             text: "text-xl font-medium",
             icon: "size-7.5 text-xl",
           }}
@@ -196,7 +196,7 @@ export default function EditPoolScreen({
           variant="letter-icon"
           textVariant="text-container-center"
           classNames={{
-            btn: "w-60 text-center after:text-xl after:bg-[#966EFF] after:text-primary-foreground border border-active",
+            btn: "sm:w-60 text-center after:text-xl after:bg-[#966EFF] after:text-primary-foreground border border-active",
             text: "text-xl font-medium",
             icon: "size-7.5 text-xl",
           }}

@@ -230,7 +230,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
                   <FieldLabel htmlFor={field.name}>
                     Network<span className="text-md-required-red">*</span>
                   </FieldLabel>
-                  <div className="flex items-center gap-2.25">
+                  <div className="flex flex-wrap items-center gap-2.25">
                     {NETWORK_CONFIGS.map((network, index) => (
                       <AnimateIconButton
                         key={index}
@@ -319,7 +319,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
             />
           </div>
 
-          <div className="flex items-center justify-end gap-5">
+          <div className="flex md:items-center justify-end gap-5 flex-col-reverse md:flex-row">
             <AnimateIconButton
               variant="letter-icon"
               iconLetter="C"
