@@ -25,7 +25,6 @@ graph LR;
   CR/convert-design --> staging/new-design;
   main-admin --> beta-admin;
 ```
-Same for admin branches, with the exception that PRs directly from main to main-admin are allowed, no middle branch is needed.
 
 # React + TypeScript + Vite
 
