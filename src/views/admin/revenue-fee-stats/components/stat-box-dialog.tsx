@@ -134,8 +134,10 @@ const StatBoxDialog = ({
               </div>
             )}
             <div
-              className="max-h-[44dvh] space-y-2.25 overflow-y-auto"
-              style={{ scrollbarGutter: "stable both-edges" }}
+              className="max-h-[44dvh] space-y-2.25 overflow-y-auto px-2"
+              style={{
+                scrollbarWidth: "thin",
+              }}
             >
               {settlementBreakdown.length === 0 ? (
                 <p className="py-6 text-center text-sm text-secondary-text">
@@ -165,8 +167,7 @@ const StatBoxDialog = ({
             {settlementBreakdown.length > 0 && (
               <div
                 // This is meant to make the total box wdith the same as the item boxes, not scrollable
-                className="mt-5 overflow-y-auto"
-                style={{ scrollbarGutter: "stable both-edges" }}
+                className="mt-5 px-2"
               >
                 <div className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-base">
                   <div>Total</div>

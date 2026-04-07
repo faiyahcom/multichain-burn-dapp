@@ -168,12 +168,18 @@ const AdminRevenueFeeStats = () => {
               value={dateFrom}
               onChange={setDateFrom}
               placeholder="DD/MM/YY"
+              calendarProps={{
+                disabled: dateTo ? { after: dateTo } : undefined,
+              }}
             />
             <p className="text-13px">to</p>
             <DatePicker
               value={dateTo}
               onChange={setDateTo}
               placeholder="DD/MM/YY"
+              calendarProps={{
+                disabled: dateFrom ? { before: dateFrom } : undefined,
+              }}
             />
           </div>
         </div>
