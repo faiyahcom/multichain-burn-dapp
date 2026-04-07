@@ -33,7 +33,7 @@ const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
         src={src}
         alt={alt || "token-image"}
         className={cn(
-          "size-8 shrink-0 rounded-full bg-foreground object-cover",
+          "size-8 shrink-0 rounded-full object-cover",
           classNames?.common,
           classNames?.img,
         )}
