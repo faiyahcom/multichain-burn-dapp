@@ -1,7 +1,9 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
+import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import CustomPagination from "@/components/common/pagination";
+import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TableNoData from "@/components/common/table-no-data";
 import TableSpinner from "@/components/common/table-spinner";
 import {
@@ -23,15 +25,13 @@ import {
   type PoolType,
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
-import {
-  formatTimestampSecondsToDate,
-  truncateString,
-} from "@/utils/helpers/string";
-import { useQuery } from "@tanstack/react-query";
+import { truncateString } from "@/utils/helpers/string";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
+  const queryClient = useQueryClient();
   const limit = 20;
 
   const { data: pools, isPending: isPendingPools } = useQuery({
@@ -46,15 +46,20 @@ const AdminMasterPoolManagementTable = () => {
           array: filter.network?.map((network) => networkIdToChainId(network)),
         }),
         kind:
-          filter.type && !isNaN(Number(filter.type)) ? filter.type : undefined,
+          filter.type === "partner"
+            ? "0"
+            : filter.type && !isNaN(Number(filter.type))
+              ? filter.type
+              : undefined,
+        isPartner: filter.type === "partner" ? "true" : undefined,
         search: filter.text || undefined,
       });
     },
   });
 
-  const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Status"];
+  const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Partner Burn", "Status"];
   return (
-    <div className="space-y-10 pb-10 pl-14">
+    <div className="space-y-10 pb-10 md:pl-14">
       <Table>
         <TableHeader>
           <TableRow>
@@ -71,14 +76,8 @@ const AdminMasterPoolManagementTable = () => {
             isLoading={isPendingPools}
           />
           {pools?.pools?.map((item) => {
-            const timeStart = formatTimestampSecondsToDate({
-              timestamp: item.timeStart,
-              notFound: "",
-            });
-            const timeEnd = formatTimestampSecondsToDate({
-              timestamp: item.timeEnd,
-              notFound: "",
-            });
+            const isBurnPool = item.kind === 0;
+
             return (
               <TableRow key={item.address}>
                 <TableCell className="pl-11.25 text-left">
@@ -111,14 +110,33 @@ const AdminMasterPoolManagementTable = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {timeStart && timeEnd && (
-                    <>
-                      {timeStart} - {timeEnd}
-                    </>
+                  {isBurnPool && (
+                    <StartEndDateDisplay
+                      startDate={item.timeStart}
+                      endDate={item.timeEnd}
+                      classNames={{
+                        container: "2xl:flex-row",
+                        dash: "2xl:block",
+                      }}
+                    />
                   )}
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
+                </TableCell>
+                <TableCell className="text-center">
+                  {isBurnPool && (
+                    <PartnerBurnSwitch
+                      address={item.address}
+                      isPartner={item.isPartner}
+                      onSuccess={() =>
+                        queryClient.invalidateQueries({
+                          queryKey: poolQueryKeys.list(filter),
+                        })
+                      }
+                      classNames={{ btn: "mx-auto" }}
+                    />
+                  )}
                 </TableCell>
                 <TableCell>
                   <AnimateIconButton

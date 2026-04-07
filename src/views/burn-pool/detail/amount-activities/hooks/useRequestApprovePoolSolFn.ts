@@ -56,6 +56,7 @@ export const useRequestApprovePoolSolFn = () => {
 
                 return tx;
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to request pool approval", {
                     description: getErrorMessage({ error }),
                 });

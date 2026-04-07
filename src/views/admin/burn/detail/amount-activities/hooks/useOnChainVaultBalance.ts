@@ -2,18 +2,15 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Connection, PublicKey } from "@solana/web3.js";
 import { ethers } from "ethers";
 import { useAppKitConnection } from "@reown/appkit-adapter-solana/react";
-import {
-    getRewardVaultPDA,
-    getDepositVaultPDA,
-    AssetTypeEnum,
-} from "@/web3/helpers";
-import { MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
+import { BorshAccountsCoder, type Idl } from "@coral-xyz/anchor";
+import idl from "@/web3/contracts/multichain_burn_sc_sol.json";
 import {
     SOLANA_BACKEND_CHAIN_ID,
     NETWORK_CONFIGS,
     getRpcUrl,
 } from "@/config/networks";
 import { ZERO_ADDRESS } from "@/config/constant";
+
 
 // ── Solana fallback RPC ──────────────────────────────────────────────────────
 const solanaConfig = NETWORK_CONFIGS.find(
@@ -23,13 +20,16 @@ const SOLANA_RPC_URL =
     (solanaConfig?.appKitNetwork as any)?.rpcUrls?.default?.http?.[0] ??
     "https://api.devnet.solana.com";
 
+// ── Anchor coder for PoolAccount deserialization ─────────────────────────────
+const accountsCoder = new BorshAccountsCoder(idl as Idl);
+
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
 function formatBalance(rawAmount: string, decimals: number): string {
     const num = Number(rawAmount) / 10 ** decimals;
     return num.toLocaleString(undefined, {
         minimumFractionDigits: 0,
-        maximumFractionDigits: Math.min(decimals, 4),
+        maximumFractionDigits: Math.min(decimals, 6),
     });
 }
 
@@ -69,10 +69,12 @@ async function fetchEvmBalance(
 // ── Hook ─────────────────────────────────────────────────────────────────────
 
 /**
- * Queries the real on-chain vault balance for both Solana and EVM pools.
+ * Queries the on-chain tracked balance for both Solana and EVM pools.
  *
- * Solana: SPL token → getTokenAccountBalance on vault PDA.
- *         Native SOL → getBalance on vault PDA.
+ * Solana: Deserializes the PoolAccount PDA and reads the program-tracked
+ *         `rewardBalance` and `totalDeposited` fields directly.
+ *         This is more accurate than querying raw vault balances because
+ *         it avoids rent-exempt reserve subtraction issues for native SOL.
  *
  * EVM:    ERC20 → balanceOf(poolAddress) on the token contract.
  *         Native ETH/BNB → provider.getBalance(poolAddress).
@@ -106,7 +108,6 @@ export function useOnChainVaultBalance(params: {
         () => new Connection(SOLANA_RPC_URL, "confirmed"),
         [],
     );
-
     const isSolana = chainId === SOLANA_BACKEND_CHAIN_ID;
 
     const [rewardBalance, setRewardBalance] = useState<string | undefined>();
@@ -125,30 +126,28 @@ export function useOnChainVaultBalance(params: {
                 let depositRaw: string;
 
                 if (isSolana) {
-                    // ── Solana ────────────────────────────────────────────────
+                    // ── Solana: read tracked balances from PoolAccount state ──
                     const conn = appKitConnection ?? fallbackSolConnection;
                     const poolPDA = new PublicKey(poolAddress);
-                    const rewardVault = getRewardVaultPDA(poolPDA, MULTICHAIN_BURN_PROGRAM_ID);
-                    const depositVault = getDepositVaultPDA(poolPDA, MULTICHAIN_BURN_PROGRAM_ID);
 
-                    const isNativeReward = assetTypeReward === AssetTypeEnum.NATIVE;
-                    if (isNativeReward) {
-                        rewardRaw = (await conn.getBalance(rewardVault)).toString();
+                    const accountInfo = await conn.getAccountInfo(poolPDA);
+                    if (!accountInfo?.data) {
+                        rewardRaw = "0";
+                        depositRaw = "0";
                     } else {
-                        try {
-                            rewardRaw = (await conn.getTokenAccountBalance(rewardVault)).value.amount;
-                        } catch {
-                            rewardRaw = "0";
-                        }
-                    }
+                        // Deserialize the PoolAccount using Anchor's BorshAccountsCoder
+                        const poolAccount = accountsCoder.decode(
+                            "PoolAccount",
+                            accountInfo.data,
+                        );
 
-                    const isNativeDeposit = assetTypeIn === AssetTypeEnum.NATIVE;
-                    if (isNativeDeposit) {
-                        depositRaw = (await conn.getBalance(depositVault)).toString();
-                    } else {
-                        try {
-                            depositRaw = (await conn.getTokenAccountBalance(depositVault)).value.amount;
-                        } catch {
+                        // rewardBalance and totalDeposited are BN instances (u64)
+                        // BorshAccountsCoder returns snake_case field names matching the IDL
+                        rewardRaw = poolAccount.reward_balance.toString();
+                        depositRaw = poolAccount.total_deposited.toString();
+
+                        let isCollected = poolAccount.is_collected;
+                        if (isCollected == true) {
                             depositRaw = "0";
                         }
                     }
@@ -207,3 +206,4 @@ export function useOnChainVaultBalance(params: {
 }
 
 export type VaultBalance = ReturnType<typeof useOnChainVaultBalance>;
+

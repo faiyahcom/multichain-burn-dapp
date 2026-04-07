@@ -7,10 +7,10 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { chainIdToNetworkConfig } from "@/config/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { txnKind, type PoolDetailResponse } from "@/types/pool";
+import { getExplorerTxUrl } from "@/utils/helpers/networks";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
@@ -20,17 +20,6 @@ import { useState } from "react";
 //     1: "Deposit",
 //     2: "Withdraw",
 // };
-
-function getExplorerTxUrl(chainId: string, hash: string): string {
-    const network = chainIdToNetworkConfig(chainId);
-    const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
-    if (!baseUrl) return "#";
-    // Solana explorer uses different path format
-    if (network?.id === "solanaDevnet") {
-        return `${baseUrl.replace(/\/$/, "")}/tx/${hash}?cluster=devnet`;
-    }
-    return `${baseUrl.replace(/\/$/, "")}/tx/${hash}`;
-}
 
 export function formatTimestamp(timestamp: string): string {
     const date = new Date(Number(timestamp) * 1000);
@@ -50,11 +39,21 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
+    const excludeKinds = [2].join(",");
     const { data: poolTxns, isLoading } = useQuery({
-        queryKey: poolQueryKeys.txns(poolDetail?.pool.address || "", page),
+        queryKey: poolQueryKeys.txns(
+            poolDetail?.pool?.address || "",
+            page,
+            excludeKinds,
+        ),
         queryFn: () =>
-            poolService.getPoolTxns(page, DEFAULT_PAGE_SIZE, poolDetail?.pool.address || ""),
-        enabled: !!poolDetail?.pool.address,
+            poolService.getPoolTxns(
+                page,
+                DEFAULT_PAGE_SIZE,
+                poolDetail?.pool?.address || "",
+                excludeKinds,
+            ),
+        enabled: !!poolDetail?.pool?.address,
         refetchInterval: 2_500, // Poll every 2.5s to update transactions
     });
 

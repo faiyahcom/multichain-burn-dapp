@@ -35,7 +35,10 @@ const CopyableText: React.FC<Props> = ({
         classNames?.container,
       )}
     >
-      <span className={cn("text-sm", classNames?.displayText)} title={content}>
+      <span
+        className={cn("min-w-0 truncate text-sm", classNames?.displayText)}
+        title={content}
+      >
         {displayText ?? content}
       </span>
       <button

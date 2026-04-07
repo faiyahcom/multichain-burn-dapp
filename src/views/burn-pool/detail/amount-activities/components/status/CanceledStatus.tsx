@@ -18,25 +18,25 @@ const CanceledStatus = ({ poolDetail }: Props) => {
         formattedBurned,
     } = useAmountActivity(poolDetail);
     const { user } = useAuthStore();
-    const isPoolOwner = user?.address === poolDetail?.pool.owner;
+    const isPoolOwner = user?.address === poolDetail?.pool?.owner;
     const formattedReturning = poolDetail?.returningAmountOnCanceling
         ? formatAmount(
             poolDetail.returningAmountOnCanceling.amount,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
 
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
     return (
         <>
@@ -50,7 +50,7 @@ const CanceledStatus = ({ poolDetail }: Props) => {
                 label="Your Burned Amount"
                 value={`${formattedBurned} ${pool?.tokenInSymbol ?? ""}`}
             />
-            {poolDetail?.pool.status === "canceled" && isPoolOwner && (
+            {poolDetail?.pool?.status === "canceled" && isPoolOwner && (
                 <div className="flex items-center justify-between text-active">
                     <span className="text-sm font-medium">Your reward token return</span>
                     <span className="text-sm font-bold">

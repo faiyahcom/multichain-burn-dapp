@@ -36,7 +36,7 @@ interface TokenInfo {
 }
 
 export interface PoolDetailResponse {
-    userAmount: {
+    userAmount?: {
         address: string;
         deposited: string;
         claimed: string;
@@ -78,6 +78,7 @@ export interface PoolDetailResponse {
         rewardAmount: string;
         settlementFee: string;
         poolCreationFee: string;
+        isPartner?: boolean;
     };
     returningAmountOnCanceling?: {
         amount: string;
@@ -113,27 +114,34 @@ export const txnKind = {
     3: "Maker Deposit Reward",
     4: "Taker Claim Reward",
     5: "Refund to Maker",
+    6: "Burn Success"
 } as const;
 
 export const activityKind = {
-    // Pool lifecycle
-    0: "Pool Created",
-    1: "Pool Requested",
-    2: "Pool Approved",
-    3: "Pool Rejected",
-    4: "Pool Canceled",
-    5: "Pool Closed",
-    8: "Pool Updated",
+  // Pool lifecycle
+  0: "Create burn pool",
+  1: "Create swap pool",
+  2: "Pool Requested",
+  3: "Pool Approved",
+  4: "Pool Rejected",
+  5: "Cancel pool",
+  6: "Pool Closed",
+  7: "Pool Updated",
+  8: "Pool Ended",
 
-    // Reward
-    10: "Reward Deposited",
+  // Maker action
+  10: "Deposit reward token",
+  11: "Maker Cancel Approve Request",
 
-    // Admin action
-    20: "Admin Refund",
+  // Admin action
+  20: "Admin Refund",
 
-    // User actions
-    30: "Taker Deposit", //taker deposit to pool
-    31: "Taker Claim", //taker claim reward from burn pool
+  // User actions
+  30: "Deposit burn token",
+  31: "Claim reward",
+  32: "Swap",
+
+  40: "Pool End",
 } as const;
 
 export interface PoolActivitiesResponse {
@@ -145,7 +153,7 @@ export interface PoolActivitiesResponse {
         log_ix: number;
         timestamp: string;
         actor: string;
-        kind: (typeof activityKind)[keyof typeof activityKind];
+        kind: keyof typeof activityKind;
         poolAddress: string;
     }[];
 }

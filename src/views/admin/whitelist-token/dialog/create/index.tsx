@@ -33,9 +33,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { whitelistService } from "@/services/whitelistService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
-import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { booleanString } from "@/types/common";
-import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -52,7 +51,7 @@ const whitelistTokenSchema = z.object({
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
-      error: "Invalid image",
+      error: "Only png, jpeg (jpg), and svg files are allowed",
     })
     .max(5 * 1024 * 1024, { error: "Image size should be less than 5MB" })
     .optional(),
@@ -64,7 +63,6 @@ const whitelistTokenSchema = z.object({
 type WhitelistTokenFormValues = z.infer<typeof whitelistTokenSchema>;
 
 const AdminWhitelistTokenDialogCreate = () => {
-  const { filter } = useAdminWhitelistTokenSearchFilterStore();
   const [open, setOpen] = useState<boolean>(false);
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
@@ -90,7 +88,7 @@ const AdminWhitelistTokenDialogCreate = () => {
         name: "",
         symbol: "",
         address: "",
-        networkId: "ethereumTestnet",
+        networkId: currentNetworkId ?? undefined,
         image: undefined,
         description: "",
         homepageLink: "",
@@ -98,7 +96,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       },
       resolver: zodResolver(whitelistTokenSchema),
     });
-    
+
   // Sync form field whenever the wallet switches network
   useEffect(() => {
     if (currentNetworkId) setValue("networkId", currentNetworkId);
@@ -142,8 +140,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     onSuccess: () => {
       toast.success("Token whitelisted successfully!");
       queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokens(filter),
-        exact: false,
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
 
       handleOpenChange(false);
@@ -181,7 +178,8 @@ const AdminWhitelistTokenDialogCreate = () => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         <Button variant={"mb-primary"} size={"mb-square-btn"}>
-          Add Token <PlusIcon className="size-3.75" />
+          <span className="max-md:sr-only">Add Token</span>{" "}
+          <PlusIcon className="size-3.75" />
         </Button>
       </DialogTrigger>
       <DialogContent
@@ -273,7 +271,7 @@ const AdminWhitelistTokenDialogCreate = () => {
                   <FieldLabel htmlFor={field.name}>
                     Network<span className="text-md-required-red">*</span>
                   </FieldLabel>
-                  <div className="flex items-center gap-2.25">
+                  <div className="flex flex-wrap items-center gap-2.25">
                     {NETWORK_CONFIGS.map((network, index) => (
                       <AnimateIconButton
                         key={index}
@@ -395,7 +393,7 @@ const AdminWhitelistTokenDialogCreate = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-end gap-4.5">
+          <div className="flex flex-col-reverse justify-end gap-4.5 md:flex-row md:items-center">
             <AnimateIconButton
               variant="letter-icon"
               iconLetter="C"

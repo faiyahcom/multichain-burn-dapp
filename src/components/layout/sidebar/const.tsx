@@ -1,16 +1,19 @@
 import {
   IconActivityHistory,
   IconBurnPool,
+  IconFeeSettingsGear,
   IconMyCreatedPools,
   IconMyDashboard,
   IconMyParticipatedPools,
   IconPairList,
   IconPersonalInfoSettings,
+  IconRevenueFeeStats,
   IconSettings,
   IconSupport,
   IconSwap,
   IconSwapHistory,
 } from "@/assets/react";
+import type { UserRole } from "@/services/authService";
 
 export const navSection = {
   overview: "overview",
@@ -33,12 +36,14 @@ type NavChild = {
   tab: string;
 };
 
-type NavItem = {
+export type NavItem = {
   label: string;
   to?: string;
   icon?: React.ComponentType<{ className?: string }>;
   section: NavSection;
   children?: NavChild[];
+  allowedRoles?: UserRole[];
+  superAdminOnly?: boolean;
 };
 
 export const navItems: NavItem[] = [
@@ -120,6 +125,12 @@ export const navItems: NavItem[] = [
     to: "/settings",
   },
   {
+    label: "Admin Management",
+    section: navSection.admin,
+    to: "/admin/admin-management",
+    superAdminOnly: true,
+  },
+  {
     label: "Whitelist Token",
     section: navSection.admin,
     to: "/admin/whitelist-token",
@@ -128,6 +139,7 @@ export const navItems: NavItem[] = [
     label: "Whitelist User",
     section: navSection.admin,
     to: "/admin/whitelist-user",
+    superAdminOnly: true,
   },
   {
     label: "Transfer History",
@@ -138,5 +150,65 @@ export const navItems: NavItem[] = [
     label: "Master Pool Management",
     section: navSection.admin,
     to: "/admin/master-pool-management",
+  },
+  {
+    label: "Revenue & Fee Stats",
+    icon: IconRevenueFeeStats,
+    section: navSection.admin,
+    to: "/admin/revenue-fee-stats",
+  },
+  {
+    label: "Fee Settings Management",
+    icon: IconFeeSettingsGear,
+    section: navSection.admin,
+    to: "/admin/fee-settings-management",
+    superAdminOnly: true,
+  },
+];
+
+export const adminNavItems: NavItem[] = [
+  {
+    label: "Admin Management",
+    section: navSection.admin,
+    to: "/admin/admin-management",
+    allowedRoles: ["super_admin"],
+  },
+  {
+    label: "Whitelist Token",
+    section: navSection.admin,
+    to: "/admin/whitelist-token",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "Whitelist User",
+    section: navSection.admin,
+    to: "/admin/whitelist-user",
+    allowedRoles: ["super_admin"],
+  },
+  {
+    label: "Transfer History",
+    section: navSection.admin,
+    to: "/admin/transfer-history",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "Master Pool Management",
+    section: navSection.admin,
+    to: "/admin/master-pool-management",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "Revenue & Fee Stats",
+    icon: IconRevenueFeeStats,
+    section: navSection.admin,
+    to: "/admin/revenue-fee-stats",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "Fee Settings Management",
+    icon: IconFeeSettingsGear,
+    section: navSection.admin,
+    to: "/admin/fee-settings-management",
+    allowedRoles: ["super_admin"],
   },
 ];

@@ -1,4 +1,5 @@
-import { format, isValid } from "date-fns";
+import { format, isValid, formatDistanceToNowStrict } from "date-fns";
+import type { PoolKind } from "@/types/pool";
 
 export const truncateString = ({
   str,
@@ -32,4 +33,27 @@ export const formatTimestampSecondsToDate = ({
   const date = new Date(Number(timestamp) * 1000);
   if (!isValid(date)) return notFound;
   return format(date, formatStr);
+};
+
+export const formatRelativeTime = (isoTimestamp: string): string => {
+  const date = new Date(isoTimestamp);
+  if (!isValid(date)) return "";
+  return formatDistanceToNowStrict(date, { addSuffix: true });
+};
+
+export const getAdminPoolHref = ({
+  address,
+  kind,
+}: {
+  address: string;
+  kind: 0 | 1;
+}): string => {
+  switch (kind) {
+    case 0:
+      return `/admin/burn/detail/${address}`;
+    case 1:
+      return `/admin/swap/detail/${address}`;
+    default:
+      return "#";
+  }
 };

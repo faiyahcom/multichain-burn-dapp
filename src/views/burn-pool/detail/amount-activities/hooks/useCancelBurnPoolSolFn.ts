@@ -58,8 +58,8 @@ export const useCancelBurnPoolSolFn = () => {
                 const program = getMultichainBurnProgram(connection, anchorWallet);
 
                 // ── 1. Resolve mints ───────────────────────────────────────
-                const rewardMint = new PublicKey(poolDetail.pool.rewardToken);
-                const depositMint = new PublicKey(poolDetail.pool.tokenIn);
+                const rewardMint = new PublicKey(poolDetail?.pool?.rewardToken);
+                const depositMint = new PublicKey(poolDetail?.pool?.tokenIn);
 
                 // ── 2. Detect token programs ───────────────────────────────
                 const rewardAssetType = await detectAssetType(connection, rewardMint);
@@ -153,6 +153,8 @@ export const useCancelBurnPoolSolFn = () => {
 
                 return signature;
             } catch (error: any) {
+                console.log(error);
+
                 toast.error("Failed to cancel pool", {
                     description: getErrorMessage({ error }),
                 });

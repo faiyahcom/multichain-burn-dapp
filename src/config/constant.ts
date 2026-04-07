@@ -11,6 +11,7 @@ export const API_BASE_URL =
 export const ZERO_ADDRESS = ethers.ZeroAddress;
 export const WSOL_ADDRESS = NATIVE_MINT.toString();
 export const DEFAULT_NATIVE_DECIMALS = 18;
+export const DEFAULT_INPUT_NUMBER_STEP = "0.000001";
 
 export const WRONG_NETWORK_ERROR_MESSAGE =
   "Please switch to an account on the correct network to continue.";

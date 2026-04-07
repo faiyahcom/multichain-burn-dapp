@@ -14,7 +14,9 @@ import { NETWORK_CONFIGS } from "@/config/networks";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { truncateString } from "@/utils/helpers/string";
 import { useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
+import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 type Props = {
   value?: string;
@@ -32,24 +34,33 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const queryClient = useQueryClient();
 
   const networkConfig = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
   const nativeCurrency = networkConfig?.appKitNetwork.nativeCurrency;
   const isSolana = selectedNetworkId === "solanaDevnet";
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
-  const { data: whitelistTokens, isPending: isLoading } = useGetWhitelistTokens(
-    {
-      search: textSearch || undefined,
-      chainIds: networkConfig?.backendChainId,
-      active: "1",
-      isDropped: "0",
-    },
-  );
+  const {
+    data: whitelistTokens,
+    isPending,
+    isFetching,
+  } = useGetWhitelistTokens({
+    search: textSearch || undefined,
+    chainIds: networkConfig?.backendChainId,
+    active: "1",
+    isDropped: "0",
+  });
+
+  const isLoading = isPending || (open && isFetching);
 
   const handleOpenChange = (open: boolean) => {
     if (!open) {
       setTextSearch("");
+    } else {
+      void queryClient.invalidateQueries({
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+      });
     }
     setOpen(open);
   };
@@ -63,6 +74,17 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
         imageUri: networkConfig?.iconSrc ?? "",
       }
     : null;
+
+  // Show native token if search text is empty or matches native token symbol or name
+  const showNativeToken =
+    !!nativeToken &&
+    (nativeToken.symbol
+      .toLocaleLowerCase()
+      .includes(textSearch.toLocaleLowerCase()) ||
+      nativeToken.name
+        .toLocaleLowerCase()
+        .includes(textSearch.toLocaleLowerCase()) ||
+      textSearch.length === 0);
 
   const selectedDetail =
     value === nativeAddress
@@ -116,7 +138,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
           </div>
         ) : (
           <div className="mt-2 max-h-[calc(var(--radix-dropdown-menu-content-available-height)*0.7)] space-y-1 overflow-y-auto">
-            {nativeToken && (
+            {showNativeToken && (
               <DropdownMenuItem
                 key={nativeAddress}
                 className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${value === nativeAddress ? "bg-inactive font-semibold text-active" : ""} ${disabledAddress === nativeAddress ? "cursor-not-allowed opacity-40" : ""}`}
@@ -147,47 +169,47 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
                 </div>
               </DropdownMenuItem>
             )}
-            {whitelistTokens?.whitelistTokens.length
-              ? whitelistTokens.whitelistTokens.map((token) => {
-                  const isSelected = value === token.address;
-                  const isDisabled = disabledAddress === token.address;
-                  return (
-                    <DropdownMenuItem
-                      key={token.address}
-                      className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${isSelected ? "bg-inactive font-semibold text-active" : ""} ${isDisabled ? "cursor-not-allowed opacity-40" : ""}`}
-                      leftSelectedPanelClassName="w-1.5"
-                      isSelected={isSelected}
-                      disabled={isDisabled}
-                      onClick={() => {
-                        if (!isDisabled) {
-                          onChange(token.address);
-                        }
-                      }}
-                    >
-                      <img
-                        src={token.imageUri}
-                        alt={token.symbol}
-                        className="size-7.75 rounded-full"
-                      />
-                      <div className="flex flex-col">
-                        <span className="text-xs">{resolveName(token)}</span>
-                        <div className="flex gap-1.25">
-                          <span className="text-[11px] font-normal text-secondary-text">
-                            {resolveSymbol(token)}
-                          </span>
-                          <span className="text-tiny font-light text-secondary-text/80">
-                            {truncateString({ str: token.address })}
-                          </span>
-                        </div>
-                      </div>
-                    </DropdownMenuItem>
-                  );
-                })
-              : !nativeToken && (
-                  <div className="flex items-center justify-center py-4">
-                    No tokens available
+            {whitelistTokens?.whitelistTokens.map((token) => {
+              const isSelected = value === token.address;
+              const isDisabled = disabledAddress === token.address;
+              return (
+                <DropdownMenuItem
+                  key={token.address}
+                  className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${isSelected ? "bg-inactive font-semibold text-active" : ""} ${isDisabled ? "cursor-not-allowed opacity-40" : ""}`}
+                  leftSelectedPanelClassName="w-1.5"
+                  isSelected={isSelected}
+                  disabled={isDisabled}
+                  onClick={() => {
+                    if (!isDisabled) {
+                      onChange(token.address);
+                    }
+                  }}
+                >
+                  <img
+                    src={token.imageUri}
+                    alt={token.symbol}
+                    className="size-7.75 rounded-full"
+                  />
+                  <div className="flex flex-col">
+                    <span className="text-xs">{resolveName(token)}</span>
+                    <div className="flex gap-1.25">
+                      <span className="text-[11px] font-normal text-secondary-text">
+                        {resolveSymbol(token)}
+                      </span>
+                      <span className="text-tiny font-light text-secondary-text/80">
+                        {truncateString({ str: token.address })}
+                      </span>
+                    </div>
                   </div>
-                )}
+                </DropdownMenuItem>
+              );
+            })}
+            {whitelistTokens?.whitelistTokens.length === 0 &&
+              !showNativeToken && (
+                <div className="flex items-center justify-center py-4">
+                  No tokens available
+                </div>
+              )}
           </div>
         )}
       </DropdownMenuContent>

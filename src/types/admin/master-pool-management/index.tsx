@@ -1,4 +1,5 @@
 import type {
+  BooleanString,
   PaginationRequest,
   PaginationResponse,
   SortBy,
@@ -16,10 +17,12 @@ export const poolTypeLabels: Record<PoolType, string> = {
 export const poolTypeOptionValues = [
   "all",
   ...poolTypes.map((type) => type.toString()),
+  "partner",
 ];
 export type PoolTypeOptionValue = (typeof poolTypeOptionValues)[number];
 export const poolTypeOptions = poolTypeOptionValues.map((value) => {
   if (value === "all") return { label: "All Types", value };
+  if (value === "partner") return { label: "Partner Burn", value };
   return {
     label: poolTypeLabels[Number(value) as PoolType],
     value,
@@ -107,6 +110,7 @@ export type PoolItemType = {
   timeEnd: string; // timestamp seconds, if none then it is "0"
   rewardNumerator: string;
   rewardDenominator: string;
+  isPartner: boolean;
 };
 
 export type PoolListRequest = PaginationRequest & {
@@ -120,6 +124,7 @@ export type PoolListRequest = PaginationRequest & {
   tokenIn?: string;
   tokenReward?: string;
   owner?: string;
+  isPartner?: BooleanString;
 };
 
 export type PoolListResponse = PaginationResponse & {

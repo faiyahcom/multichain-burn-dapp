@@ -38,7 +38,7 @@ const buttonVariants = cva(
         "icon-lg": "size-10",
         "mb-btn": "rounded-md-plus h-[34px] px-4 py-2",
         "mb-square-btn":
-          "rounded-sm h-[46px] py-[8px] pl-[34px] pr-[25px] gap-[25px]",
+          "rounded-sm h-[46px] py-[8px] px-4 md:pl-[34px] md:pr-[25px] gap-[25px]",
         "mb-pagination-small": "h-[28px] py-[8px] px-[12px] rounded-5px",
         "mb-pagination-normal": "h-[28px] py-[8px] px-[21px] rounded-5px",
       },

@@ -13,6 +13,20 @@ import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 
+type FactoryAccountState = {
+  whitelistToken?: PublicKey[];
+};
+
+type MultichainBurnProgramWithFactoryAccount = ReturnType<
+  typeof getMultichainBurnProgram
+> & {
+  account: {
+    factoryAccount: {
+      fetch: (address: PublicKey) => Promise<FactoryAccountState>;
+    };
+  };
+};
+
 export const useCreateWhitelistTokenSolanaFn = () => {
   const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
   const { connection } = useAppKitConnection();
@@ -36,10 +50,21 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           signAllTransactions: provider.signAllTransactions?.bind(provider),
         };
 
-        const program = getMultichainBurnProgram(connection, anchorWallet);
+        const program = getMultichainBurnProgram(
+          connection,
+          anchorWallet,
+        ) as MultichainBurnProgramWithFactoryAccount;
+        
         const factoryPDA = getFactoryPDA(program.programId);
-
         const tokenPubkey = new PublicKey(tokenAddress);
+        const factory = await program.account.factoryAccount.fetch(factoryPDA);
+        const isTokenWhitelisted = (factory.whitelistToken ?? []).some(
+          (whitelistedToken) => whitelistedToken.equals(tokenPubkey),
+        );
+
+        if (isTokenWhitelisted) {
+          throw new Error("Token is already whitelisted on-chain");
+        }
 
         const tx = await program.methods
           .updateWhitelistToken(tokenPubkey, true) // false to disable token
@@ -75,7 +100,9 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         });
 
         return true;
-      } catch (error: any) {
+      } catch (error: unknown) {
+        console.log(error);
+
         toast.error("Failed to create whitelist token", {
           description: getErrorMessage({ error }),
         });

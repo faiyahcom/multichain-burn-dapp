@@ -1,5 +1,5 @@
 {
-  "address": "GtbzyHpYikqrQshmDvxiw6Uam66jd4xRHPtGbBdsAiuw",
+  "address": "h6iikWdj6NUFBqsEWZSME8Ru145nEJDi89uHi467cnR",
   "metadata": {
     "name": "multichain_burn_sc_sol",
     "version": "0.1.0",
@@ -787,10 +787,6 @@
           "writable": true
         },
         {
-          "name": "reward_mint",
-          "writable": true
-        },
-        {
           "name": "deposit_mint",
           "writable": true
         },
@@ -852,35 +848,6 @@
           }
         },
         {
-          "name": "reward_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  119,
-                  97,
-                  114,
-                  100,
-                  45,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool"
-              }
-            ]
-          }
-        },
-        {
           "name": "deposit_vault",
           "writable": true,
           "pda": {
@@ -908,63 +875,6 @@
                 "path": "pool"
               }
             ]
-          }
-        },
-        {
-          "name": "pool_owner_reward_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "pool_owner"
-              },
-              {
-                "kind": "account",
-                "path": "reward_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "reward_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
           }
         },
         {
@@ -2495,6 +2405,81 @@
       ]
     },
     {
+      "name": "retreive_reward_native",
+      "discriminator": [
+        242,
+        100,
+        149,
+        234,
+        21,
+        107,
+        36,
+        154
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "factory",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiver_address",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "set_merkle_root",
       "discriminator": [
         43,
@@ -2603,14 +2588,18 @@
               }
             ]
           }
-        },
-        {
-          "name": "new_admin",
-          "writable": true,
-          "signer": true
         }
       ],
-      "args": []
+      "args": [
+        {
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
+        }
+      ]
     },
     {
       "name": "update_pool",
@@ -2734,6 +2723,56 @@
         {
           "name": "treasury",
           "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "update_subadmin",
+      "discriminator": [
+        98,
+        69,
+        163,
+        135,
+        165,
+        69,
+        50,
+        128
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "factory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "admin",
+          "type": "pubkey"
+        },
+        {
+          "name": "enabled",
+          "type": "bool"
         }
       ]
     },
@@ -3123,6 +3162,19 @@
       ]
     },
     {
+      "name": "SubadminUpdated",
+      "discriminator": [
+        251,
+        209,
+        12,
+        16,
+        192,
+        31,
+        165,
+        164
+      ]
+    },
+    {
       "name": "WhitelistTokenUpdated",
       "discriminator": [
         59,
@@ -3319,6 +3371,31 @@
       "code": 6033,
       "name": "RewardTooSmall",
       "msg": "Reward amount too small (rounds to zero)"
+    },
+    {
+      "code": 6034,
+      "name": "ExceedBalance",
+      "msg": "Exceed balance"
+    },
+    {
+      "code": 6035,
+      "name": "BothAssetsNative",
+      "msg": "Deposit and reward asset cannot both be native SOL"
+    },
+    {
+      "code": 6036,
+      "name": "CannotRemoveLastAdmin",
+      "msg": "Cannot remove last admin"
+    },
+    {
+      "code": 6037,
+      "name": "CannotSelfRemove",
+      "msg": "Cannot self remove"
+    },
+    {
+      "code": 6038,
+      "name": "UserAlreadyWhitelisted",
+      "msg": "User already whitelisted"
     }
   ],
   "types": [
@@ -3328,12 +3405,22 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "admin",
-            "type": "pubkey"
+            "name": "admin_list",
+            "type": {
+              "vec": "pubkey"
+            }
           },
           {
-            "name": "new_admin",
-            "type": "pubkey"
+            "name": "added",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "removed",
+            "type": {
+              "vec": "pubkey"
+            }
           },
           {
             "name": "timestamp",
@@ -3477,7 +3564,15 @@
         "fields": [
           {
             "name": "admin",
-            "type": "pubkey"
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "subadmin",
+            "type": {
+              "vec": "pubkey"
+            }
           },
           {
             "name": "operator",
@@ -4132,8 +4227,58 @@
             "type": "u64"
           },
           {
+            "name": "old_creation_fee",
+            "type": "u64"
+          },
+          {
+            "name": "new_creation_fee",
+            "type": "u64"
+          },
+          {
+            "name": "old_treasury",
+            "type": "pubkey"
+          },
+          {
+            "name": "new_treasury",
+            "type": "pubkey"
+          },
+          {
             "name": "timestamp",
             "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "SubadminUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "subadmin_list",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "added",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "removed",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }

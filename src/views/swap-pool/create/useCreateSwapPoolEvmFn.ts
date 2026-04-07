@@ -9,6 +9,7 @@ import {
 import { DEFAULT_NATIVE_DECIMALS, ZERO_ADDRESS } from "@/config/constant";
 import { getDecimalsTokenNativeByChainId } from "@/config/networks";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { assertSufficientNativeBalanceForTransaction } from "@/utils/helpers/evm-gas";
 import { normalizeRatioToIntegers } from "@/utils/helpers/ratio";
 
 const AssetType = {
@@ -57,6 +58,8 @@ export const useCreateSwapPoolEvmFn = () => {
         const userAddress = await signer.getAddress();
 
         const contract = getContractSwapFactory(signer);
+        const contractAddress = await contract.getAddress();
+        const poolCreationFee: bigint = await contract.poolCreationFee();
 
         const rewardIsNative = isNativeToken(tokenReward);
         const depositIsNative = isNativeToken(tokenIn);
@@ -73,9 +76,6 @@ export const useCreateSwapPoolEvmFn = () => {
         let rewardDecimals = DEFAULT_NATIVE_DECIMALS;
         let parsedAmount: bigint;
 
-        const swapContract = getContractSwapFactory(signer);
-        const CONTRACT_ADDRESS = await swapContract.getAddress();
-
         if (rewardIsNative) {
           const chainId = Number((await provider.getNetwork()).chainId);
           rewardDecimals =
@@ -86,13 +86,6 @@ export const useCreateSwapPoolEvmFn = () => {
             rewardAmount.toString(),
             rewardDecimals,
           );
-
-          const nativeBalance = await provider.getBalance(userAddress);
-          if (nativeBalance < parsedAmount) {
-            throw new Error(
-              `Insufficient native balance. Required: ${ethers.formatUnits(parsedAmount, rewardDecimals)}`,
-            );
-          }
         } else {
           const tokenContract = getERC20Contract(tokenReward, signer);
 
@@ -114,12 +107,12 @@ export const useCreateSwapPoolEvmFn = () => {
 
           const currentAllowance = await tokenContract.allowance(
             userAddress,
-            CONTRACT_ADDRESS,
+            contractAddress,
           );
 
           if (currentAllowance < parsedAmount) {
             const approveTx = await tokenContract.approve(
-              CONTRACT_ADDRESS,
+              contractAddress,
               parsedAmount,
             );
 
@@ -150,8 +143,20 @@ export const useCreateSwapPoolEvmFn = () => {
           rewardAmount: parsedAmount,
         };
 
+        const txValue = poolCreationFee + (rewardIsNative ? parsedAmount : 0n);
+
+        await assertSufficientNativeBalanceForTransaction({
+          provider,
+          address: userAddress,
+          txValue,
+          estimateGas: () =>
+            contract.createSwapPool.estimateGas(payload, {
+              value: txValue,
+            }),
+        });
+
         const tx = await contract.createSwapPool(payload, {
-          value: rewardIsNative ? parsedAmount : 0n,
+          value: txValue,
         });
 
         const receipt = await tx.wait();

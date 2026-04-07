@@ -8,6 +8,7 @@ export const API_ROUTES = {
     GET_PARTICIPATED_POOLS: "/users/pools",
     GET_POOL_MERKLE_PROOF: (poolAddress: string) =>
       `/users/pools/${poolAddress}/proof`,
+    UPDATE_PROFILE: "/users/profile",
   },
   POOLS: {
     LIST: "/pools",
@@ -15,6 +16,7 @@ export const API_ROUTES = {
     GET_POOL_TXNS: (address: string) => `/pools/${address}/txns`,
     GET_POOL_ACTIVITIES: (address: string) => `/pools/${address}/actitvites`,
     REASON_CLOSE_POOL: (address: string) => `/pools/${address}/close-reason`,
+    TOGGLE_PARTNER_POOL: (address: string) => `/pools/${address}/partner`,
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",
@@ -26,9 +28,20 @@ export const API_ROUTES = {
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
-    UPDATE_USER_INFO: (address: string) => `/whitelist-users/${address}/info`,
+    CHECK_USER: "/whitelist-users/check-user",
+    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
+  },
+  ADMINS: {
+    LIST: "/admins",
+    UPSERT_USER: "/admins/user",
+    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
+    NOTIFICATIONS: {
+      LIST: "/admins/notifications",
+      MARK_READ: "/admins/notifications/mark-read",
+      STREAM: "/admins/notifications-stream",
+    },
   },
   PAIRS: {
     LIST: "/pairs",
@@ -37,5 +50,12 @@ export const API_ROUTES = {
   TRANSFER_HISTORY: {
     LIST: "/transfers",
     ANALYSIS: "/transfers/analysis",
+  },
+  FEE: {
+    LIST: "/fee",
+    STATS: "/fee/stats",
+  },
+  GENERAL: {
+    NATIVE_PRICES: "/general/native-prices",
   },
 } as const;

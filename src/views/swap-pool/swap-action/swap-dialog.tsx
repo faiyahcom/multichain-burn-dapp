@@ -29,7 +29,9 @@ import { parseUnits } from "ethers";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useQuery } from "@tanstack/react-query";
-import { safeDecimalParse } from "@/utils/helpers/numbers";
+import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
+import { useDebounceValue } from "usehooks-ts";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 const swapFormSchema = z.object({
     burnAmount: z
@@ -48,14 +50,13 @@ const swapFormSchema = z.object({
 
 export type SwapFormValues = z.infer<typeof swapFormSchema>;
 
+const SELL_INPUT_DEBOUNCE_MS = 500;
+
 const formatBalanceDisplay = (value?: string) => {
     if (!value) return "0";
     const numericValue = Number(value);
     if (!Number.isFinite(numericValue)) return value;
-    return numericValue.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 3,
-    });
+    return String(shortenNumber({ number: numericValue }));
 };
 
 type Props = {
@@ -96,63 +97,81 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     });
 
     const burnAmount = watch("burnAmount");
+    const [debouncedBurnAmount] = useDebounceValue(
+        burnAmount,
+        SELL_INPUT_DEBOUNCE_MS,
+    );
+    const derivedBurnAmount = burnAmount ? debouncedBurnAmount : burnAmount;
+    const isSellAmountDebouncing =
+        !!burnAmount && burnAmount !== derivedBurnAmount;
 
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
 
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     const {
         formatted: burnBalanceFormatted,
         symbol: burnBalanceSymbol,
         isLoading: isLoadingBurnBalance,
+        refetch: refetchBurnBalance,
     } = useTokenBalance({
-        tokenAddress: poolDetail?.pool.tokenIn,
-        decimals: poolDetail?.pool.tokenInDecimals,
-        symbol: poolDetail?.pool.tokenInSymbol,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        decimals: poolDetail?.pool?.tokenInDecimals,
+        symbol: poolDetail?.pool?.tokenInSymbol,
     });
 
     const {
         formatted: rewardBalanceFormatted,
         symbol: rewardBalanceSymbol,
         isLoading: isLoadingRewardBalance,
+        refetch: refetchRewardBalance,
     } = useTokenBalance({
-        tokenAddress: poolDetail?.pool.rewardToken,
-        decimals: poolDetail?.pool.rewardTokenDecimals,
-        symbol: poolDetail?.pool.rewardTokenSymbol,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        decimals: poolDetail?.pool?.rewardTokenDecimals,
+        symbol: poolDetail?.pool?.rewardTokenSymbol,
     });
 
     const handleSelectPercent = (percent: number) => {
-        if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null)
+        if (!burnBalanceFormatted || poolDetail?.pool?.tokenInDecimals == null)
             return;
         try {
+            const decimals = poolDetail?.pool?.tokenInDecimals;
             const balanceBN = new BN(
-                parseUnits(burnBalanceFormatted, poolDetail.pool.tokenInDecimals).toString(),
+                parseUnits(burnBalanceFormatted, decimals).toString(),
             );
             if (balanceBN.isZero()) return;
-            const amountBN =
+            let amountBN =
                 percent === 100 ? balanceBN : balanceBN.muln(percent).divn(100);
+            if (maxBurnLeft && maxBurnLeft !== "0") {
+                const maxBurnRawBN = new BN(
+                    parseUnits(maxBurnLeft, decimals).toString(),
+                );
+                if (amountBN.gt(maxBurnRawBN)) {
+                    amountBN = maxBurnRawBN;
+                }
+            }
             const formatted = formatUnits(
                 BigInt(amountBN.toString()),
-                poolDetail.pool.tokenInDecimals,
+                decimals,
             );
             setValue("burnAmount", formatted, { shouldValidate: true });
         } catch {
@@ -163,11 +182,11 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     const maxBurnLeft = useMemo(() => {
         if (!poolDetail) return "0";
         try {
-            const numeratorBN = new BN(poolDetail.pool.rewardNumerator ?? "0");
-            const denominatorBN = new BN(poolDetail.pool.rewardDenominator ?? "0");
+            const numeratorBN = new BN(poolDetail?.pool?.rewardNumerator ?? "0");
+            const denominatorBN = new BN(poolDetail?.pool?.rewardDenominator ?? "0");
             if (numeratorBN.isZero() || denominatorBN.isZero()) return "0";
-            const rewardDecimals = poolDetail.pool.rewardTokenDecimals;
-            const burnDecimals = poolDetail.pool.tokenInDecimals;
+            const rewardDecimals = poolDetail?.pool?.rewardTokenDecimals;
+            const burnDecimals = poolDetail?.pool?.tokenInDecimals;
             const rewardAmountBN = new BN(poolDetail.rewardAmount ?? "0");
             const rewardDecimalsBN = new BN(10).pow(new BN(rewardDecimals));
             const burnDecimalsBN = new BN(10).pow(new BN(burnDecimals));
@@ -185,13 +204,37 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
     }, [poolDetail]);
 
     const isExceedingMax =
-        !!burnAmount &&
-        Number(burnAmount) > 0 &&
+        !!derivedBurnAmount &&
+        Number(derivedBurnAmount) > 0 &&
         Number(maxBurnLeft) > 0 &&
-        Number(burnAmount) > Number(maxBurnLeft);
+        Number(derivedBurnAmount) > Number(maxBurnLeft);
+
+    const insufficientBalanceMessage = useMemo(() => {
+        if (!derivedBurnAmount || !burnBalanceFormatted || isLoadingBurnBalance) {
+            return undefined;
+        }
+
+        const burnAmountDecimal = safeDecimalParse({ value: derivedBurnAmount });
+        const burnBalanceDecimal = safeDecimalParse({ value: burnBalanceFormatted });
+
+        if (!burnAmountDecimal || !burnBalanceDecimal) return undefined;
+        if (burnAmountDecimal.lte(0) || burnAmountDecimal.lte(burnBalanceDecimal)) {
+            return undefined;
+        }
+
+        return `Amount exceeds wallet balance (${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""})`;
+    }, [
+        derivedBurnAmount,
+        burnBalanceFormatted,
+        burnBalanceSymbol,
+        burnTokenDisplay?.symbol,
+        isLoadingBurnBalance,
+    ]);
+
+    const isInsufficientBalance = !!insufficientBalanceMessage;
 
     const formattedEstimatedRewardAmount = useMemo(() => {
-        if (!burnAmount || !poolDetail) return "0";
+        if (!derivedBurnAmount || !poolDetail) return "0";
 
         try {
             const {
@@ -203,7 +246,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
             } = poolDetail.pool;
 
             const amountInBN = new BN(
-                parseUnits(burnAmount || "0", tokenInDecimals).toString(),
+                parseUnits(derivedBurnAmount || "0", tokenInDecimals).toString(),
             );
 
             if (amountInBN.isZero()) return "0";
@@ -221,21 +264,18 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
 
             const feeBN = rewardBN
                 .mul(new BN(settlementFee ?? "0"))
-                .div(new BN(10000));
+                .div(new BN(DECIMAL_FEE_PERCENT));
 
             const finalReward = rewardBN.sub(feeBN);
 
             const formatted = formatUnits(BigInt(finalReward.toString()), rewardTokenDecimals);
             const num = Number(formatted);
             if (!Number.isFinite(num)) return formatted;
-            return num.toLocaleString(undefined, {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 6,
-            });
+            return String(shortenNumber({ number: num }));
         } catch {
             return "0";
         }
-    }, [burnAmount, poolDetail]);
+    }, [derivedBurnAmount, poolDetail]);
 
     const onSubmit = async (data: SwapFormValues) => {
         try {
@@ -244,20 +284,22 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                 await depositSwapPoolSOL({ amountIn: data.burnAmount, poolDetail });
             } else {
                 await depositSwapPoolETH({
-                    poolAddress: poolDetail.pool.address,
+                    poolAddress: poolDetail?.pool?.address,
                     amountIn: data.burnAmount,
                     // Use decimals from poolDetail directly — authoritative source.
                     // burnToken lookup can be undefined if address casing differs,
                     // which would cause parseUnits to use wrong decimals (18 instead of e.g. 9)
                     // sending 10^9× too large an amount → contract reverts InsufficientReward.
-                    decimals: poolDetail.pool.tokenInDecimals,
-                    tokenInAddress: poolDetail.pool.tokenIn,
+                    decimals: poolDetail?.pool?.tokenInDecimals,
+                    tokenInAddress: poolDetail?.pool?.tokenIn,
                 });
             }
+            refetchBurnBalance();
+            refetchRewardBalance();
             reset();
             onOpenChange(false);
             onSuccess();
-        } catch (error: any) {
+        } catch (error: unknown) {
             toast.error("Swap failed", {
                 description: getErrorMessage({ error }),
             });
@@ -283,10 +325,11 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             errors={errors}
                             onSelectPercent={handleSelectPercent}
                             isLoadingBalance={isLoadingBurnBalance}
-                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnBalanceSymbol ?? burnTokenDisplay.symbol ?? ""}`}
+                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""}`}
                             poolDetail={poolDetail}
                             maxBurnLeft={maxBurnLeft}
                             isExceedingMax={isExceedingMax}
+                            insufficientBalanceMessage={insufficientBalanceMessage}
                         />
 
                         <BuySection
@@ -294,7 +337,7 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             isLoadingWhitelistTokens={!poolDetail}
                             estimatedAmount={formattedEstimatedRewardAmount}
                             isLoadingBalance={isLoadingRewardBalance}
-                            balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardBalanceSymbol ?? rewardTokenDisplay.symbol ?? ""}`}
+                            balanceText={`${formatBalanceDisplay(rewardBalanceFormatted)} ${rewardTokenDisplay?.symbol ?? ""}`}
                         />
 
                         <AnimateIconButton
@@ -312,7 +355,11 @@ const SwapDialog = ({ open, onOpenChange, poolDetail: poolDetailProp, poolAddres
                             isLoadingText="Swapping..."
                             btnProps={{
                                 type: "submit",
-                                disabled: isSubmitting || isExceedingMax,
+                                disabled:
+                                    isSubmitting ||
+                                    isSellAmountDebouncing ||
+                                    isExceedingMax ||
+                                    isInsufficientBalance,
                             }}
                         />
 

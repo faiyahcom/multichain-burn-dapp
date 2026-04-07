@@ -58,8 +58,8 @@ export const useCancelPoolSolanaFn = () => {
                 // =============================
                 // 1️⃣ Resolve mints from poolDetail
                 // =============================
-                const rewardMint = new PublicKey(params.poolDetail.pool.rewardToken);
-                const depositMint = new PublicKey(params.poolDetail.pool.tokenIn);
+                const rewardMint = new PublicKey(params.poolDetail?.pool?.rewardToken);
+                const depositMint = new PublicKey(params.poolDetail?.pool?.tokenIn);
 
                 // Detect token programs (Token-2022 support)
                 const [rewardAssetType, depositAssetType] = await Promise.all([
@@ -159,6 +159,7 @@ export const useCancelPoolSolanaFn = () => {
 
                 return poolPDA.toBase58();
             } catch (error: any) {
+                console.log(error);
                 toast.error("Failed to cancel pool", {
                     description: getErrorMessage({ error }),
                 });

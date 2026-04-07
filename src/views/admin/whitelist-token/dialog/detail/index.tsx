@@ -53,12 +53,12 @@ const AdminWhitelistTokenDialogDetail: React.FC<Props> = ({
 
   return (
     <Dialog open={data !== undefined} onOpenChange={handleOpenChange}>
-      <DialogContent className="px-14 pt-14 pb-6.25 sm:max-w-185.75">
+      <DialogContent className="sm:max-w-185.75 md:px-14 md:pt-14 md:pb-6.25">
         <DialogHeader className="sr-only">
           <DialogTitle>Token Detail</DialogTitle>
           <DialogDescription>Whitelisted Token Detail</DialogDescription>
         </DialogHeader>
-        <div>
+        <div className="w-full min-w-0">
           {/* logo + name + symbol + network + status */}
           <div className="mb-6.75 flex items-center gap-4.75 pl-3">
             <div className="aspect-square size-13.75 shrink-0 overflow-hidden rounded-2px border border-inactive bg-sub-bg">
@@ -97,10 +97,13 @@ const AdminWhitelistTokenDialogDetail: React.FC<Props> = ({
           </div>
 
           {/* Address */}
-          <div className="mb-4.5 space-y-1.25">
+          <div className="mb-4.5 w-full space-y-1.25">
             <p className="text-base font-medium">Contract Address</p>
-            <div className="flex items-center justify-between gap-1 rounded-md-plus bg-inactive px-5 py-2.75">
-              <p className="truncate text-15px font-normal">
+            <div className="flex w-full min-w-0 items-center justify-between gap-1 rounded-md-plus bg-inactive px-5 py-2.75">
+              <p
+                className="min-w-0 truncate text-15px font-normal"
+                title={data?.address || "N/A"}
+              >
                 {data?.address || "N/A"}
               </p>
               <button onClick={handleCopy}>

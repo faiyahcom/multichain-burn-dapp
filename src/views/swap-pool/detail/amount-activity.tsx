@@ -21,7 +21,7 @@ type Props = {
 
 const AmountAndActivity = ({ poolDetail }: Props) => {
     const { user } = useAuthStore();
-    const isPoolOwner = user?.address === poolDetail?.pool.owner;
+    const isPoolOwner = user?.address === poolDetail?.pool?.owner;
     const { caipAddress } = useAppKitAccount();
     const namespace = caipAddress?.split(":")[0];
     const isSolana = namespace === "solana";
@@ -30,43 +30,43 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     const queryClient = useQueryClient();
     const formattedBurned = poolDetail
         ? formatAmount(
-            poolDetail.userAmount.deposited,
-            poolDetail.pool.tokenInDecimals,
+            poolDetail?.userAmount?.deposited || "0",
+            poolDetail?.pool?.tokenInDecimals,
         )
         : "-";
     const formattedReward = poolDetail
         ? formatAmount(
-            poolDetail.userAmount.claimed,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.userAmount?.claimed || "0",
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
     const formattedReturning = poolDetail?.returningAmountOnCanceling
         ? formatAmount(
             poolDetail.returningAmountOnCanceling.amount,
-            poolDetail.pool.rewardTokenDecimals,
+            poolDetail?.pool?.rewardTokenDecimals,
         )
         : "-";
 
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
     const [openSwapDialog, setOpenSwapDialog] = useState(false);
     const [isCancelLoading, setIsCancelLoading] = useState(false);
@@ -78,15 +78,15 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
     };
     const handleSuccessSwap = () => {
         queryClient.invalidateQueries({
-            queryKey: [poolQueryKeys.txns(poolDetail?.pool.address || "")],
+            queryKey: [poolQueryKeys.txns(poolDetail?.pool?.address || "")],
             exact: false,
         });
         queryClient.invalidateQueries({
-            queryKey: [poolQueryKeys.activities(poolDetail?.pool.address || "")],
+            queryKey: [poolQueryKeys.activities(poolDetail?.pool?.address || "")],
             exact: false,
         });
         queryClient.invalidateQueries({
-            queryKey: poolQueryKeys.detail(poolDetail?.pool.address || ""),
+            queryKey: poolQueryKeys.detail(poolDetail?.pool?.address || ""),
             exact: false,
         });
     };
@@ -97,16 +97,16 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
         try {
             if (isSolana) {
                 await cancelPoolSol({
-                    poolAddress: poolDetail.pool.address,
+                    poolAddress: poolDetail?.pool?.address,
                     poolDetail,
                 });
             } else {
                 await cancelPoolEvm({
-                    poolAddress: poolDetail.pool.address,
+                    poolAddress: poolDetail?.pool?.address,
                 });
             }
             queryClient.invalidateQueries({
-                queryKey: poolQueryKeys.detail(poolDetail.pool.address),
+                queryKey: poolQueryKeys.detail(poolDetail?.pool?.address),
                 exact: false,
             });
         } finally {
@@ -143,7 +143,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     )}
                 </span>
             </div>
-            {Number(poolDetail?.userAmount.claimed || "0") > 0 && (
+            {Number(poolDetail?.userAmount?.claimed || "0") > 0 && (
                 <div className="mx-6 inline-flex items-start gap-1">
                     <IconTick className="inline size-3.5 translate-y-0.5" />
                     <span className="text-sm text-greyed">
@@ -151,7 +151,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     </span>
                 </div>
             )}
-            {poolDetail?.pool.status === "closed" && (
+            {poolDetail?.pool?.status === "closed" && (
                 <div className="mx-6 inline-flex items-start gap-1">
                     <IconExclaimation className="inline size-5 translate-y-0.5" />
                     <span className="text-sm text-greyed">
@@ -159,7 +159,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     </span>
                 </div>
             )}
-            {poolDetail?.pool.status === "canceled" && isPoolOwner && (
+            {poolDetail?.pool?.status === "canceled" && isPoolOwner && (
                 <div className="flex items-center justify-between text-active">
                     <span className="text-sm font-medium">Your reward token return</span>
                     <span className="text-sm font-bold">
@@ -174,8 +174,8 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                 </div>
             )}
 
-            {poolDetail?.pool.status === "on_going" && (
-                <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+            {poolDetail?.pool?.status === "on_going" && (
+                <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
                     <div className="mx-2">
                         <AnimateIconButton
                             iconLetter="S"

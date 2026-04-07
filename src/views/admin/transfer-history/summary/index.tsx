@@ -1,6 +1,5 @@
 import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { whitelistUserService } from "@/services/whitelistUserService";
-import { sciToFormatted } from "@/utils/helpers/numbers";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import type { DialogData } from "./dialog";
@@ -19,15 +18,11 @@ const AdminTransferHistorySummary = () => {
   const groupedAnalysisData: {
     chainId: string;
     txnCount: number;
-    totalAmount: number;
+    totalAmount: number; // this means the number of tokens (different addresses) instead of the total amount
   }[] = useMemo(() => {
     const grouped =
       analysisData?.analysis?.reduce(
         (acc, item) => {
-          const amount = Number(
-            sciToFormatted(item.totalAmount, item.tokenDecimals),
-          );
-
           if (!acc[item.chainId]) {
             acc[item.chainId] = {
               chainId: item.chainId,
@@ -37,7 +32,7 @@ const AdminTransferHistorySummary = () => {
           }
 
           acc[item.chainId].txnCount += item.txnCount;
-          acc[item.chainId].totalAmount += amount;
+          acc[item.chainId].totalAmount += 1;
 
           return acc;
         },
@@ -52,7 +47,7 @@ const AdminTransferHistorySummary = () => {
 
   return (
     <>
-      <div className="mb-8.75 space-y-4.25 px-13.5 pt-12.75">
+      <div className="mb-8.75 space-y-4.25 pt-4 px-4 md:px-13.5 md:pt-12.75">
         <div className="space-y-1 pl-7.5">
           <h1 className="text-3xl font-semibold">Transfer History</h1>
           <p className="text-base text-secondary-text">

@@ -5,6 +5,7 @@ import { useAmountActivity } from "../../use-amount-activity";
 import DepositBurnDialog from "../deposit-burn";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { useMemo } from "react";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 
@@ -20,49 +21,50 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
         handleDepositBurn,
     } = useAmountActivity(poolDetail);
 
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn.symbol,
-        tokenName: poolDetail?.tokenIn.name,
-        customName: poolDetail?.tokenIn.customName,
-        customSymbol: poolDetail?.tokenIn.customSymbol,
-        imageUri: poolDetail?.tokenIn.imageUri,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network,
-        tokenAddress: poolDetail?.pool.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut.symbol,
-        tokenName: poolDetail?.tokenOut.name,
-        customName: poolDetail?.tokenOut.customName,
-        customSymbol: poolDetail?.tokenOut.customSymbol,
-        imageUri: poolDetail?.tokenOut.imageUri,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     const estmatedReward = useMemo(() => {
         if (!poolDetail) return "-";
         const rewardSymbol =
-            rewardTokenDisplay?.symbol ?? poolDetail.pool.rewardTokenSymbol;
+            rewardTokenDisplay?.symbol ?? poolDetail?.pool?.rewardTokenSymbol;
+        const decimals = poolDetail?.pool?.rewardTokenDecimals;
         const totalDeposited =
             Number(poolDetail.depositedAmount) /
-            Math.pow(10, poolDetail.pool.tokenInDecimals);
+            Math.pow(10, poolDetail?.pool?.tokenInDecimals);
         const rewardPool =
-            Number(poolDetail.pool.rewardAmount) /
-            Math.pow(10, poolDetail.pool.rewardTokenDecimals);
+            Number(poolDetail?.pool?.currentRewardAmount) /
+            Math.pow(10, decimals);
         const yourCurrentDeposited =
-            Number(poolDetail.userAmount.deposited) /
-            Math.pow(10, poolDetail.pool.tokenInDecimals);
+            Number(poolDetail?.userAmount?.deposited) /
+            Math.pow(10, poolDetail?.pool?.tokenInDecimals);
         if (totalDeposited === 0 || rewardPool === 0 || yourCurrentDeposited === 0)
             return `0 ${rewardSymbol}`;
         const reward = (yourCurrentDeposited / totalDeposited) * rewardPool;
-        return `${reward} ${rewardSymbol}`;
+        return `${shortenNumber({ number: reward })} ${rewardSymbol}`;
     }, [poolDetail, rewardTokenDisplay]);
 
     return (
-        <PoolChainGuard chainId={poolDetail?.pool.chainId}>
+        <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
             <StatRow
                 label="Estimated Claimable Reward"
                 value={`${estmatedReward}`}

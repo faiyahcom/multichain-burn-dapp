@@ -18,9 +18,12 @@ export interface WhitelistUser {
   address: string;
   name: string;
   email: string;
-  enabled: boolean;
-  /** Chain IDs this user is registered on (backend stringified BigInt array) */
-  whitelistChainId: string[];
+  /** Whether this user is whitelisted on this chain */
+  whitelisted: boolean;
+  /** Whether this user is enabled on this chain */
+  enable: boolean;
+  /** The chain ID this user belongs to (stringified) */
+  chainId: string;
   createdAt: string;
   tokenAllocations: TokenAllocation[];
 }
@@ -81,7 +84,26 @@ export interface TransferHistoryResponse extends PaginationResponse {
   txns: TransferHistoryApiTxn[];
 }
 
+export interface CheckUserResponse {
+  address: string;
+  whitelisted: boolean;
+  [key: string]: unknown;
+}
+
 export const whitelistUserService = {
+  checkUser: async (params: { walletAddress: string; chainId: string }) => {
+    const response = await apiClient.get<CheckUserResponse>(
+      WHITELIST_USERS_API_ROUTES.CHECK_USER,
+      {
+        params: {
+          walletAddress: params.walletAddress,
+          chainId: params.chainId,
+        },
+      },
+    );
+    return response;
+  },
+
   getListUsers: async (params?: {
     search?: string;
     chainIds?: number[];
@@ -107,6 +129,7 @@ export const whitelistUserService = {
 
   updateUserInfo: async (data: {
     walletAddress: string;
+    chainId: string;
     name?: string;
     email?: string;
   }) => {
@@ -115,7 +138,7 @@ export const whitelistUserService = {
     if (data.email !== undefined) formData.append("email", data.email ?? "");
 
     const response = await apiClient.post(
-      WHITELIST_USERS_API_ROUTES.UPDATE_USER_INFO(data.walletAddress),
+      WHITELIST_USERS_API_ROUTES.UPDATE_USER_INFO(data.walletAddress, data.chainId),
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },

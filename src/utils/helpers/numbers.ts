@@ -13,10 +13,7 @@ export function formatAmount(amount: string, decimals: number): string {
   if (!amount) return "0";
   const amt = Number(amount);
   if (isNaN(amt)) return amount;
-  return (amt / Math.pow(10, decimals)).toLocaleString(undefined, {
-    minimumFractionDigits: 0,
-    maximumFractionDigits: Math.min(decimals, 4),
-  });
+  return String(shortenNumber({ number: amt / Math.pow(10, decimals) }));
 }
 
 export function sciToFormatted(value: string, decimals: number): string {
@@ -58,20 +55,39 @@ export const shortenNumber = ({
 }) => {
   if (typeof number !== "number") return number;
 
-  if (number < 10000) return number.toLocaleString("de-DE");
+  if (number < 10000)
+    return number.toLocaleString("en-US", {
+      maximumFractionDigits: 6,
+      minimumFractionDigits: 0,
+    });
 
-  return (
-    numbro(number)
-      .format({
-        average: true,
-        mantissa: 2,
-        trimMantissa: true,
-        ...customFormat,
-      })
-      // This is a hack to fix numbro's formatting to match the design:
-      // "." as thousands separator, "," as decimal separator
-      .replace(/,/g, "#") // temp placeholder
-      .replace(/\./g, ",") // . → ,
-      .replace(/#/g, ".") // , → .
-  );
+  return numbro(number).format({
+    average: true,
+    mantissa: 2,
+    trimMantissa: true,
+    ...customFormat,
+  });
 };
+
+function formatUsd(usd: number): string {
+  if (usd === 0) return "$0.00";
+  if (usd < 0.01) return `$${usd.toPrecision(2)}`;
+  return `$${usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+/**
+ * Formats a raw (big-integer) native amount as "{humanAmount} {symbol} ~ ${usd}".
+ * If `price` is undefined the USD suffix is omitted.
+ */
+export function formatNativeWithUsd(
+  rawAmount: string,
+  decimals: number,
+  symbol: string,
+  price: number | undefined,
+): string {
+  const humanAmt = Number(rawAmount) / Math.pow(10, decimals);
+  const nativePart = `${shortenNumber({ number: humanAmt })} ${symbol}`;
+  if (price == null || isNaN(humanAmt)) return nativePart;
+  return `${nativePart} ~ ${formatUsd(humanAmt * price)}`;
+}
+

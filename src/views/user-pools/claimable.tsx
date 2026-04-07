@@ -24,7 +24,7 @@ import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import type { SortOption, UserPoolSortBy } from "./menu";
 import UserPoolsMenu from "./menu";
@@ -51,6 +51,7 @@ const SORT_OPTIONS: SortOption[] = [
 ];
 
 function UserClaimablePool() {
+  const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [selectedNetworks, setSelectedNetworks] =
     useState<string[]>(ALL_NETWORK_IDS);
@@ -72,6 +73,7 @@ function UserClaimablePool() {
     search: searchText || undefined,
     sortBy: sortBy as GetParticipatedPoolsByUserParams["sortBy"],
     sortDirection: sortOrder,
+    onlyUnClaimed: "true",
   };
 
   const { data, isPending } = useQuery({
@@ -111,17 +113,22 @@ function UserClaimablePool() {
           <TableSpinner isLoading={isPending} colSpan={columns.length} />
           {!isPending &&
             data?.pools?.map((item) => {
+              const href = `/burn/detail/${item.address}`;
               return (
-                <TableRow key={item.address}>
+                <TableRow
+                  key={item.address}
+                  onClick={() => {
+                    navigate({
+                      to: href,
+                    });
+                  }}
+                  className="cursor-pointer"
+                  title={href}
+                >
                   <TableCell className="pl-11.25 text-left">
-                    <Link
-                      to="/burn/detail/$address"
-                      params={{ address: item.address }}
-                      className="block max-w-full truncate"
-                      title={item.name}
-                    >
+                    <p className="max-w-full truncate" title={item.name}>
                       {item.name}
-                    </Link>
+                    </p>
                     <CopyableText
                       content={item.address}
                       displayText={truncateString({ str: item.address })}
@@ -173,7 +180,10 @@ function UserClaimablePool() {
                         textVariant="text-container-center"
                         hasGroupHover
                         text="Claim"
-                        classNames={{ btn: "min-w-28 mx-auto" }}
+                        classNames={{
+                          btn: "min-w-28 mx-auto after:text-primary-foreground",
+                        }}
+                        color="#6E37FF"
                       />
                     </Link>
                   </TableCell>
