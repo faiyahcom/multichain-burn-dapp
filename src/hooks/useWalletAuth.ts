@@ -74,31 +74,25 @@ export function useWalletAuth() {
         let signature: string
 
         if (walletType === 'evm') {
-          // Sign with EVM wallet using wagmi
-          if (!signEvmMessage) {
-            throw new Error('EVM wallet not connected')
-          }
-          console.log('Signing message with EVM wallet:', message)
           try {
             signature = await signEvmMessage({ message })
           } catch (signError: any) {
-            // ConnectorChainMismatchError: wagmi stores chainId as string from WC CAIP-2
-            // parsing ("1") while connector.getChainId() returns a number (1). The strict
-            // inequality check ("1" !== 1) throws even though both values appear equal.
+            console.log('signEvmMessage failed, trying personal_sign fallback:', signError?.name, signError?.message)
             // Fall back to raw personal_sign via the connector's provider.
-            if (signError?.name === 'ConnectorChainMismatchError' && connector) {
-              const provider = await connector.getProvider() as any
-              const msgHex = '0x' + Array.from(
-                new TextEncoder().encode(message),
-                (b) => b.toString(16).padStart(2, '0'),
-              ).join('')
-              signature = await provider.request({
-                method: 'personal_sign',
-                params: [msgHex, address],
-              })
-            } else {
+            // Handles ConnectorChainMismatchError (wagmi type/value chain ID mismatch),
+            // WalletConnect session errors, and mobile wallet signing failures.
+            if (!connector) {
               throw signError
             }
+            const provider = await connector.getProvider() as any
+            const msgHex = '0x' + Array.from(
+              new TextEncoder().encode(message),
+              (b) => b.toString(16).padStart(2, '0'),
+            ).join('')
+            signature = await provider.request({
+              method: 'personal_sign',
+              params: [msgHex, address],
+            })
           }
         } else {
           // Sign with Solana wallet
