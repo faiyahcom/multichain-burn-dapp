@@ -27,6 +27,35 @@ const formatInsufficientBalanceMessage = ({
 }) =>
   `Insufficient ${symbol} balance. Required: ${ethers.formatUnits(required, decimals)} ${symbol}, available: ${ethers.formatUnits(available, decimals)} ${symbol}.`;
 
+export const estimateEvmTransactionFee = async ({
+  provider,
+  estimateGas,
+}: {
+  provider: BrowserProvider;
+  estimateGas: () => Promise<bigint>;
+}) => {
+  const [feeData, nativeContext] = await Promise.all([
+    provider.getFeeData(),
+    getReadableNativeContext(provider),
+  ]);
+
+  const gasPrice = feeData.maxFeePerGas ?? feeData.gasPrice;
+  if (!gasPrice) {
+    throw new Error("Unable to estimate gas price for this transaction.");
+  }
+
+  const gasLimit = await estimateGas();
+  const gasCost = gasLimit * gasPrice;
+
+  return {
+    gasLimit,
+    gasPrice,
+    gasCost,
+    nativeDecimals: nativeContext.decimals,
+    nativeSymbol: nativeContext.symbol,
+  };
+};
+
 export const assertSufficientNativeBalanceForTransaction = async ({
   provider,
   address,

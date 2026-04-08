@@ -13,9 +13,15 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { toast } from "@/components/common/custom-toast";
 import { useTokenBalance } from "../../../hooks/useTokenBalance";
 import { useSystemStore } from "@/stores/systemStore";
-import { useSwapPoolETH } from "./hooks/useSwapPoolETH";
-import { useSwapPoolSOL } from "./hooks/useSwapPoolSOL";
-import { useMemo, useState } from "react";
+import {
+  useSwapPoolETH,
+  type EstimateSwapPoolNetworkFeeResult,
+} from "./hooks/useSwapPoolETH";
+import {
+  useSwapPoolSOL,
+  type EstimateSwapPoolNetworkFeeResult as EstimateSwapPoolSolNetworkFeeResult,
+} from "./hooks/useSwapPoolSOL";
+import { useEffect, useMemo, useState } from "react";
 import BN from "bn.js";
 import { formatUnits } from "viem";
 import { chainIdToNetworkConfig } from "@/config/networks";
@@ -61,20 +67,155 @@ const swapFormSchema = z.object({
 export type SwapFormValues = z.infer<typeof swapFormSchema>;
 
 const SELL_INPUT_DEBOUNCE_MS = 500;
+const DEFAULT_NETWORK_FEE_TOOLTIP = "Estimated gas fee for the transaction";
+
+type NetworkFeeState = {
+  display: string;
+  tooltip: string;
+};
+
+const DEFAULT_NETWORK_FEE_STATE: NetworkFeeState = {
+  display: "-",
+  tooltip: DEFAULT_NETWORK_FEE_TOOLTIP,
+};
+
+const ESTIMATING_NETWORK_FEE_STATE: NetworkFeeState = {
+  display: "Estimating...",
+  tooltip: DEFAULT_NETWORK_FEE_TOOLTIP,
+};
 
 const formatBalanceDisplay = (value?: string) => {
-    if (!value) return "0";
-    const numericValue = Number(value);
-    if (!Number.isFinite(numericValue)) return value;
-    return String(shortenNumber({ number: numericValue }));
+  if (!value) return "0";
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) return value;
+  return String(shortenNumber({ number: numericValue }));
+};
+
+const formatNetworkFeeDisplay = ({
+  amount,
+  decimals,
+  symbol,
+}: {
+  amount: bigint;
+  decimals: number;
+  symbol: string;
+}) => {
+  const formatted = formatUnits(amount, decimals);
+  const numericValue = Number(formatted);
+
+  if (!Number.isFinite(numericValue)) {
+    return `${formatted} ${symbol}`;
+  }
+
+  if (numericValue > 0 && numericValue < 0.000001) {
+    return `<0.000001 ${symbol}`;
+  }
+
+  return `${shortenNumber({
+    number: numericValue,
+    decimalPlaces: 6,
+  })} ${symbol}`;
+};
+
+const formatGasUnits = (value: bigint) => value.toLocaleString("en-US");
+
+const buildNetworkFeeTooltip = ({
+  steps,
+}: EstimateSwapPoolNetworkFeeResult) => {
+  if (!steps.length) return DEFAULT_NETWORK_FEE_TOOLTIP;
+  if (steps.length === 1 && steps[0].type === "approve") {
+    return "Approval is required first; the app can estimate the full swap gas after approval succeeds.";
+  }
+
+  const actionLabel = steps.map(({ type }) => type).join(" + ");
+  const gasLabel = steps
+    .map(({ gasLimit }) => formatGasUnits(gasLimit))
+    .join(" + ");
+
+  return `Estimated gas fee for ${actionLabel} (~${gasLabel} gas).`;
+};
+
+const getNetworkFeeStateFromEstimate = (
+  estimate: EstimateSwapPoolNetworkFeeResult,
+): NetworkFeeState => {
+  const lastStep = estimate.steps[estimate.steps.length - 1];
+  if (!lastStep) return DEFAULT_NETWORK_FEE_STATE;
+
+  const display = formatNetworkFeeDisplay({
+    amount: estimate.totalGasCost,
+    decimals: estimate.nativeDecimals,
+    symbol: estimate.nativeSymbol,
+  });
+
+  return {
+    display: lastStep.type === "approve" ? `${display} approve` : display,
+    tooltip: buildNetworkFeeTooltip(estimate),
+  };
+};
+
+const getSolanaNetworkFeeStateFromEstimate = ({
+  ataCreations,
+  nativeDecimals,
+  nativeSymbol,
+  totalGasCost,
+}: EstimateSwapPoolSolNetworkFeeResult): NetworkFeeState => {
+  const tokenAccountLabel =
+    ataCreations === 1 ? "token account" : "token accounts";
+
+  return {
+    display: formatNetworkFeeDisplay({
+      amount: totalGasCost,
+      decimals: nativeDecimals,
+      symbol: nativeSymbol,
+    }),
+    tooltip:
+      ataCreations > 0
+        ? `Estimated network fee for swap. Wallet may also show rent to create ${ataCreations} ${tokenAccountLabel}.`
+        : "Estimated network fee for swap.",
+  };
+};
+
+const getEvmNetworkFeeStateFromError = (error: unknown): NetworkFeeState => {
+  const message = getErrorMessage({ error });
+
+  if (message === "Wallet not connected") {
+    return {
+      display: "Connect wallet",
+      tooltip: "Connect an EVM wallet to estimate the swap gas fee.",
+    };
+  }
+
+  return {
+    display: "Unavailable",
+    tooltip: DEFAULT_NETWORK_FEE_TOOLTIP,
+  };
+};
+
+const getSolanaNetworkFeeStateFromError = (error: unknown): NetworkFeeState => {
+  const message = getErrorMessage({ error });
+
+  if (
+    message === "Wallet is not connected" ||
+    message === "Solana connection not available"
+  ) {
+    return {
+      display: "Connect wallet",
+      tooltip: "Connect a Solana wallet to estimate the network fee.",
+    };
+  }
+
+  return {
+    display: "Unavailable",
+    tooltip: DEFAULT_NETWORK_FEE_TOOLTIP,
+  };
 };
 
 type Props = {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    poolDetail?: PoolDetailResponse;
-    poolAddress?: string;
-    onSuccess: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  poolDetail?: PoolDetailResponse;
+  poolAddress?: string;
+  onSuccess: () => void;
 };
 
 const SwapDialog = ({
@@ -90,40 +231,47 @@ const SwapDialog = ({
         enabled: !poolDetailProp && !!poolAddress,
     });
 
-    const poolDetail = poolDetailProp ?? fetchedPoolDetail;
+  const poolDetail = poolDetailProp ?? fetchedPoolDetail;
 
-    const [openFeePopUp, setOpenFeePopUp] = useState(false);
+  const [openFeePopUp, setOpenFeePopUp] = useState(false);
+  const [networkFee, setNetworkFee] = useState<NetworkFeeState>(
+    DEFAULT_NETWORK_FEE_STATE,
+  );
 
-    const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
-    const isSolanaNetwork = selectedNetworkId === "solanaDevnet";
+  const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
+  const isSolanaNetwork = selectedNetworkId === "solanaDevnet";
 
-    const { depositSwapPool: depositSwapPoolETH } = useSwapPoolETH();
-    const { depositSwapPool: depositSwapPoolSOL } = useSwapPoolSOL();
+  const { depositSwapPool: depositSwapPoolETH, estimateSwapPoolNetworkFee } =
+    useSwapPoolETH();
+  const {
+    depositSwapPool: depositSwapPoolSOL,
+    estimateSwapPoolNetworkFee: estimateSwapPoolSolNetworkFee,
+  } = useSwapPoolSOL();
 
-    const {
-        register,
-        handleSubmit,
-        watch,
-        setValue,
-        reset,
-        formState: { errors, isSubmitting },
-    } = useForm<SwapFormValues>({
-        defaultValues: { burnAmount: "" },
-        resolver: zodResolver(swapFormSchema),
-    });
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { errors, isSubmitting },
+  } = useForm<SwapFormValues>({
+    defaultValues: { burnAmount: "" },
+    resolver: zodResolver(swapFormSchema),
+  });
 
-    const burnAmount = watch("burnAmount");
-    const [debouncedBurnAmount] = useDebounceValue(
-        burnAmount,
-        SELL_INPUT_DEBOUNCE_MS,
-    );
-    const derivedBurnAmount = burnAmount ? debouncedBurnAmount : burnAmount;
-    const isSellAmountDebouncing =
-        !!burnAmount && burnAmount !== derivedBurnAmount;
+  const burnAmount = watch("burnAmount");
+  const [debouncedBurnAmount] = useDebounceValue(
+    burnAmount,
+    SELL_INPUT_DEBOUNCE_MS,
+  );
+  const derivedBurnAmount = burnAmount ? debouncedBurnAmount : burnAmount;
+  const isSellAmountDebouncing =
+    !!burnAmount && burnAmount !== derivedBurnAmount;
 
-    const network = poolDetail?.pool.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
-        : undefined;
+  const network = poolDetail?.pool.chainId
+    ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+    : undefined;
 
     const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -144,27 +292,25 @@ const SwapDialog = ({
         imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
-    const {
-        formatted: burnBalanceFormatted,
-        symbol: burnBalanceSymbol,
-        isLoading: isLoadingBurnBalance,
-        refetch: refetchBurnBalance,
-    } = useTokenBalance({
-        tokenAddress: poolDetail?.pool.tokenIn,
-        decimals: poolDetail?.pool.tokenInDecimals,
-        symbol: poolDetail?.pool.tokenInSymbol,
-    });
+  const {
+    formatted: burnBalanceFormatted,
+    isLoading: isLoadingBurnBalance,
+    refetch: refetchBurnBalance,
+  } = useTokenBalance({
+    tokenAddress: poolDetail?.pool.tokenIn,
+    decimals: poolDetail?.pool.tokenInDecimals,
+    symbol: poolDetail?.pool.tokenInSymbol,
+  });
 
-    const {
-        formatted: rewardBalanceFormatted,
-        symbol: rewardBalanceSymbol,
-        isLoading: isLoadingRewardBalance,
-        refetch: refetchRewardBalance,
-    } = useTokenBalance({
-        tokenAddress: poolDetail?.pool.rewardToken,
-        decimals: poolDetail?.pool.rewardTokenDecimals,
-        symbol: poolDetail?.pool.rewardTokenSymbol,
-    });
+  const {
+    formatted: rewardBalanceFormatted,
+    isLoading: isLoadingRewardBalance,
+    refetch: refetchRewardBalance,
+  } = useTokenBalance({
+    tokenAddress: poolDetail?.pool.rewardToken,
+    decimals: poolDetail?.pool.rewardTokenDecimals,
+    symbol: poolDetail?.pool.rewardTokenSymbol,
+  });
 
     const handleSelectPercent = (percent: number) => {
         if (!burnBalanceFormatted || poolDetail?.pool.tokenInDecimals == null)
@@ -222,72 +368,71 @@ const SwapDialog = ({
         }
     }, [poolDetail]);
 
-    const isExceedingMax =
-        !!derivedBurnAmount &&
-        Number(derivedBurnAmount) > 0 &&
-        Number(maxBurnLeft) > 0 &&
-        Number(derivedBurnAmount) > Number(maxBurnLeft);
+  const isExceedingMax =
+    !!derivedBurnAmount &&
+    Number(derivedBurnAmount) > 0 &&
+    Number(maxBurnLeft) > 0 &&
+    Number(derivedBurnAmount) > Number(maxBurnLeft);
 
-    const insufficientBalanceMessage = useMemo(() => {
-        if (!derivedBurnAmount || !burnBalanceFormatted || isLoadingBurnBalance) {
-            return undefined;
-        }
+  const insufficientBalanceMessage = useMemo(() => {
+    if (!derivedBurnAmount || !burnBalanceFormatted || isLoadingBurnBalance) {
+      return undefined;
+    }
 
         const burnAmountDecimal = safeDecimalParse({ value: derivedBurnAmount });
         const burnBalanceDecimal = safeDecimalParse({
             value: burnBalanceFormatted,
         });
 
-        if (!burnAmountDecimal || !burnBalanceDecimal) return undefined;
-        if (burnAmountDecimal.lte(0) || burnAmountDecimal.lte(burnBalanceDecimal)) {
-            return undefined;
-        }
+    if (!burnAmountDecimal || !burnBalanceDecimal) return undefined;
+    if (burnAmountDecimal.lte(0) || burnAmountDecimal.lte(burnBalanceDecimal)) {
+      return undefined;
+    }
 
-        return `Amount exceeds wallet balance (${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""})`;
-    }, [
-        derivedBurnAmount,
-        burnBalanceFormatted,
-        burnBalanceSymbol,
-        burnTokenDisplay?.symbol,
-        isLoadingBurnBalance,
-    ]);
+    return `Amount exceeds wallet balance (${formatBalanceDisplay(burnBalanceFormatted)} ${burnTokenDisplay?.symbol ?? ""})`;
+  }, [
+    derivedBurnAmount,
+    burnBalanceFormatted,
+    burnTokenDisplay?.symbol,
+    isLoadingBurnBalance,
+  ]);
 
-    const isInsufficientBalance = !!insufficientBalanceMessage;
+  const isInsufficientBalance = !!insufficientBalanceMessage;
 
-    const formattedEstimatedRewardAmount = useMemo(() => {
-        if (!derivedBurnAmount || !poolDetail) return "0";
+  const formattedEstimatedRewardAmount = useMemo(() => {
+    if (!derivedBurnAmount || !poolDetail) return "0";
 
-        try {
-            const {
-                tokenInDecimals,
-                rewardTokenDecimals,
-                rewardNumerator,
-                rewardDenominator,
-                settlementFee,
-            } = poolDetail.pool;
+    try {
+      const {
+        tokenInDecimals,
+        rewardTokenDecimals,
+        rewardNumerator,
+        rewardDenominator,
+        settlementFee,
+      } = poolDetail.pool;
 
-            const amountInBN = new BN(
-                parseUnits(derivedBurnAmount || "0", tokenInDecimals).toString(),
-            );
+      const amountInBN = new BN(
+        parseUnits(derivedBurnAmount || "0", tokenInDecimals).toString(),
+      );
 
-            if (amountInBN.isZero()) return "0";
+      if (amountInBN.isZero()) return "0";
 
             const numeratorBN = parseToBN(rewardNumerator);
             const denominatorBN = parseToBN(rewardDenominator);
 
-            const rewardDecimalsBN = new BN(10).pow(new BN(rewardTokenDecimals));
-            const tokenDecimalsBN = new BN(10).pow(new BN(tokenInDecimals));
+      const rewardDecimalsBN = new BN(10).pow(new BN(rewardTokenDecimals));
+      const tokenDecimalsBN = new BN(10).pow(new BN(tokenInDecimals));
 
-            const rewardBN = amountInBN
-                .mul(numeratorBN)
-                .mul(rewardDecimalsBN)
-                .div(denominatorBN.mul(tokenDecimalsBN));
+      const rewardBN = amountInBN
+        .mul(numeratorBN)
+        .mul(rewardDecimalsBN)
+        .div(denominatorBN.mul(tokenDecimalsBN));
 
             const feeBN = rewardBN
                 .mul(parseToBN(settlementFee))
                 .div(new BN(DECIMAL_FEE_PERCENT * 100));
 
-            const finalReward = rewardBN.sub(feeBN);
+      const finalReward = rewardBN.sub(feeBN);
 
             const formatted = formatUnits(
                 BigInt(finalReward.toString()),
@@ -301,34 +446,111 @@ const SwapDialog = ({
         }
     }, [derivedBurnAmount, poolDetail]);
 
-    const onSubmit = async (data: SwapFormValues) => {
-        try {
-            if (!poolDetail) return;
-            if (isSolanaNetwork) {
-                await depositSwapPoolSOL({ amountIn: data.burnAmount, poolDetail });
-            } else {
-                await depositSwapPoolETH({
-                    poolAddress: poolDetail.pool.address,
-                    amountIn: data.burnAmount,
-                    // Use decimals from poolDetail directly — authoritative source.
-                    // burnToken lookup can be undefined if address casing differs,
-                    // which would cause parseUnits to use wrong decimals (18 instead of e.g. 9)
-                    // sending 10^9× too large an amount → contract reverts InsufficientReward.
-                    decimals: poolDetail.pool.tokenInDecimals,
-                    tokenInAddress: poolDetail.pool.tokenIn,
-                });
-            }
-            refetchBurnBalance();
-            refetchRewardBalance();
-            reset();
-            onOpenChange(false);
-            onSuccess();
-        } catch (error: unknown) {
-            toast.error("Swap failed", {
-                description: getErrorMessage({ error }),
-            });
+  useEffect(() => {
+    let cancelled = false;
+
+    if (!open || !poolDetail) {
+      setNetworkFee(DEFAULT_NETWORK_FEE_STATE);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    const parsedBurnAmount = derivedBurnAmount
+      ? safeDecimalParse({ value: derivedBurnAmount })
+      : null;
+
+    if (!parsedBurnAmount || parsedBurnAmount.lte(0)) {
+      setNetworkFee(DEFAULT_NETWORK_FEE_STATE);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    if (isSellAmountDebouncing) {
+      setNetworkFee(ESTIMATING_NETWORK_FEE_STATE);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    setNetworkFee(ESTIMATING_NETWORK_FEE_STATE);
+
+    const estimateNetworkFee = async () => {
+      try {
+        const nextNetworkFee = isSolanaNetwork
+          ? getSolanaNetworkFeeStateFromEstimate(
+              await estimateSwapPoolSolNetworkFee({
+                amountIn: derivedBurnAmount,
+                poolDetail,
+              }),
+            )
+          : getNetworkFeeStateFromEstimate(
+              await estimateSwapPoolNetworkFee({
+                poolAddress: poolDetail.pool.address,
+                amountIn: derivedBurnAmount,
+                decimals: poolDetail.pool.tokenInDecimals,
+                tokenInAddress: poolDetail.pool.tokenIn,
+              }),
+            );
+
+        if (!cancelled) {
+          setNetworkFee(nextNetworkFee);
         }
+      } catch (error: unknown) {
+        if (cancelled) return;
+
+        setNetworkFee(
+          isSolanaNetwork
+            ? getSolanaNetworkFeeStateFromError(error)
+            : getEvmNetworkFeeStateFromError(error),
+        );
+      }
     };
+
+    void estimateNetworkFee();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    derivedBurnAmount,
+    estimateSwapPoolNetworkFee,
+    estimateSwapPoolSolNetworkFee,
+    isSellAmountDebouncing,
+    isSolanaNetwork,
+    open,
+    poolDetail,
+  ]);
+
+  const onSubmit = async (data: SwapFormValues) => {
+    try {
+      if (!poolDetail) return;
+      if (isSolanaNetwork) {
+        await depositSwapPoolSOL({ amountIn: data.burnAmount, poolDetail });
+      } else {
+        await depositSwapPoolETH({
+          poolAddress: poolDetail.pool.address,
+          amountIn: data.burnAmount,
+          // Use decimals from poolDetail directly — authoritative source.
+          // burnToken lookup can be undefined if address casing differs,
+          // which would cause parseUnits to use wrong decimals (18 instead of e.g. 9)
+          // sending 10^9× too large an amount → contract reverts InsufficientReward.
+          decimals: poolDetail.pool.tokenInDecimals,
+          tokenInAddress: poolDetail.pool.tokenIn,
+        });
+      }
+      refetchBurnBalance();
+      refetchRewardBalance();
+      reset();
+      onOpenChange(false);
+      onSuccess();
+    } catch (error: unknown) {
+      toast.error("Swap failed", {
+        description: getErrorMessage({ error }),
+      });
+    }
+  };
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
@@ -413,6 +635,8 @@ const SwapDialog = ({
 
                         <FeePanel
                             open={openFeePopUp}
+                            networkFeeDisplay={networkFee.display}
+                            networkFeeTooltip={networkFee.tooltip}
                             settlementFee={poolDetail?.pool?.settlementFee}
                         />
                     </div>

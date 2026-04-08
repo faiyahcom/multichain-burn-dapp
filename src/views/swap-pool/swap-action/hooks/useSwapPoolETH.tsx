@@ -7,6 +7,7 @@ import {
   getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { ZERO_ADDRESS } from "@/config/constant";
+import { estimateEvmTransactionFee } from "@/utils/helpers/evm-gas";
 
 type DepositSwapPoolParams = {
   poolAddress: string;
@@ -15,9 +16,125 @@ type DepositSwapPoolParams = {
   tokenInAddress: string;
 };
 
+export type EstimateSwapPoolNetworkFeeResult = {
+  nativeDecimals: number;
+  nativeSymbol: string;
+  steps: Array<{
+    type: "approve" | "swap";
+    gasCost: bigint;
+    gasLimit: bigint;
+  }>;
+  totalGasCost: bigint;
+};
+
+const isNativeToken = (tokenAddress: string) =>
+  !tokenAddress ||
+  tokenAddress.toLowerCase() === ZERO_ADDRESS.toLowerCase() ||
+  tokenAddress.toLowerCase() === "native";
+
 export const useSwapPoolETH = () => {
   const { isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
+
+  const estimateSwapPoolNetworkFee = useCallback(
+    async ({
+      poolAddress,
+      amountIn,
+      decimals,
+      tokenInAddress,
+    }: DepositSwapPoolParams): Promise<EstimateSwapPoolNetworkFeeResult> => {
+      if (!isConnected || !walletProvider) {
+        throw new Error("Wallet not connected");
+      }
+
+      const provider = new ethers.BrowserProvider(
+        walletProvider as Eip1193Provider,
+      );
+      const signer = await provider.getSigner();
+      const userAddress = await signer.getAddress();
+      const routerContract = getContractSwapRouter(signer);
+      const parsedAmount = ethers.parseUnits(amountIn, decimals);
+      const nativeDeposit = isNativeToken(tokenInAddress);
+      const steps: EstimateSwapPoolNetworkFeeResult["steps"] = [];
+
+      const estimateStep = async ({
+        type,
+        estimateGas,
+      }: {
+        type: "approve" | "swap";
+        estimateGas: () => Promise<bigint>;
+      }) => {
+        const estimate = await estimateEvmTransactionFee({
+          provider,
+          estimateGas,
+        });
+
+        steps.push({
+          type,
+          gasCost: estimate.gasCost,
+          gasLimit: estimate.gasLimit,
+        });
+
+        return estimate;
+      };
+
+      let nativeSymbol: string | undefined;
+      let nativeDecimals: number | undefined;
+
+      if (!nativeDeposit) {
+        const tokenContract = getERC20Contract(tokenInAddress, signer);
+        const allowance = await tokenContract.allowance(
+          userAddress,
+          poolAddress,
+        );
+        const approvalRequired = allowance < parsedAmount;
+
+        if (approvalRequired) {
+          const approvalEstimate = await estimateStep({
+            type: "approve",
+            estimateGas: () =>
+              tokenContract.approve.estimateGas(poolAddress, parsedAmount),
+          });
+
+          nativeSymbol = approvalEstimate.nativeSymbol;
+          nativeDecimals = approvalEstimate.nativeDecimals;
+        }
+      }
+
+      try {
+        const swapEstimate = await estimateStep({
+          type: "swap",
+          estimateGas: () =>
+            routerContract.depositSwapPool.estimateGas(
+              poolAddress,
+              parsedAmount,
+              {
+                value: nativeDeposit ? parsedAmount : 0n,
+              },
+            ),
+        });
+
+        nativeSymbol = swapEstimate.nativeSymbol;
+        nativeDecimals = swapEstimate.nativeDecimals;
+      } catch (error) {
+        if (!steps.some(({ type }) => type === "approve")) {
+          throw error;
+        }
+      }
+
+      if (!nativeSymbol || nativeDecimals == null) {
+        throw new Error("Unable to estimate gas fee for this transaction.");
+      }
+
+      return {
+        nativeDecimals,
+        nativeSymbol,
+        steps,
+        totalGasCost: steps.reduce((total, step) => total + step.gasCost, 0n),
+      };
+    },
+    [isConnected, walletProvider],
+  );
 
   const depositSwapPool = useCallback(
     async ({
@@ -39,10 +156,7 @@ export const useSwapPoolETH = () => {
       const routerContract = getContractSwapRouter(signer);
       const parsedAmount = ethers.parseUnits(amountIn, decimals);
 
-      const isNative =
-        !tokenInAddress ||
-        tokenInAddress.toLowerCase() === ZERO_ADDRESS.toLowerCase() ||
-        tokenInAddress.toLowerCase() === "native";
+      const isNative = isNativeToken(tokenInAddress);
 
       if (!isNative) {
         const tokenContract = getERC20Contract(tokenInAddress, signer);
@@ -80,5 +194,5 @@ export const useSwapPoolETH = () => {
     [isConnected, walletProvider],
   );
 
-  return { depositSwapPool };
+  return { depositSwapPool, estimateSwapPoolNetworkFee };
 };

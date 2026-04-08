@@ -3,10 +3,17 @@ import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks
 
 type Props = {
     open: boolean;
+    networkFeeDisplay?: string;
+    networkFeeTooltip?: string;
     settlementFee?: string | number | null;
 };
 
-const FeePanel = ({ open, settlementFee }: Props) => (
+const FeePanel = ({
+    open,
+    settlementFee,
+    networkFeeDisplay = "-",
+    networkFeeTooltip = "Estimated gas fee for the transaction",
+}: Props) => (
     <div
         className={`w-[calc(100%-2rem)] overflow-hidden font-inter transition-all duration-300 sm:w-lg ${open ? "mt-2 max-h-40 opacity-100" : "max-h-0 opacity-0"
             }`}
@@ -31,15 +38,14 @@ const FeePanel = ({ open, settlementFee }: Props) => (
                 <div className="flex items-center gap-1.5">
                     Network Fee:
                     <InfoTooltip
-                        content="Estimated gas fee for the transaction"
+                        content={networkFeeTooltip}
                         variant="swap"
                         classNames={{
                             text: "font-inter",
                         }}
                     />
                 </div>
-                {/* TODO: estimate real network fee */}
-                <div>{"<0.01 USD$"}</div>
+                <div>{networkFeeDisplay}</div>
             </div>
         </div>
     </div>
