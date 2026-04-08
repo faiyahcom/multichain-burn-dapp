@@ -49,9 +49,7 @@ const PairDetailGlowList = () => {
   return (
     <GlowContainer
       variant="pair"
-      className={cn("space-y-5 p-2.5 sm:space-y-10 sm:p-5", {
-        "pt-0 sm:pt-0": listLayout === "list",
-      })}
+      className={cn("space-y-5 p-2.5 sm:space-y-10 sm:p-5")}
     >
       {listLayout === "list" && (
         <PairDetailGlowListTable
