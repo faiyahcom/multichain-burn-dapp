@@ -123,7 +123,14 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   asChild: true,
                   children: (
                     <Link
-                      to={`/${isBurnPool ? "burn" : "swap"}/detail/${pool.address}`}
+                      to={
+                        isBurnPool
+                          ? "/burn/detail/$address"
+                          : "/swap/detail/$address"
+                      }
+                      params={{
+                        address: pool.address,
+                      }}
                     >
                       {isBurnPool ? getPoolStatusLabel(pool.status) : "View"}
                     </Link>
