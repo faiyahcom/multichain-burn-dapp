@@ -5,7 +5,7 @@ import { networkIdToChainId } from "@/config/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
-import { appKit } from "@/config/appkit";
+import { useDisconnect } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 
 const useWalletConnectionHandler = () => {
@@ -13,10 +13,25 @@ const useWalletConnectionHandler = () => {
     const { isConnected, caipAddress } = useAppKitAccount();
     const { selectedNetworkId, setSelectedNetworkId } = useSystemStore();
     const { authenticateEvm, authenticateSolana } = useWalletAuth();
+    const { disconnect } = useDisconnect();
 
     const isAuthenticating = useRef(false);
     const wasConnected = useRef(false);
     const prevChainKey = useRef<string | null>(null);
+
+    // Stable refs so the effect never re-runs just because callbacks were recreated.
+    const authenticateEvmRef = useRef(authenticateEvm);
+    const authenticateSolanaRef = useRef(authenticateSolana);
+    const disconnectRef = useRef(disconnect);
+    useEffect(() => {
+        authenticateEvmRef.current = authenticateEvm;
+    }, [authenticateEvm]);
+    useEffect(() => {
+        authenticateSolanaRef.current = authenticateSolana;
+    }, [authenticateSolana]);
+    useEffect(() => {
+        disconnectRef.current = disconnect;
+    }, [disconnect]);
 
     const queryClient = useQueryClient();
 
@@ -39,7 +54,9 @@ const useWalletConnectionHandler = () => {
         prevChainKey.current = currentChainKey;
 
         const networkId = mapChainToSystemNetwork(namespace, chainRef);
-        const backendChainId = networkId ? networkIdToChainId(networkId) : undefined;
+        const backendChainId = networkId
+            ? networkIdToChainId(networkId)
+            : undefined;
 
         const isInitialConnect = prev === null;
         const chainSwitched = !isInitialConnect && prev !== currentChainKey;
@@ -52,9 +69,16 @@ const useWalletConnectionHandler = () => {
             if (systemNetwork) setSelectedNetworkId(systemNetwork);
         }
 
-        const walletChanged = user?.address && (
-            user.address !== address || user.chainId !== backendChainId
-        );
+        // Unsupported EVM chain (e.g. mainnet) — disconnect immediately so the
+        // connector doesn't stay in a half-connected limbo.
+        if (namespace === "eip155" && !networkId) {
+            disconnectRef.current();
+            return;
+        }
+
+        const walletChanged =
+            user?.address &&
+            (user.address !== address || user.chainId !== backendChainId);
 
         if (walletChanged) {
             logout();
@@ -69,14 +93,17 @@ const useWalletConnectionHandler = () => {
                 try {
                     let result;
                     if (namespace === "eip155") {
-                        result = await authenticateEvm(address, backendChainId);
+                        result = await authenticateEvmRef.current(address, backendChainId);
                     } else if (namespace === "solana") {
-                        result = await authenticateSolana(address, backendChainId);
+                        result = await authenticateSolanaRef.current(
+                            address,
+                            backendChainId,
+                        );
                     }
                     if (result && !result.success) {
                         // User rejected signature or auth failed — disconnect
                         // so the wallet doesn't stay in a connected+unauthenticated limbo.
-                        appKit.disconnect();
+                        disconnectRef.current();
                     }
                 } finally {
                     isAuthenticating.current = false;
@@ -92,8 +119,9 @@ const useWalletConnectionHandler = () => {
         user,
         logout,
         setSelectedNetworkId,
-        authenticateEvm,
-        authenticateSolana,
+        // authenticateEvm / authenticateSolana / disconnect intentionally omitted —
+        // they're accessed via stable refs above to prevent the effect re-running
+        // (and triggering a second auth attempt) when hook callbacks are recreated.
     ]);
 };
 

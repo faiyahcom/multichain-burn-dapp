@@ -7,16 +7,17 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import { useSystemStore } from "@/stores/systemStore";
-import { appKit } from "@/config/appkit";
 
 export function SwitchNetworkModal() {
   const { switchNetworkRequest, closeSwitchNetworkModal } = useSystemStore();
   const { switchNetwork } = useAppKitNetwork();
   const { open } = useAppKit();
+  const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
+  const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
   const fromNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === switchNetworkRequest?.fromId,
   );
@@ -29,7 +30,7 @@ export function SwitchNetworkModal() {
   const handleSwitch = async () => {
     if (!toNetwork) return;
     const targetNamespace = toNetwork.id === "solanaDevnet" ? "solana" : "eip155";
-    const alreadyConnectedToNamespace = !!appKit.getAddress(targetNamespace);
+    const alreadyConnectedToNamespace = targetNamespace === "solana" ? !!solanaAddress : !!evmAddress;
     try {
       if (alreadyConnectedToNamespace) {
         // Already connected to the target namespace — switch directly to the exact chain.
