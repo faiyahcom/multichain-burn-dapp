@@ -195,10 +195,32 @@ function Button({
       disabled={isDisabled}
       {...props}
     >
-      <>
-        {isLoading && <Spinner />}
-        {children}
-      </>
+      {asChild ? (
+        // Slot.Root requires a single child — clone it and inject the spinner alongside its children
+        React.isValidElement(children) ? (
+          React.cloneElement(
+            children,
+            {} as object,
+            <>
+              {isLoading && <Spinner />}
+              {
+                (children as React.ReactElement<{ children?: React.ReactNode }>)
+                  .props.children
+              }
+            </>,
+          )
+        ) : // if children is not a ReactElement, then render the only the spinner if isLoading
+        isLoading ? (
+          <Spinner />
+        ) : (
+          children
+        )
+      ) : (
+        <>
+          {isLoading && <Spinner />}
+          {children}
+        </>
+      )}
     </Comp>
   );
 }

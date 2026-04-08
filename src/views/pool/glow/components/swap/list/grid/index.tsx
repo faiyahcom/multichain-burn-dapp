@@ -3,8 +3,9 @@ import {
   Button,
   getButtonVariantFromContainerVariant,
 } from "@/components/common/glow/button";
-import { getVariantBorderClassName } from "@/components/common/glow/container";
-import GridCard from "@/components/common/glow/grid-card";
+import GridCard, {
+  gridCardButtonClassName,
+} from "@/components/common/glow/grid-card";
 import GridCardSkeleton from "@/components/common/glow/grid-card-skeleton";
 import TokenOutInNetworkDisplay from "@/components/common/glow/token-out-in-network-display";
 import MetricNumber from "@/components/common/metric-number";
@@ -12,7 +13,6 @@ import NoData from "@/components/common/no-data";
 import RatioDisplay from "@/components/common/ratio-display";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { chainIdToNetworkConfig } from "@/config/networks";
-import { cn } from "@/lib/utils";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import type { PoolItemType } from "@/types/admin/master-pool-management";
@@ -138,13 +138,9 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                           containerVariant: "swap",
                           isGrid: true,
                         })}
-                        className={cn(
-                          "mx-auto min-w-45 pb-2.75",
-                          getVariantBorderClassName({
-                            variant: "swap",
-                            custom: "rounded-13px border",
-                          }),
-                        )}
+                        className={gridCardButtonClassName({
+                          variant: "swap",
+                        })}
                         hasHover
                         onClick={(e) => {
                           e.stopPropagation();

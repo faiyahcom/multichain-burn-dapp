@@ -4,7 +4,6 @@ import type { ContainerVariant } from "./container";
 import GlowContainer, {
   getVariantBorderClassName,
   getVariantBtnBgClassName,
-  getVariantShadowClassName,
 } from "./container";
 
 interface Props {
@@ -31,6 +30,23 @@ const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
   pair: "grid-pair-bg",
   swap: "grid-swap-bg",
   green: "",
+};
+
+export const gridCardButtonClassName = ({
+  variant,
+  className,
+}: {
+  variant: ContainerVariant;
+  className?: string;
+}): string => {
+  return cn(
+    "mx-auto min-w-45 pb-2.75",
+    getVariantBorderClassName({
+      variant: variant,
+      custom: "rounded-13px border",
+    }),
+    className,
+  );
 };
 
 const GridCard: React.FC<Props> = ({
@@ -74,16 +90,10 @@ const GridCard: React.FC<Props> = ({
             containerVariant: variant,
             isGrid: true,
           })}
-          className={cn(
-            "mx-auto min-w-45 pb-2.75",
-            variant === "pair" &&
-              getVariantShadowClassName({ variant: "swap" }), // Exception for pair card
-            getVariantBorderClassName({
-              variant,
-              custom: "rounded-13px border",
-            }),
-            btnClassName,
-          )}
+          className={gridCardButtonClassName({
+            variant,
+            className: btnClassName,
+          })}
           hasHover
           {...btnProps}
         >
