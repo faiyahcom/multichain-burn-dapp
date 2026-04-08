@@ -1,4 +1,3 @@
-import { createAppKit } from "@reown/appkit";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import { type AppKitNetwork } from "@reown/appkit/networks";
@@ -45,5 +44,3 @@ export const appKitConfig = {
     analytics: true,
   },
 };
-
-export const appKit = createAppKit(appKitConfig);

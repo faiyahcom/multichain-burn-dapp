@@ -2,54 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- Prevent index.html from being served from a stale browser cache after re-deployment -->
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate, max-age=0" />
-    <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
     <title>Faiyah.com</title>
     <meta name="description" content="Faiyah.com | Your Gateway to DeFi Services" />
-    <!--
-      Safari-only guard: when a deployment rotates content-hashed JS chunk filenames,
-      any tab that still holds the previous index.html will try to load the old chunk
-      URLs.  Those URLs 404 and the server returns the HTML catch-all page.  Safari's
-      strict ES-module MIME-type check then throws:
-        "text/html is not a valid JavaScript MIME type"
-      Chrome silently handles this differently, so it only surfaces in Safari.
-
-      The handler below catches that error (and the equivalent unhandledrejection for
-      dynamic import() failures) and forces a single hard reload so the tab picks up
-      the newly-deployed index.html with correct chunk URLs.
-      sessionStorage prevents an infinite reload loop if the server itself is broken.
-    -->
-    <script>
-      (function () {
-        var RELOAD_KEY = '__vite_chunk_reload__';
-        function isChunkError(msg) {
-          return (
-            msg.indexOf('not a valid JavaScript MIME type') !== -1 ||
-            msg.indexOf('Failed to fetch dynamically imported module') !== -1 ||
-            msg.indexOf('Importing a module script failed') !== -1 ||
-            msg.indexOf('error loading dynamically imported module') !== -1
-          );
-        }
-        window.addEventListener('error', function (e) {
-          var msg = e.message || '';
-          if (isChunkError(msg) && !sessionStorage.getItem(RELOAD_KEY)) {
-            sessionStorage.setItem(RELOAD_KEY, '1');
-            window.location.reload(true);
-          }
-        }, true);
-        window.addEventListener('unhandledrejection', function (e) {
-          var msg = e.reason ? String(e.reason) : '';
-          if (isChunkError(msg) && !sessionStorage.getItem(RELOAD_KEY)) {
-            sessionStorage.setItem(RELOAD_KEY, '1');
-            window.location.reload(true);
-          }
-        });
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>

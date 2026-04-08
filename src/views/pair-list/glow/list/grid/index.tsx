@@ -100,7 +100,12 @@ const PairListGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   asChild: true,
                   children: (
                     <Link
-                      to={`/pair-detail/${item.chainId}/${item.tokenIn}/${item.tokenOut}`}
+                      to="/pair-detail/$chainId/$tokenIn/$tokenOut"
+                      params={{
+                        chainId: item.chainId,
+                        tokenIn: item.tokenIn,
+                        tokenOut: item.tokenOut,
+                      }}
                     >
                       View Detail
                     </Link>
