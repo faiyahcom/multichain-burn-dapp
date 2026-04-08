@@ -1,4 +1,3 @@
-import { createAppKit } from "@reown/appkit";
 import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import { type AppKitNetwork } from "@reown/appkit/networks";
@@ -45,5 +44,6 @@ export const appKitConfig = {
     analytics: true,
   },
 };
-
-export const appKit = createAppKit(appKitConfig);
+// createAppKit is called once by <AppKitProvider> in AppkitProvider.tsx.
+// Do NOT call it here — a second call creates a duplicate WalletConnect Core
+// instance and corrupts the wagmi connector state (ConnectorChainMismatchError).
