@@ -19,7 +19,7 @@ window.addEventListener("vite:preloadError", (event) => {
     sessionStorage.setItem(RELOAD_KEY, "true");
     window.location.reload();
   } else {
-    sessionStorage.removeItem(RELOAD_KEY);
+    // sessionStorage.removeItem(RELOAD_KEY);
     console.error("Failed to load application after reload attempt");
   }
 });
