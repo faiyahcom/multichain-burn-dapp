@@ -209,6 +209,9 @@ function Button({
               }
             </>,
           )
+        ) : // if children is not a ReactElement, then render the only the spinner if isLoading
+        isLoading ? (
+          <Spinner />
         ) : (
           children
         )
