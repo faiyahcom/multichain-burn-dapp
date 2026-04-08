@@ -8,21 +8,21 @@ import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
 import "./polyfills";
 
-// ✅ Reload when a stale deployment causes chunk load failures
-window.addEventListener("vite:preloadError", (event) => {
-  const RELOAD_KEY = "vite:preloadError:reloaded";
-  const hasReloaded = sessionStorage.getItem(RELOAD_KEY);
+// // ✅ Reload when a stale deployment causes chunk load failures
+// window.addEventListener("vite:preloadError", (event) => {
+//   const RELOAD_KEY = "vite:preloadError:reloaded";
+//   const hasReloaded = sessionStorage.getItem(RELOAD_KEY);
 
-  console.error("Vite preload error:", event.payload);
+//   console.error("Vite preload error:", event.payload);
 
-  if (!hasReloaded) {
-    sessionStorage.setItem(RELOAD_KEY, "true");
-    window.location.reload();
-  } else {
-    // sessionStorage.removeItem(RELOAD_KEY);
-    console.error("Failed to load application after reload attempt");
-  }
-});
+//   if (!hasReloaded) {
+//     sessionStorage.setItem(RELOAD_KEY, "true");
+//     window.location.reload();
+//   } else {
+//     // sessionStorage.removeItem(RELOAD_KEY);
+//     console.error("Failed to load application after reload attempt");
+//   }
+// });
 
 setupAxiosDefaults();
 

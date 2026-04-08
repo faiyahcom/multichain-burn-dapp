@@ -48,6 +48,13 @@
             window.location.reload(true);
           }
         });
+        window.addEventListener('vite:preloadError', function (e) {
+          var msg = e.reason ? String(e.reason) : '';
+          if (isChunkError(msg) && !sessionStorage.getItem(RELOAD_KEY)) {
+            sessionStorage.setItem(RELOAD_KEY, '1');
+            window.location.reload(true);
+          }
+        });
       })();
     </script>
   </head>
