@@ -14,10 +14,12 @@ import {
   type NetworkConfig,
 } from "@/config/networks";
 
+import { toast } from "@/components/common/custom-toast";
 import { useSystemStore } from "@/stores/systemStore";
 import { DECIMAL_FEE_PERCENT, useFeeSettings } from "../hooks/useFeeSettings";
 import { useUpdateFeeConfigEvmFn } from "../hooks/useUpdateFeeConfigEvmFn";
 import { useUpdateFeeConfigSolFn } from "../hooks/useUpdateFeeConfigSolFn";
+import { ensureLatestSuperAdminAccess } from "@/utils/helpers/ensure-super-admin-access";
 
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import { ArrowIcon } from "@/components/common/arrow-icon";
@@ -194,6 +196,15 @@ const FeeSettingsForm = () => {
   };
 
   const onSubmit = async (values: FeeSettingsFormValues) => {
+    const access = await ensureLatestSuperAdminAccess({
+      forbiddenMessage: "Only super admin can update fee settings.",
+    });
+
+    if (!access.ok) {
+      toast.error(access.message);
+      return;
+    }
+
     try {
       if (isSolana) {
         await updateFeeConfigSol(values);

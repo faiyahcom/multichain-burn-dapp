@@ -1,6 +1,5 @@
-import { appKit } from "@/config/appkit";
 import { useSystemStore } from "@/stores/systemStore";
-import { useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKitEvents, useAppKitNetwork } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 
 /**
@@ -28,26 +27,22 @@ export function useAppKitEventHandler() {
   useEffect(() => { closeSwitchNetworkModalRef.current = closeSwitchNetworkModal; }, [closeSwitchNetworkModal]);
   useEffect(() => { setPendingRef.current = setPendingNetworkSwitch; }, [setPendingNetworkSwitch]);
 
+  const appKitEvent = useAppKitEvents();
+
   useEffect(() => {
-    const unsubscribe = appKit.subscribeEvents(({ data }) => {
-      if (data.event !== "MODAL_CLOSE") return;
+    if (appKitEvent?.data?.event !== "MODAL_CLOSE") return;
 
-      const pending = pendingRef.current;
-      if (!pending) return;
+    const pending = pendingRef.current;
+    if (!pending) return;
 
-      if (data.properties.connected) {
-        switchNetworkRef.current(pending.network).catch(() => {});
-      }
+    if (appKitEvent.data.properties.connected) {
+      switchNetworkRef.current(pending.network).catch(() => {});
+    }
 
-      setPendingRef.current(null);
+    setPendingRef.current(null);
 
-      if (pending.closeModalOnDone) {
-        closeSwitchNetworkModalRef.current();
-      }
-    });
-
-    return unsubscribe;
-    // Empty deps — subscribe once for the lifetime of the root component.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (pending.closeModalOnDone) {
+      closeSwitchNetworkModalRef.current();
+    }
+  }, [appKitEvent]);
 }

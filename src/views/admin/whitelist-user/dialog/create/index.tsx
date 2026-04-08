@@ -5,7 +5,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
@@ -22,6 +21,7 @@ import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useCreateWhitelistUserSolanaFn } from "./useCreateWhitelistUserSolanaFn";
 import { useCreateWhitelistUserEvmFn } from "./useCreateWhitelistUserEvmFn";
 import { whitelistUserService } from "@/services/whitelistUserService";
+import { ensureLatestSuperAdminAccess } from "@/utils/helpers/ensure-super-admin-access";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { isSolanaAddress, isEvmAddress } from "@/utils/helpers/address";
 import { toast } from "@/components/common/custom-toast";
@@ -118,6 +118,15 @@ const AdminWhitelistUserDialogCreate = () => {
   );
 
   const onSubmit = async (data: WhitelistUserFormValues) => {
+    const access = await ensureLatestSuperAdminAccess({
+      forbiddenMessage: "Only super admin can manage whitelist users.",
+    });
+
+    if (!access.ok) {
+      toast.error(access.message);
+      return;
+    }
+
     const isSolanaNetwork = data.networkId === "solanaDevnet";
 
     // Validate address format matches selected network
@@ -190,12 +199,25 @@ const AdminWhitelistUserDialogCreate = () => {
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant={"mb-primary"} size={"mb-square-btn"}>
-          <span className="max-md:sr-only">Add User</span>{" "}
-          <PlusIcon className="size-3.75" />
-        </Button>
-      </DialogTrigger>
+      <Button
+        variant={"mb-primary"}
+        size={"mb-square-btn"}
+        onClick={async () => {
+          const access = await ensureLatestSuperAdminAccess({
+            forbiddenMessage: "Only super admin can manage whitelist users.",
+          });
+
+          if (!access.ok) {
+            toast.error(access.message);
+            return;
+          }
+
+          setOpen(true);
+        }}
+      >
+        <span className="max-md:sr-only">Add User</span>{" "}
+        <PlusIcon className="size-3.75" />
+      </Button>
       <DialogContent
         showCloseButton={false}
         className="sm:max-w-185.75"

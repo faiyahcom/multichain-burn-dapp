@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useSignMessage } from 'wagmi'
+import { useSignMessage, useConnections } from 'wagmi'
 import { useAppKitAccount } from '@reown/appkit/react'
 import bs58 from 'bs58'
 import { authService } from '@/services/authService'
@@ -45,6 +45,8 @@ export function useWalletAuth() {
     namespace: 'eip155',
   })
   const { mutateAsync: signEvmMessage } = useSignMessage()
+  const connections = useConnections()
+  const connector = connections[0]?.connector
 
   const { address: solanaAddress } = useAppKitAccount({
     namespace: 'solana',
@@ -72,12 +74,26 @@ export function useWalletAuth() {
         let signature: string
 
         if (walletType === 'evm') {
-          // Sign with EVM wallet using wagmi
-          if (!signEvmMessage) {
-            throw new Error('EVM wallet not connected')
+          try {
+            signature = await signEvmMessage({ message })
+          } catch (signError: any) {
+            console.log('signEvmMessage failed, trying personal_sign fallback:', signError?.name, signError?.message)
+            // Fall back to raw personal_sign via the connector's provider.
+            // Handles ConnectorChainMismatchError (wagmi type/value chain ID mismatch),
+            // WalletConnect session errors, and mobile wallet signing failures.
+            if (!connector) {
+              throw signError
+            }
+            const provider = await connector.getProvider() as any
+            const msgHex = '0x' + Array.from(
+              new TextEncoder().encode(message),
+              (b) => b.toString(16).padStart(2, '0'),
+            ).join('')
+            signature = await provider.request({
+              method: 'personal_sign',
+              params: [msgHex, address],
+            })
           }
-          console.log('Signing message with EVM wallet:', message)
-          signature = await signEvmMessage({ message })
         } else {
           // Sign with Solana wallet
           console.log('Signing message with Solana wallet:', message)
@@ -126,7 +142,7 @@ export function useWalletAuth() {
         setLoading(false)
       }
     },
-    [signEvmMessage, login, setLoading, setError],
+    [signEvmMessage, connector, login, setLoading, setError],
   )
 
   const authenticateEvm = useCallback(

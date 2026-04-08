@@ -47,7 +47,10 @@ const DatePicker: React.FC<Props> = ({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className={cn("w-auto overflow-y-auto p-0", classNames?.content)}
+        className={cn(
+          "w-auto overflow-y-auto p-0 md:w-auto",
+          classNames?.content,
+        )}
         align="center"
         // https://www.radix-ui.com/primitives/docs/components/popover#constrain-the-content-size
         style={{
