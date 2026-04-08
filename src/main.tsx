@@ -7,6 +7,12 @@ import AppRouterProvider from "@/components/providers/AppRouterProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
 import "./polyfills";
+
+// ✅ Reload when a stale deployment causes chunk load failures
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload();
+});
+
 setupAxiosDefaults();
 
 const rootElement = document.getElementById("root")!;
