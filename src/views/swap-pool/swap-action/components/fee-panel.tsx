@@ -27,7 +27,7 @@ const FeePanel = ({ open, settlementFee }: Props) => (
                     {settlementFee ? `${Number(settlementFee) / DECIMAL_FEE_PERCENT}%` : "Free"}
                 </div>
             </div>
-            <div className="mt-3 flex items-center justify-between text-sm text-foreground">
+            {/* <div className="mt-3 flex items-center justify-between text-sm text-foreground">
                 <div className="flex items-center gap-1.5">
                     Network Fee:
                     <InfoTooltip
@@ -38,9 +38,8 @@ const FeePanel = ({ open, settlementFee }: Props) => (
                         }}
                     />
                 </div>
-                {/* TODO: estimate real network fee */}
                 <div>{"<0.01 USD$"}</div>
-            </div>
+            </div> */}
         </div>
     </div>
 );
