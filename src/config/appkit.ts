@@ -44,6 +44,3 @@ export const appKitConfig = {
     analytics: true,
   },
 };
-// createAppKit is called once by <AppKitProvider> in AppkitProvider.tsx.
-// Do NOT call it here — a second call creates a duplicate WalletConnect Core
-// instance and corrupts the wagmi connector state (ConnectorChainMismatchError).
