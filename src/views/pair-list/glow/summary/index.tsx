@@ -15,7 +15,7 @@ const PairListGlowSummary = () => {
       title: "Total Volume",
       value: shortenNumber({
         number: Number(overallStats?.stats?.totalVolume ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(overallStats?.stats?.totalVolume ?? 0).toLocaleString(
         "en-US",
       ),
@@ -24,7 +24,7 @@ const PairListGlowSummary = () => {
       title: "Total Participants",
       value: shortenNumber({
         number: Number(overallStats?.stats?.totalParticipants ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(
         overallStats?.stats?.totalParticipants ?? 0,
       ).toLocaleString("en-US"),
@@ -33,7 +33,7 @@ const PairListGlowSummary = () => {
       title: "Total Pairs",
       value: shortenNumber({
         number: Number(overallStats?.stats?.totalPairs ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(overallStats?.stats?.totalPairs ?? 0).toLocaleString(
         "en-US",
       ),
@@ -42,7 +42,7 @@ const PairListGlowSummary = () => {
       title: "Total Transactions",
       value: shortenNumber({
         number: Number(overallStats?.stats?.totalTransactions ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(
         overallStats?.stats?.totalTransactions ?? 0,
       ).toLocaleString("en-US"),

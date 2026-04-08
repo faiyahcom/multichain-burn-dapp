@@ -83,7 +83,7 @@ const EndStatus = ({ poolDetail }: Props) => {
       totalDeposited,
       rewardBalanceNum,
     });
-    return shortenNumber({ number: reward })?.toUpperCase() ?? "0";
+    return shortenNumber({ number: reward }) ?? "0";
   }, [poolDetail, rewardBalance]);
 
 
@@ -94,7 +94,7 @@ const EndStatus = ({ poolDetail }: Props) => {
           label="Claimable Reward"
           value={
             <div className="inline-flex items-center gap-1.5 md:gap-2.5">
-              {estimatedRewardNum?.toUpperCase() ?? "0"}
+              {estimatedRewardNum ?? "0"}
               <TokenDisplay
                 symbol={poolDetail?.tokenOut?.symbol}
                 customSymbol={poolDetail?.tokenOut?.customSymbol}

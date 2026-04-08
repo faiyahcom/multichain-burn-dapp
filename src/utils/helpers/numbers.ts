@@ -46,7 +46,9 @@ export function formatAmount(
 ): string {
   if (!amount) return "0";
   try {
-    const human = new Decimal(amount).div(new Decimal(10).pow(decimals)).toNumber();
+    const human = new Decimal(amount)
+      .div(new Decimal(10).pow(decimals))
+      .toNumber();
     return String(
       shortenNumber({
         number: human,
@@ -114,12 +116,14 @@ export const shortenNumberOld = ({
       minimumFractionDigits: 0,
     });
 
-  return numbro(number).format({
-    average: true,
-    mantissa: 2,
-    trimMantissa: true,
-    ...customFormat,
-  }).toUpperCase();
+  return numbro(number)
+    .format({
+      average: true,
+      mantissa: 2,
+      trimMantissa: true,
+      ...customFormat,
+    })
+    .toUpperCase();
 };
 
 const formatDecimalDisplay = (val: Decimal, decimalPlaces: number): string => {
@@ -136,8 +140,9 @@ export const shortenNumber = ({
 }: {
   number: number;
   decimalPlaces?: number;
-}) => {
-  if (typeof number !== "number" || !Number.isFinite(number)) return number;
+}): string => {
+  if (typeof number !== "number" || !Number.isFinite(number))
+    return String(number);
 
   const d = new Decimal(number);
   const abs = d.abs();

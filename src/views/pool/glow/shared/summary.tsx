@@ -50,7 +50,7 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
       title: "Total Transactions",
       value: shortenNumber({
         number: Number(overallStats?.totalTransactions ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(overallStats?.totalTransactions ?? 0).toLocaleString(
         "en-US",
       ),
@@ -59,14 +59,14 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
       title: "Total Pools",
       value: shortenNumber({
         number: Number(overallStats?.totalPools ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(overallStats?.totalPools ?? 0).toLocaleString("en-US"),
     },
     {
       title: "Total Participants",
       value: shortenNumber({
         number: Number(overallStats?.totalParticipants ?? 0),
-      }).toLocaleUpperCase(),
+      }),
       valueTitle: Number(overallStats?.totalParticipants ?? 0).toLocaleString(
         "en-US",
       ),
