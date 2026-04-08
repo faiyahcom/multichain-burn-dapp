@@ -10,16 +10,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { appKit } from "@/config/appkit";
 import { NETWORK_CONFIGS, type NetworkConfig } from "@/config/networks";
 import { useSystemStore } from "@/stores/systemStore";
-import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import NetworkIcon from "./network-icon";
+import { useAppKit, useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 
 export default function NetworkSelect() {
   const selectedNetworkId = useSystemStore((s) => s.selectedNetworkId);
   const { switchNetwork } = useAppKitNetwork();
   const { open } = useAppKit();
+  const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
+  const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
   const selectedNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === selectedNetworkId,
   );
@@ -30,7 +31,7 @@ export default function NetworkSelect() {
 
   const handleNetworkChange = async (network: NetworkConfig) => {
     const targetNamespace = network.id === "solanaDevnet" ? "solana" : "eip155";
-    const alreadyConnectedToNamespace = !!appKit.getAddress(targetNamespace);
+    const alreadyConnectedToNamespace = targetNamespace === "solana" ? !!solanaAddress : !!evmAddress;
     try {
       if (alreadyConnectedToNamespace) {
         // Already connected to the target namespace — switch directly to the exact chain.

@@ -7,10 +7,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { NETWORK_CONFIGS } from "@/config/networks";
-import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKit, useAppKitAccount, useAppKitNetwork } from "@reown/appkit/react";
 import { Button } from "@/components/common/glow/button";
 import { useSystemStore } from "@/stores/systemStore";
-import { appKit } from "@/config/appkit";
 import { IconSwitchTo } from "@/assets/react";
 import { cn } from "@/lib/utils";
 import { getVariantBorderClassName, getVariantShadowClassName } from "../common/glow/container";
@@ -19,6 +18,8 @@ export function SwitchNetworkModal() {
   const { switchNetworkRequest, closeSwitchNetworkModal } = useSystemStore();
   const { switchNetwork } = useAppKitNetwork();
   const { open } = useAppKit();
+  const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
+  const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
   const fromNetwork = NETWORK_CONFIGS.find(
     (n) => n.id === switchNetworkRequest?.fromId,
   );
@@ -31,7 +32,7 @@ export function SwitchNetworkModal() {
   const handleSwitch = async () => {
     if (!toNetwork) return;
     const targetNamespace = toNetwork.id === "solanaDevnet" ? "solana" : "eip155";
-    const alreadyConnectedToNamespace = !!appKit.getAddress(targetNamespace);
+    const alreadyConnectedToNamespace = targetNamespace === "solana" ? !!solanaAddress : !!evmAddress;
     try {
       if (alreadyConnectedToNamespace) {
         // Already connected to the target namespace — switch directly to the exact chain.
