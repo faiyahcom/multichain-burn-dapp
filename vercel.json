@@ -1,10 +1,4 @@
 {
-  "headers": [
-    {
-      "source": "/assets/(.*).js",
-      "headers": [{ "key": "Content-Type", "value": "application/javascript" }]
-    }
-  ],
   "rewrites": [
     {
       "source": "/((?!assets/).*)",
