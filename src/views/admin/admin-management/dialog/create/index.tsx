@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { adminManagementService } from "@/services/adminManagementService";
 import { adminManagementQueryKeys } from "@/services/queries/queryKey";
 import { useSystemStore } from "@/stores/systemStore";
+import { ensureLatestSuperAdminAccess } from "@/utils/helpers/ensure-super-admin-access";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
@@ -43,7 +44,18 @@ const AdminManagementDialogCreate = () => {
       <Button
         variant="mb-primary"
         size="mb-square-btn"
-        onClick={() => setOpen(true)}
+        onClick={async () => {
+          const access = await ensureLatestSuperAdminAccess({
+            forbiddenMessage: "Only super admin can create new admins.",
+          });
+
+          if (!access.ok) {
+            toast.error(access.message);
+            return;
+          }
+
+          setOpen(true);
+        }}
       >
         <span className="max-md:sr-only">Add new Admin</span>
         <PlusIcon className="size-3.75" />
@@ -61,6 +73,15 @@ const AdminManagementDialogCreate = () => {
         }}
         isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
+          const access = await ensureLatestSuperAdminAccess({
+            forbiddenMessage: "Only super admin can create new admins.",
+          });
+
+          if (!access.ok) {
+            toast.error(access.message);
+            return;
+          }
+
           const targetNetworkId = values.networkId;
           const isExistingAdmin =
             await adminManagementService.checkExistingAdmin({

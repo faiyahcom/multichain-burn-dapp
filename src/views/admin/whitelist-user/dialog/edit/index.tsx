@@ -14,6 +14,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { useState } from "react";
 import { whitelistUserService } from "@/services/whitelistUserService";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { ensureLatestSuperAdminAccess } from "@/utils/helpers/ensure-super-admin-access";
 import { toast } from "@/components/common/custom-toast";
 import type { WhitelistUser } from "@/services/whitelistUserService";
 
@@ -57,6 +58,15 @@ const AdminWhitelistUserDialogEdit: React.FC<Props> = ({
   };
 
   const onSubmit = async (data: EditUserFormValues) => {
+    const access = await ensureLatestSuperAdminAccess({
+      forbiddenMessage: "Only super admin can update whitelist users.",
+    });
+
+    if (!access.ok) {
+      toast.error(access.message);
+      return;
+    }
+
     const hasInfo = !!data.name?.trim() || !!data.email?.trim();
     if (!hasInfo) {
       handleOpenChange(false);
