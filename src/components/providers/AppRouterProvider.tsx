@@ -1,7 +1,7 @@
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import { routeTree } from "@/routeTree.gen";
 
-const router = createRouter({ routeTree } as any);
+const router = createRouter({ routeTree, scrollRestoration: true });
 
 function AppRouterProvider() {
   return <RouterProvider router={router} />;
