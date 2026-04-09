@@ -9,10 +9,12 @@ import "./index.css";
 import "./polyfills";
 
 const reloadKey = "vite-preload-reload";
-window.addEventListener("vite:preloadError", () => {
+window.addEventListener("vite:preloadError", (e) => {
+  console.log("vite:preloadError", e);
   const lastReload = sessionStorage.getItem(reloadKey);
   const now = Date.now();
-  
+  console.log("vite:preloadError", lastReload, now, now - Number(lastReload));
+
   // Only reload if we haven't reloaded in the last 10 seconds
   if (!lastReload || now - Number(lastReload) > 10000) {
     sessionStorage.setItem(reloadKey, String(now));
