@@ -6,6 +6,7 @@ import { authService, hasEnabledAdminRole } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { getErrorMessage } from '@/utils/helpers/error-message'
 import { toast } from '@/components/common/custom-toast'
+import { useNavigate } from '@tanstack/react-router'
 
 type WalletType = 'evm' | 'solana'
 
@@ -41,6 +42,7 @@ async function signSolanaMessage(
 export function useWalletAuth() {
   const [isAuthenticating, setIsAuthenticating] = useState(false)
   const { login, setLoading, setError, logout } = useAuthStore()
+  const navigate = useNavigate()
 
   const { address: evmAddress } = useAppKitAccount({
     namespace: 'eip155',
@@ -131,6 +133,9 @@ export function useWalletAuth() {
           logout()
           const errorMessage = "Access Denied: This wallet does not have administrative privileges."
           toast.error(errorMessage)
+          navigate({
+            to: "/",
+          })
           throw new Error(errorMessage)
         }
 
