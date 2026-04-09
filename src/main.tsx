@@ -15,8 +15,8 @@ window.addEventListener("vite:preloadError", (e) => {
   const now = Date.now();
   console.log("vite:preloadError", lastReload, now, now - Number(lastReload));
 
-  // Only reload if we haven't reloaded in the last 10 seconds
-  if (!lastReload || now - Number(lastReload) > 10000) {
+  // Only reload if we haven't reloaded in the last 30 seconds
+  if (!lastReload || now - Number(lastReload) > 30000) {
     sessionStorage.setItem(reloadKey, String(now));
     window.location.reload();
   }
