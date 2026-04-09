@@ -4,7 +4,7 @@ import MultipleSelect from "@/components/common/multiple-select";
 import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SortSelect from "@/components/common/sort-select";
-import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { usePoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
 import { PoolKindCodeEnum } from "@/types/pool";
 import {
   burnPoolStatusColors,
