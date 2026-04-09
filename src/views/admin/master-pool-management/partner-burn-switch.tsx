@@ -33,7 +33,11 @@ const PartnerBurnSwitch: React.FC<Props> = ({
   return (
     <BlueSwitch
       active={isPartner}
-      onClick={() => mutate(!isPartner)}
+      onClick={(e) => {
+        e?.preventDefault();
+        e?.stopPropagation();
+        mutate(!isPartner)
+      }}
       isLoading={isPending}
       classNames={classNames}
     />
