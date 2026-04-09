@@ -33,7 +33,7 @@ export const useBurnPoolListSearchFilterStore =
       status: [...userViewBurnPoolStatuses],
       sortBy: "volume",
       sortOrder: "desc",
-      listLayout: "list",
+      listLayout: "card",
     },
     setFilter: (filter) =>
       set((state) => ({
@@ -50,7 +50,7 @@ export const useSwapPoolListSearchFilterStore =
       status: [...userViewSwapPoolStatuses],
       sortBy: "liquidity",
       sortOrder: "desc",
-      listLayout: "list",
+      listLayout: "card",
     },
     setFilter: (filter) =>
       set((state) => ({

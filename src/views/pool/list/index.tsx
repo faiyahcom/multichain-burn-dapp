@@ -1,4 +1,4 @@
-import { usePoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { usePoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
 import { PoolKindCodeEnum } from "@/types/pool";
 import {
   userHiddenBurnPoolStatuses,

@@ -3,7 +3,7 @@ import LayoutPicker from "@/components/common/glow/layout-picker";
 import NetworkMultipleSelect from "@/components/common/glow/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
 import SortSelect from "@/components/common/glow/sort-select";
-import { useSwapPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { useSwapPoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
 
 const SwapSearch = () => {
   const { filter, setFilter } = useSwapPoolListSearchFilterStore();

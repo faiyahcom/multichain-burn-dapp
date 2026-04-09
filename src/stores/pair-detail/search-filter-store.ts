@@ -31,7 +31,7 @@ export const usePairDetailSearchFilterStore =
       sortBy: "volume",
       sortOrder: "desc",
       text: "",
-      listLayout: "list",
+      listLayout: "card",
     },
     setFilter: (filter) =>
       set((state) => ({
