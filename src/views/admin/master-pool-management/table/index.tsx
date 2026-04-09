@@ -1,7 +1,6 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
-import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import CustomPagination from "@/components/common/pagination";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import TableNoData from "@/components/common/table-no-data";
@@ -26,8 +25,9 @@ import {
 } from "@/types/admin/master-pool-management";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { truncateString } from "@/utils/helpers/string";
+import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
@@ -88,22 +88,19 @@ const AdminMasterPoolManagementTable = () => {
             const isBurnPool = item.kind === 0;
 
             return (
-              <TableRow key={item.address}
+              <TableRow
+                key={item.address}
                 className="cursor-pointer"
                 onClick={() => {
                   navigate({
-                    to: ""
-                  })
+                    to: isBurnPool
+                      ? "/admin/burn/detail/$address"
+                      : "/admin/swap/detail/$address",
+                    params: { address: item.address },
+                  });
                 }}
               >
                 <TableCell className="pl-11.25 text-left">
-                  {/* <Link
-                    to={`/admin/${item.kind === 0 ? "burn" : "swap"}/detail/${item.address}`}
-                    className="block max-w-full truncate"
-                    title={item.name}
-                  >
-                    {item.name}
-                  </Link> */}
                   <p className="block max-w-full truncate" title={item.name}>
                     {item.name}
                   </p>
