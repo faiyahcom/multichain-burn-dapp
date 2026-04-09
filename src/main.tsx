@@ -8,8 +8,16 @@ import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
 import "./polyfills";
 
+const reloadKey = "vite-preload-reload";
 window.addEventListener("vite:preloadError", () => {
-  window.location.reload();
+  const lastReload = sessionStorage.getItem(reloadKey);
+  const now = Date.now();
+  
+  // Only reload if we haven't reloaded in the last 10 seconds
+  if (!lastReload || now - Number(lastReload) > 10000) {
+    sessionStorage.setItem(reloadKey, String(now));
+    window.location.reload();
+  }
 });
 
 setupAxiosDefaults();
