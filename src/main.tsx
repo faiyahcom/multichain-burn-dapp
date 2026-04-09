@@ -7,6 +7,11 @@ import AppRouterProvider from "@/components/providers/AppRouterProvider";
 import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
 import "./polyfills";
+
+window.addEventListener("vite:preloadError", () => {
+  window.location.reload();
+});
+
 setupAxiosDefaults();
 
 const rootElement = document.getElementById("root")!;
