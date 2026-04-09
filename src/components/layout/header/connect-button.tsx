@@ -1,6 +1,6 @@
 import {
+  getVariantBgClassName,
   getVariantBorderClassName,
-  getVariantShadowClassName,
 } from "@/components/common/glow/container";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -18,7 +18,7 @@ const ConnectButton = () => {
       className={cn(
         "flex items-center",
         getVariantBorderClassName({ variant: "swap" }),
-        getVariantShadowClassName({ variant: "swap" }),
+        getVariantBgClassName({ variant: "swap" }),
         "rounded-24px bg-transparent px-6 py-5.75 hover:bg-transparent",
       )}
       onClick={handleConnect}
