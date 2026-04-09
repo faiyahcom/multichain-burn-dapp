@@ -11,7 +11,7 @@ import {
 import { useNativePrices } from "@/hooks/useNativePrices";
 import { feeService, feeTxnKind } from "@/services/feeService";
 import { feeQueryKeys } from "@/services/queries/queryKey";
-import { formatNativeWithUsd } from "@/utils/helpers/numbers";
+import { formatNativeWithUsd, shortenNumber } from "@/utils/helpers/numbers";
 import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
 import clsx from "clsx";
@@ -38,11 +38,9 @@ const AdminRevenueFeeStats = () => {
   const networkConfig = chainIdToNetworkConfig(chainId);
 
   const nativeDecimals =
-    (networkConfig?.appKitNetwork.nativeCurrency as nativeCurrency | undefined)
-      ?.decimals ?? 18;
+    networkConfig?.appKitNetwork.nativeCurrency?.decimals ?? 18;
   const nativeSymbol =
-    (networkConfig?.appKitNetwork.nativeCurrency as nativeCurrency | undefined)
-      ?.symbol ?? "";
+    networkConfig?.appKitNetwork.nativeCurrency?.symbol ?? "";
 
   const fromParam = dateFrom
     ? String(Math.floor(startOfDay(dateFrom).getTime() / 1000))
@@ -95,23 +93,29 @@ const AdminRevenueFeeStats = () => {
         userAddress: record.executorAddress,
         chainId: record.chainId,
         txHash: record.hash,
-        feeAmount: formatNativeWithUsd(
-          record.amount,
-          record.tokenDecimals,
-          record.tokenSymbol,
-          nativePriceForChain(record.chainId),
-        ),
+        feeAmount:
+          activeTab === "creation"
+            ? formatNativeWithUsd(
+              record.amount,
+              record.tokenDecimals,
+              nativeSymbol,
+              nativePriceForChain(record.chainId),
+            )
+            : shortenNumber({
+              number:
+                Number(record.amount) / Math.pow(10, record.tokenDecimals),
+            }) + ` ${record.tokenSymbol}`,
       })),
     [listData],
   );
 
   const creationFeeDisplay = statsData?.create_fee
     ? formatNativeWithUsd(
-        statsData.create_fee,
-        nativeDecimals,
-        nativeSymbol,
-        nativePriceForChain(chainId),
-      )
+      statsData.create_fee,
+      nativeDecimals,
+      nativeSymbol,
+      nativePriceForChain(chainId),
+    )
     : "—";
   const settlementFeesCount = statsData?.settlement_fees.length ?? 0;
 
