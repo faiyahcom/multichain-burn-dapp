@@ -134,7 +134,7 @@ const SwapRow = ({ item }: { item: ActivityItem }) => {
 };
 
 const TransactionRow = ({ item }: { item: ActivityItem }) => {
-  const hash = truncateString({ str: item.hash, left: 6, right: 6 });
+  const hash = truncateString({ str: item.hash, left: 8, right: 8 });
   const wallet = truncateString({ str: item.executor, left: 6, right: 6 });
   const time = formatRelativeTime(item.timestamp);
   const type = POOL_KIND[item.poolKind] === "burn_pool" ? "Burn" : "Swap";
@@ -211,7 +211,7 @@ export const ActivityFeed = ({
 
       <div
         key={animKey}
-        className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-y-4"
+        className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-x-40 2xl:gap-y-4"
       >
         {slots.map((item, i) =>
           item ? (
