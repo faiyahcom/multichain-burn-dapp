@@ -60,7 +60,8 @@ const MyActivityList = () => {
       variant="pair"
       className="space-y-5 px-5.75 py-3 sm:space-y-10 sm:px-11.5 sm:py-6"
     >
-      <Table className="sm:text-2xl">
+      {/* Change this max width if more columns are added */}
+      <Table className="max-w-319.25 sm:text-2xl">
         <TableHeader className="sm:text-2xl">
           <TableRow>
             {columns.map((column) => (
@@ -213,7 +214,7 @@ const renderDescription = (activity: UserActivityType) => {
   // Swap
   if (kind === 32) {
     return (
-      <div className="flex flex-wrap items-center justify-start gap-1">
+      <div className="flex min-w-0 flex-wrap items-center justify-start gap-1">
         <MetricNumber
           number={uiAmountIn}
           unit={pool?.tokenInSymbol}
