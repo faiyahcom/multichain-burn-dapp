@@ -62,7 +62,7 @@ export const AdminSidebar = () => {
   const location = useLocation();
   const pathname = location.pathname;
 
-  const { data: userApiData } = useQuery({
+  const { data: userApiData, isEnabled: isUserApiDataEnabled } = useQuery({
     queryKey: authQueryKeys.me({
       id: user?.id,
     }),
@@ -85,24 +85,26 @@ export const AdminSidebar = () => {
             {NavSectionLabel[navSection.admin]}
           </p>
           <ul className="space-y-4.5">
-            {adminNavItems
-              .filter(
-                (navItem) =>
-                  navItem.allowedRoles && // has role check
-                  userApiData?.role && // has user role from api
-                  navItem.allowedRoles.includes(userApiData.role), // role check
-              )
-              .map((navItem, index) => {
-                const isActive = pathname === navItem.to;
+            {isUserApiDataEnabled &&
+              userApiData &&
+              adminNavItems
+                .filter(
+                  (navItem) =>
+                    navItem.allowedRoles && // has role check
+                    userApiData?.role && // has user role from api
+                    navItem.allowedRoles.includes(userApiData.role), // role check
+                )
+                .map((navItem, index) => {
+                  const isActive = pathname === navItem.to;
 
-                return (
-                  <AdminNavItem
-                    key={index}
-                    navItem={navItem}
-                    isActive={isActive}
-                  />
-                );
-              })}
+                  return (
+                    <AdminNavItem
+                      key={index}
+                      navItem={navItem}
+                      isActive={isActive}
+                    />
+                  );
+                })}
           </ul>
         </div>
       </nav>
