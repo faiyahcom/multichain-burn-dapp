@@ -22,10 +22,10 @@ import { Link } from "@tanstack/react-router";
 
 // Mobile: text-xs (12px) | Tablet: text-base (16px) | 2xl: 18px
 const ROW_BURN_GRID =
-  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.9fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.55fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
 
 const ROW_SWAP_GRID =
-  "grid grid-cols-[minmax(0,1fr)_90px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_160px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+  "grid grid-cols-[minmax(0,1fr)_90px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_110px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
 
 // ── Row components ────────────────────────────────────────────────────────────
 
@@ -211,7 +211,7 @@ export const ActivityFeed = ({
 
       <div
         key={animKey}
-        className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-12 2xl:gap-y-4"
+        className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-y-4"
       >
         {slots.map((item, i) =>
           item ? (
