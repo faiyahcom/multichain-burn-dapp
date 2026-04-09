@@ -4,7 +4,7 @@ import MultipleSelect from "@/components/common/glow/multiple-select";
 import NetworkMultipleSelect from "@/components/common/glow/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
 import SortSelect from "@/components/common/glow/sort-select";
-import { useBurnPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { useBurnPoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
 import {
   burnPoolStatusLabels,
   userViewBurnPoolStatuses,

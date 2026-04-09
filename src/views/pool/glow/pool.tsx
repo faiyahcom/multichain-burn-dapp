@@ -4,7 +4,7 @@ import BurnRecentPoolsTable from "./components/burn/recent-table";
 import SwapRecentPoolsTable from "./components/swap/recent-table";
 import BurnPoolSection from "./components/burn/pool-section";
 import SwapPoolSection from "./components/swap/pool-section";
-import { useBurnPoolListSearchFilterStore, useSwapPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { useBurnPoolListSearchFilterStore, useSwapPoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
 
 type Props = {};
 
