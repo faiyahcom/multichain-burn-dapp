@@ -18,15 +18,8 @@ interface Props {
   };
 }
 
-const CARD_VARIANT_BG_IMG: Record<ContainerVariant, string> = {
-  burn: "/images/grid/burn-card-bg.png",
-  pair: "/images/grid/pair-card-bg.png",
-  swap: "/images/grid/swap-card-bg.png",
-  green: "",
-};
-
 const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
-  burn: "grid-burn-bg",
+  burn: "grid-burn-bg opacity-90",
   pair: "grid-pair-bg",
   swap: "grid-swap-bg",
   green: "",
@@ -60,10 +53,6 @@ const GridCard: React.FC<Props> = ({
 
   return (
     <div className={cn("relative rounded-24px", classNames?.container)}>
-      <div
-        className="pointer-events-none absolute inset-0 z-0 rounded-24px bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: `url(${CARD_VARIANT_BG_IMG[variant]})` }}
-      />
       <GlowContainer
         variant={variant}
         className={cn(
@@ -73,6 +62,7 @@ const GridCard: React.FC<Props> = ({
           CARD_VARIANT_BG_CLASS_NAME[variant],
           classNames?.glowContainer,
         )}
+        hasBg={false}
         hasShadow={false}
       >
         <div className={cn("space-y-2.25 sm:space-y-4.5", classNames?.content)}>
