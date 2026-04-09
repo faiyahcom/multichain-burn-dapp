@@ -27,12 +27,13 @@ import {
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { truncateString } from "@/utils/helpers/string";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
   const queryClient = useQueryClient();
   const limit = 20;
+  const navigate = useNavigate();
 
   const { data: pools, isPending: isPendingPools } = useQuery({
     queryKey: poolQueryKeys.list(filter),
@@ -57,7 +58,15 @@ const AdminMasterPoolManagementTable = () => {
     },
   });
 
-  const columns = ["Pool", "Pool Type", "Creator", "Time", "Network", "Partner Burn", "Status"];
+  const columns = [
+    "Pool",
+    "Pool Type",
+    "Creator",
+    "Time",
+    "Network",
+    "Partner Burn",
+    "Status",
+  ];
   return (
     <div className="space-y-10 pb-10 md:pl-14">
       <Table>
@@ -79,15 +88,25 @@ const AdminMasterPoolManagementTable = () => {
             const isBurnPool = item.kind === 0;
 
             return (
-              <TableRow key={item.address}>
+              <TableRow key={item.address}
+                className="cursor-pointer"
+                onClick={() => {
+                  navigate({
+                    to: ""
+                  })
+                }}
+              >
                 <TableCell className="pl-11.25 text-left">
-                  <Link
+                  {/* <Link
                     to={`/admin/${item.kind === 0 ? "burn" : "swap"}/detail/${item.address}`}
                     className="block max-w-full truncate"
                     title={item.name}
                   >
                     {item.name}
-                  </Link>
+                  </Link> */}
+                  <p className="block max-w-full truncate" title={item.name}>
+                    {item.name}
+                  </p>
                   <CopyableText
                     content={item.address}
                     displayText={truncateString({

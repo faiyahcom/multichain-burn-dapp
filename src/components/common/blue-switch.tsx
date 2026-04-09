@@ -3,7 +3,7 @@ import { Spinner } from "../ui/spinner";
 
 interface Props {
   active?: boolean;
-  onClick?: () => void;
+  onClick?: (e?: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   classNames?: {
     btn?: string;
   };
@@ -27,7 +27,7 @@ const BlueSwitch: React.FC<Props> = ({
         { "justify-end": active },
         classNames?.btn,
       )}
-      onClick={() => onClick?.()}
+      onClick={(e) => onClick?.(e)}
       disabled={disabled || isLoading}
     >
       <div
