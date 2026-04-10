@@ -17,7 +17,7 @@ export interface WhitelistToken {
   homepage: string;
   whitepaper: string;
   createdAt: string;
-  kind: number;
+  kind: number[];
 }
 
 export interface ListTokensRequest {
@@ -57,7 +57,6 @@ export interface DeleteWhitelistTokenRequest {
 export interface UpdateWhitelistTokenRequest {
   chainId: string;
   address: string;
-  kind: number;
   data: FormData;
 }
 
@@ -127,7 +126,6 @@ export const whitelistService = {
       `${WHITELIST_API_ROUTES.UPDATE_WHITELIST_TOKEN(
         request.chainId,
         request.address,
-        request.kind,
       )}`,
       request.data,
       {

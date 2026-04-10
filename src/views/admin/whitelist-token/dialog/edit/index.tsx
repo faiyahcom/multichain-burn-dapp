@@ -117,7 +117,6 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
       const result = await whitelistService.updateWhitelistToken({
         chainId: token.chainId,
         address: token.address,
-        kind: token.kind,
         data: formData,
       });
       return result;

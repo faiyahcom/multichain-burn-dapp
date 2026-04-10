@@ -35,11 +35,12 @@ import {
   tokenStatusLabels,
   tokenStatusLetters,
 } from "@/types/admin/whitelist-token";
+import { poolTypeLabels } from "@/types/admin/master-pool-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { toast } from "@/components/common/custom-toast";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
 import AdminWhitelistTokenDialogEdit from "../dialog/edit";
@@ -48,21 +49,6 @@ import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
 import TokenImage from "@/components/common/token-image";
 import TableNoData from "@/components/common/table-no-data";
-
-/** 0 = Burn Pool, 1 = Swap Pool, 2 = Stake Pool, 3 = Launchpad */
-const POOL_KIND_LABELS: Record<number, string> = {
-  0: "Burn Pool",
-  1: "Swap Pool",
-  2: "Stake Pool",
-  3: "Launchpad",
-};
-
-
-
-/** A merged row that groups multiple WhitelistToken items sharing the same chainId + address. */
-type MergedWhitelistToken = WhitelistToken & {
-  kinds: Set<number>;
-};
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
@@ -114,24 +100,7 @@ const AdminWhitelistTokenTable = () => {
       }),
   });
 
-  // Merge items sharing the same chainId + address into a single row,
-  // collecting all their `kind` values into a Set.
-  const mergedTokens = useMemo<MergedWhitelistToken[]>(() => {
-    const tokens = listTokensData?.whitelistTokens;
-    if (!tokens) return [];
 
-    const map = new Map<string, MergedWhitelistToken>();
-    for (const token of tokens) {
-      const key = `${token.chainId}:${token.address}`;
-      const existing = map.get(key);
-      if (existing) {
-        existing.kinds.add(token.kind);
-      } else {
-        map.set(key, { ...token, kinds: new Set([token.kind]) });
-      }
-    }
-    return Array.from(map.values());
-  }, [listTokensData?.whitelistTokens]);
 
   const { mutate: deleteTokenMutation, isPending: isDeleteTokenPending } =
     useMutation({
@@ -231,10 +200,10 @@ const AdminWhitelistTokenTable = () => {
             />
             <TableNoData
               colSpan={columns.length}
-              data={mergedTokens}
+              data={listTokensData?.whitelistTokens}
               isLoading={isListTokensPending}
             />
-            {mergedTokens.map((item, index) => {
+            {listTokensData?.whitelistTokens?.map((item, index) => {
               const status = booleanToTokenStatus(item.enable);
 
               return (
@@ -271,9 +240,9 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-0.5">
-                      {Array.from(item.kinds).map((kind) => (
+                      {item.kind?.map((kind) => (
                         <span key={kind} className="text-xs font-medium">
-                          {POOL_KIND_LABELS[kind] ?? `Kind ${kind}`}
+                          {poolTypeLabels[kind as keyof typeof poolTypeLabels] ?? `Kind ${kind}`}
                         </span>
                       ))}
                     </div>

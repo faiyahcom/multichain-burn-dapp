@@ -8,6 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import {
+  poolTypes,
+  poolTypeLabels,
+  type PoolType,
+} from "@/types/admin/master-pool-management";
 import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -49,6 +54,9 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
+  poolType: z.coerce.number().refine((v) => poolTypes.includes(v as PoolType), {
+    message: "Pool type is required",
+  }) as z.ZodType<PoolType>,
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -90,6 +98,7 @@ const AdminWhitelistTokenDialogCreate = () => {
         symbol: "",
         address: "",
         networkId: currentNetworkId ?? undefined,
+        poolType: 0 as PoolType,
         image: undefined,
         description: "",
         homepageLink: "",
@@ -136,6 +145,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
+      formData.append("kind", data.poolType.toString());
       // default to enable and not dropped
       formData.append("enable", booleanString[4]);
       formData.append("isDropped", booleanString[5]);
@@ -162,6 +172,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     if (isSolana) {
       const result = await createWhitelistTokenSolana({
         tokenAddress: data.address,
+        poolType: data.poolType,
       });
       if (result) {
         createWhitelistTokenMutation(data);
@@ -170,6 +181,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     if (isEvm) {
       const result = await createWhitelistTokenEvm({
         tokenAddress: data.address,
+        poolType: data.poolType,
       });
       if (result) {
         createWhitelistTokenMutation(data);
@@ -323,6 +335,39 @@ const AdminWhitelistTokenDialogCreate = () => {
                       />
                     ))}
                   </div>
+                </Field>
+              )}
+            />
+            <Controller
+              control={control}
+              name="poolType"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="gap-3.25">
+                  <FieldLabel htmlFor={field.name}>
+                    Pool type<span className="text-md-required-red">*</span>
+                  </FieldLabel>
+                  <div className="flex items-center gap-2.25">
+                    {poolTypes.map((type) => (
+                      <AnimateIconButton
+                        key={type}
+                        variant="letter-icon"
+                        iconLetter={poolTypeLabels[type][0]}
+                        isActive={field.value === type}
+                        btnProps={{
+                          type: "button",
+                          onClick: () => field.onChange(type),
+                        }}
+                        text={poolTypeLabels[type]}
+                        color="#9072f9"
+                        classNames={{
+                          btn: "after:text-primary-foreground",
+                        }}
+                      />
+                    ))}
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

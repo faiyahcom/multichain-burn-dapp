@@ -11,7 +11,12 @@ export const useCreateWhitelistTokenEvmFn = () => {
 
   // Calling this function also enables the token if it is already whitelisted
   const createWhitelistToken = useCallback(
-    async ({ tokenAddress }: { tokenAddress: string }) => {
+    async ({
+      tokenAddress,
+    }: {
+      tokenAddress: string;
+      poolType?: number;
+    }) => {
       try {
         if (!isConnected || !walletProvider) {
           throw new Error("Wallet not connected");

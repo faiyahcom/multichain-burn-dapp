@@ -8,10 +8,11 @@ import {
   type Provider,
 } from "@reown/appkit-adapter-solana/react";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { PublicKey } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import type { PoolType } from "@/types/admin/master-pool-management";
 
 type FactoryAccountState = {
   whitelistToken?: PublicKey[];
@@ -27,13 +28,30 @@ type MultichainBurnProgramWithFactoryAccount = ReturnType<
   };
 };
 
+/**
+ * Maps numeric pool type to the Anchor enum variant object expected by the IDL.
+ * IDL PoolType: Swap (0), Burn (1), Staking (2), Launchpad (3)
+ */
+const POOL_TYPE_VARIANTS: Record<PoolType, Record<string, object>> = {
+  0: { burn: {} },
+  1: { swap: {} },
+  2: { staking: {} },
+  3: { launchpad: {} },
+};
+
 export const useCreateWhitelistTokenSolanaFn = () => {
   const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
   const { connection } = useAppKitConnection();
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
   const createWhitelistToken = useCallback(
-    async ({ tokenAddress }: { tokenAddress: string }) => {
+    async ({
+      tokenAddress,
+      poolType,
+    }: {
+      tokenAddress: string;
+      poolType: PoolType;
+    }) => {
       try {
         if (!isConnected || !address) {
           throw new Error("Wallet is not connected");
@@ -54,7 +72,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           connection,
           anchorWallet,
         ) as MultichainBurnProgramWithFactoryAccount;
-        
+
         const factoryPDA = getFactoryPDA(program.programId);
         const tokenPubkey = new PublicKey(tokenAddress);
         const factory = await program.account.factoryAccount.fetch(factoryPDA);
@@ -66,13 +84,14 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           throw new Error("Token is already whitelisted on-chain");
         }
 
+        const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
+
         const tx = await program.methods
-          .updateWhitelistToken(tokenPubkey, true) // false to disable token
+          .updateWhitelistToken(tokenPubkey, true, poolTypeVariant)
           .accounts({
             admin: walletPublicKey,
             factory: factoryPDA,
-            systemProgram: SystemProgram.programId,
-          })
+          } as any)
           .transaction();
 
         const { blockhash, lastValidBlockHeight } =
@@ -114,3 +133,4 @@ export const useCreateWhitelistTokenSolanaFn = () => {
 
   return { createWhitelistToken };
 };
+

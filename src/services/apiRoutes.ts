@@ -25,8 +25,8 @@ export const API_ROUTES = {
       `/whitelist-tokens/${chainId}/${address}`,
     DELETE_WHITELIST_TOKEN: (chainId: string, address: string) =>
       `/whitelist-tokens/${chainId}/${address}`,
-    UPDATE_WHITELIST_TOKEN: (chainId: string, address: string, kind: number) =>
-      `/whitelist-tokens/${chainId}/${address}/${kind}`,
+    UPDATE_WHITELIST_TOKEN: (chainId: string, address: string) =>
+      `/whitelist-tokens/${chainId}/${address}`,
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",

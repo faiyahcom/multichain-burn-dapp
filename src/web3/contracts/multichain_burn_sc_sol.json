@@ -1,5 +1,5 @@
 {
-  "address": "h6iikWdj6NUFBqsEWZSME8Ru145nEJDi89uHi467cnR",
+  "address": "GttSZyACvGSP6mNgdKkwQ8DCv4KnH6hK6vFHUBaGcK9E",
   "metadata": {
     "name": "multichain_burn_sc_sol",
     "version": "0.1.0",
@@ -1996,12 +1996,6 @@
           "type": "pubkey"
         },
         {
-          "name": "whitelist_token",
-          "type": {
-            "vec": "pubkey"
-          }
-        },
-        {
           "name": "whitelist_user",
           "type": {
             "vec": "pubkey"
@@ -2827,6 +2821,14 @@
         {
           "name": "is_whitelisted",
           "type": "bool"
+        },
+        {
+          "name": "pool_type",
+          "type": {
+            "defined": {
+              "name": "PoolType"
+            }
+          }
         }
       ]
     },
@@ -3396,6 +3398,36 @@
       "code": 6038,
       "name": "UserAlreadyWhitelisted",
       "msg": "User already whitelisted"
+    },
+    {
+      "code": 6039,
+      "name": "NotBurnPool",
+      "msg": "Not burn pool"
+    },
+    {
+      "code": 6040,
+      "name": "InvalidPoolType",
+      "msg": "Invalid pool type"
+    },
+    {
+      "code": 6041,
+      "name": "InvalidMaxDeposit",
+      "msg": "Invalid max deposit"
+    },
+    {
+      "code": 6042,
+      "name": "InvalidMinDeposit",
+      "msg": "Invalid min deposit"
+    },
+    {
+      "code": 6043,
+      "name": "InvalidMaxParticipants",
+      "msg": "Invalid max participants"
+    },
+    {
+      "code": 6044,
+      "name": "InvalidMinParticipants",
+      "msg": "Invalid min participants"
     }
   ],
   "types": [
@@ -3612,6 +3644,18 @@
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "whitelist_token_swap",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "whitelist_token_burn",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }
@@ -3695,7 +3739,7 @@
             "type": "u64"
           },
           {
-            "name": "total_deposited",
+            "name": "deposit_balance",
             "type": "u64"
           },
           {
@@ -3750,6 +3794,10 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "total_deposited",
+            "type": "u64"
           }
         ]
       }
@@ -3926,6 +3974,14 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "pool_type",
+            "type": {
+              "defined": {
+                "name": "PoolType"
+              }
+            }
           }
         ]
       }
@@ -4033,6 +4089,29 @@
           },
           {
             "name": "Canceled"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolType",
+      "repr": {
+        "kind": "rust"
+      },
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Swap"
+          },
+          {
+            "name": "Burn"
+          },
+          {
+            "name": "Staking"
+          },
+          {
+            "name": "Launchpad"
           }
         ]
       }
@@ -4351,6 +4430,14 @@
           {
             "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "pool_type",
+            "type": {
+              "defined": {
+                "name": "PoolType"
+              }
+            }
           }
         ]
       }
