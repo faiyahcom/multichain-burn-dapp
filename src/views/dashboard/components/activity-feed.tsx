@@ -138,7 +138,7 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
   const wallet = truncateString({ str: item.executor, left: 6, right: 6 });
   const time = formatRelativeTime(item.timestamp);
   const type = POOL_KIND[item.poolKind] === "burn_pool" ? "Burn" : "Swap";
-  const fee = shortenNumber({ number: Number(item.fee) }) ?? "0";
+  const fee = formatAmount(item.fee || "0", item.tokenOutDecimals);
   const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
 
   return (

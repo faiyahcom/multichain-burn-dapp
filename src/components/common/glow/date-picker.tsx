@@ -44,7 +44,9 @@ export function DatePicker({
   className,
 }: DatePickerProps) {
   // Internal state for date, hour, and minute
-  const [internalDate, setInternalDate] = React.useState<Date | undefined>(value);
+  const [internalDate, setInternalDate] = React.useState<Date | undefined>(
+    value,
+  );
   const [hour, setHour] = React.useState<string>(
     value instanceof Date ? String(value.getHours()).padStart(2, "0") : "00",
   );
@@ -80,8 +82,12 @@ export function DatePicker({
     }
   }, [internalDate, hour, minute]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const hourOptions = Array.from({ length: 24 }, (_, i) => String(i).padStart(2, "0"));
-  const minuteOptions = Array.from({ length: 60 }, (_, i) => String(i).padStart(2, "0"));
+  const hourOptions = Array.from({ length: 24 }, (_, i) =>
+    String(i).padStart(2, "0"),
+  );
+  const minuteOptions = Array.from({ length: 60 }, (_, i) =>
+    String(i).padStart(2, "0"),
+  );
 
   const borderClass = getVariantBorderClassName({ variant });
   const shadowClass = getVariantShadowClassName({ variant });
@@ -100,7 +106,7 @@ export function DatePicker({
             className,
           )}
         >
-          <CalendarIcon className="size-3.5 md:size-5 shrink-0" />
+          <CalendarIcon className="size-3.5 shrink-0 md:size-5" />
           <span className="flex-1 text-left">
             {value ? format(value, "dd/MM/yy HH:mm") : placeholder}
           </span>
@@ -108,7 +114,7 @@ export function DatePicker({
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto sm:w-fit overflow-y-auto p-0 bg-mb-dark-popover border border-mb-dark-popover-item-border"
+        className="w-auto overflow-y-auto border border-mb-dark-popover-item-border bg-mb-dark-popover p-0 sm:w-fit"
         align="start"
         style={{ maxHeight: "var(--radix-popover-content-available-height)" }}
       >
@@ -131,16 +137,18 @@ export function DatePicker({
             ),
           }}
         />
-        <div className="flex items-center justify-center gap-4 border-t border-border px-4 pb-4 pt-3">
+        <div className="flex items-center justify-center gap-4 border-t border-border px-4 pt-3 pb-4">
           <div className="flex flex-col items-center font-inter">
             <span className="mb-1 text-xs text-muted-foreground">Hour</span>
             <select
-              className="rounded-md border border-border px-3 py-1 text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-mb-btn-burn/50 transition-colors"
+              className="rounded-md border border-border bg-mb-dark-popover px-3 py-1 text-base font-medium text-foreground transition-colors focus:ring-2 focus:ring-mb-btn-burn/50 focus:outline-none"
               value={hour}
               onChange={(e) => setHour(e.target.value)}
             >
               {hourOptions.map((h) => (
-                <option key={h} value={h}>{h}</option>
+                <option key={h} value={h}>
+                  {h}
+                </option>
               ))}
             </select>
           </div>
@@ -148,12 +156,14 @@ export function DatePicker({
           <div className="flex flex-col items-center font-inter">
             <span className="mb-1 text-xs text-muted-foreground">Minute</span>
             <select
-              className="rounded-md border border-border px-3 py-1 text-base font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-mb-btn-burn/50 transition-colors"
+              className="rounded-md border border-border bg-mb-dark-popover px-3 py-1 text-base font-medium text-foreground transition-colors focus:ring-2 focus:ring-mb-btn-burn/50 focus:outline-none"
               value={minute}
               onChange={(e) => setMinute(e.target.value)}
             >
               {minuteOptions.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m} value={m}>
+                  {m}
+                </option>
               ))}
             </select>
           </div>
