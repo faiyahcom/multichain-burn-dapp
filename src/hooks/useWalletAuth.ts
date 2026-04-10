@@ -8,30 +8,21 @@ import { getErrorMessage } from '@/utils/helpers/error-message'
 
 type WalletType = 'evm' | 'solana'
 
-// Helper function to sign message with Solana wallet
-async function signSolanaMessage(
-  message: string,
-): Promise<string> {
-  // Check if Solana wallet is available (Phantom, etc.)
+async function signSolanaMessage(message: string): Promise<string> {
   const solanaWallet = window.solana
 
   if (!solanaWallet) {
     throw new Error('Solana wallet not found. Please install Phantom wallet.')
   }
 
-  // Ensure wallet is connected
   if (!solanaWallet.isConnected) {
     await solanaWallet.connect()
   }
 
-  // Convert message to Uint8Array
   const messageBytes = new TextEncoder().encode(message)
-
-  // Sign message - Phantom and other Solana wallets use signMessage method
   const signedMessage = await solanaWallet.signMessage(messageBytes, 'utf8')
 
-  // Convert signature to base58 string (Solana standard)
-  // The signature is already a Uint8Array from signMessage
+  // Solana wallets return a Uint8Array signature; encode to base58 per the standard.
   const signature = bs58.encode(signedMessage.signature)
 
   return signature
@@ -64,8 +55,6 @@ export function useWalletAuth() {
           chainId,
         })
 
-        // Extract message from response
-        // Response format: { "message": "1767860919362, Welcome" }
         const message = response.message
         if (!message) {
           throw new Error('Invalid response: message is missing')
@@ -77,26 +66,44 @@ export function useWalletAuth() {
           try {
             signature = await signEvmMessage({ message })
           } catch (signError: any) {
-            console.log('signEvmMessage failed, trying personal_sign fallback:', signError?.name, signError?.message)
-            // Fall back to raw personal_sign via the connector's provider.
-            // Handles ConnectorChainMismatchError (wagmi type/value chain ID mismatch),
-            // WalletConnect session errors, and mobile wallet signing failures.
-            if (!connector) {
+            // wagmi's signEvmMessage can fail with ConnectorChainMismatchError when the
+            // wagmi-internal chain ID doesn't match the connector's active chain, or with
+            // WalletConnect session errors on mobile. Fall back to a raw personal_sign
+            // via the connector's underlying provider, which bypasses wagmi's chain
+            // validation entirely and works across all EVM wallet types.
+            if (!connector) throw signError
+
+            let provider: any
+            try {
+              provider = await connector.getProvider()
+            } catch {
               throw signError
             }
-            const provider = await connector.getProvider() as any
+
+            // Encode message as hex for personal_sign (EIP-191).
             const msgHex = '0x' + Array.from(
               new TextEncoder().encode(message),
               (b) => b.toString(16).padStart(2, '0'),
             ).join('')
-            signature = await provider.request({
-              method: 'personal_sign',
-              params: [msgHex, address],
-            })
+
+            // Race against a timeout so a dead WalletConnect relay doesn't hang
+            // the auth flow indefinitely and leave isAuthenticating stuck as true.
+            const timeoutMs = 60_000
+            try {
+              signature = await Promise.race([
+                provider.request({
+                  method: 'personal_sign',
+                  params: [msgHex, address],
+                }),
+                new Promise<never>((_, reject) =>
+                  setTimeout(() => reject(new Error(`personal_sign timed out after ${timeoutMs / 1000}s`)), timeoutMs)
+                ),
+              ]) as string
+            } catch (psErr: any) {
+              throw psErr
+            }
           }
         } else {
-          // Sign with Solana wallet
-          console.log('Signing message with Solana wallet:', message)
           signature = await signSolanaMessage(message)
         }
 
@@ -111,17 +118,16 @@ export function useWalletAuth() {
           signature,
           chainId,
         })
-        console.log('Authentication successful, token received')
 
+        // Store a temporary session immediately so protected queries can start;
+        // then overwrite with the full user profile from the next request.
         const tempToken = token
-        console.log('Temporary token:', tempToken)
         login({
-          user: { id: '', address, chainId }, // Temporary, will be updated below
+          user: { id: '', address, chainId },
           accessToken: tempToken,
         })
 
         const userInfo = await authService.getCurrentUser()
-        console.log('User info received:', userInfo)
 
         login({
           user: { id: userInfo.id, address: userInfo.address || address, role: userInfo.role, chainId },
@@ -134,8 +140,9 @@ export function useWalletAuth() {
           error,
           fallbackMsg: 'Authentication failed. Please try again.',
         })
-        setError(errorMessage)
-        console.error('Authentication error:', error)
+        // Do NOT call setError here. useWalletConnectionHandler owns error display
+        // and checks the auth generation before showing a toast, so stale auth
+        // failures (e.g. a previous WC session timing out) are silently discarded.
         return { success: false, error: errorMessage }
       } finally {
         setIsAuthenticating(false)
