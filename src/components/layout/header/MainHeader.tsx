@@ -25,7 +25,7 @@ export function MainHeader() {
           <MenuIcon />
         </button>
         <Link to="/" className="flex items-center gap-4 xl:gap-7.5">
-          <img src="/logo.svg" alt="Logo" className="h-8 w-8" />
+          <img src="/logo.png" alt="Logo" className="h-11 w-8" />
           <h1 className="text-lg font-extrabold max-md:sr-only">FAIYAH.COM</h1>
         </Link>
       </div>
