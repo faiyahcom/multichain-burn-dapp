@@ -24,7 +24,7 @@ export const usePairListSearchFilterStore = create<PairListSearchFilterState>(
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "volume",
       sortOrder: "desc",
-      listLayout: "list",
+      listLayout: "card",
     },
     setFilter: (filter) =>
       set((state) => ({

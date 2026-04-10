@@ -8,21 +8,19 @@ import { ThemeProvider } from "./components/providers/ThemeProvider";
 import "./index.css";
 import "./polyfills";
 
-// // ✅ Reload when a stale deployment causes chunk load failures
-// window.addEventListener("vite:preloadError", (event) => {
-//   const RELOAD_KEY = "vite:preloadError:reloaded";
-//   const hasReloaded = sessionStorage.getItem(RELOAD_KEY);
+const reloadKey = "vite-preload-reload";
+window.addEventListener("vite:preloadError", (e) => {
+  console.log("vite:preloadError", e);
+  const lastReload = sessionStorage.getItem(reloadKey);
+  const now = Date.now();
+  console.log("vite:preloadError", lastReload, now, now - Number(lastReload));
 
-//   console.error("Vite preload error:", event.payload);
-
-//   if (!hasReloaded) {
-//     sessionStorage.setItem(RELOAD_KEY, "true");
-//     window.location.reload();
-//   } else {
-//     // sessionStorage.removeItem(RELOAD_KEY);
-//     console.error("Failed to load application after reload attempt");
-//   }
-// });
+  // Only reload if we haven't reloaded in the last 30 seconds
+  if (!lastReload || now - Number(lastReload) > 30000) {
+    sessionStorage.setItem(reloadKey, String(now));
+    window.location.reload();
+  }
+});
 
 setupAxiosDefaults();
 

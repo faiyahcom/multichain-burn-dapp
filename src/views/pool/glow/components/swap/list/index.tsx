@@ -4,7 +4,7 @@ import { networkIdToChainId } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
-import { useSwapPoolListSearchFilterStore } from "@/stores/burn-pool-list/search-filter-store";
+import { useSwapPoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
 import {
   poolTypes,
   userHiddenSwapPoolStatuses,
