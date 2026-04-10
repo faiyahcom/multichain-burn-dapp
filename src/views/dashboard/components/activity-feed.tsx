@@ -17,6 +17,7 @@ import SwapActivityImage from "/images/dashboard/swap-activity.png";
 import { POOL_KIND } from "@/types/pool";
 import { cn } from "@/lib/utils";
 import { Link } from "@tanstack/react-router";
+import { getExplorerUrl } from "@/utils/helpers/networks";
 
 // ── Grid Constants (Responsive & Synced) ──────────────────────────────────────
 
@@ -140,9 +141,26 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
   const type = POOL_KIND[item.poolKind] === "burn_pool" ? "Burn" : "Swap";
   const fee = formatAmount(item.fee || "0", item.tokenOutDecimals);
   const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
+  const scanUrl = getExplorerUrl(item.chainId, item.hash, "tx");
+
+  const handleRowClick = () => {
+    if (scanUrl) {
+      window.open(scanUrl, "_blank");
+    }
+  };
 
   return (
-    <div className="txn-grid py-1 md:py-0">
+    <div
+      className="txn-grid cursor-pointer py-1 transition-opacity hover:opacity-70 md:py-0"
+      onClick={handleRowClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          handleRowClick();
+        }
+      }}
+    >
       <Dot className="size-2.5 bg-mb-btn-swap md:size-3.25" />
       <span className="truncate">{hash}</span>
       <span className="hidden truncate text-center md:block">{time}</span>

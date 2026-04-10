@@ -1,6 +1,6 @@
 import { IconGoTo } from "@/assets/react";
-import { chainIdToNetworkConfig, SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { truncateString } from "@/utils/helpers/string";
+import { getExplorerUrl } from "@/utils/helpers/networks";
 
 type Props = {
     address: string;
@@ -10,13 +10,7 @@ type Props = {
 };
 
 const ScanLink = ({ address, chainId, className, iconClassName }: Props) => {
-    const networkConfig = chainId ? chainIdToNetworkConfig(chainId) : undefined;
-
-    const href = networkConfig
-        ? chainId === SOLANA_BACKEND_CHAIN_ID
-            ? `${networkConfig.scanUrl}/address/${address}?cluster=devnet`
-            : `${networkConfig.scanUrl}/address/${address}`
-        : undefined;
+    const href = chainId ? getExplorerUrl(chainId, address, "address") : undefined;
 
     const content = (
         <>
