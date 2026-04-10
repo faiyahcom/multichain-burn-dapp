@@ -40,6 +40,7 @@ export const appKitConfig = {
   networks,
   metadata,
   projectId: APPKIT_PROJECT_ID ?? "",
+  allowUnsupportedChain: true,
   features: {
     analytics: true,
   },

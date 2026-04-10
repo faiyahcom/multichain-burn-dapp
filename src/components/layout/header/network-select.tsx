@@ -35,7 +35,7 @@ export default function NetworkSelect() {
         // Not yet connected to the target namespace — open connect modal.
         // The root-level useAppKitEventHandler will finalise the switch on MODAL_CLOSE.
         setPendingNetworkSwitch({ network: network.appKitNetwork, closeModalOnDone: false });
-        open({ view: "Connect", namespace: targetNamespace });
+        open({ view: "Connect" });
       }
     } catch {
       setPendingNetworkSwitch(null);

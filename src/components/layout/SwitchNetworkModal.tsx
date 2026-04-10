@@ -41,7 +41,7 @@ export function SwitchNetworkModal() {
         // The root-level useAppKitEventHandler will finalise the switch on MODAL_CLOSE
         // and close this modal via closeModalOnDone: true.
         setPendingNetworkSwitch({ network: toNetwork.appKitNetwork, closeModalOnDone: true });
-        open({ view: "Connect", namespace: targetNamespace });
+        open({ view: "Connect" });
       }
     } catch {
       setPendingNetworkSwitch(null);
