@@ -1,4 +1,7 @@
-import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import {
+  getContractSwapFactory,
+  getERC20Contract,
+} from "@/web3/contracts/multichainBurnContractEVM";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
@@ -23,6 +26,14 @@ export const useCreateWhitelistTokenEvmFn = () => {
         );
         const signer = await provider.getSigner();
         const swapFactoryContract = getContractSwapFactory(signer);
+        const tokenContract = getERC20Contract(normalizedTokenAddress, signer);
+
+        try {
+          await tokenContract.totalSupply();
+        } catch {
+          throw new Error("Token address is not a valid ERC20 contract");
+        }
+
         const isTokenWhitelisted =
           await swapFactoryContract.isTokenWhitelisted(normalizedTokenAddress);
 

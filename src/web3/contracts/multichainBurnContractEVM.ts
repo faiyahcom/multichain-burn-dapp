@@ -109,6 +109,7 @@ export const getERC20Contract = (token: string, signer: Signer) => {
   return new ethers.Contract(
     token,
     [
+      "function totalSupply() view returns (uint256)",
       "function decimals() view returns (uint8)",
       "function balanceOf(address owner) view returns (uint256)",
       "function allowance(address owner, address spender) view returns (uint256)",

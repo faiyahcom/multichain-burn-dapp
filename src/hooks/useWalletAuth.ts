@@ -1,10 +1,12 @@
 import { useState, useCallback } from 'react'
 import { useSignMessage, useConnections } from 'wagmi'
-import { useAppKitAccount } from '@reown/appkit/react'
+import { useAppKitAccount, useDisconnect } from '@reown/appkit/react'
 import bs58 from 'bs58'
-import { authService } from '@/services/authService'
+import { authService, hasEnabledAdminRole } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { getErrorMessage } from '@/utils/helpers/error-message'
+import { toast } from '@/components/common/custom-toast'
+import { useNavigate } from '@tanstack/react-router'
 
 type WalletType = 'evm' | 'solana'
 
@@ -39,7 +41,8 @@ async function signSolanaMessage(
 
 export function useWalletAuth() {
   const [isAuthenticating, setIsAuthenticating] = useState(false)
-  const { login, setLoading, setError, user } = useAuthStore()
+  const { login, setLoading, setError, logout } = useAuthStore()
+  const navigate = useNavigate()
 
   const { address: evmAddress } = useAppKitAccount({
     namespace: 'eip155',
@@ -51,6 +54,7 @@ export function useWalletAuth() {
   const { address: solanaAddress } = useAppKitAccount({
     namespace: 'solana',
   })
+  const { disconnect } = useDisconnect();
 
   const authenticate = useCallback(
     async (walletType: WalletType, address: string, chainId?: string) => {
@@ -122,6 +126,18 @@ export function useWalletAuth() {
 
         const userInfo = await authService.getCurrentUser()
         console.log('User info received:', userInfo)
+
+        // For admin branch only, check if user is admin
+        if (!hasEnabledAdminRole(userInfo)) {
+          await disconnect()
+          logout()
+          const errorMessage = "Access Denied: This wallet does not have administrative privileges."
+          toast.error(errorMessage)
+          navigate({
+            to: "/",
+          })
+          throw new Error(errorMessage)
+        }
 
         login({
           user: { id: userInfo.id, address: userInfo.address || address, role: userInfo.role, chainId },
