@@ -225,6 +225,15 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                 </Field>
               )}
             />
+            <Field>
+              <FieldLabel>Decimal</FieldLabel>
+              <Input
+                value={String(token.decimals)}
+                className="px-5 placeholder:text-15px placeholder:text-secondary-text bg-inactive cursor-not-allowed"
+                readOnly
+                disabled
+              />
+            </Field>
             <Controller
               control={control}
               name="networkId"

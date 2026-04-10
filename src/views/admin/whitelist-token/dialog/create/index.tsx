@@ -24,6 +24,7 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import ImageUpload from "./image-upload";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
+import { useTokenDecimals } from "@/hooks/useTokenDecimals";
 import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
 import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
@@ -82,7 +83,7 @@ const AdminWhitelistTokenDialogCreate = () => {
 
   const queryClient = useQueryClient();
 
-  const { control, handleSubmit, resetField, reset, setValue } =
+  const { control, handleSubmit, resetField, reset, setValue, watch } =
     useForm<WhitelistTokenFormValues>({
       defaultValues: {
         name: "",
@@ -96,6 +97,11 @@ const AdminWhitelistTokenDialogCreate = () => {
       },
       resolver: zodResolver(whitelistTokenSchema),
     });
+
+  const watchedAddress = watch("address");
+  const watchedNetworkId = watch("networkId");
+  const { decimals: onChainDecimals, isLoading: isDecimalsLoading } =
+    useTokenDecimals({ address: watchedAddress, networkId: watchedNetworkId });
 
   // Sync form field whenever the wallet switches network
   useEffect(() => {
@@ -262,6 +268,22 @@ const AdminWhitelistTokenDialogCreate = () => {
                 </Field>
               )}
             />
+            <Field>
+              <FieldLabel>Decimal</FieldLabel>
+              <Input
+                value={
+                  isDecimalsLoading
+                    ? "Loading..."
+                    : onChainDecimals != null
+                      ? String(onChainDecimals)
+                      : ""
+                }
+                // placeholder="Auto-fetched from on-chain"
+                className="px-5 placeholder:text-15px placeholder:text-secondary-text bg-inactive cursor-not-allowed"
+                readOnly
+                disabled
+              />
+            </Field>
             <Controller
               control={control}
               name="networkId"

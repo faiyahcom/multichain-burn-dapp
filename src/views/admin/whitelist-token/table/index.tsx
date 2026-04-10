@@ -89,9 +89,9 @@ const AdminWhitelistTokenTable = () => {
         chainIds:
           filter.network.length > 0
             ? filter.network
-                .map((network) => networkIdToChainId(network))
-                .filter((chainId) => chainId)
-                .join(",")
+              .map((network) => networkIdToChainId(network))
+              .filter((chainId) => chainId)
+              .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,
@@ -106,7 +106,7 @@ const AdminWhitelistTokenTable = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
-         queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+          queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
         });
         toast.success("Token deleted successfully!");
       },
@@ -124,7 +124,7 @@ const AdminWhitelistTokenTable = () => {
   ) => {
     if (request.enabled) {
       const tokenNetworkId = chainIdToNetworkConfig(request.chainId)?.id;
-      
+
       if (tokenNetworkId && currentNetworkId !== tokenNetworkId) {
         openSwitchNetworkModal(currentNetworkId, tokenNetworkId);
         return;
@@ -168,6 +168,7 @@ const AdminWhitelistTokenTable = () => {
     "Token",
     "Address",
     "Network",
+    "Decimal",
     "Description",
     "Links",
     "Status",
@@ -229,6 +230,9 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <NetworkDisplay chainId={item.chainId} />
+                  </TableCell>
+                  <TableCell>
+                    {item.decimals}
                   </TableCell>
                   <TableCell>
                     <p
