@@ -4,7 +4,10 @@ import BN from "bn.js";
 import { NETWORK_CONFIGS, getRpcUrl, SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { PublicKey } from "@solana/web3.js";
 import { getFactoryPDA } from "@/web3/helpers";
-import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import {
+    EVM_POOL_TYPES,
+    getContractAccessManager,
+} from "@/web3/contracts/multichainBurnContractEVM";
 import {
     useAppKitConnection,
 } from "@reown/appkit-adapter-solana/react";
@@ -35,7 +38,7 @@ export const DECIMAL_FEE_PERCENT = 100;
 
 /**
  * Reads the current creation fee, settlement fee, and treasury address
- * from the burn factory contract for the given EVM network on mount
+ * from the AccessManager swap fee config for the given EVM network on mount
  * (and whenever networkId or fetchKey changes).
  */
 export function useFeeSettings(networkId: string | undefined): FeeSettingsData {
@@ -94,15 +97,16 @@ export function useFeeSettings(networkId: string | undefined): FeeSettingsData {
                     if (!rpcUrl) throw new Error("No RPC URL for network");
 
                     const jsonProvider = new ethers.JsonRpcProvider(rpcUrl);
-                    const factoryContract = getContractSwapFactory(
+                    const accessManagerContract = getContractAccessManager(
                         jsonProvider as unknown as ethers.Signer,
                     );
 
-                    const [cf, sf, tr] = await Promise.all([
-                        factoryContract.poolCreationFee() as Promise<bigint>,
-                        factoryContract.settlementFee() as Promise<bigint>,
-                        factoryContract.treasury() as Promise<string>,
-                    ]);
+                    const [tr, cf, sf] =
+                        await accessManagerContract.getFeeConfig(EVM_POOL_TYPES.SWAP) as [
+                            string,
+                            bigint,
+                            bigint,
+                        ];
 
                     if (cancelled) return;
                     setCreationFee(new BN(cf.toString()));

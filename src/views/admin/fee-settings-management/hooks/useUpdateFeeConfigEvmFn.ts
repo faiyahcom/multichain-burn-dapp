@@ -2,7 +2,10 @@ import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
-import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import {
+    EVM_POOL_TYPES,
+    getContractAccessManager,
+} from "@/web3/contracts/multichainBurnContractEVM";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { DECIMAL_FEE_PERCENT } from "./useFeeSettings";
 
@@ -29,7 +32,7 @@ export const useUpdateFeeConfigEvmFn = () => {
                     walletProvider as Eip1193Provider,
                 );
                 const signer = await provider.getSigner();
-                const contract = getContractSwapFactory(signer);
+                const contract = getContractAccessManager(signer);
 
                 // creationFee: human ETH/BNB/XPT → wei
                 const creationFeeWei = ethers.parseEther(creationFee);
@@ -37,6 +40,7 @@ export const useUpdateFeeConfigEvmFn = () => {
                 const settlementFeeBps = BigInt(Math.round(parseFloat(settlementFee) * DECIMAL_FEE_PERCENT));
 
                 const tx = await contract.setFeeConfig(
+                    EVM_POOL_TYPES.SWAP,
                     treasury,
                     creationFeeWei,
                     settlementFeeBps,
