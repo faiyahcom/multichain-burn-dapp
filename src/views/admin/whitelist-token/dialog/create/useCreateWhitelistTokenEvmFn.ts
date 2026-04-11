@@ -1,5 +1,6 @@
 import {
-  getContractSwapFactory,
+  EVM_POOL_TYPES,
+  getContractAccessManager,
   getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
@@ -8,11 +9,13 @@ import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 
+const PHASE1_POOL_TYPES = [EVM_POOL_TYPES.BURN, EVM_POOL_TYPES.SWAP];
+
 export const useCreateWhitelistTokenEvmFn = () => {
   const { isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
 
-  // Calling this function also enables the token if it is already whitelisted
+  // Phase 1 keeps burn and swap whitelist status in sync.
   const createWhitelistToken = useCallback(
     async ({ tokenAddress }: { tokenAddress: string }) => {
       try {
@@ -25,7 +28,7 @@ export const useCreateWhitelistTokenEvmFn = () => {
           walletProvider as Eip1193Provider,
         );
         const signer = await provider.getSigner();
-        const swapFactoryContract = getContractSwapFactory(signer);
+        const accessManagerContract = getContractAccessManager(signer);
         const tokenContract = getERC20Contract(normalizedTokenAddress, signer);
 
         try {
@@ -34,15 +37,25 @@ export const useCreateWhitelistTokenEvmFn = () => {
           throw new Error("Token address is not a valid ERC20 contract");
         }
 
-        const isTokenWhitelisted =
-          await swapFactoryContract.isTokenWhitelisted(normalizedTokenAddress);
+        const [isBurnWhitelisted, isSwapWhitelisted] = await Promise.all(
+          PHASE1_POOL_TYPES.map((poolType) =>
+            accessManagerContract.isTokenWhitelisted(
+              poolType,
+              normalizedTokenAddress,
+            ),
+          ),
+        );
 
-        if (isTokenWhitelisted) {
+        if (isBurnWhitelisted && isSwapWhitelisted) {
           throw new Error("Token is already whitelisted on-chain");
         }
 
         const tx =
-          await swapFactoryContract.whitelistToken(normalizedTokenAddress);
+          await accessManagerContract.setTokenWhitelistForPoolTypes(
+            PHASE1_POOL_TYPES,
+            normalizedTokenAddress,
+            true,
+          );
         const receipt = await tx.wait();
 
         toast.success("Token whitelisted successfully!", {

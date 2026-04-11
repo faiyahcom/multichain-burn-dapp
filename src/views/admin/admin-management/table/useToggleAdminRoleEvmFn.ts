@@ -1,7 +1,7 @@
 import { toast } from "@/components/common/custom-toast";
 import type { AdminManagementRole } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import { getContractAccessManager } from "@/web3/contracts/multichainBurnContractEVM";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
@@ -31,7 +31,7 @@ export const useToggleAdminRoleEvmFn = () => {
           walletProvider as Eip1193Provider,
         );
         const signer = await provider.getSigner();
-        const contract = getContractSwapFactory(signer);
+        const contract = getContractAccessManager(signer);
 
         const tx =
           role === "super_admin"
