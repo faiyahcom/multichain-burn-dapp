@@ -17,7 +17,7 @@ export interface WhitelistToken {
   homepage: string;
   whitepaper: string;
   createdAt: string;
-  kind: number;
+  kind: { enable: boolean; kind: number }[];
 }
 
 export interface ListTokensRequest {
@@ -43,6 +43,7 @@ export interface ForceUpdateWhitelistTokenStatusRequest {
   chainId: string;
   address: string;
   active: boolean;
+  kind: number;
 }
 
 export interface ForceUpdateWhitelistTokenStatusResponse {
@@ -57,7 +58,6 @@ export interface DeleteWhitelistTokenRequest {
 export interface UpdateWhitelistTokenRequest {
   chainId: string;
   address: string;
-  kind: number;
   data: FormData;
 }
 
@@ -104,6 +104,7 @@ export const whitelistService = {
         )}`,
         {
           active: request.active,
+          kind: request.kind,
         },
       );
 
@@ -127,7 +128,6 @@ export const whitelistService = {
       `${WHITELIST_API_ROUTES.UPDATE_WHITELIST_TOKEN(
         request.chainId,
         request.address,
-        request.kind,
       )}`,
       request.data,
       {

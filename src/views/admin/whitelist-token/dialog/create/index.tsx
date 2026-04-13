@@ -8,6 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import {
+  poolTypes,
+  poolTypeLabels,
+  type PoolType,
+} from "@/types/admin/master-pool-management";
 import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -30,11 +35,8 @@ import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useCreateWhitelistTokenSolanaFn } from "./useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { whitelistService } from "@/services/whitelistService";
-import { getErrorMessage } from "@/utils/helpers/error-message";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/common/custom-toast";
-import { booleanString } from "@/types/common";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 const networkIdValues = [
@@ -49,6 +51,9 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
+  poolTypes: z
+    .array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]))
+    .min(1, { error: "At least one pool type is required" }),
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -90,6 +95,7 @@ const AdminWhitelistTokenDialogCreate = () => {
         symbol: "",
         address: "",
         networkId: currentNetworkId ?? undefined,
+        poolTypes: [] as PoolType[],
         image: undefined,
         description: "",
         homepageLink: "",
@@ -115,70 +121,36 @@ const AdminWhitelistTokenDialogCreate = () => {
     setOpen(open);
   };
 
-  const {
-    mutate: createWhitelistTokenMutation,
-    isPending: isCreateWhitelistTokenPending,
-  } = useMutation({
-    mutationFn: async (data: WhitelistTokenFormValues) => {
-      const formData = new FormData();
-      formData.append("address", data.address.trim());
-      formData.append("name", data.name);
-      formData.append("symbol", data.symbol);
-      const networkConfig = NETWORK_CONFIGS.find(
-        (n) => n.id === data.networkId,
-      );
-      if (networkConfig) {
-        formData.append("chainId", networkConfig.backendChainId);
-      }
-      if (data.image) {
-        formData.append("img", data.image);
-      }
-      formData.append("description", data.description);
-      formData.append("homepage", data.homepageLink);
-      formData.append("whitepaper", data.docLink);
-      // default to enable and not dropped
-      formData.append("enable", booleanString[4]);
-      formData.append("isDropped", booleanString[5]);
+  const onSubmit = async (data: WhitelistTokenFormValues) => {
+    setIsCallingSc(true);
 
-      const result = await whitelistService.createWhitelistToken(formData);
-      return result;
-    },
-    onSuccess: () => {
+    let scSuccess = false;
+
+    if (isSolana) {
+      scSuccess = await createWhitelistTokenSolana({
+        tokenAddress: data.address,
+        poolTypes: data.poolTypes,
+      });
+    }
+    if (isEvm) {
+      scSuccess = await createWhitelistTokenEvm({
+        tokenAddress: data.address,
+        poolTypes: data.poolTypes,
+      });
+    }
+
+    setIsCallingSc(false);
+
+    if (scSuccess) {
       toast.success("Token whitelisted successfully!");
       queryClient.invalidateQueries({
         queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
-
       handleOpenChange(false);
-    },
-    onError: (error) => {
-      const message = getErrorMessage({ error });
-      toast.error(message);
-    },
-  });
-
-  const onSubmit = async (data: WhitelistTokenFormValues) => {
-    setIsCallingSc(true);
-    if (isSolana) {
-      const result = await createWhitelistTokenSolana({
-        tokenAddress: data.address,
-      });
-      if (result) {
-        createWhitelistTokenMutation(data);
-      }
     }
-    if (isEvm) {
-      const result = await createWhitelistTokenEvm({
-        tokenAddress: data.address,
-      });
-      if (result) {
-        createWhitelistTokenMutation(data);
-      }
-    }
-    setIsCallingSc(false);
   };
 
-  const isLoading = isCreateWhitelistTokenPending || isCallingSc;
+  const isLoading = isCallingSc;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -323,6 +295,49 @@ const AdminWhitelistTokenDialogCreate = () => {
                       />
                     ))}
                   </div>
+                </Field>
+              )}
+            />
+            <Controller
+              control={control}
+              name="poolTypes"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="gap-3.25">
+                  <FieldLabel htmlFor={field.name}>
+                    Pool type<span className="text-md-required-red">*</span>
+                  </FieldLabel>
+                  <div className="flex items-center gap-2.25">
+                    {poolTypes.map((type) => {
+                      const selected = (field.value ?? []).includes(type);
+                      return (
+                        <AnimateIconButton
+                          key={type}
+                          variant="letter-icon"
+                          iconLetter={poolTypeLabels[type][0]}
+                          isActive={selected}
+                          btnProps={{
+                            type: "button",
+                            onClick: () => {
+                              const current = field.value ?? [];
+                              field.onChange(
+                                selected
+                                  ? current.filter((t) => t !== type)
+                                  : [...current, type],
+                              );
+                            },
+                          }}
+                          text={poolTypeLabels[type]}
+                          color="#9072f9"
+                          classNames={{
+                            btn: "after:text-primary-foreground",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

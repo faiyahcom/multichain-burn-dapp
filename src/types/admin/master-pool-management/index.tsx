@@ -7,11 +7,13 @@ import type {
 } from "@/types/common";
 
 // 0 - burn pool | 1 - swap pool
-export const poolTypes = [0, 1] as const;
+export const poolTypes = [0, 1, 2, 3] as const;
 export type PoolType = (typeof poolTypes)[number];
 export const poolTypeLabels: Record<PoolType, string> = {
   0: "Burn pool",
   1: "Swap pool",
+  2: "Stake pool",
+  3: "Launchpad",
 };
 
 export const poolTypeOptionValues = [
