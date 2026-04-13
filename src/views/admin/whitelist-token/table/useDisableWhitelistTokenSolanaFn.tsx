@@ -2,13 +2,22 @@ import {
   getMultichainBurnProgram,
   type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
+import { getStakingProgram } from "@/web3/contracts/stakingProgramSol";
 import { getFactoryPDA } from "@/web3/helpers";
+import type { PoolType } from "@/types/admin/master-pool-management";
+
+const POOL_TYPE_VARIANTS: Record<PoolType, Record<string, object>> = {
+  0: { burn: {} },
+  1: { swap: {} },
+  2: { staking: {} },
+  3: { launchpad: {} },
+};
 import {
   useAppKitConnection,
   type Provider,
 } from "@reown/appkit-adapter-solana/react";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { PublicKey, SystemProgram } from "@solana/web3.js";
+import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
@@ -19,7 +28,7 @@ export const useDisableWhitelistTokenSolanaFn = () => {
   const { walletProvider: provider } = useAppKitProvider<Provider>("solana");
 
   const disableWhitelistToken = useCallback(
-    async ({ tokenAddress }: { tokenAddress: string }) => {
+    async ({ tokenAddress, poolTypes }: { tokenAddress: string; poolTypes: PoolType[] }) => {
       try {
         if (!isConnected || !address) {
           throw new Error("Wallet is not connected");
@@ -40,15 +49,19 @@ export const useDisableWhitelistTokenSolanaFn = () => {
         const factoryPDA = getFactoryPDA(program.programId);
 
         const tokenPubkey = new PublicKey(tokenAddress);
+        const tx = new Transaction();
 
-        const tx = await program.methods
-          .updateWhitelistToken(tokenPubkey, false) // false to disable token
-          .accounts({
-            admin: walletPublicKey,
-            factory: factoryPDA,
-            systemProgram: SystemProgram.programId,
-          })
-          .transaction();
+        for (const poolType of poolTypes) {
+          const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
+          const ix = await program.methods
+            .updateWhitelistToken(tokenPubkey, false, poolTypeVariant)
+            .accounts({
+              admin: walletPublicKey,
+              factory: factoryPDA,
+            } as any)
+            .instruction();
+          tx.add(ix);
+        }
 
         const { blockhash, lastValidBlockHeight } =
           await connection.getLatestBlockhash();

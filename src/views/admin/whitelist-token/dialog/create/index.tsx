@@ -54,9 +54,9 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
-  poolType: z.coerce.number().refine((v) => poolTypes.includes(v as PoolType), {
-    message: "Pool type is required",
-  }) as z.ZodType<PoolType>,
+  poolTypes: z
+    .array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]))
+    .min(1, { error: "At least one pool type is required" }),
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -98,7 +98,7 @@ const AdminWhitelistTokenDialogCreate = () => {
         symbol: "",
         address: "",
         networkId: currentNetworkId ?? undefined,
-        poolType: 0 as PoolType,
+        poolTypes: [] as PoolType[],
         image: undefined,
         description: "",
         homepageLink: "",
@@ -145,7 +145,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
-      formData.append("kind", data.poolType.toString());
+      formData.append("kind", data.poolTypes.join(","));
       // default to enable and not dropped
       formData.append("enable", booleanString[4]);
       formData.append("isDropped", booleanString[5]);
@@ -172,7 +172,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     if (isSolana) {
       const result = await createWhitelistTokenSolana({
         tokenAddress: data.address,
-        poolType: data.poolType,
+        poolTypes: data.poolTypes,
       });
       if (result) {
         createWhitelistTokenMutation(data);
@@ -181,7 +181,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     if (isEvm) {
       const result = await createWhitelistTokenEvm({
         tokenAddress: data.address,
-        poolType: data.poolType,
+        poolTypes: data.poolTypes,
       });
       if (result) {
         createWhitelistTokenMutation(data);
@@ -340,30 +340,40 @@ const AdminWhitelistTokenDialogCreate = () => {
             />
             <Controller
               control={control}
-              name="poolType"
+              name="poolTypes"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-3.25">
                   <FieldLabel htmlFor={field.name}>
                     Pool type<span className="text-md-required-red">*</span>
                   </FieldLabel>
                   <div className="flex items-center gap-2.25">
-                    {poolTypes.map((type) => (
-                      <AnimateIconButton
-                        key={type}
-                        variant="letter-icon"
-                        iconLetter={poolTypeLabels[type][0]}
-                        isActive={field.value === type}
-                        btnProps={{
-                          type: "button",
-                          onClick: () => field.onChange(type),
-                        }}
-                        text={poolTypeLabels[type]}
-                        color="#9072f9"
-                        classNames={{
-                          btn: "after:text-primary-foreground",
-                        }}
-                      />
-                    ))}
+                    {poolTypes.map((type) => {
+                      const selected = (field.value ?? []).includes(type);
+                      return (
+                        <AnimateIconButton
+                          key={type}
+                          variant="letter-icon"
+                          iconLetter={poolTypeLabels[type][0]}
+                          isActive={selected}
+                          btnProps={{
+                            type: "button",
+                            onClick: () => {
+                              const current = field.value ?? [];
+                              field.onChange(
+                                selected
+                                  ? current.filter((t) => t !== type)
+                                  : [...current, type],
+                              );
+                            },
+                          }}
+                          text={poolTypeLabels[type]}
+                          color="#9072f9"
+                          classNames={{
+                            btn: "after:text-primary-foreground",
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />

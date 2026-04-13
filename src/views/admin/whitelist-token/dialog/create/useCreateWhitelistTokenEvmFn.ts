@@ -15,7 +15,7 @@ export const useCreateWhitelistTokenEvmFn = () => {
       tokenAddress,
     }: {
       tokenAddress: string;
-      poolType?: number;
+      poolTypes?: number[];
     }) => {
       try {
         if (!isConnected || !walletProvider) {

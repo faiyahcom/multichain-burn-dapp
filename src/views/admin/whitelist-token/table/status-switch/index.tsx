@@ -15,15 +15,17 @@ import { useCreateWhitelistTokenEvmFn } from "../../dialog/create/useCreateWhite
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
+import { poolTypes as allPoolTypes, type PoolType } from "@/types/admin/master-pool-management";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 interface Props {
   switchProps?: React.ComponentProps<typeof BlueSwitch>;
   chainId?: string;
   address?: string;
+  poolTypes?: PoolType[];
 }
 
-const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
+const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address, poolTypes }) => {
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
   const { caipAddress } = useAppKitAccount();
@@ -88,9 +90,9 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
 
     if (isSolana) {
       if (isActive) {
-        result = await disableWhitelistTokenSolana({ tokenAddress: address });
+        result = await disableWhitelistTokenSolana({ tokenAddress: address, poolTypes: poolTypes ?? [] });
       } else {
-        result = await enableWhitelistTokenSolana({ tokenAddress: address });
+        result = await enableWhitelistTokenSolana({ tokenAddress: address, poolTypes: [...allPoolTypes] });
       }
     }
 

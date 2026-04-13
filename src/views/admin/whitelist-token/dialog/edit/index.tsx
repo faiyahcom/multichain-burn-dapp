@@ -7,9 +7,15 @@ import {
 } from "@/components/ui/dialog";
 import {
   NETWORK_CONFIGS,
+  SOLANA_BACKEND_CHAIN_ID,
   chainIdToNetworkConfig,
   type NetworkId,
 } from "@/config/networks";
+import {
+  poolTypes,
+  poolTypeLabels,
+  type PoolType,
+} from "@/types/admin/master-pool-management";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,6 +39,8 @@ import {
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { useCreateWhitelistTokenSolanaFn } from "../create/useCreateWhitelistTokenSolanaFn";
+import { useCreateWhitelistTokenEvmFn } from "../create/useCreateWhitelistTokenEvmFn";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -46,6 +54,7 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
+  poolTypes: z.array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)])),
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -72,10 +81,23 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
   onOpenChange,
 }) => {
   const [imageRemoved, setImageRemoved] = useState(false);
+  const [isCallingSc, setIsCallingSc] = useState(false);
   const queryClient = useQueryClient();
 
   const tokenNetworkConfig = chainIdToNetworkConfig(token.chainId);
   const tokenNetworkId = tokenNetworkConfig?.id;
+  const isSolanaToken = token.chainId === SOLANA_BACKEND_CHAIN_ID;
+  const isEvmToken = !isSolanaToken;
+
+  const { createWhitelistToken: updateWhitelistTokenSolana } =
+    useCreateWhitelistTokenSolanaFn();
+  const { createWhitelistToken: updateWhitelistTokenEvm } =
+    useCreateWhitelistTokenEvmFn();
+
+  // The token's currently enabled pool types from the backend
+  const initialKinds = (token.kind ?? [])
+    .filter((k) => k.enable)
+    .map((k) => k.kind) as PoolType[];
 
   const { control, handleSubmit, resetField, reset } =
     useForm<WhitelistTokenFormValues>({
@@ -84,6 +106,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
         symbol: token.customSymbol || token.symbol || "",
         address: token.address,
         networkId: tokenNetworkId,
+        poolTypes: initialKinds,
         image: undefined,
         description: token.description || "",
         homepageLink: token.homepage || "",
@@ -110,6 +133,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
+      formData.append("kind", data.poolTypes.join(","));
       if (data.image) {
         formData.append("img", data.image);
       }
@@ -136,9 +160,51 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
   });
 
   const onSubmit = async (data: WhitelistTokenFormValues) => {
-    // Edit only updates backend metadata — no SC call needed
+    const selectedPoolTypes = data.poolTypes;
+
+    // Determine which pool types to enable/disable compared to initial state
+    const toEnable = selectedPoolTypes.filter(
+      (t) => !initialKinds.includes(t),
+    );
+    const toDisable = initialKinds.filter(
+      (t) => !selectedPoolTypes.includes(t),
+    );
+
+    // If there are on-chain pool type changes, call the SC
+    if (toEnable.length > 0 || toDisable.length > 0) {
+      setIsCallingSc(true);
+
+      if (isSolanaToken) {
+        const result = await updateWhitelistTokenSolana({
+          tokenAddress: data.address,
+          poolTypes: toEnable,
+          disablePoolTypes: toDisable,
+        });
+        if (!result) {
+          setIsCallingSc(false);
+          return;
+        }
+      }
+
+      if (isEvmToken) {
+        const result = await updateWhitelistTokenEvm({
+          tokenAddress: data.address,
+          poolTypes: toEnable,
+        });
+        if (!result) {
+          setIsCallingSc(false);
+          return;
+        }
+      }
+
+      setIsCallingSc(false);
+    }
+
+    // Then update backend metadata
     updateWhitelistTokenMutation(data);
   };
+
+  const isLoading = isUpdatePending || isCallingSc;
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
@@ -272,6 +338,49 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
             />
             <Controller
               control={control}
+              name="poolTypes"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="gap-3.25">
+                  <FieldLabel htmlFor={field.name}>
+                    Pool type
+                  </FieldLabel>
+                  <div className="flex items-center gap-2.25">
+                    {poolTypes.map((type) => {
+                      const selected = (field.value ?? []).includes(type);
+                      return (
+                        <AnimateIconButton
+                          key={type}
+                          variant="letter-icon"
+                          iconLetter={poolTypeLabels[type][0]}
+                          isActive={selected}
+                          btnProps={{
+                            type: "button",
+                            onClick: () => {
+                              const current = field.value ?? [];
+                              field.onChange(
+                                selected
+                                  ? current.filter((t) => t !== type)
+                                  : [...current, type],
+                              );
+                            },
+                          }}
+                          text={poolTypeLabels[type]}
+                          color="#9072f9"
+                          classNames={{
+                            btn: "after:text-primary-foreground",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <Controller
+              control={control}
               name="image"
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
@@ -373,7 +482,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
               btnProps={{
                 type: "reset",
                 onClick: () => handleDialogOpenChange(false),
-                disabled: isUpdatePending,
+                disabled: isLoading,
               }}
             />
             <AnimateIconButton
@@ -388,7 +497,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
               btnProps={{
                 type: "submit",
               }}
-              isLoading={isUpdatePending}
+              isLoading={isLoading}
               isLoadingText="Saving..."
             />
           </div>

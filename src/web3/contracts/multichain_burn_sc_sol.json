@@ -1,5 +1,5 @@
 {
-  "address": "GttSZyACvGSP6mNgdKkwQ8DCv4KnH6hK6vFHUBaGcK9E",
+  "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j",
   "metadata": {
     "name": "multichain_burn_sc_sol",
     "version": "0.1.0",
@@ -1932,6 +1932,114 @@
       "args": []
     },
     {
+      "name": "emit_staking_event",
+      "discriminator": [
+        156,
+        208,
+        67,
+        99,
+        33,
+        54,
+        31,
+        158
+      ],
+      "accounts": [
+        {
+          "name": "staking_factory",
+          "docs": [
+            "The staking program's factory PDA — used as the CPI signer.",
+            "Validates that only the staking program can call this instruction."
+          ],
+          "signer": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                190,
+                20,
+                20,
+                144,
+                13,
+                141,
+                16,
+                8,
+                130,
+                120,
+                194,
+                237,
+                176,
+                35,
+                252,
+                31,
+                7,
+                220,
+                46,
+                112,
+                88,
+                88,
+                58,
+                117,
+                154,
+                180,
+                217,
+                115,
+                169,
+                97,
+                80,
+                239
+              ]
+            }
+          }
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn factory — ensures the instruction runs under burn's context."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "StakingEvent"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "initialize",
       "discriminator": [
         175,
@@ -3164,6 +3272,123 @@
       ]
     },
     {
+      "name": "StakingPoolCanceled",
+      "discriminator": [
+        219,
+        147,
+        244,
+        125,
+        149,
+        106,
+        56,
+        195
+      ]
+    },
+    {
+      "name": "StakingPoolClosed",
+      "discriminator": [
+        221,
+        237,
+        135,
+        212,
+        34,
+        81,
+        60,
+        224
+      ]
+    },
+    {
+      "name": "StakingPoolDeployed",
+      "discriminator": [
+        60,
+        208,
+        120,
+        169,
+        15,
+        199,
+        41,
+        68
+      ]
+    },
+    {
+      "name": "StakingPoolUpdated",
+      "discriminator": [
+        221,
+        57,
+        85,
+        178,
+        161,
+        101,
+        203,
+        42
+      ]
+    },
+    {
+      "name": "StakingRewardClaimed",
+      "discriminator": [
+        39,
+        3,
+        161,
+        85,
+        27,
+        49,
+        103,
+        208
+      ]
+    },
+    {
+      "name": "StakingRewardDeposited",
+      "discriminator": [
+        204,
+        50,
+        219,
+        225,
+        52,
+        100,
+        124,
+        50
+      ]
+    },
+    {
+      "name": "StakingRewardRefund",
+      "discriminator": [
+        127,
+        132,
+        244,
+        54,
+        66,
+        53,
+        227,
+        46
+      ]
+    },
+    {
+      "name": "StakingStaked",
+      "discriminator": [
+        150,
+        179,
+        150,
+        29,
+        185,
+        0,
+        147,
+        117
+      ]
+    },
+    {
+      "name": "StakingUnstaked",
+      "discriminator": [
+        184,
+        99,
+        252,
+        13,
+        56,
+        191,
+        213,
+        6
+      ]
+    },
+    {
       "name": "SubadminUpdated",
       "discriminator": [
         251,
@@ -3656,6 +3881,18 @@
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "whitelist_token_staking",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "whitelist_token_launchpad",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }
@@ -4102,10 +4339,10 @@
         "kind": "enum",
         "variants": [
           {
-            "name": "Swap"
+            "name": "Burn"
           },
           {
-            "name": "Burn"
+            "name": "Swap"
           },
           {
             "name": "Staking"
@@ -4320,6 +4557,715 @@
           {
             "name": "new_treasury",
             "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingEvent",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PoolDeployed",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "token_mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "asset_type",
+                "type": "u8"
+              },
+              {
+                "name": "time_start",
+                "type": "i64"
+              },
+              {
+                "name": "time_end",
+                "type": "i64"
+              },
+              {
+                "name": "reward_deposited",
+                "type": "u64"
+              },
+              {
+                "name": "creation_fee_paid",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "apr",
+                "type": "u64"
+              },
+              {
+                "name": "lock_duration",
+                "type": "u64"
+              },
+              {
+                "name": "max_staking_amount",
+                "type": "u64"
+              },
+              {
+                "name": "min_staking_amount",
+                "type": "u64"
+              },
+              {
+                "name": "reward_threshold",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Staked",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "user",
+                "type": "pubkey"
+              },
+              {
+                "name": "stake_index",
+                "type": "u64"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "staked_at",
+                "type": "i64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "Unstaked",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "user",
+                "type": "pubkey"
+              },
+              {
+                "name": "stake_index",
+                "type": "u64"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "RewardDeposited",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "total_amount",
+                "type": "u64"
+              },
+              {
+                "name": "current_amount",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "RewardClaimed",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "fee",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "current_amount",
+                "type": "u64"
+              },
+              {
+                "name": "total_amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "RewardRefund",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "token_mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "recipient",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "PoolClosed",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "PoolCanceled",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "reward_token_amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "PoolUpdated",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "time_start",
+                "type": "i64"
+              },
+              {
+                "name": "time_end",
+                "type": "i64"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "max_staking_amount",
+                "type": "u64"
+              },
+              {
+                "name": "min_staking_amount",
+                "type": "u64"
+              },
+              {
+                "name": "apr",
+                "type": "u64"
+              },
+              {
+                "name": "lock_duration",
+                "type": "u64"
+              },
+              {
+                "name": "delay_accumulate",
+                "type": "i64"
+              },
+              {
+                "name": "delay_claim",
+                "type": "i64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingPoolCanceled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "reward_token_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingPoolClosed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingPoolDeployed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_type",
+            "type": "u8"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "reward_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "creation_fee_paid",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "apr",
+            "type": "u64"
+          },
+          {
+            "name": "lock_duration",
+            "type": "u64"
+          },
+          {
+            "name": "max_staking_amount",
+            "type": "u64"
+          },
+          {
+            "name": "min_staking_amount",
+            "type": "u64"
+          },
+          {
+            "name": "reward_threshold",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingPoolUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "max_staking_amount",
+            "type": "u64"
+          },
+          {
+            "name": "min_staking_amount",
+            "type": "u64"
+          },
+          {
+            "name": "apr",
+            "type": "u64"
+          },
+          {
+            "name": "lock_duration",
+            "type": "u64"
+          },
+          {
+            "name": "delay_accumulate",
+            "type": "i64"
+          },
+          {
+            "name": "delay_claim",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingRewardClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingRewardDeposited",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingRewardRefund",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingStaked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_index",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "staked_at",
+            "type": "i64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingUnstaked",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_index",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
           },
           {
             "name": "timestamp",

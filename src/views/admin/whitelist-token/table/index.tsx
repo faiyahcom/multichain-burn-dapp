@@ -52,6 +52,7 @@ import TableNoData from "@/components/common/table-no-data";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
+  poolTypes: number[];
 };
 
 const AdminWhitelistTokenTable = () => {
@@ -147,6 +148,7 @@ const AdminWhitelistTokenTable = () => {
       if (isSolana) {
         isDisabled = await disableWhitelistTokenSolana({
           tokenAddress: request.address,
+          poolTypes: request.poolTypes as any,
         });
       }
 
@@ -204,7 +206,8 @@ const AdminWhitelistTokenTable = () => {
               isLoading={isListTokensPending}
             />
             {listTokensData?.whitelistTokens?.map((item, index) => {
-              const status = booleanToTokenStatus(item.enable);
+              const isItemEnabled = item.kind?.length > 0 ? item.kind.some((k) => k.enable) : item.enable;
+              const status = booleanToTokenStatus(isItemEnabled);
 
               return (
                 <TableRow key={index}>
@@ -240,9 +243,12 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-0.5">
-                      {item.kind?.map((kind) => (
-                        <span key={kind} className="text-xs font-medium">
-                          {poolTypeLabels[kind as keyof typeof poolTypeLabels] ?? `Kind ${kind}`}
+                      {item.kind?.filter(kObj => kObj.enable).map((kObj) => (
+                        <span 
+                          key={kObj.kind} 
+                          className="text-xs font-medium"
+                        >
+                          {poolTypeLabels[kObj.kind as keyof typeof poolTypeLabels] ?? `Kind ${kObj.kind}`}
                         </span>
                       ))}
                     </div>
@@ -292,13 +298,14 @@ const AdminWhitelistTokenTable = () => {
                   <TableCell>
                     <StatusSwitch
                       switchProps={{
-                        active: item.enable,
+                        active: isItemEnabled,
                         classNames: {
                           btn: "mx-auto",
                         },
                       }}
                       chainId={item.chainId}
                       address={item.address}
+                      poolTypes={item.kind?.filter(k => k.enable).map(k => k.kind) as any ?? []}
                     />
                   </TableCell>
                   <TableCell>
@@ -315,6 +322,7 @@ const AdminWhitelistTokenTable = () => {
                             chainId: item.chainId,
                             address: item.address,
                             enabled: item.enable,
+                            poolTypes: item.kind?.filter(k => k.enable).map(k => k.kind) || [],
                           })
                         }
                       >

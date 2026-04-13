@@ -17,7 +17,7 @@ export interface WhitelistToken {
   homepage: string;
   whitepaper: string;
   createdAt: string;
-  kind: number[];
+  kind: { enable: boolean; kind: number }[];
 }
 
 export interface ListTokensRequest {
