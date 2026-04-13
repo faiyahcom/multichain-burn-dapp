@@ -27,6 +27,9 @@ export interface ListTokensRequest {
   isDropped?: BooleanString; // soft delete
   chainIds?: string; // comma separated
   search?: string;
+  kinds?: string; // comma separated pool type numbers
+  minDecimals?: number;
+  maxDecimals?: number;
 }
 
 export interface ListTokensResponse extends PaginationResponse {
