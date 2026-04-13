@@ -35,11 +35,8 @@ import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useCreateWhitelistTokenSolanaFn } from "./useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { whitelistService } from "@/services/whitelistService";
-import { getErrorMessage } from "@/utils/helpers/error-message";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/common/custom-toast";
-import { booleanString } from "@/types/common";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 const networkIdValues = [
@@ -124,73 +121,36 @@ const AdminWhitelistTokenDialogCreate = () => {
     setOpen(open);
   };
 
-  const {
-    mutate: createWhitelistTokenMutation,
-    isPending: isCreateWhitelistTokenPending,
-  } = useMutation({
-    mutationFn: async (data: WhitelistTokenFormValues) => {
-      const formData = new FormData();
-      formData.append("address", data.address.trim());
-      formData.append("name", data.name);
-      formData.append("symbol", data.symbol);
-      const networkConfig = NETWORK_CONFIGS.find(
-        (n) => n.id === data.networkId,
-      );
-      if (networkConfig) {
-        formData.append("chainId", networkConfig.backendChainId);
-      }
-      if (data.image) {
-        formData.append("img", data.image);
-      }
-      formData.append("description", data.description);
-      formData.append("homepage", data.homepageLink);
-      formData.append("whitepaper", data.docLink);
-      formData.append("kind", data.poolTypes.join(","));
-      // default to enable and not dropped
-      formData.append("enable", booleanString[4]);
-      formData.append("isDropped", booleanString[5]);
+  const onSubmit = async (data: WhitelistTokenFormValues) => {
+    setIsCallingSc(true);
 
-      const result = await whitelistService.createWhitelistToken(formData);
-      return result;
-    },
-    onSuccess: () => {
+    let scSuccess = false;
+
+    if (isSolana) {
+      scSuccess = await createWhitelistTokenSolana({
+        tokenAddress: data.address,
+        poolTypes: data.poolTypes,
+      });
+    }
+    if (isEvm) {
+      scSuccess = await createWhitelistTokenEvm({
+        tokenAddress: data.address,
+        poolTypes: data.poolTypes,
+      });
+    }
+
+    setIsCallingSc(false);
+
+    if (scSuccess) {
       toast.success("Token whitelisted successfully!");
       queryClient.invalidateQueries({
         queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
-
       handleOpenChange(false);
-    },
-    onError: (error) => {
-      const message = getErrorMessage({ error });
-      toast.error(message);
-    },
-  });
-
-  const onSubmit = async (data: WhitelistTokenFormValues) => {
-    setIsCallingSc(true);
-    if (isSolana) {
-      const result = await createWhitelistTokenSolana({
-        tokenAddress: data.address,
-        poolTypes: data.poolTypes,
-      });
-      if (result) {
-        createWhitelistTokenMutation(data);
-      }
     }
-    if (isEvm) {
-      const result = await createWhitelistTokenEvm({
-        tokenAddress: data.address,
-        poolTypes: data.poolTypes,
-      });
-      if (result) {
-        createWhitelistTokenMutation(data);
-      }
-    }
-    setIsCallingSc(false);
   };
 
-  const isLoading = isCreateWhitelistTokenPending || isCallingSc;
+  const isLoading = isCallingSc;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

@@ -43,6 +43,7 @@ export interface ForceUpdateWhitelistTokenStatusRequest {
   chainId: string;
   address: string;
   active: boolean;
+  kind: number;
 }
 
 export interface ForceUpdateWhitelistTokenStatusResponse {
@@ -103,6 +104,7 @@ export const whitelistService = {
         )}`,
         {
           active: request.active,
+          kind: request.kind,
         },
       );
 

@@ -119,7 +119,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         }
 
         const { blockhash, lastValidBlockHeight } =
-          await connection.getLatestBlockhash();
+          await connection.getLatestBlockhash("confirmed");
 
         tx.recentBlockhash = blockhash;
         tx.feePayer = walletPublicKey;
@@ -127,9 +127,11 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         // Sign
         const signedTx = await provider.signTransaction(tx);
 
-        // Send
+        // Send – skip preflight to avoid "already processed" errors from
+        // the RPC caching the simulated tx hash.
         const signature = await connection.sendRawTransaction(
           signedTx.serialize(),
+          { skipPreflight: true, maxRetries: 3 },
         );
 
         await connection.confirmTransaction({
