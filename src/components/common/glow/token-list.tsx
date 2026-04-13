@@ -6,7 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
-import { chainIdToNetworkConfig } from "@/config/networks";
+import { chainIdToNetworkConfig, NETWORK_CONFIGS } from "@/config/networks";
 import { cn } from "@/lib/utils";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import {
@@ -17,6 +17,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 import TokenImage from "../token-image";
 import GlowContainer, { type ContainerVariant } from "./container";
+import { convertArrayToStringParam } from "@/utils/helpers/array";
 
 interface Props {
   variant: ContainerVariant;
@@ -37,6 +38,9 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
       limit: limit, // 100 items per page
       active: "true",
       isDropped: "false",
+      chainIds: convertArrayToStringParam({
+        array: NETWORK_CONFIGS.map((config) => config.backendChainId),
+      })
     });
 
     const totalPages = Math.ceil(firstPage.total / limit);
@@ -56,6 +60,9 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
           limit: limit,
           active: "true",
           isDropped: "false",
+          chainIds: convertArrayToStringParam({
+            array: NETWORK_CONFIGS.map((config) => config.backendChainId),
+          })
         }),
       ),
     );
