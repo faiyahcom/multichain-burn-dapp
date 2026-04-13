@@ -1,4 +1,4 @@
-import { getContractSwapFactory } from "@/web3/contracts/multichainBurnContractEVM";
+import { getContractAccessManager } from "@/web3/contracts/multichainBurnContractEVM";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
@@ -26,13 +26,17 @@ export const useDisableWhitelistUserEvmFn = () => {
           throw new Error(`"${userAddress}" is not a valid EVM address`);
         }
 
-        const provider = new ethers.BrowserProvider(walletProvider as Eip1193Provider);
+        const normalizedUserAddress = ethers.getAddress(userAddress.trim());
+        const provider = new ethers.BrowserProvider(
+          walletProvider as Eip1193Provider,
+        );
         const signer = await provider.getSigner();
-        const swapFactoryContract = getContractSwapFactory(signer);
+        const accessManagerContract = getContractAccessManager(signer);
 
-        const tx = whitelist
-          ? await swapFactoryContract.whitelistAddress(userAddress)
-          : await swapFactoryContract.removeWhitelistAddress(userAddress);
+        const tx = await accessManagerContract.setWhitelistedAccount(
+          normalizedUserAddress,
+          whitelist,
+        );
         const receipt = await tx.wait();
 
         toast.success(
