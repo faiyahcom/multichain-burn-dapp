@@ -22,7 +22,10 @@ import {
 } from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
 import { useMyParticipatedPoolsClaimableSearchFilterStore } from "@/stores/my-participated-pools/claimable";
-import type { PoolType } from "@/types/admin/master-pool-management";
+import {
+  swapPoolStatuses,
+  type PoolType,
+} from "@/types/admin/master-pool-management";
 import { PoolKindCodeEnum } from "@/types/pool";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { sciToFormatted } from "@/utils/helpers/numbers";
@@ -55,7 +58,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
     page: filter?.page ?? 1,
     limit: limit,
     kind: PoolKindCodeEnum.Burn.toString(),
-    includeStatuses: undefined,
+    includeStatuses: swapPoolStatuses[3], // only ended pools are claimable
     chainIds: convertArrayToStringParam({
       array: filter?.network?.map(networkIdToChainId)?.filter(Boolean) ?? [],
     }),
@@ -154,7 +157,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
                 variant="pair"
               >
                 <TableCell className="min-w-0 space-y-1 text-left">
-                  <p className="min-w-0 truncate max-w-38.75" title={pool.name}>
+                  <p className="max-w-38.75 min-w-0 truncate" title={pool.name}>
                     {pool.name}
                   </p>
                   <CopyableText
