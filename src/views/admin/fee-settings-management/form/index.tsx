@@ -127,7 +127,7 @@ const FeeSettingsForm = () => {
 
   const nativeSymbol = nativeCurrencyInfo?.symbol ?? "ETH";
   const nativeDecimals = nativeCurrencyInfo?.decimals ?? 18;
-  const isSolana = selectedNetworkId === "solanaDevnet";
+  const isSolana = selectedNetworkId === "solana";
 
   const feeSettingsSchema = useMemo(
     () => createFeeSettingsSchema(isSolana),

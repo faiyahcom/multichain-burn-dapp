@@ -120,7 +120,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       admin.role === "super_admin" &&
       values.role === "admin";
     const isEvmAdminPromotedToSuperAdmin =
-      targetNetworkId !== "solanaDevnet" &&
+      targetNetworkId !== "solana" &&
       admin.role === "admin" &&
       values.role === "super_admin";
     const shouldDisablePreviousRole =
@@ -131,7 +131,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
     try {
       if (roleChanged && admin.enabled) {
         const shouldBatchSolanaRoleSwap =
-          targetNetworkId === "solanaDevnet" && shouldDisablePreviousRole;
+          targetNetworkId === "solana" && shouldDisablePreviousRole;
 
         if (shouldBatchSolanaRoleSwap) {
           const isRoleSwapped = await toggleAdminRolesSolana([
@@ -152,7 +152,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
           }
         } else {
           const enableNextRole =
-            targetNetworkId === "solanaDevnet"
+            targetNetworkId === "solana"
               ? await toggleAdminRoleSolana({
                 walletAddress: admin.walletAddress,
                 enabled: true,
@@ -174,7 +174,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
 
           if (shouldDisablePreviousRole) {
             const disablePreviousRole =
-              targetNetworkId === "solanaDevnet"
+              targetNetworkId === "solana"
                 ? await toggleAdminRoleSolana({
                   walletAddress: admin.walletAddress,
                   enabled: false,

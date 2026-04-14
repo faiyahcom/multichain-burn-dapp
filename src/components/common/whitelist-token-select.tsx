@@ -38,7 +38,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
 
   const networkConfig = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
   const nativeCurrency = networkConfig?.appKitNetwork.nativeCurrency;
-  const isSolana = selectedNetworkId === "solanaDevnet";
+  const isSolana = selectedNetworkId === "solana";
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
   const {
