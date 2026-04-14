@@ -104,10 +104,10 @@ export const getContractAccessManager = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       address = MULTICHAIN_BURN_PROGRAM_XPHERE_ACCESS_MANAGER_SWAP_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       address = MULTICHAIN_BURN_PROGRAM_BSC_ACCESS_MANAGER_SWAP_ADDRESS;
       break;
     default:

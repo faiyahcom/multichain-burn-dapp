@@ -8,6 +8,7 @@ import {
     TableRow,
 } from "@/components/ui/table";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { getExplorerTxUrl } from "@/utils/helpers/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { txnKind, type PoolDetailResponse } from "@/types/pool";
@@ -16,16 +17,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 
-function getExplorerTxUrl(chainId: string, hash: string): string {
-    const network = chainIdToNetworkConfig(chainId);
-    const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
-    if (!baseUrl) return "#";
-    // Solana explorer uses different path format
-    if (network?.id === "solanaDevnet") {
-        return `${baseUrl.replace(/\/$/, "")}/tx/${hash}?cluster=devnet`;
-    }
-    return `${baseUrl.replace(/\/$/, "")}/tx/${hash}`;
-}
+
 
 export function formatTimestamp(timestamp: string): string {
     const date = new Date(Number(timestamp) * 1000);
