@@ -10,6 +10,7 @@ import {
     getRpcUrl,
 } from "@/config/networks";
 import { ZERO_ADDRESS } from "@/config/constant";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 
 // ── Solana fallback RPC ──────────────────────────────────────────────────────
@@ -24,14 +25,6 @@ const SOLANA_RPC_URL =
 const accountsCoder = new BorshAccountsCoder(idl as Idl);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
-
-function formatBalance(rawAmount: string, decimals: number): string {
-    const num = Number(rawAmount) / 10 ** decimals;
-    return num.toLocaleString(undefined, {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: Math.min(decimals, 6),
-    });
-}
 
 function isNativeEvm(tokenAddress: string): boolean {
     return (
@@ -172,8 +165,8 @@ export function useOnChainVaultBalance(params: {
 
                 if (cancelled) return;
 
-                const fmtReward = formatBalance(rewardRaw, rewardTokenDecimals ?? 18);
-                const fmtDeposit = formatBalance(depositRaw, tokenInDecimals ?? 18);
+                const fmtReward = shortenNumber({ number: Number(rewardRaw) / 10 ** (rewardTokenDecimals ?? 18) });
+                const fmtDeposit = shortenNumber({ number: Number(depositRaw) / 10 ** (tokenInDecimals ?? 18) });
 
                 setRewardBalance(fmtReward);
                 setDepositBalance(fmtDeposit);
