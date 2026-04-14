@@ -65,7 +65,7 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
   const burnDec = poolDetail?.pool?.tokenInDecimals ?? 0;
 
   const formattedReward = fmt(
-    poolDetail?.pool?.currentRewardAmount,
+    poolDetail?.pool?.rewardAmount,
     rewardDec,
   )?.toUpperCase();
   const formattedClaimed = fmt(poolDetail?.claimedRewardAmount, rewardDec);
