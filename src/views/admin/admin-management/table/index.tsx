@@ -203,7 +203,7 @@ const AdminManagementTable = () => {
     enabled: boolean;
     networkId: NetworkId;
   }) =>
-    networkId === "solanaDevnet"
+    networkId === "solana"
       ? toggleAdminRoleSolana({ walletAddress, enabled, role })
       : toggleAdminRoleEvm({ walletAddress, enabled, role });
 
