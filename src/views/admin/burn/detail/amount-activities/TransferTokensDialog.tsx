@@ -113,20 +113,20 @@ const UserRow = ({
 // ── Main dialog ───────────────────────────────────────────────────────────────
 
 export interface TransferTokensDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  chainId: string;
-  /** 0 = burn pool (dynamic), 1 = swap pool (fixed ratio) */
-  poolKind?: number;
-  poolInfo: {
-    tokenInSymbol?: string;
-    rewardTokenSymbol?: string;
-    currentRewardAmount?: string;
-    currentDepositAmount?: string;
-    rewardTokenDecimals?: number;
-    tokenInDecimals?: number;
-  };
-  onTransfer: (recipients: BatchRecipient[], mode: TokenMode) => Promise<void>;
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    chainId: string;
+    /** 0 = burn pool (dynamic), 1 = swap pool (fixed ratio), 2 = Stake pool, 3 = Launchpad pool */
+    poolKind?: number;
+    poolInfo: {
+        tokenInSymbol?: string;
+        rewardTokenSymbol?: string;
+        currentRewardAmount?: string;
+        currentDepositAmount?: string;
+        rewardTokenDecimals?: number;
+        tokenInDecimals?: number;
+    };
+    onTransfer: (recipients: BatchRecipient[], mode: TokenMode) => Promise<void>;
 }
 
 const TransferTokensDialog = ({
