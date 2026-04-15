@@ -24,7 +24,7 @@ import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 
 const AdminRevenueFeeStats = () => {
   const [activeTab, setActiveTab] = useState<TabType>("creation");
-  const [networkId, setNetworkId] = useState<string>("ethereumTestnet");
+  const [networkId, setNetworkId] = useState<string>("ethereum");
   const [networkSelectOpen, setNetworkSelectOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);

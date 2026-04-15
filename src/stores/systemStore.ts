@@ -1,4 +1,4 @@
-import type { NetworkConfig, NetworkId } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkConfig, type NetworkId } from "@/config/networks";
 import type { AppKitNetwork } from "@reown/appkit/networks";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -37,7 +37,7 @@ type SystemState = {
 export const useSystemStore = create<SystemState>()(
   persist(
     (set) => ({
-      selectedNetworkId: "ethereumTestnet",
+      selectedNetworkId: NETWORK_CONFIGS[0].id,
       setSelectedNetworkId: (id) => set({ selectedNetworkId: id }),
 
       switchNetworkRequest: null,

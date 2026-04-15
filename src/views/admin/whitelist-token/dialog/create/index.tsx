@@ -43,10 +43,10 @@ import { booleanString } from "@/types/common";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 const networkIdValues = [
-  "ethereumTestnet",
-  "binanceTestnet",
-  "xphereTestnet",
-  "solanaDevnet",
+  "ethereum",
+  "binance",
+  "xphere",
+  "solana",
 ] as const satisfies [NetworkId, ...NetworkId[]];
 
 const whitelistTokenSchema = z.object({

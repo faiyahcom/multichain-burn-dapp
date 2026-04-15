@@ -37,7 +37,7 @@ export function useTokenBalance({
   symbol,
 }: UseTokenBalanceParams) {
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
-  const isSolanaNetwork = selectedNetworkId === "solanaDevnet";
+  const isSolanaNetwork = selectedNetworkId === "solana";
 
   /* ==============================
      EVM

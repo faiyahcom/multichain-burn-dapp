@@ -31,7 +31,7 @@ export function SwitchNetworkModal() {
 
   const handleSwitch = async () => {
     if (!toNetwork) return;
-    const targetNamespace = toNetwork.id === "solanaDevnet" ? "solana" : "eip155";
+    const targetNamespace = toNetwork.id === "solana" ? "solana" : "eip155";
     const alreadyConnectedToNamespace = targetNamespace === "solana" ? !!solanaAddress : !!evmAddress;
     try {
       if (alreadyConnectedToNamespace) {
