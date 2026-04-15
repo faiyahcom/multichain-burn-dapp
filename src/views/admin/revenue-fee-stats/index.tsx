@@ -25,7 +25,9 @@ import StatBoxDialog, { type TabType } from "./components/stat-box-dialog";
 
 const AdminRevenueFeeStats = () => {
   const [activeTab, setActiveTab] = useState<TabType>("creation");
-  const [networkId, setNetworkId] = useState<string>("ethereum");
+  const [networkId, setNetworkId] = useState<string>(
+    NETWORK_CONFIGS?.[0]?.id ?? "",
+  );
   const [networkSelectOpen, setNetworkSelectOpen] = useState(false);
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
@@ -96,26 +98,26 @@ const AdminRevenueFeeStats = () => {
         feeAmount:
           activeTab === "creation"
             ? formatNativeWithUsd(
-              record.amount,
-              record.tokenDecimals,
-              nativeSymbol,
-              nativePriceForChain(record.chainId),
-            )
+                record.amount,
+                record.tokenDecimals,
+                nativeSymbol,
+                nativePriceForChain(record.chainId),
+              )
             : shortenNumber({
-              number:
-                Number(record.amount) / Math.pow(10, record.tokenDecimals),
-            }) + ` ${record.tokenSymbol}`,
+                number:
+                  Number(record.amount) / Math.pow(10, record.tokenDecimals),
+              }) + ` ${record.tokenSymbol}`,
       })),
     [listData],
   );
 
   const creationFeeDisplay = statsData?.create_fee
     ? formatNativeWithUsd(
-      statsData.create_fee,
-      nativeDecimals,
-      nativeSymbol,
-      nativePriceForChain(chainId),
-    )
+        statsData.create_fee,
+        nativeDecimals,
+        nativeSymbol,
+        nativePriceForChain(chainId),
+      )
     : "—";
   const settlementFeesCount = statsData?.settlement_fees.length ?? 0;
 
