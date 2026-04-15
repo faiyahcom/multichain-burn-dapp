@@ -12,15 +12,24 @@ import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
 import { poolTypes as allPoolTypes, type PoolType } from "@/types/admin/master-pool-management";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { whitelistService } from "@/services/whitelistService";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 interface Props {
   switchProps?: React.ComponentProps<typeof BlueSwitch>;
   chainId?: string;
   address?: string;
   poolTypes?: PoolType[];
+  availablePoolTypes?: PoolType[];
 }
 
-const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address, poolTypes }) => {
+const StatusSwitch: React.FC<Props> = ({
+  switchProps,
+  chainId,
+  address,
+  poolTypes,
+  availablePoolTypes,
+}) => {
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
   const { caipAddress } = useAppKitAccount();
@@ -43,6 +52,22 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address, poolType
 
   const queryClient = useQueryClient();
 
+  const syncBackendStatus = async (
+    nextStatus: boolean,
+    targetPoolTypes: PoolType[],
+  ) => {
+    await Promise.all(
+      targetPoolTypes.map((poolType) =>
+        whitelistService.updateStatusWhitelistTokenStatus({
+          chainId: chainId!,
+          address: address!,
+          active: nextStatus,
+          kind: poolType,
+        }),
+      ),
+    );
+  };
+
   const handleToggleSwitch = async () => {
     const isActive = switchProps?.active;
     if (!address) {
@@ -63,29 +88,54 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address, poolType
 
     setIsCallingSc(true);
 
+    const targetPoolTypes = isActive
+      ? poolTypes ?? []
+      : availablePoolTypes?.length
+        ? availablePoolTypes
+        : [...allPoolTypes];
+
     let result = false;
 
     if (isSolana) {
       if (isActive) {
-        result = await disableWhitelistTokenSolana({ tokenAddress: address, poolTypes: poolTypes ?? [] });
+        result = await disableWhitelistTokenSolana({
+          tokenAddress: address,
+          poolTypes: targetPoolTypes,
+        });
       } else {
-        result = await enableWhitelistTokenSolana({ tokenAddress: address, poolTypes: [...allPoolTypes] });
+        result = await enableWhitelistTokenSolana({
+          tokenAddress: address,
+          poolTypes: targetPoolTypes,
+        });
       }
     }
 
     if (isEvm) {
       if (isActive) {
-        result = await disableWhitelistTokenEvm({ tokenAddress: address });
+        result = await disableWhitelistTokenEvm({
+          tokenAddress: address,
+          poolTypes: targetPoolTypes,
+        });
       } else {
-        result = await enableWhitelistTokenEvm({ tokenAddress: address });
+        result = await enableWhitelistTokenEvm({
+          tokenAddress: address,
+          poolTypes: targetPoolTypes,
+        });
       }
     }
 
-    // On success, refetch the list with the current filter instead of calling a separate POST
     if (result) {
-      queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
-      });
+      try {
+        await syncBackendStatus(!isActive, targetPoolTypes);
+      } catch (error) {
+        toast.error("On-chain update succeeded but backend sync failed", {
+          description: getErrorMessage({ error }),
+        });
+      } finally {
+        await queryClient.invalidateQueries({
+          queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+        });
+      }
     }
 
     setIsCallingSc(false);

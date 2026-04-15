@@ -145,7 +145,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
-      formData.append("kind", data.poolTypes.join(","));
+      formData.append("kinds", data.poolTypes.join(","));
       // default to enable and not dropped
       formData.append("enable", booleanString[4]);
       formData.append("isDropped", booleanString[5]);

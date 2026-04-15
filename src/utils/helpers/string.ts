@@ -1,5 +1,4 @@
 import { format, isValid, formatDistanceToNowStrict } from "date-fns";
-import type { PoolKind } from "@/types/pool";
 
 export const truncateString = ({
   str,
@@ -46,7 +45,7 @@ export const getAdminPoolHref = ({
   kind,
 }: {
   address: string;
-  kind: 0 | 1;
+  kind?: number;
 }): string => {
   switch (kind) {
     case 0:
