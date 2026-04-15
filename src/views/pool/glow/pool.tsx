@@ -9,6 +9,7 @@ import {
   useStakePoolListSearchFilterStore,
   useSwapPoolListSearchFilterStore,
 } from "@/stores/pool-list/search-filter-store";
+import StakeRecentPoolsTable from "./components/stake/recent-table";
 
 type Props = {};
 
@@ -65,7 +66,7 @@ const StakePoolList = ({}: Props) => {
           title="MY STAKING LIST"
           poolKind={PoolKindCodeEnum.Stake}
         >
-          {/* <StakeRecentPoolsTable /> */}
+          <StakeRecentPoolsTable />
         </PoolGlowSection>
       }
       // poolSection={<StakePoolSection />}
