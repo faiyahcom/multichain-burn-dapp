@@ -1,5 +1,6 @@
 import { apiClient } from "@/config/axios";
 import { API_ROUTES } from "@/services/apiRoutes";
+import type { PoolType } from "@/types/admin/master-pool-management";
 import type { BooleanString, PaginationResponse } from "@/types/common";
 const WHITELIST_API_ROUTES = API_ROUTES.WHITELIST;
 
@@ -46,7 +47,7 @@ export interface ForceUpdateWhitelistTokenStatusRequest {
   chainId: string;
   address: string;
   active: boolean;
-  kind: number;
+  kind: PoolType;
 }
 
 export interface ForceUpdateWhitelistTokenStatusResponse {

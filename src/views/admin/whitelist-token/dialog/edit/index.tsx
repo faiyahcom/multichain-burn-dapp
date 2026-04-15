@@ -41,6 +41,7 @@ import { toast } from "@/components/common/custom-toast";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { useCreateWhitelistTokenSolanaFn } from "../create/useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "../create/useCreateWhitelistTokenEvmFn";
+import { useDisableWhitelistTokenEvmFn } from "../../table/useDisableWhitelistTokenEvmFn";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -93,6 +94,8 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
     useCreateWhitelistTokenSolanaFn();
   const { createWhitelistToken: updateWhitelistTokenEvm } =
     useCreateWhitelistTokenEvmFn();
+  const { disableWhitelistToken: disableWhitelistTokenEvm } =
+    useDisableWhitelistTokenEvmFn();
 
   // The token's currently enabled pool types from the backend
   const initialKinds = (token.kind ?? [])
@@ -158,6 +161,21 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
     },
   });
 
+  const syncBackendStatus = async (
+    nextStatuses: { active: boolean; kind: PoolType }[],
+  ) => {
+    await Promise.all(
+      nextStatuses.map((status) =>
+        whitelistService.updateStatusWhitelistTokenStatus({
+          chainId: token.chainId,
+          address: token.address,
+          active: status.active,
+          kind: status.kind,
+        }),
+      ),
+    );
+  };
+
   const onSubmit = async (data: WhitelistTokenFormValues) => {
     const selectedPoolTypes = data.poolTypes;
 
@@ -186,14 +204,46 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
       }
 
       if (isEvmToken) {
-        const result = await updateWhitelistTokenEvm({
-          tokenAddress: data.address,
-          poolTypes: toEnable,
-        });
-        if (!result) {
-          setIsCallingSc(false);
-          return;
+        if (toDisable.length > 0) {
+          const disableResult = await disableWhitelistTokenEvm({
+            tokenAddress: data.address,
+            poolTypes: toDisable,
+          });
+
+          if (!disableResult) {
+            setIsCallingSc(false);
+            return;
+          }
         }
+
+        if (toEnable.length > 0) {
+          const enableResult = await updateWhitelistTokenEvm({
+            tokenAddress: data.address,
+            poolTypes: toEnable,
+          });
+
+          if (!enableResult) {
+            setIsCallingSc(false);
+            return;
+          }
+        }
+      }
+
+      const nextStatuses = [
+        ...toEnable.map((kind) => ({ active: true, kind })),
+        ...toDisable.map((kind) => ({ active: false, kind })),
+      ];
+
+      try {
+        await syncBackendStatus(nextStatuses);
+      } catch (error) {
+        toast.error("On-chain update succeeded but backend sync failed", {
+          description: getErrorMessage({ error }),
+        });
+      } finally {
+        await queryClient.invalidateQueries({
+          queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+        });
       }
 
       setIsCallingSc(false);

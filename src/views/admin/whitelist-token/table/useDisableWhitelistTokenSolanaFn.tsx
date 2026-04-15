@@ -2,9 +2,17 @@ import {
   getMultichainBurnProgram,
   type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
-import { getStakingProgram } from "@/web3/contracts/stakingProgramSol";
 import { getFactoryPDA } from "@/web3/helpers";
 import type { PoolType } from "@/types/admin/master-pool-management";
+import {
+  useAppKitConnection,
+  type Provider,
+} from "@reown/appkit-adapter-solana/react";
+import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
+import { PublicKey, Transaction } from "@solana/web3.js";
+import { useCallback } from "react";
+import { toast } from "@/components/common/custom-toast";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 const POOL_TYPE_VARIANTS: Record<PoolType, Record<string, object>> = {
   0: { burn: {} },
@@ -12,15 +20,6 @@ const POOL_TYPE_VARIANTS: Record<PoolType, Record<string, object>> = {
   2: { staking: {} },
   3: { launchpad: {} },
 };
-import {
-  useAppKitConnection,
-  type Provider,
-} from "@reown/appkit-adapter-solana/react";
-import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
-import { useCallback } from "react";
-import { toast } from "@/components/common/custom-toast";
-import { getErrorMessage } from "@/utils/helpers/error-message";
 
 export const useDisableWhitelistTokenSolanaFn = () => {
   const { isConnected, address } = useAppKitAccount({ namespace: "solana" });

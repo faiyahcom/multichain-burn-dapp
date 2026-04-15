@@ -1,9 +1,7 @@
 import {
   getMultichainBurnProgram,
-  MULTICHAIN_BURN_PROGRAM_ID,
   type BrowserWallet,
 } from "@/web3/contracts/multichainBurnProgramSol";
-import { getStakingProgram } from "@/web3/contracts/stakingProgramSol";
 import { getFactoryPDA } from "@/web3/helpers";
 import {
   useAppKitConnection,
@@ -16,25 +14,7 @@ import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import type { PoolType } from "@/types/admin/master-pool-management";
 
-type FactoryAccountState = {
-  whitelistToken?: PublicKey[];
-};
-
-type MultichainBurnProgramWithFactoryAccount = ReturnType<
-  typeof getMultichainBurnProgram
-> & {
-  account: {
-    factoryAccount: {
-      fetch: (address: PublicKey) => Promise<FactoryAccountState>;
-    };
-  };
-};
-
-/**
- * Maps numeric pool type to the Anchor enum variant object expected by the IDL.
- * Backend PoolType: Burn (0), Swap (1), Staking (2), Launchpad (3)
- * IDL PoolType enum: Swap (0), Burn (1), Staking (2), Launchpad (3)
- */
+// Maps numeric pool types to the Anchor enum variant object expected by the IDL.
 const POOL_TYPE_VARIANTS: Record<PoolType, Record<string, object>> = {
   0: { burn: {} },
   1: { swap: {} },
@@ -76,10 +56,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           signAllTransactions: provider.signAllTransactions?.bind(provider),
         };
 
-        const program = getMultichainBurnProgram(
-          connection,
-          anchorWallet,
-        ) as MultichainBurnProgramWithFactoryAccount;
+        const program = getMultichainBurnProgram(connection, anchorWallet);
 
         const factoryPDA = getFactoryPDA(program.programId);
         const tokenPubkey = new PublicKey(tokenAddress);
@@ -159,4 +136,3 @@ export const useCreateWhitelistTokenSolanaFn = () => {
 
   return { createWhitelistToken };
 };
-

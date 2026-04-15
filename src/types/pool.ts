@@ -13,10 +13,16 @@ export type BurnPoolStatus =
     | "upcoming"
     | "holding"
     | "ended";
-export type PoolKind = "burn_pool" | "swap_pool";
+export type PoolKind =
+    | "burn_pool"
+    | "swap_pool"
+    | "staking_pool"
+    | "launchpad_pool";
 export const POOL_KIND: Record<number, PoolKind> = {
     0: "burn_pool",
     1: "swap_pool",
+    2: "staking_pool",
+    3: "launchpad_pool",
 };
 interface TokenInfo {
     address: string;

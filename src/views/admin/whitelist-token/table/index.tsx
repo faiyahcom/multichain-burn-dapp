@@ -42,10 +42,11 @@ import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
 import TokenImage from "@/components/common/token-image";
 import TableNoData from "@/components/common/table-no-data";
+import type { PoolType } from "@/types/admin/master-pool-management";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
-  poolTypes: number[];
+  poolTypes: PoolType[];
 };
 
 const AdminWhitelistTokenTable = () => {
@@ -144,13 +145,14 @@ const AdminWhitelistTokenTable = () => {
       if (isSolana) {
         isDisabled = await disableWhitelistTokenSolana({
           tokenAddress: request.address,
-          poolTypes: request.poolTypes as any,
+          poolTypes: request.poolTypes,
         });
       }
 
       if (isEvm) {
         isDisabled = await disableWhitelistTokenEvm({
           tokenAddress: request.address,
+          poolTypes: request.poolTypes,
         });
       }
 
@@ -202,7 +204,19 @@ const AdminWhitelistTokenTable = () => {
               isLoading={isListTokensPending}
             />
             {listTokensData?.whitelistTokens?.map((item, index) => {
-              const isItemEnabled = item.kind?.length > 0 ? item.kind.some((k) => k.enable) : item.enable;
+              const activePoolTypes =
+                (item.kind?.filter((k) => k.enable).map((k) => k.kind) as PoolType[]) ??
+                [];
+              const availablePoolTypes =
+                (item.kind?.map((k) => k.kind) as PoolType[]) ?? [];
+              const displayKinds =
+                item.kind?.length
+                  ? activePoolTypes.length > 0
+                    ? item.kind.filter((kObj) => kObj.enable)
+                    : item.kind
+                  : [];
+              const isItemEnabled =
+                item.kind?.length > 0 ? activePoolTypes.length > 0 : item.enable;
 
               return (
                 <TableRow key={index}>
@@ -238,9 +252,9 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex flex-col gap-0.5">
-                      {item.kind?.filter(kObj => kObj.enable).map((kObj) => (
-                        <span 
-                          key={kObj.kind} 
+                      {displayKinds.map((kObj) => (
+                        <span
+                          key={kObj.kind}
                           className="text-xs font-medium"
                         >
                           {poolTypeLabels[kObj.kind as keyof typeof poolTypeLabels] ?? `Kind ${kObj.kind}`}
@@ -292,7 +306,8 @@ const AdminWhitelistTokenTable = () => {
                       }}
                       chainId={item.chainId}
                       address={item.address}
-                      poolTypes={item.kind?.filter(k => k.enable).map(k => k.kind) as any ?? []}
+                      poolTypes={activePoolTypes}
+                      availablePoolTypes={availablePoolTypes}
                     />
                   </TableCell>
                   <TableCell>
@@ -308,8 +323,8 @@ const AdminWhitelistTokenTable = () => {
                           handleDeleteToken({
                             chainId: item.chainId,
                             address: item.address,
-                            enabled: item.enable,
-                            poolTypes: item.kind?.filter(k => k.enable).map(k => k.kind) || [],
+                            enabled: isItemEnabled,
+                            poolTypes: activePoolTypes,
                           })
                         }
                       >
