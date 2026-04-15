@@ -40,6 +40,12 @@ export const NAV_ITEMS: NavItemType[] = [
     // Exactly /swap or start with /swap/
     activeRegexMatch: /^\/swap(\/|$)/,
   },
+  {
+    title: "Staking",
+    href: "/staking",
+    // Exactly /staking or start with /staking/
+    activeRegexMatch: /^\/staking(\/|$)/,
+  },
 ];
 
 export const PROFILE_NAV_ITEMS: NavItemType[] = [

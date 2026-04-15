@@ -4,7 +4,11 @@ import BurnRecentPoolsTable from "./components/burn/recent-table";
 import SwapRecentPoolsTable from "./components/swap/recent-table";
 import BurnPoolSection from "./components/burn/pool-section";
 import SwapPoolSection from "./components/swap/pool-section";
-import { useBurnPoolListSearchFilterStore, useSwapPoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
+import {
+  useBurnPoolListSearchFilterStore,
+  useStakePoolListSearchFilterStore,
+  useSwapPoolListSearchFilterStore,
+} from "@/stores/pool-list/search-filter-store";
 
 type Props = {};
 
@@ -31,7 +35,7 @@ const BurnPoolList = ({}: Props) => {
 
 const SwapPoolList = ({}: Props) => {
   const { setFilter } = useSwapPoolListSearchFilterStore();
-  
+
   return (
     <PoolGlowPageLayout
       poolKind={PoolKindCodeEnum.Swap}
@@ -50,4 +54,28 @@ const SwapPoolList = ({}: Props) => {
   );
 };
 
-export { BurnPoolList, SwapPoolList };
+const StakePoolList = ({}: Props) => {
+  const { setFilter } = useStakePoolListSearchFilterStore();
+
+  return (
+    <PoolGlowPageLayout
+      poolKind={PoolKindCodeEnum.Stake}
+      recentSection={
+        <PoolGlowSection
+          title="MY STAKING LIST"
+          poolKind={PoolKindCodeEnum.Stake}
+        >
+          {/* <StakeRecentPoolsTable /> */}
+        </PoolGlowSection>
+      }
+      // poolSection={<StakePoolSection />}
+      onTokenClick={(token) => {
+        setFilter({
+          text: token.customSymbol ?? token.symbol,
+        });
+      }}
+    />
+  );
+};
+
+export { BurnPoolList, SwapPoolList, StakePoolList };
