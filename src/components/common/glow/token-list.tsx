@@ -81,12 +81,9 @@ const TokenListGlow: React.FC<Props> = ({ variant, onTokenClick }) => {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // If the token list is less than 13 tokens, we need to double the list to trigger the carousel loop option
+  // The number of tokens for a full loop
   const MIN_TO_LOOP = 13;
-  const displayTokens =
-    tokenList && tokenList.length < MIN_TO_LOOP
-      ? [...tokenList, ...tokenList]
-      : tokenList;
+  const displayTokens = tokenList;
 
   return (
     <GlowContainer
