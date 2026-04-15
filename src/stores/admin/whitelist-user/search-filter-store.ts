@@ -19,7 +19,7 @@ export const useAdminWhitelistUserSearchFilterStore =
         filter: {
             status: "all",
             tokens: [],
-            network: "ethereumTestnet",
+            network: "ethereum",
             text: "",
             page: 1,
         },
