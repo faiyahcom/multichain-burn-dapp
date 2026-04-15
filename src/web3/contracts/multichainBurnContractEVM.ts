@@ -4,6 +4,7 @@ import MULTICHAIN_BURN_ABI_SWAP_ROUTER from "./abis/abi_evm_swap_router.json";
 import MULTICHAIN_BURN_ABI_BURN_FACTORY from "./abis/abi_evm_burn_factory.json";
 import MULTICHAIN_BURN_ABI_BURN_ROUTER from "./abis/abi_evm_burn_router.json";
 import MULTICHAIN_BURN_ABI_ACCESS_MANAGER from "./abis/abi_evm_access_manager.json";
+import MULTICHAIN_STAKE_ABI_FACTORY from "./abis/abi_evm_stake_factory.json";
 import { useSystemStore } from "@/stores/systemStore";
 
 import {
@@ -22,6 +23,9 @@ import {
   MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_SWAP_ADDRESS,
   MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_SWAP_ADDRESS,
   MULTICHAIN_BURN_PROGRAM_BSC_ACCESS_MANAGER_SWAP_ADDRESS,
+  MULTICHAIN_STAKE_PROGRAM_EVM_FACTORY_ADDRESS,
+  MULTICHAIN_STAKE_PROGRAM_BSC_FACTORY_ADDRESS,
+  MULTICHAIN_STAKE_PROGRAM_XPHERE_FACTORY_ADDRESS,
 } from "@/web3";
 
 export const EVM_POOL_TYPES = {
@@ -100,6 +104,23 @@ export const getContractBurnRouter = (signer: Signer) => {
   return new ethers.Contract(address, MULTICHAIN_BURN_ABI_BURN_ROUTER, signer);
 };
 
+export const getContractStakeFactory = (signer: Signer) => {
+  const networkId = useSystemStore.getState().selectedNetworkId;
+  let address: string;
+  switch (networkId) {
+    case "xphereTestnet":
+      address = MULTICHAIN_STAKE_PROGRAM_XPHERE_FACTORY_ADDRESS;
+      break;
+    case "binanceTestnet":
+      address = MULTICHAIN_STAKE_PROGRAM_BSC_FACTORY_ADDRESS;
+      break;
+    default:
+      address = MULTICHAIN_STAKE_PROGRAM_EVM_FACTORY_ADDRESS;
+  }
+  console.log("[getContractStakeFactory] address:", address);
+  return new ethers.Contract(address, MULTICHAIN_STAKE_ABI_FACTORY, signer);
+};
+
 export const getContractAccessManager = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
@@ -114,7 +135,11 @@ export const getContractAccessManager = (signer: Signer) => {
       address = MULTICHAIN_BURN_PROGRAM_EVM_ACCESS_MANAGER_SWAP_ADDRESS;
   }
   console.log("[getContractAccessManager] address:", address);
-  return new ethers.Contract(address, MULTICHAIN_BURN_ABI_ACCESS_MANAGER, signer);
+  return new ethers.Contract(
+    address,
+    MULTICHAIN_BURN_ABI_ACCESS_MANAGER,
+    signer,
+  );
 };
 
 export const getContractBurnFactoryInterface = () => {
@@ -131,6 +156,10 @@ export const getContractSwapFactoryInterface = () => {
 
 export const getContractSwapRouterInterface = () => {
   return new ethers.Interface(MULTICHAIN_BURN_ABI_SWAP_ROUTER);
+};
+
+export const getContractStakeFactoryInterface = () => {
+  return new ethers.Interface(MULTICHAIN_STAKE_ABI_FACTORY);
 };
 
 export const getContractAccessManagerInterface = () => {

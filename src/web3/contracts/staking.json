@@ -623,10 +623,6 @@
           }
         },
         {
-          "name": "treasury",
-          "writable": true
-        },
-        {
           "name": "reward_mint"
         },
         {
@@ -1852,6 +1848,13 @@
           "name": "deposit_mint"
         },
         {
+          "name": "reward_mint"
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
           "name": "reward_vault",
           "docs": [
             "Pool's reward vault"
@@ -1919,7 +1922,7 @@
         {
           "name": "user_token_ata",
           "docs": [
-            "User's ATA to receive tokens"
+            "User's ATA for deposit token (principal return)"
           ],
           "writable": true,
           "pda": {
@@ -1935,6 +1938,66 @@
               {
                 "kind": "account",
                 "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "user_reward_ata",
+          "docs": [
+            "User's ATA for reward token (auto-claim)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
               }
             ],
             "program": {
@@ -2148,6 +2211,10 @@
               }
             ]
           }
+        },
+        {
+          "name": "treasury",
+          "writable": true
         },
         {
           "name": "user_stake_tracker",
@@ -2975,6 +3042,10 @@
           {
             "name": "interest_duration",
             "type": "i64"
+          },
+          {
+            "name": "low_reward_noti",
+            "type": "bool"
           }
         ]
       }
