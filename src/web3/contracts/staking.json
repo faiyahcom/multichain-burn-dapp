@@ -22,7 +22,8 @@
       "accounts": [
         {
           "name": "admin",
-          "writable": true
+          "writable": true,
+          "signer": true
         },
         {
           "name": "factory",
@@ -271,7 +272,7 @@
           }
         },
         {
-          "name": "token_mint"
+          "name": "reward_mint"
         },
         {
           "name": "reward_vault",
@@ -323,7 +324,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "reward_mint"
               }
             ],
             "program": {
@@ -645,6 +646,36 @@
                   97,
                   114,
                   100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
                   45,
                   118,
                   97,
@@ -1224,341 +1255,6 @@
       ]
     },
     {
-      "name": "retreive_reward",
-      "discriminator": [
-        170,
-        14,
-        238,
-        105,
-        38,
-        44,
-        154,
-        101
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "burn_factory"
-        },
-        {
-          "name": "burn_program",
-          "docs": [
-            "The burn program — for CPI proxy-emit."
-          ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
-        },
-        {
-          "name": "factory",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  99,
-                  116,
-                  111,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "pool",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool.pool_id",
-                "account": "PoolAccount"
-              }
-            ]
-          }
-        },
-        {
-          "name": "reward_mint",
-          "writable": true
-        },
-        {
-          "name": "deposit_mint",
-          "writable": true
-        },
-        {
-          "name": "reward_vault",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  119,
-                  97,
-                  114,
-                  100,
-                  45,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool"
-              }
-            ]
-          }
-        },
-        {
-          "name": "receiver_address",
-          "writable": true
-        },
-        {
-          "name": "receiver_reward_token_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "receiver_address"
-              },
-              {
-                "kind": "account",
-                "path": "reward_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "reward_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "receiver_deposit_token_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "receiver_address"
-              },
-              {
-                "kind": "account",
-                "path": "deposit_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "deposit_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
-        },
-        {
-          "name": "reward_token_program"
-        },
-        {
-          "name": "deposit_token_program"
-        },
-        {
-          "name": "associated_token_program",
-          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "token_mint",
-          "type": "pubkey"
-        },
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
-      "name": "retreive_reward_native",
-      "discriminator": [
-        242,
-        100,
-        149,
-        234,
-        21,
-        107,
-        36,
-        154
-      ],
-      "accounts": [
-        {
-          "name": "admin",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "burn_factory"
-        },
-        {
-          "name": "burn_program",
-          "docs": [
-            "The burn program — for CPI proxy-emit."
-          ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
-        },
-        {
-          "name": "factory",
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  102,
-                  97,
-                  99,
-                  116,
-                  111,
-                  114,
-                  121
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "pool",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool.pool_id",
-                "account": "PoolAccount"
-              }
-            ]
-          }
-        },
-        {
-          "name": "receiver_address",
-          "writable": true
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "amount",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "stake",
       "discriminator": [
         206,
@@ -1618,7 +1314,7 @@
           }
         },
         {
-          "name": "token_mint"
+          "name": "deposit_mint"
         },
         {
           "name": "user_token_ata",
@@ -1638,7 +1334,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "deposit_mint"
               }
             ],
             "program": {
@@ -1683,7 +1379,7 @@
         {
           "name": "reward_vault",
           "docs": [
-            "Pool's deposit vault"
+            "Pool's reward vault"
           ],
           "writable": true,
           "pda": {
@@ -1697,6 +1393,39 @@
                   97,
                   114,
                   100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "docs": [
+            "Pool's deposit vault"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
                   45,
                   118,
                   97,
@@ -1981,6 +1710,80 @@
       ]
     },
     {
+      "name": "submit_pool",
+      "discriminator": [
+        138,
+        6,
+        64,
+        197,
+        135,
+        17,
+        242,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "burn_factory"
+        },
+        {
+          "name": "factory",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "burn_program",
+          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "unstake",
       "discriminator": [
         90,
@@ -2046,12 +1849,12 @@
           }
         },
         {
-          "name": "token_mint"
+          "name": "deposit_mint"
         },
         {
           "name": "reward_vault",
           "docs": [
-            "Reward vault — for auto-claiming unclaimed reward"
+            "Pool's reward vault"
           ],
           "writable": true,
           "pda": {
@@ -2065,6 +1868,39 @@
                   97,
                   114,
                   100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "docs": [
+            "Pool's deposit vault"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
                   45,
                   118,
                   97,
@@ -2098,7 +1934,7 @@
               },
               {
                 "kind": "account",
-                "path": "token_mint"
+                "path": "deposit_mint"
               }
             ],
             "program": {
@@ -2491,6 +2327,286 @@
           }
         }
       ]
+    },
+    {
+      "name": "withdraw_tokens",
+      "discriminator": [
+        2,
+        4,
+        225,
+        61,
+        19,
+        182,
+        106,
+        170
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory"
+        },
+        {
+          "name": "burn_program",
+          "docs": [
+            "The burn program — for CPI proxy-emit."
+          ],
+          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+        },
+        {
+          "name": "factory",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "writable": true
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "reward_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiver_address",
+          "writable": true
+        },
+        {
+          "name": "receiver_reward_token_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "receiver_address"
+              },
+              {
+                "kind": "account",
+                "path": "reward_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "receiver_deposit_token_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "receiver_address"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "reward_token_program"
+        },
+        {
+          "name": "deposit_token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -2782,6 +2898,16 @@
       "code": 6046,
       "name": "DelayAccumulateNotMet",
       "msg": "Delay accumulate not met"
+    },
+    {
+      "code": 6047,
+      "name": "LockupTimeNotMet",
+      "msg": "Lockup time not met"
+    },
+    {
+      "code": 6048,
+      "name": "DelayClaimNotMet",
+      "msg": "Delay claim not met"
     }
   ],
   "types": [
@@ -2843,12 +2969,12 @@
             "type": "i64"
           },
           {
-            "name": "reward_threshold",
+            "name": "staking_limit",
             "type": "u64"
           },
           {
-            "name": "staking_limit",
-            "type": "u64"
+            "name": "interest_duration",
+            "type": "i64"
           }
         ]
       }
@@ -2901,7 +3027,11 @@
             "type": "pubkey"
           },
           {
-            "name": "token_mint",
+            "name": "reward_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_mint",
             "type": "pubkey"
           },
           {
@@ -2917,7 +3047,15 @@
             "type": "i64"
           },
           {
+            "name": "admin_dep_tracking",
+            "type": "u64"
+          },
+          {
             "name": "reward_balance",
+            "type": "u64"
+          },
+          {
+            "name": "deposit_balance",
             "type": "u64"
           },
           {
@@ -2973,6 +3111,10 @@
             "type": "i64"
           },
           {
+            "name": "interest_duration",
+            "type": "i64"
+          },
+          {
             "name": "settlement_fee_bps",
             "type": "u64"
           },
@@ -2995,16 +3137,10 @@
             "name": "Draft"
           },
           {
-            "name": "Pending"
+            "name": "Upcoming"
           },
           {
-            "name": "Approved"
-          },
-          {
-            "name": "Holding"
-          },
-          {
-            "name": "Ongoing"
+            "name": "Live"
           },
           {
             "name": "Ended"
@@ -3053,10 +3189,6 @@
           {
             "name": "bump",
             "type": "u8"
-          },
-          {
-            "name": "reward_to_claim",
-            "type": "u64"
           }
         ]
       }
