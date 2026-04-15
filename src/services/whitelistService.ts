@@ -48,6 +48,7 @@ export interface ForceUpdateWhitelistTokenStatusRequest {
   address: string;
   active: boolean;
   kind: PoolType;
+  isDropped?: boolean;
 }
 
 export interface ForceUpdateWhitelistTokenStatusResponse {
@@ -109,6 +110,9 @@ export const whitelistService = {
         {
           active: request.active,
           kind: request.kind,
+          ...(request.isDropped !== undefined
+            ? { isDropped: request.isDropped }
+            : {}),
         },
       );
 
