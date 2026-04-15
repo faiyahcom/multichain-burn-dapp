@@ -5,6 +5,7 @@ import MultipleSelect, {
 import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SingleSelect from "@/components/common/single-select";
+import { Button } from "@/components/ui/button";
 import { useMasterPoolManagementSearchFilterStore } from "@/stores/admin/master-pool-management/search-filter-store";
 import {
   burnPoolStatusColors,
@@ -19,33 +20,36 @@ import {
   type PoolTypeOptionValue,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
+import { useNavigate } from "@tanstack/react-router";
+import { PlusIcon } from "lucide-react";
 
 const AdminMasterPoolManagementSearch = () => {
+  const navigate = useNavigate();
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
   const statusOptions: MultipleSelectOption[] =
     filter.type === poolTypes[1].toString()
       ? swapPoolStatuses.map((status) => ({
-          label: swapPoolStatusLabels[status],
-          value: status,
-          icon: ({ className }: { className?: string }) => (
-            <LetterIcon
-              letter={status.slice(0, 1).toUpperCase()}
-              color={swapPoolStatusColors[status]}
-              className={className}
-            />
-          ),
-        }))
+        label: swapPoolStatusLabels[status],
+        value: status,
+        icon: ({ className }: { className?: string }) => (
+          <LetterIcon
+            letter={status.slice(0, 1).toUpperCase()}
+            color={swapPoolStatusColors[status]}
+            className={className}
+          />
+        ),
+      }))
       : burnPoolStatuses.map((status) => ({
-          label: burnPoolStatusLabels[status],
-          value: status,
-          icon: ({ className }: { className?: string }) => (
-            <LetterIcon
-              letter={status.slice(0, 1).toUpperCase()}
-              color={burnPoolStatusColors[status]}
-              className={className}
-            />
-          ),
-        }));
+        label: burnPoolStatusLabels[status],
+        value: status,
+        icon: ({ className }: { className?: string }) => (
+          <LetterIcon
+            letter={status.slice(0, 1).toUpperCase()}
+            color={burnPoolStatusColors[status]}
+            className={className}
+          />
+        ),
+      }));
 
   const handleSelectType = (value: PoolTypeOptionValue) => {
     // swap pool has fewer statuses than burn pool
@@ -83,7 +87,21 @@ const AdminMasterPoolManagementSearch = () => {
 
   return (
     <div className="space-y-9.5 px-4 pt-4 md:pt-12.75 md:pr-12.75 md:pl-21">
-      <h1 className="text-3xl font-semibold">Master Pool Management</h1>
+      <div className="flex flex-col justify-between md:flex-row">
+        <h1 className="text-3xl font-semibold">Master Pool Management</h1>
+        <Button
+          variant={"mb-primary"}
+          size={"mb-square-btn"}
+          onClick={() => {
+            navigate({
+              to: "/admin/stake/create",
+            });
+          }}
+        >
+          <span className="">Create Staking Pool</span>{" "}
+          <PlusIcon className="size-3.75" />
+        </Button>
+      </div>
       <div className="flex flex-col justify-between gap-2.5 md:flex-row md:items-center">
         <SingleSelect
           options={poolTypeOptions}

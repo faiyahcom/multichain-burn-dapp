@@ -32,8 +32,11 @@ import { Route as AdminFeeSettingsManagementIndexRouteImport } from './routes/ad
 import { Route as AdminAdminManagementIndexRouteImport } from './routes/admin/admin-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
+import { Route as AdminStakeCreateIndexRouteImport } from './routes/admin/stake/create/index'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
+import { Route as AdminStakeEditAddressRouteImport } from './routes/admin/stake/edit/$address'
+import { Route as AdminStakeDetailAddressRouteImport } from './routes/admin/stake/detail/$address'
 import { Route as AdminBurnEditAddressRouteImport } from './routes/admin/burn/edit/$address'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 
@@ -160,6 +163,11 @@ const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
   path: '/burn/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStakeCreateIndexRoute = AdminStakeCreateIndexRouteImport.update({
+  id: '/admin/stake/create/',
+  path: '/admin/stake/create/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PairDetailChainIdTokenInTokenOutRoute =
   PairDetailChainIdTokenInTokenOutRouteImport.update({
     id: '/pair-detail/$chainId/$tokenIn/$tokenOut',
@@ -169,6 +177,16 @@ const PairDetailChainIdTokenInTokenOutRoute =
 const AdminSwapDetailAddressRoute = AdminSwapDetailAddressRouteImport.update({
   id: '/admin/swap/detail/$address',
   path: '/admin/swap/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminStakeEditAddressRoute = AdminStakeEditAddressRouteImport.update({
+  id: '/admin/stake/edit/$address',
+  path: '/admin/stake/edit/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminStakeDetailAddressRoute = AdminStakeDetailAddressRouteImport.update({
+  id: '/admin/stake/detail/$address',
+  path: '/admin/stake/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminBurnEditAddressRoute = AdminBurnEditAddressRouteImport.update({
@@ -208,8 +226,11 @@ export interface FileRoutesByFullPath {
   '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
+  '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/stake/create': typeof AdminStakeCreateIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -237,8 +258,11 @@ export interface FileRoutesByTo {
   '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
+  '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/stake/create': typeof AdminStakeCreateIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -267,8 +291,11 @@ export interface FileRoutesById {
   '/swap/create/': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
+  '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/stake/create/': typeof AdminStakeCreateIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -298,8 +325,11 @@ export interface FileRouteTypes {
     | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/stake/detail/$address'
+    | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/stake/create'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -327,8 +357,11 @@ export interface FileRouteTypes {
     | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/stake/detail/$address'
+    | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/stake/create'
   id:
     | '__root__'
     | '/'
@@ -356,8 +389,11 @@ export interface FileRouteTypes {
     | '/swap/create/'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/stake/detail/$address'
+    | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/stake/create/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -386,8 +422,11 @@ export interface RootRouteChildren {
   SwapCreateIndexRoute: typeof SwapCreateIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
   AdminBurnEditAddressRoute: typeof AdminBurnEditAddressRoute
+  AdminStakeDetailAddressRoute: typeof AdminStakeDetailAddressRoute
+  AdminStakeEditAddressRoute: typeof AdminStakeEditAddressRoute
   AdminSwapDetailAddressRoute: typeof AdminSwapDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
+  AdminStakeCreateIndexRoute: typeof AdminStakeCreateIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -553,6 +592,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BurnDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/stake/create/': {
+      id: '/admin/stake/create/'
+      path: '/admin/stake/create'
+      fullPath: '/admin/stake/create'
+      preLoaderRoute: typeof AdminStakeCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pair-detail/$chainId/$tokenIn/$tokenOut': {
       id: '/pair-detail/$chainId/$tokenIn/$tokenOut'
       path: '/pair-detail/$chainId/$tokenIn/$tokenOut'
@@ -565,6 +611,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/swap/detail/$address'
       fullPath: '/admin/swap/detail/$address'
       preLoaderRoute: typeof AdminSwapDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/stake/edit/$address': {
+      id: '/admin/stake/edit/$address'
+      path: '/admin/stake/edit/$address'
+      fullPath: '/admin/stake/edit/$address'
+      preLoaderRoute: typeof AdminStakeEditAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/stake/detail/$address': {
+      id: '/admin/stake/detail/$address'
+      path: '/admin/stake/detail/$address'
+      fullPath: '/admin/stake/detail/$address'
+      preLoaderRoute: typeof AdminStakeDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/burn/edit/$address': {
@@ -610,8 +670,11 @@ const rootRouteChildren: RootRouteChildren = {
   SwapCreateIndexRoute: SwapCreateIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
   AdminBurnEditAddressRoute: AdminBurnEditAddressRoute,
+  AdminStakeDetailAddressRoute: AdminStakeDetailAddressRoute,
+  AdminStakeEditAddressRoute: AdminStakeEditAddressRoute,
   AdminSwapDetailAddressRoute: AdminSwapDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
+  AdminStakeCreateIndexRoute: AdminStakeCreateIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -22,6 +22,7 @@ type Props = {
   value?: string;
   onChange: (address: string) => void;
   disabledAddress?: string;
+  poolKind?: number;
 };
 
 const resolveSymbol = (token: { symbol: string; customSymbol?: string }) =>
@@ -30,7 +31,12 @@ const resolveSymbol = (token: { symbol: string; customSymbol?: string }) =>
 const resolveName = (token: { name: string; customName?: string }) =>
   token.customName?.trim() || token.name;
 
-const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
+const WhitelistTokenSelect = ({
+  value,
+  onChange,
+  disabledAddress,
+  poolKind,
+}: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
@@ -50,6 +56,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     chainIds: networkConfig?.backendChainId,
     active: "1",
     isDropped: "0",
+    kinds: poolKind !== undefined ? String(poolKind) : undefined,
   });
 
   const isLoading = isPending || (open && isFetching);
@@ -68,11 +75,11 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
   // Native token entry shown at top of list
   const nativeToken = nativeCurrency
     ? {
-        address: nativeAddress,
-        name: nativeCurrency.name,
-        symbol: nativeCurrency.symbol,
-        imageUri: networkConfig?.iconSrc ?? "",
-      }
+      address: nativeAddress,
+      name: nativeCurrency.name,
+      symbol: nativeCurrency.symbol,
+      imageUri: networkConfig?.iconSrc ?? "",
+    }
     : null;
 
   // Show native token if search text is empty or matches native token symbol or name
@@ -90,8 +97,8 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     value === nativeAddress
       ? nativeToken
       : whitelistTokens?.whitelistTokens.find(
-          (token) => token.address === value,
-        );
+        (token) => token.address === value,
+      );
 
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
