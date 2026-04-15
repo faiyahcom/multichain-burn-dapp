@@ -31,10 +31,12 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import ImageUpload from "../create/image-upload";
 import { Textarea } from "@/components/ui/textarea";
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  whitelistService,
   type WhitelistToken,
 } from "@/services/whitelistService";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 import { toast } from "@/components/common/custom-toast";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { useCreateWhitelistTokenSolanaFn } from "../create/useCreateWhitelistTokenSolanaFn";
@@ -121,6 +123,41 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
     onOpenChange(isOpen);
   };
 
+  const {
+    mutate: updateWhitelistTokenMutation,
+    isPending: isUpdatePending,
+  } = useMutation({
+    mutationFn: async (data: WhitelistTokenFormValues) => {
+      const formData = new FormData();
+      formData.append("name", data.name);
+      formData.append("description", data.description);
+      formData.append("homepage", data.homepageLink);
+      formData.append("whitepaper", data.docLink);
+      if (data.image) {
+        formData.append("img", data.image);
+      }
+
+      const result = await whitelistService.updateWhitelistToken({
+        chainId: token.chainId,
+        address: token.address,
+        data: formData,
+      });
+      return result;
+    },
+    onSuccess: () => {
+      toast.success("Token updated successfully!");
+      queryClient.invalidateQueries({
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+      });
+
+      handleDialogOpenChange(false);
+    },
+    onError: (error) => {
+      const message = getErrorMessage({ error });
+      toast.error(message);
+    },
+  });
+
   const onSubmit = async (data: WhitelistTokenFormValues) => {
     const selectedPoolTypes = data.poolTypes;
 
@@ -136,37 +173,37 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
     if (toEnable.length > 0 || toDisable.length > 0) {
       setIsCallingSc(true);
 
-      let scSuccess = false;
-
       if (isSolanaToken) {
-        scSuccess = await updateWhitelistTokenSolana({
+        const result = await updateWhitelistTokenSolana({
           tokenAddress: data.address,
           poolTypes: toEnable,
           disablePoolTypes: toDisable,
         });
+        if (!result) {
+          setIsCallingSc(false);
+          return;
+        }
       }
 
       if (isEvmToken) {
-        scSuccess = await updateWhitelistTokenEvm({
+        const result = await updateWhitelistTokenEvm({
           tokenAddress: data.address,
           poolTypes: toEnable,
         });
+        if (!result) {
+          setIsCallingSc(false);
+          return;
+        }
       }
 
       setIsCallingSc(false);
-
-      if (!scSuccess) return;
     }
 
-    // Invalidate the list query so it refetches with the current filter
-    toast.success("Token updated successfully!");
-    queryClient.invalidateQueries({
-      queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
-    });
-    handleDialogOpenChange(false);
+    // Then update backend metadata
+    updateWhitelistTokenMutation(data);
   };
 
-  const isLoading = isCallingSc;
+  const isLoading = isUpdatePending || isCallingSc;
 
   return (
     <Dialog open={open} onOpenChange={handleDialogOpenChange}>
