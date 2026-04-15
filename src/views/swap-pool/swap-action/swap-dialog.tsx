@@ -95,7 +95,7 @@ const SwapDialog = ({
     const [openFeePopUp, setOpenFeePopUp] = useState(false);
 
     const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
-    const isSolanaNetwork = selectedNetworkId === "solanaDevnet";
+    const isSolanaNetwork = selectedNetworkId === "solana";
 
     const { depositSwapPool: depositSwapPoolETH } = useSwapPoolETH();
     const { depositSwapPool: depositSwapPoolSOL } = useSwapPoolSOL();
