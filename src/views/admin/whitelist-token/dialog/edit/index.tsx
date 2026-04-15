@@ -162,7 +162,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
   });
 
   const syncBackendStatus = async (
-    nextStatuses: { active: boolean; kind: PoolType }[],
+    nextStatuses: { active: boolean; kind: PoolType; isDropped?: boolean }[],
   ) => {
     await Promise.all(
       nextStatuses.map((status) =>
@@ -171,6 +171,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
           address: token.address,
           active: status.active,
           kind: status.kind,
+          isDropped: status.isDropped,
         }),
       ),
     );
@@ -230,8 +231,12 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
       }
 
       const nextStatuses = [
-        ...toEnable.map((kind) => ({ active: true, kind })),
-        ...toDisable.map((kind) => ({ active: false, kind })),
+        ...toEnable.map((kind) => ({ active: true, kind, isDropped: false })),
+        ...toDisable.map((kind) => ({
+          active: false,
+          kind,
+          isDropped: true,
+        })),
       ];
 
       try {
