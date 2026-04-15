@@ -1,4 +1,4 @@
-import { chainIdToNetworkConfig, NETWORK_CONFIGS, SOLANA_BACKEND_CHAIN_ID, type NetworkId } from "@/config/networks";
+import { chainIdToNetworkConfig, IS_MAINNET, NETWORK_CONFIGS, SOLANA_BACKEND_CHAIN_ID, type NetworkId } from "@/config/networks";
 
 export function mapChainToSystemNetwork(
     namespace: string,
@@ -10,7 +10,7 @@ export function mapChainToSystemNetwork(
         }
 
         if (namespace === "solana") {
-            return net.id === "solanaDevnet";
+            return net.id === "solana";
         }
 
         return false;
@@ -25,9 +25,10 @@ export function getExplorerUrl(chainId: string, value: string, type: "address" |
     const network = chainIdToNetworkConfig(chainId);
     const baseUrl = network?.appKitNetwork.blockExplorers?.default?.url;
     if (!baseUrl || !value) return "#";
-    // Solana explorer uses different path format
-    if (network?.id === "solanaDevnet") {
-        return `${baseUrl.replace(/\/$/, "")}/${type}/${value}?cluster=devnet`;
+    // Solana explorer uses a different path format; devnet requires a cluster param
+    if (network?.id === "solana") {
+        const suffix = IS_MAINNET ? "" : "?cluster=devnet";
+        return `${baseUrl.replace(/\/$/, "")}/${type}/${value}${suffix}`;
     }
     return `${baseUrl.replace(/\/$/, "")}/${type}/${value}`;
 }

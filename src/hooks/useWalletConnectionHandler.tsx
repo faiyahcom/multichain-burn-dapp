@@ -63,7 +63,7 @@ const useWalletConnectionHandler = () => {
 
         // Always sync selectedNetworkId to whatever chain the wallet reports.
         if (namespace === "solana") {
-            setSelectedNetworkId("solanaDevnet");
+            setSelectedNetworkId("solana");
         } else if (isInitialConnect || chainSwitched) {
             const systemNetwork = mapChainToSystemNetwork(namespace, chainRef);
             if (systemNetwork) setSelectedNetworkId(systemNetwork);
