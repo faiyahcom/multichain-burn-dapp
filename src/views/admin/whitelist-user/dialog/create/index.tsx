@@ -31,10 +31,10 @@ import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { useAdminWhitelistUserSearchFilterStore } from "@/stores/admin/whitelist-user/search-filter-store";
 
 const networkIdValues = [
-  "ethereumTestnet",
-  "binanceTestnet",
-  "xphereTestnet",
-  "solanaDevnet",
+    "ethereum",
+    "binance",
+    "xphere",
+    "solana",
 ] as const satisfies [NetworkId, ...NetworkId[]];
 
 const whitelistUserSchema = z.object({
@@ -70,16 +70,16 @@ const AdminWhitelistUserDialogCreate = () => {
   const queryClient = useQueryClient();
   const { filter } = useAdminWhitelistUserSearchFilterStore();
 
-  const { control, handleSubmit, reset, setValue } =
-    useForm<WhitelistUserFormValues>({
-      defaultValues: {
-        networkId: "ethereumTestnet",
-        walletAddress: "",
-        name: "",
-        email: "",
-      },
-      resolver: zodResolver(whitelistUserSchema),
-    });
+    const { control, handleSubmit, reset, setValue } =
+        useForm<WhitelistUserFormValues>({
+            defaultValues: {
+                networkId: "ethereum",
+                walletAddress: "",
+                name: "",
+                email: "",
+            },
+            resolver: zodResolver(whitelistUserSchema),
+        });
 
   // Sync form field whenever the wallet switches network
   useEffect(() => {
@@ -103,19 +103,19 @@ const AdminWhitelistUserDialogCreate = () => {
     });
   }, [queryClient, filter]);
 
-  const handleOpenChange = useCallback(
-    (next: boolean) => {
-      if (!next)
-        reset({
-          networkId: currentNetworkId ?? "ethereumTestnet",
-          walletAddress: "",
-          name: "",
-          email: "",
-        });
-      setOpen(next);
-    },
-    [reset, currentNetworkId],
-  );
+    const handleOpenChange = useCallback(
+        (next: boolean) => {
+            if (!next)
+                reset({
+                    networkId: currentNetworkId ?? "ethereum",
+                    walletAddress: "",
+                    name: "",
+                    email: "",
+                });
+            setOpen(next);
+        },
+        [reset, currentNetworkId],
+    );
 
   const onSubmit = async (data: WhitelistUserFormValues) => {
     const access = await ensureLatestSuperAdminAccess({
@@ -127,7 +127,7 @@ const AdminWhitelistUserDialogCreate = () => {
       return;
     }
 
-    const isSolanaNetwork = data.networkId === "solanaDevnet";
+    const isSolanaNetwork = data.networkId === "solana";
 
     // Validate address format matches selected network
     if (isSolanaNetwork && !isSolanaAddress(data.walletAddress)) {
@@ -191,11 +191,11 @@ const AdminWhitelistUserDialogCreate = () => {
     handleOpenChange(false);
   };
 
-  const isLoading = isCallingSc;
-  const addressPlaceholder =
-    currentNetworkId === "solanaDevnet"
-      ? "e.g. 9noXzpXnLLrrTn…"
-      : "0x0000000000000000000000000000000000000000";
+    const isLoading = isCallingSc;
+    const addressPlaceholder =
+        currentNetworkId === "solana"
+            ? "e.g. 9noXzpXnLLrrTn…"
+            : "0x0000000000000000000000000000000000000000";
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

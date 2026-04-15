@@ -70,7 +70,7 @@ const resolveDefaultValues = (
   name: defaultValues?.name ?? "",
   email: defaultValues?.email ?? "",
   walletAddress: defaultValues?.walletAddress ?? "",
-  networkId: defaultValues?.networkId ?? "ethereumTestnet",
+  networkId: defaultValues?.networkId ?? "ethereum",
   role: defaultValues?.role ?? "super_admin",
 });
 
