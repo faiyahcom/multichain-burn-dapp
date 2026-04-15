@@ -133,7 +133,6 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
-      formData.append("kind", data.poolTypes.join(","));
       if (data.image) {
         formData.append("img", data.image);
       }
