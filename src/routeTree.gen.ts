@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as SwapIndexRouteImport } from './routes/swap/index'
 import { Route as SwapHistoryIndexRouteImport } from './routes/swap-history/index'
 import { Route as SupportIndexRouteImport } from './routes/support/index'
+import { Route as StakingIndexRouteImport } from './routes/staking/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PersonalInfoSettingsIndexRouteImport } from './routes/personal-info-settings/index'
 import { Route as PairListIndexRouteImport } from './routes/pair-list/index'
@@ -56,6 +57,11 @@ const SwapHistoryIndexRoute = SwapHistoryIndexRouteImport.update({
 const SupportIndexRoute = SupportIndexRouteImport.update({
   id: '/support/',
   path: '/support/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StakingIndexRoute = StakingIndexRouteImport.update({
+  id: '/staking/',
+  path: '/staking/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
@@ -199,6 +205,7 @@ export interface FileRoutesByFullPath {
   '/pair-list': typeof PairListIndexRoute
   '/personal-info-settings': typeof PersonalInfoSettingsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/staking': typeof StakingIndexRoute
   '/support': typeof SupportIndexRoute
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
@@ -229,6 +236,7 @@ export interface FileRoutesByTo {
   '/pair-list': typeof PairListIndexRoute
   '/personal-info-settings': typeof PersonalInfoSettingsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/staking': typeof StakingIndexRoute
   '/support': typeof SupportIndexRoute
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
@@ -260,6 +268,7 @@ export interface FileRoutesById {
   '/pair-list/': typeof PairListIndexRoute
   '/personal-info-settings/': typeof PersonalInfoSettingsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/staking/': typeof StakingIndexRoute
   '/support/': typeof SupportIndexRoute
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
@@ -292,6 +301,7 @@ export interface FileRouteTypes {
     | '/pair-list'
     | '/personal-info-settings'
     | '/settings'
+    | '/staking'
     | '/support'
     | '/swap-history'
     | '/swap'
@@ -322,6 +332,7 @@ export interface FileRouteTypes {
     | '/pair-list'
     | '/personal-info-settings'
     | '/settings'
+    | '/staking'
     | '/support'
     | '/swap-history'
     | '/swap'
@@ -352,6 +363,7 @@ export interface FileRouteTypes {
     | '/pair-list/'
     | '/personal-info-settings/'
     | '/settings/'
+    | '/staking/'
     | '/support/'
     | '/swap-history/'
     | '/swap/'
@@ -383,6 +395,7 @@ export interface RootRouteChildren {
   PairListIndexRoute: typeof PairListIndexRoute
   PersonalInfoSettingsIndexRoute: typeof PersonalInfoSettingsIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  StakingIndexRoute: typeof StakingIndexRoute
   SupportIndexRoute: typeof SupportIndexRoute
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
@@ -431,6 +444,13 @@ declare module '@tanstack/react-router' {
       path: '/support'
       fullPath: '/support'
       preLoaderRoute: typeof SupportIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/staking/': {
+      id: '/staking/'
+      path: '/staking'
+      fullPath: '/staking'
+      preLoaderRoute: typeof StakingIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -615,6 +635,7 @@ const rootRouteChildren: RootRouteChildren = {
   PairListIndexRoute: PairListIndexRoute,
   PersonalInfoSettingsIndexRoute: PersonalInfoSettingsIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  StakingIndexRoute: StakingIndexRoute,
   SupportIndexRoute: SupportIndexRoute,
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,

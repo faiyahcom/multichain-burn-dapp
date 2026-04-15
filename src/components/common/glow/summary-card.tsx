@@ -18,6 +18,7 @@ const CARD_VARIANT_BG_IMG: Record<ContainerVariant, string> = {
   pair: "/images/summary/pair-card-bg.png",
   swap: "/images/summary/swap-card-bg.png",
   green: "",
+  stake: "/images/summary/stake-card-bg.png",
 };
 
 const CARD_VARIANT_BG: Record<ContainerVariant, string> = {
@@ -25,6 +26,7 @@ const CARD_VARIANT_BG: Record<ContainerVariant, string> = {
   pair: "card-pair-bold-bottom-bg",
   swap: "card-swap-bold-bottom-bg",
   green: "",
+  stake: "card-stake-bold-bottom-bg",
 };
 
 const GlowSummaryCard: React.FC<Props> = ({
