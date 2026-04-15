@@ -10,6 +10,7 @@ import {
   useSwapPoolListSearchFilterStore,
 } from "@/stores/pool-list/search-filter-store";
 import StakeRecentPoolsTable from "./components/stake/recent-table";
+import StakePoolSection from "./components/stake/pool-section";
 
 type Props = {};
 
@@ -69,7 +70,7 @@ const StakePoolList = ({}: Props) => {
           <StakeRecentPoolsTable />
         </PoolGlowSection>
       }
-      // poolSection={<StakePoolSection />}
+      poolSection={<StakePoolSection />}
       onTokenClick={(token) => {
         setFilter({
           text: token.customSymbol ?? token.symbol,
