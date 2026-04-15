@@ -21,9 +21,9 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-type Tab = "burn-pool" | "swap-pool" | "claimable";
+type Tab = "burn-pool" | "swap-pool" | "claimable" | "stake-pool";
 
-const validTabs: Tab[] = ["burn-pool", "swap-pool", "claimable"];
+const validTabs: Tab[] = ["burn-pool", "swap-pool", "claimable", "stake-pool"];
 const isValidTab = (value: unknown): value is Tab =>
   typeof value === "string" && validTabs.includes(value as Tab);
 
@@ -31,6 +31,7 @@ const TabToPoolType: Record<Tab, PoolType | "claimable"> = {
   "burn-pool": PoolKindCodeEnum.Burn,
   "swap-pool": PoolKindCodeEnum.Swap,
   claimable: "claimable",
+  "stake-pool": PoolKindCodeEnum.Stake,
 };
 
 export const Route = createFileRoute("/my-participated-pools/")({
@@ -92,6 +93,8 @@ function RouteComponent() {
         return filterSwap;
       case "claimable":
         return filterClaimable;
+      case "stake-pool":
+        return undefined; // TODO: implement stake pool search
       default:
         void (tab satisfies never); // exhaustive check
         return undefined;
@@ -106,6 +109,8 @@ function RouteComponent() {
         return setFilterSwap;
       case "claimable":
         return setFilterClaimable;
+      case "stake-pool":
+        return undefined; // TODO: implement stake pool search
       default:
         void (tab satisfies never); // exhaustive check
         return undefined;
