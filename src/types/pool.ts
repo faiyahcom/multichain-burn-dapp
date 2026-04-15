@@ -16,12 +16,16 @@ export type BurnPoolStatus =
 export enum PoolKindCodeEnum {
   Burn = 0,
   Swap = 1,
+  Stake = 2,
+  Launchpad = 3,
 }
-export type PoolKindCode = PoolKindCodeEnum.Burn | PoolKindCodeEnum.Swap;
-export type PoolKind = "burn_pool" | "swap_pool";
+export type PoolKindCode = PoolKindCodeEnum.Burn | PoolKindCodeEnum.Swap | PoolKindCodeEnum.Stake | PoolKindCodeEnum.Launchpad;
+export type PoolKind = "burn_pool" | "swap_pool" | "stake_pool" | "launchpad_pool";
 export const POOL_KIND: Record<PoolKindCode, PoolKind> = {
   [PoolKindCodeEnum.Burn]: "burn_pool",
   [PoolKindCodeEnum.Swap]: "swap_pool",
+  [PoolKindCodeEnum.Stake]: "stake_pool",
+  [PoolKindCodeEnum.Launchpad]: "launchpad_pool",
 };
 interface TokenInfo {
   address: string;

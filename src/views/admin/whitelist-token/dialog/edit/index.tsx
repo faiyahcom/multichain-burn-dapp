@@ -1,19 +1,21 @@
-import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import {
+  NETWORK_CONFIGS,
+  SOLANA_BACKEND_CHAIN_ID,
+  chainIdToNetworkConfig,
+  type NetworkId,
+} from "@/config/networks";
 import {
   poolTypes,
   poolTypeLabels,
   type PoolType,
 } from "@/types/admin/master-pool-management";
-import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,18 +28,17 @@ import {
 import { Input } from "@/components/ui/input";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import NetworkImgIcon from "@/components/common/network-img-icon";
-import ImageUpload from "./image-upload";
+import ImageUpload from "../create/image-upload";
 import { Textarea } from "@/components/ui/textarea";
-import { useState, useEffect } from "react";
-import { useTokenDecimals } from "@/hooks/useTokenDecimals";
-import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
-import { useSystemStore } from "@/stores/systemStore";
-import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
-import { useCreateWhitelistTokenSolanaFn } from "./useCreateWhitelistTokenSolanaFn";
-import { useCreateWhitelistTokenEvmFn } from "./useCreateWhitelistTokenEvmFn";
+import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import {
+  type WhitelistToken,
+} from "@/services/whitelistService";
 import { toast } from "@/components/common/custom-toast";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { useCreateWhitelistTokenSolanaFn } from "../create/useCreateWhitelistTokenSolanaFn";
+import { useCreateWhitelistTokenEvmFn } from "../create/useCreateWhitelistTokenEvmFn";
 
 const networkIdValues = [
   "ethereumTestnet",
@@ -51,9 +52,7 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
-  poolTypes: z
-    .array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]))
-    .min(1, { error: "At least one pool type is required" }),
+  poolTypes: z.array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)])),
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -68,97 +67,109 @@ const whitelistTokenSchema = z.object({
 
 type WhitelistTokenFormValues = z.infer<typeof whitelistTokenSchema>;
 
-const AdminWhitelistTokenDialogCreate = () => {
-  const [open, setOpen] = useState<boolean>(false);
-  const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
+interface Props {
+  token: WhitelistToken;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
 
-  const { caipAddress } = useAppKitAccount();
-  const { open: openAppKit } = useAppKit();
-  const { openSwitchNetworkModal } = useSystemStore();
-  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
-  const isSolana = namespace === "solana";
-  const isEvm = namespace === "eip155";
-  const currentNetworkId =
-    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
-
-  const { createWhitelistToken: createWhitelistTokenSolana } =
-    useCreateWhitelistTokenSolanaFn();
-  const { createWhitelistToken: createWhitelistTokenEvm } =
-    useCreateWhitelistTokenEvmFn();
-
+const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
+  token,
+  open,
+  onOpenChange,
+}) => {
+  const [imageRemoved, setImageRemoved] = useState(false);
+  const [isCallingSc, setIsCallingSc] = useState(false);
   const queryClient = useQueryClient();
 
-  const { control, handleSubmit, resetField, reset, setValue, watch } =
+  const tokenNetworkConfig = chainIdToNetworkConfig(token.chainId);
+  const tokenNetworkId = tokenNetworkConfig?.id;
+  const isSolanaToken = token.chainId === SOLANA_BACKEND_CHAIN_ID;
+  const isEvmToken = !isSolanaToken;
+
+  const { createWhitelistToken: updateWhitelistTokenSolana } =
+    useCreateWhitelistTokenSolanaFn();
+  const { createWhitelistToken: updateWhitelistTokenEvm } =
+    useCreateWhitelistTokenEvmFn();
+
+  // The token's currently enabled pool types from the backend
+  const initialKinds = (token.kind ?? [])
+    .filter((k) => k.enable)
+    .map((k) => k.kind) as PoolType[];
+
+  const { control, handleSubmit, resetField, reset } =
     useForm<WhitelistTokenFormValues>({
       defaultValues: {
-        name: "",
-        symbol: "",
-        address: "",
-        networkId: currentNetworkId ?? undefined,
-        poolTypes: [] as PoolType[],
+        name: token.customName || token.name || "",
+        symbol: token.customSymbol || token.symbol || "",
+        address: token.address,
+        networkId: tokenNetworkId,
+        poolTypes: initialKinds,
         image: undefined,
-        description: "",
-        homepageLink: "",
-        docLink: "",
+        description: token.description || "",
+        homepageLink: token.homepage || "",
+        docLink: token.whitepaper || "",
       },
       resolver: zodResolver(whitelistTokenSchema),
     });
 
-  const watchedAddress = watch("address");
-  const watchedNetworkId = watch("networkId");
-  const { decimals: onChainDecimals, isLoading: isDecimalsLoading } =
-    useTokenDecimals({ address: watchedAddress, networkId: watchedNetworkId });
-
-  // Sync form field whenever the wallet switches network
-  useEffect(() => {
-    if (currentNetworkId) setValue("networkId", currentNetworkId);
-  }, [currentNetworkId, setValue]);
-
-  const handleOpenChange = (open: boolean) => {
-    if (!open) {
+  const handleDialogOpenChange = (isOpen: boolean) => {
+    if (!isOpen) {
       reset();
+      setImageRemoved(false);
     }
-    setOpen(open);
+    onOpenChange(isOpen);
   };
 
   const onSubmit = async (data: WhitelistTokenFormValues) => {
-    setIsCallingSc(true);
+    const selectedPoolTypes = data.poolTypes;
 
-    let scSuccess = false;
+    // Determine which pool types to enable/disable compared to initial state
+    const toEnable = selectedPoolTypes.filter(
+      (t) => !initialKinds.includes(t),
+    );
+    const toDisable = initialKinds.filter(
+      (t) => !selectedPoolTypes.includes(t),
+    );
 
-    if (isSolana) {
-      scSuccess = await createWhitelistTokenSolana({
-        tokenAddress: data.address,
-        poolTypes: data.poolTypes,
-      });
+    // If there are on-chain pool type changes, call the SC
+    if (toEnable.length > 0 || toDisable.length > 0) {
+      setIsCallingSc(true);
+
+      let scSuccess = false;
+
+      if (isSolanaToken) {
+        scSuccess = await updateWhitelistTokenSolana({
+          tokenAddress: data.address,
+          poolTypes: toEnable,
+          disablePoolTypes: toDisable,
+        });
+      }
+
+      if (isEvmToken) {
+        scSuccess = await updateWhitelistTokenEvm({
+          tokenAddress: data.address,
+          poolTypes: toEnable,
+        });
+      }
+
+      setIsCallingSc(false);
+
+      if (!scSuccess) return;
     }
-    if (isEvm) {
-      scSuccess = await createWhitelistTokenEvm({
-        tokenAddress: data.address,
-        poolTypes: data.poolTypes,
-      });
-    }
 
-    setIsCallingSc(false);
-
-    if (scSuccess) {
-      toast.success("Token whitelisted successfully!");
-      queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
-      });
-      handleOpenChange(false);
-    }
+    // Invalidate the list query so it refetches with the current filter
+    toast.success("Token updated successfully!");
+    queryClient.invalidateQueries({
+      queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+    });
+    handleDialogOpenChange(false);
   };
 
   const isLoading = isCallingSc;
 
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant={"mb-primary"} size={"mb-square-btn"}>
-          Add Token <PlusIcon className="size-3.75" />
-        </Button>
-      </DialogTrigger>
+    <Dialog open={open} onOpenChange={handleDialogOpenChange}>
       <DialogContent
         showCloseButton={false}
         className="sm:max-w-185.75"
@@ -167,9 +178,9 @@ const AdminWhitelistTokenDialogCreate = () => {
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader>
-          <DialogTitle>ADD TOKEN TO WHITELIST</DialogTitle>
+          <DialogTitle>EDIT WHITELIST TOKEN</DialogTitle>
           <DialogDescription>
-            Fill in the token details to add it to the whitelist
+            Update the token details in the whitelist
           </DialogDescription>
         </DialogHeader>
 
@@ -232,7 +243,8 @@ const AdminWhitelistTokenDialogCreate = () => {
                     id={field.name}
                     aria-invalid={fieldState.invalid}
                     placeholder="0x0000000000000000000000000000000000000000"
-                    className="px-5 placeholder:text-15px placeholder:text-secondary-text"
+                    className="px-5 placeholder:text-15px placeholder:text-secondary-text bg-inactive cursor-not-allowed"
+                    readOnly
                   />
                   {fieldState.invalid && (
                     <FieldError errors={[fieldState.error]} />
@@ -243,14 +255,7 @@ const AdminWhitelistTokenDialogCreate = () => {
             <Field>
               <FieldLabel>Decimal</FieldLabel>
               <Input
-                value={
-                  isDecimalsLoading
-                    ? "Loading..."
-                    : onChainDecimals != null
-                      ? String(onChainDecimals)
-                      : ""
-                }
-                // placeholder="Auto-fetched from on-chain"
+                value={String(token.decimals)}
                 className="px-5 placeholder:text-15px placeholder:text-secondary-text bg-inactive cursor-not-allowed"
                 readOnly
                 disabled
@@ -276,16 +281,11 @@ const AdminWhitelistTokenDialogCreate = () => {
                             className={className}
                           />
                         )}
-                        isActive={currentNetworkId === network.id}
+                        isActive={tokenNetworkId === network.id}
                         btnProps={{
-                          onClick: () => {
-                            if (currentNetworkId !== network.id) {
-                              openSwitchNetworkModal(
-                                currentNetworkId,
-                                network.id,
-                              );
-                            }
-                          },
+                          // Network is locked for edit — cannot change
+                          type: "button",
+                          disabled: true,
                         }}
                         text={network.label}
                         color={network.color}
@@ -304,7 +304,7 @@ const AdminWhitelistTokenDialogCreate = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-3.25">
                   <FieldLabel htmlFor={field.name}>
-                    Pool type<span className="text-md-required-red">*</span>
+                    Pool type
                   </FieldLabel>
                   <div className="flex items-center gap-2.25">
                     {poolTypes.map((type) => {
@@ -349,6 +349,8 @@ const AdminWhitelistTokenDialogCreate = () => {
                   <FieldLabel htmlFor={field.name}>Token Image</FieldLabel>
                   <ImageUpload
                     img={field.value}
+                    initialUrl={!imageRemoved ? token.imageUri : undefined}
+                    onRemoveInitialUrl={() => setImageRemoved(true)}
                     onChange={(img) => {
                       if (img) {
                         field.onChange(img);
@@ -441,39 +443,25 @@ const AdminWhitelistTokenDialogCreate = () => {
               }}
               btnProps={{
                 type: "reset",
-                onClick: () => handleOpenChange(false),
+                onClick: () => handleDialogOpenChange(false),
                 disabled: isLoading,
               }}
             />
-            {!caipAddress ? (
-              <AnimateIconButton
-                variant="letter-icon"
-                iconLetter="W"
-                text="Connect Wallet"
-                color="#9072f9"
-                textVariant="text-self-center"
-                classNames={{
-                  btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
-                }}
-                btnProps={{ type: "button", onClick: () => openAppKit() }}
-              />
-            ) : (
-              <AnimateIconButton
-                variant="letter-icon"
-                iconLetter="A"
-                text={"Add to Whitelist"}
-                color="#9072f9"
-                textVariant="text-self-center"
-                classNames={{
-                  btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
-                }}
-                btnProps={{
-                  type: "submit",
-                }}
-                isLoading={isLoading}
-                isLoadingText="Adding..."
-              />
-            )}
+            <AnimateIconButton
+              variant="letter-icon"
+              iconLetter="S"
+              text={"Save Changes"}
+              color="#9072f9"
+              textVariant="text-self-center"
+              classNames={{
+                btn: "sm:min-w-60.25 sm:py-4.25 sm:px-2.25 border border-mb-submit-border",
+              }}
+              btnProps={{
+                type: "submit",
+              }}
+              isLoading={isLoading}
+              isLoadingText="Saving..."
+            />
           </div>
         </form>
       </DialogContent>
@@ -481,4 +469,4 @@ const AdminWhitelistTokenDialogCreate = () => {
   );
 };
 
-export default AdminWhitelistTokenDialogCreate;
+export default AdminWhitelistTokenDialogEdit;

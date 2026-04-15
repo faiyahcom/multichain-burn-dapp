@@ -3,27 +3,24 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useState } from "react";
 import { useDisableWhitelistTokenSolanaFn } from "../useDisableWhitelistTokenSolanaFn";
 import { useDisableWhitelistTokenEvmFn } from "../useDisableWhitelistTokenEvmFn";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  whitelistService,
-  type ForceUpdateWhitelistTokenStatusRequest,
-} from "@/services/whitelistService";
-import { getErrorMessage } from "@/utils/helpers/error-message";
+import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "@/components/common/custom-toast";
 import { useCreateWhitelistTokenSolanaFn } from "../../dialog/create/useCreateWhitelistTokenSolanaFn";
 import { useCreateWhitelistTokenEvmFn } from "../../dialog/create/useCreateWhitelistTokenEvmFn";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
+import { poolTypes as allPoolTypes, type PoolType } from "@/types/admin/master-pool-management";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 
 interface Props {
   switchProps?: React.ComponentProps<typeof BlueSwitch>;
   chainId?: string;
   address?: string;
+  poolTypes?: PoolType[];
 }
 
-const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
+const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address, poolTypes }) => {
   const [isCallingSc, setIsCallingSc] = useState<boolean>(false);
 
   const { caipAddress } = useAppKitAccount();
@@ -45,24 +42,6 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
     useCreateWhitelistTokenEvmFn();
 
   const queryClient = useQueryClient();
-
-  const {
-    mutate: updateStatusWhitelistTokenStatusMutation,
-    isPending: isForceUpdateWhitelistTokenStatusPending,
-  } = useMutation({
-    mutationFn: async (request: ForceUpdateWhitelistTokenStatusRequest) => {
-      return await whitelistService.updateStatusWhitelistTokenStatus(request);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
-      });
-    },
-    onError: (error) => {
-      const message = getErrorMessage({ error });
-      toast.error(message);
-    },
-  });
 
   const handleToggleSwitch = async () => {
     const isActive = switchProps?.active;
@@ -88,9 +67,9 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
 
     if (isSolana) {
       if (isActive) {
-        result = await disableWhitelistTokenSolana({ tokenAddress: address });
+        result = await disableWhitelistTokenSolana({ tokenAddress: address, poolTypes: poolTypes ?? [] });
       } else {
-        result = await enableWhitelistTokenSolana({ tokenAddress: address });
+        result = await enableWhitelistTokenSolana({ tokenAddress: address, poolTypes: [...allPoolTypes] });
       }
     }
 
@@ -102,23 +81,20 @@ const StatusSwitch: React.FC<Props> = ({ switchProps, chainId, address }) => {
       }
     }
 
+    // On success, refetch the list with the current filter instead of calling a separate POST
     if (result) {
-      updateStatusWhitelistTokenStatusMutation({
-        chainId,
-        address,
-        active: !isActive,
+      queryClient.invalidateQueries({
+        queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
       });
     }
 
     setIsCallingSc(false);
   };
 
-  const isLoading = isForceUpdateWhitelistTokenStatusPending || isCallingSc;
-
   return (
     <BlueSwitch
       {...switchProps}
-      isLoading={isLoading}
+      isLoading={isCallingSc}
       onClick={handleToggleSwitch}
     />
   );

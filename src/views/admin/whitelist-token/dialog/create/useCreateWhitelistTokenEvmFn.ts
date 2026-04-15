@@ -17,7 +17,12 @@ export const useCreateWhitelistTokenEvmFn = () => {
 
   // Phase 1 keeps burn and swap whitelist status in sync.
   const createWhitelistToken = useCallback(
-    async ({ tokenAddress }: { tokenAddress: string }) => {
+    async ({
+      tokenAddress,
+    }: {
+      tokenAddress: string;
+      poolTypes?: number[];
+    }) => {
       try {
         if (!isConnected || !walletProvider) {
           throw new Error("Wallet not connected");

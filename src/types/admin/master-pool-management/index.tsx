@@ -18,6 +18,8 @@ export const isPoolType = (value: unknown): value is PoolType =>
 export const poolTypeLabels: Record<PoolType, string> = {
   [PoolKindCodeEnum.Burn]: "Burn pool",
   [PoolKindCodeEnum.Swap]: "Swap pool",
+  [PoolKindCodeEnum.Stake]: "Stake pool",
+  [PoolKindCodeEnum.Launchpad]: "Launchpad pool",
 };
 
 export const poolTypeOptionValues = [
