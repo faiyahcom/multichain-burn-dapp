@@ -4,11 +4,13 @@ import MultipleSelect from "@/components/common/glow/multiple-select";
 import NetworkMultipleSelect from "@/components/common/glow/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
 import SortSelect from "@/components/common/glow/sort-select";
+import { cn } from "@/lib/utils";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
 import {
   burnPoolStatuses,
   getPoolStatusLabel,
   swapPoolStatuses,
+  userViewStakePoolStatuses,
   type AllPoolStatus,
   type PoolType,
 } from "@/types/admin/master-pool-management";
@@ -45,6 +47,14 @@ const ProfilePoolSearch: React.FC<Props> = ({
         if (profileType === "my-participated-pools")
           statuses = [...swapPoolStatuses];
         break;
+      case PoolKindCodeEnum.Stake:
+        if (profileType === "my-create-pools") statuses = []; // user cannot create stake pool
+        if (profileType === "my-participated-pools")
+          statuses = [...userViewStakePoolStatuses];
+        break;
+      case PoolKindCodeEnum.Launchpad:
+        statuses = []; // TODO: implement launchpad pool search
+        break;
       case "claimable":
         statuses = [];
         break;
@@ -63,6 +73,8 @@ const ProfilePoolSearch: React.FC<Props> = ({
   const sortOptions = useMemo<SortBy[]>(() => {
     if (poolType === "claimable")
       return ["claimableReward", "amountBurned", "timestamp"];
+
+    if (poolType === PoolKindCodeEnum.Stake) return ["stakedAmount", "apr"];
 
     return ["volume", "liquidity"];
   }, [poolType]);
@@ -113,8 +125,12 @@ const ProfilePoolSearch: React.FC<Props> = ({
         setSortOrder={(sortOrder) => setFilter?.({ sortOrder })}
         variant="pair"
         classNames={{
-          container: "w-full 2xl:max-w-65",
-          btn: "w-full",
+          container: cn("w-full 2xl:max-w-65", {
+            "2xl:max-w-79": poolType === PoolKindCodeEnum.Stake,
+          }),
+          btn: cn("w-full", {
+            "2xl:min-w-79": poolType === PoolKindCodeEnum.Stake,
+          }),
         }}
       />
     </GlowContainer>
