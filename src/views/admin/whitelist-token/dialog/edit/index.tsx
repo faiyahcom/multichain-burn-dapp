@@ -529,6 +529,12 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
             </div>
           </div>
 
+          {isTokenFullyDisabled && (
+            <p className="text-sm font-medium text-mb-danger">
+              Disable all pool type can not edit whitelist token
+            </p>
+          )}
+
           <div className="flex items-center justify-end gap-4.5">
             <AnimateIconButton
               variant="letter-icon"
@@ -556,6 +562,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
               }}
               btnProps={{
                 type: "submit",
+                disabled: isTokenFullyDisabled,
               }}
               isLoading={isLoading}
               isLoadingText="Saving..."
