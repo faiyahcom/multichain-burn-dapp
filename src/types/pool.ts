@@ -19,8 +19,16 @@ export enum PoolKindCodeEnum {
   Stake = 2,
   Launchpad = 3,
 }
-export type PoolKindCode = PoolKindCodeEnum.Burn | PoolKindCodeEnum.Swap | PoolKindCodeEnum.Stake | PoolKindCodeEnum.Launchpad;
-export type PoolKind = "burn_pool" | "swap_pool" | "stake_pool" | "launchpad_pool";
+export type PoolKindCode =
+  | PoolKindCodeEnum.Burn
+  | PoolKindCodeEnum.Swap
+  | PoolKindCodeEnum.Stake
+  | PoolKindCodeEnum.Launchpad;
+export type PoolKind =
+  | "burn_pool"
+  | "swap_pool"
+  | "stake_pool"
+  | "launchpad_pool";
 export const POOL_KIND: Record<PoolKindCode, PoolKind> = {
   [PoolKindCodeEnum.Burn]: "burn_pool",
   [PoolKindCodeEnum.Swap]: "swap_pool",
@@ -151,6 +159,10 @@ export const activityKind = {
   32: "Swap",
 
   40: "Pool End",
+
+  // TODO: subject to change
+  51: "Staking",
+  52: "Unstaking",
 } as const;
 
 export type ActivityKindKey = keyof typeof activityKind;
@@ -170,7 +182,9 @@ export function pickActivityKind<K extends keyof ActivityKind>(
   >;
 }
 
-export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
+export const myActivityActions = pickActivityKind([
+  1, 0, 10, 32, 30, 31, 5, 51, 52,
+]);
 
 export interface PoolActivitiesResponse {
   page: number;
