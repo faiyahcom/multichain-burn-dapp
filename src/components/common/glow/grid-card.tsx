@@ -23,6 +23,7 @@ const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
   pair: "grid-pair-bg",
   swap: "grid-swap-bg",
   green: "",
+  stake: "grid-stake-bg",
 };
 
 export const gridCardButtonClassName = ({
@@ -65,6 +66,9 @@ const GridCard: React.FC<Props> = ({
         hasBg={false}
         hasShadow={false}
       >
+        {variant === "stake" && (
+          <div className="absolute! inset-0 z-0! h-full w-full bg-black opacity-20" />
+        )}
         <div className={cn("space-y-2.25 sm:space-y-4.5", classNames?.content)}>
           {topSection}
           <div
@@ -80,10 +84,13 @@ const GridCard: React.FC<Props> = ({
             containerVariant: variant,
             isGrid: true,
           })}
-          className={gridCardButtonClassName({
-            variant,
-            className: btnClassName,
-          })}
+          className={cn(
+            "relative",
+            gridCardButtonClassName({
+              variant,
+              className: btnClassName,
+            }),
+          )}
           hasHover
           {...btnProps}
         >

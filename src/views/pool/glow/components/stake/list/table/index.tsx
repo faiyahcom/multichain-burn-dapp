@@ -72,7 +72,7 @@ const StakePoolListTable: React.FC<Props> = ({ data, isLoading }) => {
         {/* TODO: implement stake pool list */}
 
         {/* TODO: remove demo data */}
-        {Array.from({ length: 2 }, (_, i) => (
+        {Array.from({ length: 12 }, (_, i) => (
           <TableRow
             key={i}
             className="cursor-pointer font-medium"

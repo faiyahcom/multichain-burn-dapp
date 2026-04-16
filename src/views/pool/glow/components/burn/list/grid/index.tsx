@@ -110,7 +110,15 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                 btn={{
                   asChild: true,
                   children: (
-                    <Link to={`/burn/detail/${pool.address}`}>
+                    <Link
+                      to="/burn/detail/$address"
+                      params={{
+                        address: pool.address,
+                      }}
+                      search={{
+                        depositReward: undefined,
+                      }}
+                    >
                       {statusLabel}
                     </Link>
                   ),
