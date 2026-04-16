@@ -55,6 +55,7 @@ export { default as IconBurnCategory } from "./icons/categories/burn.svg?react";
 export { default as IconPairCategory } from "./icons/categories/pair.svg?react";
 export { default as IconSwapCategory } from "./icons/categories/swap.svg?react";
 export { default as IconStakeCategory } from "./icons/categories/stake.svg?react";
+export { default as IconStakeGlowCategory } from "./icons/categories/stake-glow.svg?react";
 
 export { default as IconTokenList } from "./icons/token-list-icon.svg?react";
 
