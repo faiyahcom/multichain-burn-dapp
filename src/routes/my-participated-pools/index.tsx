@@ -7,6 +7,7 @@ import { userService } from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
 import { useMyParticipatedPoolsBurnSearchFilterStore } from "@/stores/my-participated-pools/burn";
 import { useMyParticipatedPoolsClaimableSearchFilterStore } from "@/stores/my-participated-pools/claimable";
+import { useMyParticipatedPoolsStakeSearchFilterStore } from "@/stores/my-participated-pools/stake";
 import { useMyParticipatedPoolsSwapSearchFilterStore } from "@/stores/my-participated-pools/swap";
 import {
   isPoolType,
@@ -52,6 +53,9 @@ function RouteComponent() {
   const { filter: filterSwap, setFilter: setFilterSwap } =
     useMyParticipatedPoolsSwapSearchFilterStore();
 
+  const { filter: filterStake, setFilter: setFilterStake } =
+    useMyParticipatedPoolsStakeSearchFilterStore();
+
   const { filter: filterClaimable, setFilter: setFilterClaimable } =
     useMyParticipatedPoolsClaimableSearchFilterStore();
 
@@ -68,14 +72,15 @@ function RouteComponent() {
   const tabOptions: SearchParamTabOption<Tab>[] = [
     { label: "Burn Pool", value: "burn-pool" },
     { label: "Swap Pool", value: "swap-pool" },
+    { label: "Staking Pool", value: "stake-pool" },
     {
       label: "Claimable",
       value: "claimable",
       rightAddons: (
         <div
           className={cn(
-            "text-xl font-medium text-foreground sm:text-2xl text-center",
-            "rounded-full px-2.5 py-1.25 shrink-0 min-w-9.5 sm:min-w-10.5",
+            "text-center text-xl font-medium text-foreground sm:text-2xl",
+            "min-w-9.5 shrink-0 rounded-full px-2.5 py-1.25 sm:min-w-10.5",
             getVariantBtnBgClassName({ variant: "pair" }),
           )}
         >
@@ -94,12 +99,12 @@ function RouteComponent() {
       case "claimable":
         return filterClaimable;
       case "stake-pool":
-        return undefined; // TODO: implement stake pool search
+        return filterStake;
       default:
         void (tab satisfies never); // exhaustive check
         return undefined;
     }
-  }, [tab, filterBurn, filterSwap, filterClaimable]);
+  }, [tab, filterBurn, filterSwap, filterClaimable, filterStake]);
 
   const setFilter = useMemo(() => {
     switch (tab) {
@@ -110,12 +115,12 @@ function RouteComponent() {
       case "claimable":
         return setFilterClaimable;
       case "stake-pool":
-        return undefined; // TODO: implement stake pool search
+        return setFilterStake;
       default:
         void (tab satisfies never); // exhaustive check
         return undefined;
     }
-  }, [tab, setFilterBurn, setFilterSwap, setFilterClaimable]);
+  }, [tab, setFilterBurn, setFilterSwap, setFilterClaimable, setFilterStake]);
 
   return (
     <ProfileLayout>
