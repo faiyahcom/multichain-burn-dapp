@@ -19,6 +19,8 @@ import { useScrollingFeed } from "@/hooks/useScrollingFeed";
 import { useActivityStream } from "@/hooks/useActivityStream";
 import { searchContainerId } from "../pair-list/glow/search";
 import { formatAmount } from "@/utils/helpers/numbers";
+import StakeHero from "./components/stake-hero";
+import { TopStakingPools } from "./components/top-staking";
 
 const DEFAULT_POOL_LIMIT = 4;
 
@@ -95,6 +97,11 @@ const HomeDashboard = () => {
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         <PartnerBurnSection />
         <TopSwapperSection data={topSwapperData} />
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <StakeHero />
+        <TopStakingPools data={topSwapperData} />
       </div>
 
       <GlowContainer className="px-5 py-4.5" variant="burn">

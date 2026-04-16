@@ -27,20 +27,22 @@ import TokenDisplay from "@/components/common/token-display";
 
 // ── Shared stat row ────────────────────────────────────────────────────────────
 
-const HeroStatRow = ({
+export const HeroStatRow = ({
     icon,
     label,
     value,
     valueClass,
+    iconWrapperClassname
 }: {
     icon: React.ReactNode;
     label: string;
     value: React.ReactNode;
     valueClass: string;
+    iconWrapperClassname?: string;
 }) => (
     <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 lg:gap-5">
-            <div className="flex size-10 items-center justify-center rounded-[6px] bg-mb-btn-burn/10">
+            <div className={`flex size-10 items-center justify-center rounded-[6px] ${iconWrapperClassname ?? "bg-mb-btn-burn/10"}`}>
                 {icon}
             </div>
             <span className="text-sm font-medium text-mb-gray-b8 2xl:text-base">
@@ -204,13 +206,13 @@ export const BurnSwapHero = ({ data }: Props) => {
                         Total Burned Volume
                     </p>
                     <HeroStatRow
-                        icon={<IconStack />}
+                        icon={<IconStack className="text-mb-burn-light" />}
                         label="Total Transactions"
                         value={shortenNumber({ number: data?.burnSection?.totalTxns ?? 0 })}
                         valueClass="text-mb-burn-light"
                     />
                     <HeroStatRow
-                        icon={<IconStack />}
+                        icon={<IconStack className="text-mb-burn-light" />}
                         label="Total Pools"
                         value={shortenNumber({
                             number: data?.burnSection?.totalPools ?? 0,
@@ -267,6 +269,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                         label="Total Transactions"
                         value={shortenNumber({ number: data?.swapSection?.totalTxns ?? 0 })}
                         valueClass="text-mb-swap-light"
+                        iconWrapperClassname="bg-mb-btn-swap/10"
                     />
                     <HeroStatRow
                         icon={<IconStackY />}
@@ -275,6 +278,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                             number: data?.swapSection?.totalPools ?? 0,
                         })}
                         valueClass="text-mb-swap-light"
+                        iconWrapperClassname="bg-mb-btn-swap/10"
                     />
                     <HeroStatRow
                         icon={<IconParticipant className="text-mb-swap-light" />}
@@ -283,6 +287,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                             number: data?.swapSection?.totalParticipants ?? 0,
                         })}
                         valueClass="text-mb-swap-light"
+                        iconWrapperClassname="bg-mb-btn-swap/10"
                     />
                 </div>
             </GlowContainer>

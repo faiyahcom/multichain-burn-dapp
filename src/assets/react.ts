@@ -70,6 +70,10 @@ export { default as IconTooltipInfo } from "./icons/glow/info.svg?react";
 export { default as IconMedal1 } from "./icons/glow/medal-1.svg?react";
 export { default as IconMedal2 } from "./icons/glow/medal-2.svg?react";
 export { default as IconMedal3 } from "./icons/glow/medal-3.svg?react";
+export { default as IconTop1 } from "./icons/glow/top-1.svg?react";
+export { default as IconTop2 } from "./icons/glow/top-2.svg?react";
+export { default as IconTop3 } from "./icons/glow/top-3.svg?react";
+export { default as IconStakeComingSoon } from "./icons/glow/stake-coming-soon.svg?react";
 
 export { default as IconDownTriangle } from "./icons/down-triangle.svg?react";
 
