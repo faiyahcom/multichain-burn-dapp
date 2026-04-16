@@ -1,23 +1,24 @@
 import {
   IconBurnCategory,
-  IconSwapCategory,
   IconPairCategory,
+  IconSwapCategory,
 } from "@/assets/react";
 import Dot from "@/components/common/glow/dot";
+import NoData from "@/components/common/no-data";
 import TokenDisplay from "@/components/common/token-display";
-import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
-import {
-  truncateString,
-  formatTimestampSecondsToDate,
-  formatRelativeTime,
-} from "@/utils/helpers/string";
 import { FEED_PAGE_SIZE, TXN_PAGE_SIZE } from "@/hooks/useScrollingFeed";
-import type { ActivityItem } from "@/services/dashboardService";
-import SwapActivityImage from "/images/dashboard/swap-activity.png";
-import { POOL_KIND } from "@/types/pool";
 import { cn } from "@/lib/utils";
-import { Link } from "@tanstack/react-router";
+import type { ActivityItem } from "@/services/dashboardService";
+import { POOL_KIND } from "@/types/pool";
 import { getExplorerUrl } from "@/utils/helpers/networks";
+import { formatAmount } from "@/utils/helpers/numbers";
+import {
+  formatRelativeTime,
+  formatTimestampSecondsToDate,
+  truncateString,
+} from "@/utils/helpers/string";
+import { Link } from "@tanstack/react-router";
+import SwapActivityImage from "/images/dashboard/swap-activity.png";
 
 // ── Grid Constants (Responsive & Synced) ──────────────────────────────────────
 
@@ -210,6 +211,8 @@ export const ActivityFeed = ({
     (_, i) => items[i] ?? null,
   );
 
+  const isEmpty = items.length === 0;
+
   return (
     <div className="flex flex-col gap-4 overflow-hidden">
       <div className="flex items-center justify-between">
@@ -227,28 +230,37 @@ export const ActivityFeed = ({
         </div>
       </div>
 
-      <div
-        key={animKey}
-        className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-x-40 2xl:gap-y-4"
-      >
-        {slots.map((item, i) =>
-          item ? (
-            <div key={item.id} className="py-0 2xl:py-1">
-              {renderRow(item)}
-            </div>
-          ) : (
-            <div
-              key={`ghost-${i}`}
-              className={cn(
-                "pointer-events-none invisible py-1.5 2xl:py-[11.5px]",
-                ghostRowClassName,
-              )}
-            >
-              &nbsp;
-            </div>
-          ),
-        )}
-      </div>
+      {isEmpty ? (
+        <NoData
+          classNames={{
+            container: "sm:py-12.5",
+          }}
+          text="No data"
+        />
+      ) : (
+        <div
+          key={animKey}
+          className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-x-40 2xl:gap-y-4"
+        >
+          {slots.map((item, i) =>
+            item ? (
+              <div key={item.id} className="py-0 2xl:py-1">
+                {renderRow(item)}
+              </div>
+            ) : (
+              <div
+                key={`ghost-${i}`}
+                className={cn(
+                  "pointer-events-none invisible py-1.5 2xl:py-[11.5px]",
+                  ghostRowClassName,
+                )}
+              >
+                &nbsp;
+              </div>
+            ),
+          )}
+        </div>
+      )}
     </div>
   );
 };
