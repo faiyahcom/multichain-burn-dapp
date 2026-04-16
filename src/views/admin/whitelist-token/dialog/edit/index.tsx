@@ -55,7 +55,7 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
-  poolTypes: z.array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)])),
+  poolTypes: z.array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)])).min(1, { error: "At least one pool type is required" }),
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -398,7 +398,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-3.25">
                   <FieldLabel htmlFor={field.name}>
-                    Pool type
+                    Pool type<span className="text-md-required-red">*</span>
                   </FieldLabel>
                   <div className="flex items-center gap-2.25">
                     {poolTypes.map((type) => {
