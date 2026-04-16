@@ -146,6 +146,9 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
       if (data.image) {
         formData.append("img", data.image);
       }
+      if (imageRemoved) {
+        formData.append("removeImg", "true");
+      }
 
       const result = await whitelistService.updateWhitelistToken({
         chainId: token.chainId,
