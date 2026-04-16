@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, StatRow } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-import TransferTokensDialog from "../TransferTokensDialog";
+import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
 import { formatAmount } from "@/utils/helpers/numbers";
 import { useBatchTransferSolFn } from "../hooks/useBatchTransferSolFn";
 import { useBatchTransferEvmFn } from "../hooks/useBatchTransferEvmFn";

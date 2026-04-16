@@ -138,6 +138,20 @@ const TransferTokensDialog = ({
   onTransfer,
 }: TransferTokensDialogProps) => {
   const isSwapPool = poolKind === 1;
+  const poolLabel = useMemo(() => {
+    switch (poolKind) {
+      case 0: return "Burn Pool";
+      case 1: return "Swap Pool";
+      case 2: return "Staking Rewards Pool";
+      case 3: return "Launchpad Pool";
+      default: return "Pool";
+    }
+  }, [poolKind]);
+
+  const depositTabDisabled = isSwapPool;
+  const depositTabTitle = isSwapPool
+    ? "Swap pools only allow reward token transfers"
+    : undefined;
   const [search, setSearch] = useState("");
   const [mode, setMode] = useState<TokenMode>("reward");
   /** map: address → amount string */
@@ -343,7 +357,7 @@ const TransferTokensDialog = ({
                 strokeLinejoin="round"
               />
             </svg>
-            Staking Rewards Pool
+            {poolLabel}
           </p>
 
           {/* 3-card row */}
@@ -493,22 +507,18 @@ const TransferTokensDialog = ({
           </button>
           <button
             type="button"
-            disabled={isSwapPool}
+            disabled={depositTabDisabled}
             className={cn(
               "rounded-r-lg border-l border-border py-2.5 text-sm font-medium transition-all",
-              mode === "deposit" && !isSwapPool
+              mode === "deposit" && !depositTabDisabled
                 ? "bg-primary text-white shadow-sm"
                 : "bg-transparent text-secondary-text",
-              isSwapPool
+              depositTabDisabled
                 ? "cursor-not-allowed opacity-35"
                 : mode !== "deposit" && "hover:bg-muted/40",
             )}
-            onClick={() => !isSwapPool && setMode("deposit")}
-            title={
-              isSwapPool
-                ? "Swap pools only allow reward token transfers"
-                : undefined
-            }
+            onClick={() => !depositTabDisabled && setMode("deposit")}
+            title={depositTabTitle}
           >
             Deposit Token
           </button>
