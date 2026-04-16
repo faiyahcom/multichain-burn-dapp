@@ -381,11 +381,6 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                           />
                         )}
                         isActive={tokenNetworkId === network.id}
-                        btnProps={{
-                          // Network is locked for edit — cannot change
-                          type: "button",
-                          disabled: true,
-                        }}
                         text={network.label}
                         color={network.color}
                         classNames={{

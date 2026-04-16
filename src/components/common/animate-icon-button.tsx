@@ -48,14 +48,14 @@ const AnimateIconButton: React.FC<Props> = (props) => {
   const isDisabled = isLoading || btnProps?.disabled;
 
   const resolveIcon = () => {
-    if (isLoading) {
-      return (
-        <IconSpinner
-          className={cn("size-5.5 animate-spin", classNames?.icon)}
-        />
-      );
-    }
-    if (isDisabled && !isActive) {
+    if (isDisabled) {
+      if (isLoading) {
+        return (
+          <IconSpinner
+            className={cn("size-5.5 animate-spin", classNames?.icon)}
+          />
+        );
+      }
       return null;
     }
 
@@ -99,14 +99,14 @@ const AnimateIconButton: React.FC<Props> = (props) => {
             hasGroupHover && !isDisabled,
         },
         {
-          "border-(--btn-bg) after:left-0": isActive,
+          "border-(--btn-bg) after:left-0": isActive && !isDisabled,
         },
         {
           "after:content-(--btn-after-text)": afterText,
         },
         {
           "justify-center gap-4 border-mb-btn-loading! bg-mb-btn-loading! after:hidden":
-            isDisabled && !isActive,
+            isDisabled,
         },
         classNames?.btn,
       )}
@@ -123,10 +123,10 @@ const AnimateIconButton: React.FC<Props> = (props) => {
               textVariant === "text-self-center",
           },
           {
-            "flex-1": !isDisabled || isActive
+            "flex-1": !isDisabled
           },
           {
-            "font-medium text-primary-foreground": isDisabled && !isActive,
+            "font-medium text-primary-foreground": isDisabled,
           },
           classNames?.text,
         )}
