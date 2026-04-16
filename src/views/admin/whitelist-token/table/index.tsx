@@ -219,7 +219,7 @@ const AdminWhitelistTokenTable = () => {
                 item.kind?.length > 0 ? activePoolTypes.length > 0 : item.enable;
 
               return (
-                <TableRow key={index}>
+                <TableRow key={index} className="group">
                   <TableCell>
                     <div className="flex items-center gap-1.75 pl-[15%]">
                       <TokenImage
@@ -255,7 +255,7 @@ const AdminWhitelistTokenTable = () => {
                       {displayKinds.map((kObj) => (
                         <span
                           key={kObj.kind}
-                          className="text-xs font-medium"
+                          className="text-xs font-medium transition-all group-hover:font-bold"
                         >
                           {poolTypeLabels[kObj.kind as keyof typeof poolTypeLabels] ?? `Kind ${kObj.kind}`}
                         </span>
@@ -338,12 +338,16 @@ const AdminWhitelistTokenTable = () => {
           </TableBody>
         </Table>
 
-        <CustomPagination
-          currentPage={filter.page}
-          totalCount={listTokensData?.total || 0}
-          pageSize={limit}
-          onPageChange={(page) => setFilter({ page })}
-        />
+        {
+          listTokensData && listTokensData?.total > 0 && (
+            <CustomPagination
+              currentPage={filter.page}
+              totalCount={listTokensData?.total || 0}
+              pageSize={limit}
+              onPageChange={(page) => setFilter({ page })}
+            />
+          )
+        }
       </div>
 
       <AdminWhitelistTokenDialogDetail
