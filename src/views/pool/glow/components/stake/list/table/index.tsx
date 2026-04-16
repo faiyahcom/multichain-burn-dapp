@@ -49,8 +49,8 @@ const StakePoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               key={index}
               variant="stake"
               style={{
-                width: index === 0 ? fixWidth : cellWidth, // 220px for first column
-                minWidth: index === 0 ? fixWidth : "", // 220px for first column
+                width: index === 0 ? fixWidth : cellWidth, // 200px for first column
+                minWidth: index === 0 ? fixWidth : "", // 200px for first column
               }}
             >
               {column}
