@@ -33,9 +33,9 @@ const AdminWhitelistTokenSearch = () => {
         chainIds:
           filter.network.length > 0
             ? filter.network
-                .map((network) => networkIdToChainId(network))
-                .filter((chainId) => chainId)
-                .join(",")
+              .map((network) => networkIdToChainId(network))
+              .filter((chainId) => chainId)
+              .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,
@@ -57,7 +57,7 @@ const AdminWhitelistTokenSearch = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold">Whitelist Token Management</h1>
           <div className="flex items-center gap-2.75 text-base font-semibold">
-            <p className="text-mb-danger">{totalTokens} tokens</p>
+            <p className="text-mb-danger"> {totalTokens} {totalTokens > 1 ? "tokens" : "token"}</p>
             <p className="text-mb-green">{totalEnable} active</p>
           </div>
         </div>
@@ -123,7 +123,7 @@ const AdminWhitelistTokenSearch = () => {
             }}
             value={filter.text}
             onValueChange={(value) => setFilter({ text: value })}
-            className="md:max-w-80.75"
+            className="min-w-75"
           />
         </div>
       </div>

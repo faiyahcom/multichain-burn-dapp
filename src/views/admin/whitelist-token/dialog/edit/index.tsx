@@ -97,10 +97,16 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
   const { disableWhitelistToken: disableWhitelistTokenEvm } =
     useDisableWhitelistTokenEvmFn();
 
+  // All pool types the token is registered for (regardless of enable status)
+  const allKinds = (token.kind ?? []).map((k) => k.kind) as PoolType[];
+
   // The token's currently enabled pool types from the backend
   const initialKinds = (token.kind ?? [])
     .filter((k) => k.enable)
     .map((k) => k.kind) as PoolType[];
+
+  // When all pool types are disabled, lock pool type editing but show which types exist
+  const isTokenFullyDisabled = allKinds.length > 0 && initialKinds.length === 0;
 
   const { control, handleSubmit, resetField, reset } =
     useForm<WhitelistTokenFormValues>({
@@ -133,6 +139,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
     mutationFn: async (data: WhitelistTokenFormValues) => {
       const formData = new FormData();
       formData.append("name", data.name);
+      formData.append("symbol", data.symbol);
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
@@ -401,15 +408,19 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                   <div className="flex items-center gap-2.25">
                     {poolTypes.map((type) => {
                       const selected = (field.value ?? []).includes(type);
+                      // When fully disabled, highlight pool types that exist in allKinds
+                      const highlighted = isTokenFullyDisabled && allKinds.includes(type);
                       return (
                         <AnimateIconButton
                           key={type}
                           variant="letter-icon"
                           iconLetter={poolTypeLabels[type][0]}
-                          isActive={selected}
+                          isActive={selected || highlighted}
                           btnProps={{
                             type: "button",
+                            disabled: isTokenFullyDisabled,
                             onClick: () => {
+                              if (isTokenFullyDisabled) return;
                               const current = field.value ?? [];
                               field.onChange(
                                 selected
