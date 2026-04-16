@@ -3311,6 +3311,19 @@
       ]
     },
     {
+      "name": "StakingPoolSubmitted",
+      "discriminator": [
+        192,
+        195,
+        166,
+        222,
+        47,
+        187,
+        46,
+        210
+      ]
+    },
+    {
       "name": "StakingPoolUpdated",
       "discriminator": [
         221,
@@ -4586,11 +4599,19 @@
                 "type": "pubkey"
               },
               {
-                "name": "token_mint",
+                "name": "reward_mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "deposit_mint",
                 "type": "pubkey"
               },
               {
                 "name": "asset_type",
+                "type": "u8"
+              },
+              {
+                "name": "asset_reward_type",
                 "type": "u8"
               },
               {
@@ -4606,7 +4627,7 @@
                 "type": "u64"
               },
               {
-                "name": "creation_fee_paid",
+                "name": "settlement_fee",
                 "type": "u64"
               },
               {
@@ -4631,10 +4652,6 @@
               },
               {
                 "name": "min_staking_amount",
-                "type": "u64"
-              },
-              {
-                "name": "reward_threshold",
                 "type": "u64"
               }
             ]
@@ -4906,6 +4923,27 @@
                 "type": "pubkey"
               }
             ]
+          },
+          {
+            "name": "PoolSubmitted",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              }
+            ]
           }
         ]
       }
@@ -4980,11 +5018,19 @@
             "type": "pubkey"
           },
           {
-            "name": "token_mint",
+            "name": "reward_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_mint",
             "type": "pubkey"
           },
           {
             "name": "asset_type",
+            "type": "u8"
+          },
+          {
+            "name": "asset_reward_type",
             "type": "u8"
           },
           {
@@ -5000,7 +5046,7 @@
             "type": "u64"
           },
           {
-            "name": "creation_fee_paid",
+            "name": "settlement_fee",
             "type": "u64"
           },
           {
@@ -5026,10 +5072,30 @@
           {
             "name": "min_staking_amount",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "StakingPoolSubmitted",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
           },
           {
-            "name": "reward_threshold",
+            "name": "pool_id",
             "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
           }
         ]
       }

@@ -3134,6 +3134,10 @@
             "type": "u8"
           },
           {
+            "name": "asset_reward_type",
+            "type": "u8"
+          },
+          {
             "name": "status",
             "type": {
               "defined": {
