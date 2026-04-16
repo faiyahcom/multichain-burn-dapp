@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import { ethers, type Eip1193Provider, type Log } from "ethers";
+import { ethers, type Eip1193Provider } from "ethers";
 import {
   getContractStakeFactory,
   getERC20Contract,
@@ -14,6 +14,8 @@ import { isNativeToken } from "@/hooks/useTokenBalance";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
 
 export type CreateStakePoolEvmParams = {
+  /** Pool name (max 31 UTF-8 bytes) */
+  name: string;
   stakingToken: string;
   rewardToken: string;
   startTime: Date;
@@ -24,7 +26,7 @@ export type CreateStakePoolEvmParams = {
   maxStakingAmount: string;
   /** Human-readable total staking cap (0 = unlimited) */
   stakingLimit: string;
-  /** Human-readable reward budget to deposit after creation */
+  /** Human-readable initial reward to deposit at creation */
   budget: string;
   /** Lock-up duration in days → unstakeDelay (seconds) */
   lockDuration: number;
@@ -36,6 +38,8 @@ export type CreateStakePoolEvmParams = {
   claimStartDelay: number;
   /** APR as plain percentage, e.g. 12 for 12% — stored as bps (×100) on-chain */
   apr: number;
+  /** Whether to submit the pool immediately after creation */
+  autoSubmit: boolean;
 };
 
 const normalizeAddress = (address: string) =>
@@ -97,7 +101,7 @@ export const useCreateStakePoolEvmFn = () => {
           params.stakingLimit || "0",
           stakingDecimals,
         );
-        const budgetAmount = ethers.parseUnits(
+        const initialReward = ethers.parseUnits(
           params.budget || "0",
           rewardDecimals,
         );
@@ -112,6 +116,7 @@ export const useCreateStakePoolEvmFn = () => {
 
         // 4. Build payload
         const payload = {
+          name: ethers.encodeBytes32String(params.name.slice(0, 31)),
           stakingToken: normalizeAddress(params.stakingToken),
           rewardToken: normalizeAddress(params.rewardToken),
           startTime: BigInt(Math.floor(params.startTime.getTime() / 1000)),
@@ -123,101 +128,69 @@ export const useCreateStakePoolEvmFn = () => {
           interestDelay: daysToSeconds(params.interestStartDelay),
           interestTime,
           claimDelay: daysToSeconds(params.claimStartDelay),
+          initialReward,
+          submitPool: params.autoSubmit,
           apr: aprBps,
         };
 
-        // 5. Gas check and create pool (no creation fee for staking pools)
+        console.log("Creating stake pool with payload:", payload);
+
+        // 5. ERC20 approve if initial reward is provided and reward is not native
+        if (initialReward > 0n && !rewardIsNative) {
+          const rewardTokenContract = getERC20Contract(params.rewardToken, signer);
+
+          const rewardBalance: bigint = await rewardTokenContract.balanceOf(userAddress);
+          if (rewardBalance < initialReward) {
+            throw new Error(
+              `Insufficient reward token balance. Required: ${ethers.formatUnits(initialReward, rewardDecimals)}`,
+            );
+          }
+
+          const currentAllowance: bigint = await rewardTokenContract.allowance(
+            userAddress,
+            contractAddress,
+          );
+          if (currentAllowance < initialReward) {
+            const approveTx = await rewardTokenContract.approve(contractAddress, initialReward);
+            await approveTx.wait();
+          }
+        }
+
+        // 6. Gas check and create pool (initialReward deposited atomically)
+        const nativeValue = rewardIsNative ? initialReward : 0n;
         await assertSufficientNativeBalanceForTransaction({
           provider,
           address: userAddress,
-          txValue: 0n,
-          estimateGas: () => contract.createPool.estimateGas(payload, { value: 0n }),
+          txValue: nativeValue,
+          estimateGas: () =>
+            contract.createPool.estimateGas(payload, { value: nativeValue }),
         });
 
-        const createTx = await contract.createPool(payload, { value: 0n });
+        const createTx = await contract.createPool(payload, { value: nativeValue });
         const createReceipt = await createTx.wait();
 
-        toast.success("Staking pool created!", {
+        toast.success(params.autoSubmit ? "Staking pool created & submitted!" : "Staking pool saved as draft!", {
           description: `Tx: ${createReceipt.hash}`,
         });
 
-        // 6. Parse pool address from PoolCreated event
-        const poolCreatedLog = createReceipt?.logs?.find((log: Log) => {
-          try {
-            const parsed = contract.interface.parseLog({
-              topics: log.topics as string[],
-              data: log.data,
-            });
-            return parsed?.name === "PoolCreated";
-          } catch {
-            return false;
-          }
-        });
+        // 7. Parse pool address from StakingPoolCreated event
+        const poolCreatedLog = createReceipt?.logs
+          ?.map((log: { topics: readonly string[]; data: string }) => {
+            try {
+              return contract.interface.parseLog({
+                topics: log.topics as string[],
+                data: log.data,
+              });
+            } catch {
+              return null;
+            }
+          })
+          .find((parsed: { name: string; }) => parsed?.name === "StakingPoolCreated");
 
-        const poolAddress: string | undefined =
-          poolCreatedLog &&
-          contract.interface.parseLog({
-            topics: poolCreatedLog.topics as string[],
-            data: poolCreatedLog.data,
-          })?.args?.pool;
+        const poolAddress: string | undefined = poolCreatedLog?.args?.pool;
 
         if (!poolAddress) {
           throw new Error("Could not determine pool address from transaction");
-        }
-
-        // 7. Deposit reward budget (if provided)
-        if (budgetAmount > 0n) {
-          if (rewardIsNative) {
-            await assertSufficientNativeBalanceForTransaction({
-              provider,
-              address: userAddress,
-              txValue: budgetAmount,
-              estimateGas: () =>
-                contract.depositReward.estimateGas(poolAddress, budgetAmount, {
-                  value: budgetAmount,
-                }),
-            });
-
-            const depositTx = await contract.depositReward(
-              poolAddress,
-              budgetAmount,
-              { value: budgetAmount },
-            );
-            await depositTx.wait();
-          } else {
-            const rewardTokenContract = getERC20Contract(
-              params.rewardToken,
-              signer,
-            );
-
-            const rewardBalance: bigint = await rewardTokenContract.balanceOf(
-              userAddress,
-            );
-            if (rewardBalance < budgetAmount) {
-              throw new Error(
-                `Insufficient reward token balance. Required: ${ethers.formatUnits(budgetAmount, rewardDecimals)}`,
-              );
-            }
-
-            const currentAllowance: bigint = await rewardTokenContract.allowance(
-              userAddress,
-              contractAddress,
-            );
-            if (currentAllowance < budgetAmount) {
-              const approveTx = await rewardTokenContract.approve(
-                contractAddress,
-                budgetAmount,
-              );
-              await approveTx.wait();
-            }
-
-            const depositTx = await contract.depositReward(
-              poolAddress,
-              budgetAmount,
-              { value: 0n },
-            );
-            await depositTx.wait();
-          }
         }
 
         return poolAddress;
@@ -231,34 +204,5 @@ export const useCreateStakePoolEvmFn = () => {
     [isConnected, walletProvider],
   );
 
-  const submitPool = useCallback(
-    async (poolAddress: string): Promise<void> => {
-      try {
-        if (!isConnected || !walletProvider) {
-          throw new Error("Wallet not connected");
-        }
-
-        const provider = new ethers.BrowserProvider(
-          walletProvider as Eip1193Provider,
-        );
-        const signer = await provider.getSigner();
-        const contract = getContractStakeFactory(signer);
-
-        const tx = await contract.submitPool(poolAddress);
-        await tx.wait();
-
-        toast.success("Staking pool submitted for review!", {
-          description: `Tx: ${tx.hash}`,
-        });
-      } catch (error: unknown) {
-        toast.error("Submit staking pool failed", {
-          description: getErrorMessage({ error }),
-        });
-        throw error;
-      }
-    },
-    [isConnected, walletProvider],
-  );
-
-  return { createPool, submitPool };
+  return { createPool };
 };

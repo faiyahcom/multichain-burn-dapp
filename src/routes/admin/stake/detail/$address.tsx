@@ -1,4 +1,4 @@
-import AdminBurnPoolDetail from '@/views/admin/burn/detail';
+import AdminStakePoolDetail from '@/views/admin/stake/detail';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useAuthStore } from '@/stores/authStore';
 
@@ -14,5 +14,5 @@ export const Route = createFileRoute('/admin/stake/detail/$address')({
 
 function RouteComponent() {
     const { address } = Route.useParams();
-    return <AdminBurnPoolDetail address={address} />
+    return <AdminStakePoolDetail address={address} />
 }

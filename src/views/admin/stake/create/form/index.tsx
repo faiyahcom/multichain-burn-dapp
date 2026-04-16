@@ -1,14 +1,13 @@
 import { useRef } from "react";
 import { Input } from "@/components/ui/input";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
 import { DatePicker } from "@/components/ui/date-picker";
 import { InputGroup, InputGroupAddon } from "@/components/ui/input-group";
-import BlueSwitch from "@/components/common/blue-switch";
 import { useCreateStakePoolSolFn } from "../useCreateStakePoolSolFn";
 import { useCreateStakePoolEvmFn } from "../useCreateStakePoolEvmFn";
 import NetworkIcon from "@/components/layout/header/network-icon";
@@ -45,7 +44,7 @@ const CreateStakePoolForm = () => {
 
   const { createPool: createPoolSol, submitPool: submitPoolSol } =
     useCreateStakePoolSolFn();
-  const { createPool: createPoolEvm, submitPool: submitPoolEvm } =
+  const { createPool: createPoolEvm } =
     useCreateStakePoolEvmFn();
   const submitActionRef = useRef<"draft" | "submit">("draft");
   const inFlightRef = useRef(false);
@@ -56,7 +55,6 @@ const CreateStakePoolForm = () => {
     reset,
     setValue,
     watch,
-    control,
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<CreateStakePoolFormValues>({
@@ -85,7 +83,6 @@ const CreateStakePoolForm = () => {
   const startTime = watch("startTime");
   const endTime = watch("endTime");
   const networkId = watch("networkId");
-  const lowRewardNotification = watch("lowRewardNotification");
   const network = NETWORK_CONFIGS.find((n) => n.id === networkId);
 
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
@@ -147,6 +144,7 @@ const CreateStakePoolForm = () => {
 
       // EVM handler
       const poolAddress = await createPoolEvm({
+        name: values.poolName.trim(),
         stakingToken: values.stakingToken,
         rewardToken: values.rewardToken,
         startTime: values.startTime,
@@ -164,9 +162,9 @@ const CreateStakePoolForm = () => {
             : Number(values.interestAccrualDuration),
         claimStartDelay: Number(values.claimStartDelay) || 0,
         apr: Number(values.apr) || 0,
+        autoSubmit: !isDraft,
       });
       if (poolAddress) {
-        if (!isDraft) await submitPoolEvm(poolAddress);
         reset();
         navigate({
           to: "/admin/stake/detail/$address",
@@ -590,26 +588,6 @@ const CreateStakePoolForm = () => {
           {errors.apr && (
             <p className="text-xs text-destructive">{errors.apr.message}</p>
           )}
-        </div>
-
-        {/* Low Reward Notification */}
-        <div className="flex flex-col gap-2">
-          <span className="text-[13px]">Low Reward Notification</span>
-          <div className="flex items-center gap-3">
-            <Controller
-              name="lowRewardNotification"
-              control={control}
-              render={({ field }) => (
-                <BlueSwitch
-                  active={field.value}
-                  onClick={() => field.onChange(!field.value)}
-                />
-              )}
-            />
-            <span className="text-[13px]">
-              {lowRewardNotification ? "Yes" : "No"}
-            </span>
-          </div>
         </div>
       </div>
 
