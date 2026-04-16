@@ -9,6 +9,7 @@ import { PoolKindCodeEnum } from "@/types/pool";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { useQuery } from "@tanstack/react-query";
 import { useMediaQuery } from "usehooks-ts";
+import StakePoolListGrid from "./grid";
 import StakePoolListTable from "./table";
 
 const StakePoolList = () => {
@@ -49,12 +50,12 @@ const StakePoolList = () => {
           isLoading={isPoolListPending}
         />
       )}
-      {/* {filter.listLayout === "card" && (
-        <BurnPoolListGrid
+      {filter.listLayout === "card" && (
+        <StakePoolListGrid
           data={poolList?.pools}
           isLoading={isPoolListPending}
         />
-      )} */}
+      )}
       {!!poolList?.pools?.length && (
         <CustomPagination
           currentPage={filter.page}

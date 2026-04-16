@@ -33,6 +33,7 @@ import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/adm
 import { Route as AdminFeeSettingsManagementIndexRouteImport } from './routes/admin/fee-settings-management/index'
 import { Route as AdminAdminManagementIndexRouteImport } from './routes/admin/admin-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
+import { Route as StakingDetailAddressRouteImport } from './routes/staking/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
@@ -167,6 +168,11 @@ const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
   path: '/swap/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const StakingDetailAddressRoute = StakingDetailAddressRouteImport.update({
+  id: '/staking/detail/$address',
+  path: '/staking/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
   id: '/burn/detail/$address',
   path: '/burn/detail/$address',
@@ -210,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/admin-management': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
@@ -241,6 +248,7 @@ export interface FileRoutesByTo {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/admin-management': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
@@ -273,6 +281,7 @@ export interface FileRoutesById {
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/admin/admin-management/': typeof AdminAdminManagementIndexRoute
   '/admin/fee-settings-management/': typeof AdminFeeSettingsManagementIndexRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/burn/detail/$address'
+    | '/staking/detail/$address'
     | '/swap/detail/$address'
     | '/admin/admin-management'
     | '/admin/fee-settings-management'
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/burn/detail/$address'
+    | '/staking/detail/$address'
     | '/swap/detail/$address'
     | '/admin/admin-management'
     | '/admin/fee-settings-management'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/swap-history/'
     | '/swap/'
     | '/burn/detail/$address'
+    | '/staking/detail/$address'
     | '/swap/detail/$address'
     | '/admin/admin-management/'
     | '/admin/fee-settings-management/'
@@ -400,6 +412,7 @@ export interface RootRouteChildren {
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
   BurnDetailAddressRoute: typeof BurnDetailAddressRoute
+  StakingDetailAddressRoute: typeof StakingDetailAddressRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
   AdminAdminManagementIndexRoute: typeof AdminAdminManagementIndexRoute
   AdminFeeSettingsManagementIndexRoute: typeof AdminFeeSettingsManagementIndexRoute
@@ -586,6 +599,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SwapDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/staking/detail/$address': {
+      id: '/staking/detail/$address'
+      path: '/staking/detail/$address'
+      fullPath: '/staking/detail/$address'
+      preLoaderRoute: typeof StakingDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/burn/detail/$address': {
       id: '/burn/detail/$address'
       path: '/burn/detail/$address'
@@ -640,6 +660,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,
   BurnDetailAddressRoute: BurnDetailAddressRoute,
+  StakingDetailAddressRoute: StakingDetailAddressRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
   AdminAdminManagementIndexRoute: AdminAdminManagementIndexRoute,
   AdminFeeSettingsManagementIndexRoute: AdminFeeSettingsManagementIndexRoute,
