@@ -1,6 +1,6 @@
-import { IconStakeCategory } from "@/assets/react";
 import CopyableText from "@/components/common/copyable-text";
 import { Button } from "@/components/common/glow/button";
+import StakeCategoryIcon from "@/components/common/glow/icon/stake-category-icon";
 import {
   Table,
   TableBody,
@@ -64,7 +64,7 @@ const StakeRecentPoolsTable = ({}: {}) => {
               {columns.map((column, index) => (
                 <TableHead
                   key={column}
-                  variant="swap"
+                  variant="stake"
                   className="h-12 pt-2 align-baseline"
                   style={{
                     width: index === 0 ? fixWidth : cellWidth, // 200px for first column
@@ -136,7 +136,7 @@ const StakeRecentPoolsTable = ({}: {}) => {
                   }
                 >
                   <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
-                    <IconStakeCategory className="size-10.75 shrink-0" />
+                    <StakeCategoryIcon className="size-10.75 shrink-0" />
                     {/* max-w - spacing * (10.75 + 3) */}
                     <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
                       <p
