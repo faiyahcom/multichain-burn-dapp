@@ -110,8 +110,9 @@ export const useCreateStakePoolEvmFn = () => {
         const aprBps = BigInt(Math.round(params.apr * DECIMAL_FEE_PERCENT));
 
         const interestTime =
-          params.interestAccrualDuration === null
-            ? ethers.MaxUint256 // infinite accrual until unstake
+          params.interestAccrualDuration === null ||
+            params.interestAccrualDuration <= 0
+            ? 0n
             : daysToSeconds(params.interestAccrualDuration);
 
         // 4. Build payload
@@ -137,9 +138,13 @@ export const useCreateStakePoolEvmFn = () => {
 
         // 5. ERC20 approve if initial reward is provided and reward is not native
         if (initialReward > 0n && !rewardIsNative) {
-          const rewardTokenContract = getERC20Contract(params.rewardToken, signer);
+          const rewardTokenContract = getERC20Contract(
+            params.rewardToken,
+            signer,
+          );
 
-          const rewardBalance: bigint = await rewardTokenContract.balanceOf(userAddress);
+          const rewardBalance: bigint =
+            await rewardTokenContract.balanceOf(userAddress);
           if (rewardBalance < initialReward) {
             throw new Error(
               `Insufficient reward token balance. Required: ${ethers.formatUnits(initialReward, rewardDecimals)}`,
@@ -151,7 +156,10 @@ export const useCreateStakePoolEvmFn = () => {
             contractAddress,
           );
           if (currentAllowance < initialReward) {
-            const approveTx = await rewardTokenContract.approve(contractAddress, initialReward);
+            const approveTx = await rewardTokenContract.approve(
+              contractAddress,
+              initialReward,
+            );
             await approveTx.wait();
           }
         }
@@ -166,12 +174,19 @@ export const useCreateStakePoolEvmFn = () => {
             contract.createPool.estimateGas(payload, { value: nativeValue }),
         });
 
-        const createTx = await contract.createPool(payload, { value: nativeValue });
+        const createTx = await contract.createPool(payload, {
+          value: nativeValue,
+        });
         const createReceipt = await createTx.wait();
 
-        toast.success(params.autoSubmit ? "Staking pool created & submitted!" : "Staking pool saved as draft!", {
-          description: `Tx: ${createReceipt.hash}`,
-        });
+        toast.success(
+          params.autoSubmit
+            ? "Staking pool created & submitted!"
+            : "Staking pool saved as draft!",
+          {
+            description: `Tx: ${createReceipt.hash}`,
+          },
+        );
 
         // 7. Parse pool address from StakingPoolCreated event
         const poolCreatedLog = createReceipt?.logs
@@ -185,7 +200,9 @@ export const useCreateStakePoolEvmFn = () => {
               return null;
             }
           })
-          .find((parsed: { name: string; }) => parsed?.name === "StakingPoolCreated");
+          .find(
+            (parsed: { name: string }) => parsed?.name === "StakingPoolCreated",
+          );
 
         const poolAddress: string | undefined = poolCreatedLog?.args?.pool;
 

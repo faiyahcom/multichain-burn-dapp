@@ -163,8 +163,8 @@ export const useCreateStakePoolSolFn = () => {
                 );
                 const delayClaim = new BN(Math.round(params.claimStartDelay * 86400));
                 const interestDuration =
-                    params.interestAccrualDuration === null
-                        ? new BN("9223372036854775807") // i64::MAX — infinite accrual until unstake
+                    params.interestAccrualDuration === null || params.interestAccrualDuration <= 0
+                        ? new BN(0) // i64::MAX — infinite accrual until unstake
                         : new BN(Math.round(params.interestAccrualDuration * 86400));
                 // APR stored as basis points: 12% → 1200 bps
                 const aprBps = new BN(Math.round(params.apr * DECIMAL_FEE_PERCENT));
