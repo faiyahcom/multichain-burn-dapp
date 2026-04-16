@@ -1,5 +1,6 @@
 import { NETWORK_CONFIGS } from "@/config/networks";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { create } from "zustand";
 
 type MyParticipatedPoolsClaimableSearchFilterState = {
@@ -16,6 +17,7 @@ export const useMyParticipatedPoolsClaimableSearchFilterStore =
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "claimableReward",
       sortOrder: "desc",
+      poolType: [PoolKindCodeEnum.Burn, PoolKindCodeEnum.Stake],
     },
     setFilter: (filter) =>
       set((state) => ({

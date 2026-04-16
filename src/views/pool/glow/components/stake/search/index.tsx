@@ -25,7 +25,7 @@ const StakeSearch = () => {
       className="flex flex-col gap-3 p-3 md:p-6 1440px:flex-row"
     >
       <SearchTextDebouncedInput
-        variant="swap"
+        variant="stake"
         inputProps={{
           placeholder: "Search",
         }}

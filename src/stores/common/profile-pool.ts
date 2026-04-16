@@ -1,4 +1,4 @@
-import type { AllPoolStatus } from "@/types/admin/master-pool-management";
+import type { AllPoolStatus, PoolType } from "@/types/admin/master-pool-management";
 import type { SortBy, SortOrder } from "@/types/common";
 
 export type ProfilePoolSearchType = {
@@ -8,4 +8,5 @@ export type ProfilePoolSearchType = {
   network?: string[];
   sortBy?: SortBy;
   sortOrder?: SortOrder;
+  poolType?: PoolType[];
 };
