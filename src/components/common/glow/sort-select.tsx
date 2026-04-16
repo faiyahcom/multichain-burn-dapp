@@ -162,7 +162,7 @@ const OptionItem: React.FC<OptionItemProps> = ({
           getVariantBtnBg50ClassName({ variant, isGroupHover: true }),
         )}
       >
-        <span className="text-15px font-normal sm:text-xl">
+        <span className="text-15px font-normal select-none sm:text-xl">
           {label ?? sortBysLabels[sortBy ?? "none"]}
         </span>{" "}
         {isActive && (

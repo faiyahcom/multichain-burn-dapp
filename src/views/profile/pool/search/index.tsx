@@ -9,6 +9,7 @@ import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
 import {
   burnPoolStatuses,
   getPoolStatusLabel,
+  poolTypeLabels,
   swapPoolStatuses,
   userViewStakePoolStatuses,
   type AllPoolStatus,
@@ -79,6 +80,14 @@ const ProfilePoolSearch: React.FC<Props> = ({
     return ["volume", "liquidity"];
   }, [poolType]);
 
+  const poolTypeOptions: MultipleSelectOption[] = [
+    PoolKindCodeEnum.Burn,
+    PoolKindCodeEnum.Stake,
+  ].map((type) => ({
+    label: poolTypeLabels[type],
+    value: type.toString(),
+  }));
+
   return (
     <GlowContainer
       variant="pair"
@@ -117,6 +126,20 @@ const ProfilePoolSearch: React.FC<Props> = ({
           },
         }}
       />
+      {poolType === "claimable" && (
+        <MultipleSelect
+          variant="pair"
+          options={poolTypeOptions}
+          onChange={(value) =>
+            setFilter?.({ poolType: value?.map((v) => Number(v)) })
+          }
+          selected={filter?.poolType?.map((v) => v.toString())}
+          placeholder="Type"
+          classNames={{
+            btn: "w-full 2xl:max-w-65",
+          }}
+        />
+      )}
       <SortSelect
         options={sortOptions}
         sortBy={filter?.sortBy ?? "none"}
