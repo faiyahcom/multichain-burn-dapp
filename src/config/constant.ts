@@ -15,3 +15,5 @@ export const DEFAULT_INPUT_NUMBER_STEP = "0.000001";
 
 export const WRONG_NETWORK_ERROR_MESSAGE =
   "Please switch to an account on the correct network to continue.";
+
+export const PLACEHOLDER_AVATAR_URL = "/images/default-avatar-pair.svg";

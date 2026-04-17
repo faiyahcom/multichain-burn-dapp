@@ -3,6 +3,7 @@ import { Button } from "@/components/common/glow/button";
 import { Input } from "@/components/common/glow/input";
 import SingleImageUpload from "@/components/common/glow/single-image-upload";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+import { PLACEHOLDER_AVATAR_URL } from "@/config/constant";
 import {
   authService,
   type UpdatePersonalInfoRequest,
@@ -143,7 +144,7 @@ const PersonalInfoSettingsGlowForm = () => {
             <SingleImageUpload
               img={field.value}
               aria-invalid={fieldState.invalid}
-              placeholderSrc="/images/placeholder-avatar.png"
+              placeholderSrc={PLACEHOLDER_AVATAR_URL}
               alt="Avatar"
               id={field.name}
               onChange={(img) => {

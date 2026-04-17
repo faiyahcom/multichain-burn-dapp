@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PLACEHOLDER_AVATAR_URL } from "@/config/constant";
 import { authService } from "@/services/authService";
 import { authQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
@@ -53,7 +54,7 @@ const ProfileMenu = ({}: Props) => {
     logout();
   };
 
-  const avatar = userApiData?.avatar ?? walletInfo?.icon;
+  const avatar = userApiData?.avatar ?? PLACEHOLDER_AVATAR_URL;
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
   return (
