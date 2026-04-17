@@ -91,7 +91,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
     ],
     [
       { label: "Creation Fee", value: creationFee },
-      { label: "Burn Amount", value: `${formattedBurn} ${burnSymbol}` },
+      { label: "Swap Amount", value: `${formattedBurn} ${burnSymbol}` },
     ],
   ] as const;
 
