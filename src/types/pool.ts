@@ -96,6 +96,21 @@ export interface PoolDetailResponse {
     settlementFee: string;
     poolCreationFee: string;
     isPartner?: boolean;
+        // Staking pool fields
+        apr?: string;
+        lockUpDuration?: string;
+        interestStrartDelay?: string; // API typo (double 'r')
+        interestAccrualDuration?: string;
+        claimStartDelay?: string;
+    };
+    // Staking pool aggregate data
+    staking?: {
+        totalStaked: string;
+        user?: {
+            totalStaked: string;
+            totalUnstaked: string;
+            totatClaimed: string; // API typo (missing 'l')
+        };
   };
   returningAmountOnCanceling?: {
     amount: string;
@@ -126,12 +141,16 @@ export interface PoolTxnsResponse {
 }
 
 export const txnKind = {
-  1: "Taker Deposit",
-  2: "Refund to Whitelist User",
-  3: "Maker Deposit Reward",
-  4: "Taker Claim Reward",
-  5: "Refund to Maker",
-  6: "Burn Success",
+    1: "Taker Deposit",
+    2: "Refund to Whitelist User",
+    3: "Maker Deposit Reward",
+    4: "Taker Claim Reward",
+    5: "Refund to Maker",
+    6: "Burn Success",
+    7: "Stake",
+    8: "Claim",
+    9: "Unstake & Claim",
+    10: "Emergency Withdraw"
 } as const;
 
 export const activityKind = {
@@ -145,24 +164,27 @@ export const activityKind = {
   6: "Pool Closed",
   7: "Pool Updated",
   8: "Pool Ended",
+  9: "Create stake pool",
+  69: "Submit stake pool",
 
   // Maker action
   10: "Deposit reward token",
   11: "Maker Cancel Approve Request",
+  12: "Maker Withdraw Reward",
 
   // Admin action
   20: "Admin Refund",
+  21: "Admin Deposit Reward",
 
   // User actions
   30: "Deposit burn token",
   31: "Claim reward",
   32: "Swap",
+  33: "Stake",
+  34: "Unstake",
+  35: "Claim Stake reward",
 
   40: "Pool End",
-
-  // TODO: subject to change
-  51: "Staking",
-  52: "Unstaking",
 } as const;
 
 export type ActivityKindKey = keyof typeof activityKind;
@@ -183,7 +205,7 @@ export function pickActivityKind<K extends keyof ActivityKind>(
 }
 
 export const myActivityActions = pickActivityKind([
-  1, 0, 10, 32, 30, 31, 5, 51, 52,
+  1, 0, 10, 32, 30, 31, 5
 ]);
 
 export interface PoolActivitiesResponse {
