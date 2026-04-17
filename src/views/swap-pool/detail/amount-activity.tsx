@@ -149,7 +149,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             </div>
             <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">
-                    Your Burned Amount
+                    Your Swapped Amount
                 </span>
                 <span className="text-sm font-bold md:text-base lg:text-md 2xl:text-xl">
                     {poolDetail ? (

@@ -94,7 +94,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
             <div className="space-y-3.75">
                 <p className="flex justify-between pr-2 text-sm md:pr-5 md:text-base lg:text-xl 2xl:text-2xl">
                     <span className="text-mb-gray-b8">
-                        Total Burned Amount:
+                        Total Swapped Amount:
                     </span>{" "}
                     <span className="">
                         {formattedBurned} / {formattedMaxBurn} {burnTokenDisplay?.symbol}

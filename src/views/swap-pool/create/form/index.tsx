@@ -210,7 +210,7 @@ const CreateSwapPoolForm = ({
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
             <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
-              Token Burn
+              Token Swap
             </span>
             <WhitelistTokenSelect
               variant="swap"
@@ -234,7 +234,7 @@ const CreateSwapPoolForm = ({
             />
             <input
               type="hidden"
-              {...register("tokenBurn", { required: "Token burn is required" })}
+              {...register("tokenBurn", { required: "Token swap is required" })}
             />
             {errors.tokenBurn && (
               <p className="font-inter text-xs text-destructive">
@@ -254,7 +254,7 @@ const CreateSwapPoolForm = ({
                 textContainer: "min-h-10 font-inter",
               }}
               side="right"
-              content="Token burn : token reward"
+              content="Token swap : token reward"
             />
           </span>
           <div className="flex items-center gap-3">
@@ -423,7 +423,7 @@ const CreateSwapPoolForm = ({
 
           <div className="flex flex-col justify-end gap-2">
             <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
-              Burn Method
+              Swap Method
             </span>
             <span
               className={cn(
