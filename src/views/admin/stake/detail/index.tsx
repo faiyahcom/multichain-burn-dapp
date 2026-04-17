@@ -9,21 +9,7 @@ import PoolHistory from "./pool-history";
 import ScanLink from "@/components/common/scan-link";
 import { useOnChainVaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
-
-// Extend status display map with staking-specific statuses
-const STAKE_POOL_STATUS: Record<string, { label: string; color: string; letter: string }> = {
-    ...BURN_POOL_STATUS,
-    live: {
-        label: "Live",
-        color: "#7af4cb",
-        letter: "L",
-    },
-    end: {
-        label: "End",
-        color: "#A6B7FF",
-        letter: "E",
-    },
-};
+import { StartsInCountdown, EndsInCountdown } from "@/components/shared/countdown";
 
 type Props = {
     address: string;
@@ -33,11 +19,12 @@ const AdminStakePoolDetail = ({ address }: Props) => {
     const { data: poolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
         queryFn: () => poolService.getPoolDetail(address),
+        refetchInterval: 2_500,
     });
 
     const pool = poolDetail?.pool;
     const status = pool?.status ?? "draft";
-    const statusDisplay = STAKE_POOL_STATUS[status] ?? STAKE_POOL_STATUS["draft"];
+    const statusDisplay = BURN_POOL_STATUS[status] ?? BURN_POOL_STATUS["draft"];
 
     // Shared on-chain vault balance — used by both StakedRewardAmount and ClosedStatus
     const vaultBalance = useOnChainVaultBalance({
@@ -52,13 +39,15 @@ const AdminStakePoolDetail = ({ address }: Props) => {
     });
 
     const renderExtraContent = () => {
-        switch (status) {
+        switch (status as string) {
             case "pending":
-                return (
-                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
-                        This pool is waiting for admin approval.
-                    </p>
-                );
+                return pool?.timeStart ? (
+                    <StartsInCountdown
+                        startTime={pool.timeStart}
+                        poolAddress={address}
+                        className="text-xl"
+                    />
+                ) : null;
             case "holding":
                 return (
                     <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
@@ -67,11 +56,13 @@ const AdminStakePoolDetail = ({ address }: Props) => {
                 );
             case "live":
             case "on_going":
-                return (
-                    <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
-                        This pool is currently active. Users can stake until the end time.
-                    </p>
-                );
+                return pool?.timeEnd ? (
+                    <EndsInCountdown
+                        endTime={pool.timeEnd}
+                        poolAddress={address}
+                        className="text-xl"
+                    />
+                ) : null;
             case "closed":
                 return (
                     <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">

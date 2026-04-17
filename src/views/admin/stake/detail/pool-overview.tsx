@@ -24,10 +24,10 @@ function formatDuration(seconds: number | bigint | undefined | null): string {
     const hours = Math.floor((s % 86400) / 3600);
     const minutes = Math.floor((s % 3600) / 60);
     const parts: string[] = [];
-    if (days) parts.push(`${days}d`);
-    if (hours) parts.push(`${hours}h`);
-    if (minutes) parts.push(`${minutes}m`);
-    return parts.length ? parts.join(" ") : `${s}s`;
+    if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+    if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
+    if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    return parts.length ? parts.join(" ") : `${s} seconds`;
 }
 
 const PoolOverview = ({ poolDetail }: Props) => {
@@ -81,14 +81,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
                 {
                     label: "Interest Accrual Duration",
-                    value: formatDuration(stakePool?.interestDuration),
+                    value: formatDuration(Number(stakePool?.interestAccrualDuration)),
                 },
             ],
             [
                 { label: "Pool Type", value: "Staking Pool" },
                 {
                     label: "Claim Start Delay",
-                    value: formatDuration(stakePool?.delayClaim),
+                    value: formatDuration(Number(stakePool?.claimStartDelay)),
                 },
             ],
             [
@@ -106,7 +106,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
             [
                 {
                     label: "Lock-up Duration",
-                    value: formatDuration(stakePool?.lockDuration),
+                    value: formatDuration(Number(stakePool?.lockUpDuration)),
                 },
                 {
                     label: "Staking Token",
@@ -125,7 +125,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
             [
                 {
                     label: "Interest Start Delay",
-                    value: formatDuration(stakePool?.delayAccumulate),
+                    // API field has a typo: "interestStrartDelay"
+                    value: formatDuration(Number(stakePool?.interestStrartDelay)),
                 },
                 {
                     label: "Reward Token",

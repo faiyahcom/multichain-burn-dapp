@@ -108,6 +108,21 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
+    const handleDepositRewardWithAmount = async (amountStr: string) => {
+        if (!pool) return;
+        if (isSolana && poolDetail) {
+            await depositRewardSol({ poolAddress: pool.address, poolDetail, amountStr });
+        } else {
+            await depositRewardEvm({
+                poolAddress: pool.address,
+                rewardToken: pool.rewardToken,
+                amountStr,
+                decimals: pool.rewardTokenDecimals,
+            });
+        }
+        invalidatePoolQueries(pool.address);
+    };
+
     const handleEdit = () => {
         if (!pool?.address) return;
         navigate({
@@ -132,6 +147,7 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         handleCancelPool,
         handleEmergencyClose,
         handleDepositReward,
+        handleDepositRewardWithAmount,
         handleEdit,
         // util
         invalidatePoolQueries,

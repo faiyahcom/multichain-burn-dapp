@@ -1,39 +1,28 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
-import { ActionBtn, AmountInput } from "../components";
+import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-import { chainIdToNetworkConfig } from "@/config/networks";
-import { AssetTypeEnum } from "@/web3/helpers";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
+import DepositRewardDialog from "../DepositRewardDialog";
+import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    vaultBalance?: VaultBalance;
 };
 
-const DraftStatus = ({ poolDetail }: Props) => {
+const DraftStatus = ({ poolDetail, vaultBalance }: Props) => {
     const {
-        pool,
         depositRewardOpen,
         setDepositRewardOpen,
-        depositRewardInput,
-        setDepositRewardInput,
         handleCancelPool,
-        handleDepositReward,
+        handleDepositRewardWithAmount,
         handleEdit,
         handleSubmitPool,
     } = useAmountActivity(poolDetail);
 
     const [activeAction, setActiveAction] = useState<"cancel" | "submit" | null>(null);
     const isRunning = activeAction !== null;
-
-    const networkConfig = useMemo(
-        () => (pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined),
-        [pool?.chainId],
-    );
-    const rewardTokenSymbolDisplay =
-        pool?.assetTypeReward === AssetTypeEnum.NATIVE
-            ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
-            : (pool?.rewardTokenSymbol ?? "");
 
     const run = async (name: "cancel" | "submit", fn: () => Promise<void>) => {
         setActiveAction(name);
@@ -59,14 +48,14 @@ const DraftStatus = ({ poolDetail }: Props) => {
                 text="Deposit Reward"
                 color="#FFC198"
                 disabled={isRunning}
-                onClick={() => setDepositRewardOpen((o) => !o)}
+                onClick={() => setDepositRewardOpen(true)}
             />
-            <AmountInput
+            <DepositRewardDialog
                 open={depositRewardOpen}
-                value={depositRewardInput}
-                onChange={setDepositRewardInput}
-                onConfirm={handleDepositReward}
-                placeholder={`Amount (${rewardTokenSymbolDisplay})`}
+                onOpenChange={setDepositRewardOpen}
+                poolDetail={poolDetail}
+                vaultBalance={vaultBalance}
+                onConfirm={handleDepositRewardWithAmount}
             />
             <ActionBtn letter="E" text="Edit" color="#7AF4CB" disabled={isRunning} onClick={handleEdit} />
             <ActionBtn

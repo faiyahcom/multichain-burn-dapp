@@ -1,9 +1,7 @@
 import React from "react";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-
-// ─────────────────────────────────────────────────────────────
+import { Input } from "@/components/ui/input";// ─────────────────────────────────────────────────────────────
 // Container
 // ─────────────────────────────────────────────────────────────
 

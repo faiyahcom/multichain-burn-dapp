@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import EditPoolScreen from "@/views/admin/burn/detail/amount-activities/EditPoolScreen";
+import EditStakePoolScreen from "@/views/admin/stake/edit/EditStakePoolScreen";
 
 export const Route = createFileRoute("/admin/stake/edit/$address")({
   component: RouteComponent,
@@ -7,5 +7,5 @@ export const Route = createFileRoute("/admin/stake/edit/$address")({
 
 function RouteComponent() {
   const { address } = Route.useParams();
-  return <EditPoolScreen poolAddress={address} />;
+  return <EditStakePoolScreen poolAddress={address} />;
 }

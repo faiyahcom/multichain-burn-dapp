@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import {
     Dialog,
@@ -9,38 +9,27 @@ import {
     DialogTitle,
 } from "@/components/ui/dialog";
 import AnimateIconButton from "@/components/common/animate-icon-button";
-import { ActionBtn, AmountInput } from "../components";
+import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-import { chainIdToNetworkConfig } from "@/config/networks";
-import { AssetTypeEnum } from "@/web3/helpers";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
+import DepositRewardDialog from "../DepositRewardDialog";
+import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    vaultBalance?: VaultBalance;
 };
 
-const LiveStatus = ({ poolDetail }: Props) => {
+const LiveStatus = ({ poolDetail, vaultBalance }: Props) => {
     const {
-        pool,
         depositRewardOpen,
         setDepositRewardOpen,
-        depositRewardInput,
-        setDepositRewardInput,
-        handleDepositReward,
+        handleDepositRewardWithAmount,
         handleEmergencyClose,
     } = useAmountActivity(poolDetail);
 
     const [closeDialogOpen, setCloseDialogOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
-
-    const networkConfig = useMemo(
-        () => (pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined),
-        [pool?.chainId],
-    );
-    const rewardTokenSymbolDisplay =
-        pool?.assetTypeReward === AssetTypeEnum.NATIVE
-            ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
-            : (pool?.rewardTokenSymbol ?? "");
 
     const handleConfirmClose = async () => {
         setIsClosing(true);
@@ -65,14 +54,15 @@ const LiveStatus = ({ poolDetail }: Props) => {
                 letter="D"
                 text="Deposit Reward"
                 color="#FFC198"
-                onClick={() => setDepositRewardOpen((o) => !o)}
+                onClick={() => setDepositRewardOpen(true)}
             />
-            <AmountInput
+
+            <DepositRewardDialog
                 open={depositRewardOpen}
-                value={depositRewardInput}
-                onChange={setDepositRewardInput}
-                onConfirm={handleDepositReward}
-                placeholder={`Amount (${rewardTokenSymbolDisplay})`}
+                onOpenChange={setDepositRewardOpen}
+                poolDetail={poolDetail}
+                vaultBalance={vaultBalance}
+                onConfirm={handleDepositRewardWithAmount}
             />
 
             <Dialog open={closeDialogOpen} onOpenChange={setCloseDialogOpen}>

@@ -1,33 +1,21 @@
-import { useMemo } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
-import { ActionBtn, AmountInput } from "../components";
+import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
-import { chainIdToNetworkConfig } from "@/config/networks";
-import { AssetTypeEnum } from "@/web3/helpers";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
+import DepositRewardDialog from "../DepositRewardDialog";
+import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    vaultBalance?: VaultBalance;
 };
 
-const UpcomingStatus = ({ poolDetail }: Props) => {
+const UpcomingStatus = ({ poolDetail, vaultBalance }: Props) => {
     const {
-        pool,
         depositRewardOpen,
         setDepositRewardOpen,
-        depositRewardInput,
-        setDepositRewardInput,
-        handleDepositReward,
+        handleDepositRewardWithAmount,
     } = useAmountActivity(poolDetail);
-
-    const networkConfig = useMemo(
-        () => (pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined),
-        [pool?.chainId],
-    );
-    const rewardTokenSymbolDisplay =
-        pool?.assetTypeReward === AssetTypeEnum.NATIVE
-            ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
-            : (pool?.rewardTokenSymbol ?? "");
 
     return (
         <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
@@ -35,14 +23,14 @@ const UpcomingStatus = ({ poolDetail }: Props) => {
                 letter="D"
                 text="Deposit Reward"
                 color="#FFC198"
-                onClick={() => setDepositRewardOpen((o) => !o)}
+                onClick={() => setDepositRewardOpen(true)}
             />
-            <AmountInput
+            <DepositRewardDialog
                 open={depositRewardOpen}
-                value={depositRewardInput}
-                onChange={setDepositRewardInput}
-                onConfirm={handleDepositReward}
-                placeholder={`Amount (${rewardTokenSymbolDisplay})`}
+                onOpenChange={setDepositRewardOpen}
+                poolDetail={poolDetail}
+                vaultBalance={vaultBalance}
+                onConfirm={handleDepositRewardWithAmount}
             />
         </PoolChainGuard>
     );

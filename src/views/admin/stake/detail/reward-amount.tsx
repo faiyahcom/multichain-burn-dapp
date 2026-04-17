@@ -12,8 +12,6 @@ type Props = {
     vaultBalance?: VaultBalance;
 };
 
-const SIMPLE_STATUSES = ["pending", "upcoming", "holding", "draft"] as const;
-
 const fmt = (raw: string | undefined, decimals: number) =>
     raw !== undefined ? formatAmount(raw, decimals) : "-";
 
@@ -22,9 +20,8 @@ const fmtFee = (fee: string | undefined) =>
 
 const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const pool = poolDetail?.pool;
-    const stakePool = pool as any;
     const status = (pool?.status ?? "draft") as string;
-    const isSimple = SIMPLE_STATUSES.includes(status as any);
+    const isSimple = false;
     const isMobile = useMediaQuery("(max-width: 640px)");
 
     const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
@@ -59,16 +56,17 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     // Settlement fee
     const settlementFee = fmtFee(pool?.settlementFee);
 
-    // Staking balances
-    const formattedTotalStaked = fmt(stakePool?.totalDeposited, stakingDec);
-    const formattedClaimedReward = fmt(stakePool?.claimedReward, rewardDec);
-    const formattedDepositedRewards = fmt(stakePool?.depositedRewards, rewardDec);
+    // Staking balances — from API staking object
+    const staking = poolDetail?.staking;
+    const formattedTotalStaked = fmt(staking?.totalStaked, stakingDec);
+    // API has a typo: "totatClaimed" (missing 'l')
+    const formattedClaimedReward = fmt(staking?.user?.totatClaimed, rewardDec);
+    // depositedRewards not in new API — fall back to pool rewardAmount
+    const formattedDepositedRewards = fmt(pool?.rewardAmount, rewardDec);
 
     // Current vault balances (live)
     const formattedRewardRemaining =
         vaultBalance?.rewardBalance ?? fmt(pool?.currentRewardAmount, rewardDec);
-    const formattedStakingRemaining =
-        vaultBalance?.depositBalance ?? fmt(poolDetail?.depositedAmount, stakingDec);
 
     const extendedRows = [
         [
@@ -76,7 +74,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
             { label: "Total Claimed Rewards", value: `${formattedClaimedReward} ${rewardSymbol}` },
         ],
         [
-            { label: "Total Reward Amount", value: `${formattedRewardRemaining} ${rewardSymbol}` },
+            { label: "Total Accrued Rewards", value: `${formattedRewardRemaining} ${rewardSymbol}` },
             { label: "Total Deposited Rewards", value: `${formattedDepositedRewards} ${rewardSymbol}` },
         ],
         [
