@@ -108,10 +108,10 @@ export const getContractStakeFactory = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       address = MULTICHAIN_STAKE_PROGRAM_XPHERE_FACTORY_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       address = MULTICHAIN_STAKE_PROGRAM_BSC_FACTORY_ADDRESS;
       break;
     default:
