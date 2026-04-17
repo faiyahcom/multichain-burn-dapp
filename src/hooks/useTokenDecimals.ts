@@ -35,7 +35,7 @@ type UseTokenDecimalsParams = {
  * Returns `{ decimals, isLoading, error }`.
  */
 export function useTokenDecimals({ address, networkId }: UseTokenDecimalsParams) {
-  const isSolana = networkId === "solanaDevnet";
+  const isSolana = networkId === "solana";
   const isEvm = !isSolana && !!networkId;
 
   const validEvmAddress = isEvm && isEvmAddress(address);
