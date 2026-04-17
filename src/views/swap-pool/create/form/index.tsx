@@ -31,7 +31,7 @@ type CreateSwapPoolFormValues = {
   ratio: string;
   budget: string;
   tokenReward: string;
-  amountReceive: string; // This only for the UI, not for the API, this is client requested (MB-1054)
+  amountReceive: string; // This is only for the UI, not for the API, this is what client requested (MB-1054)
 };
 
 type Props = {
@@ -542,6 +542,11 @@ const CreateSwapPoolForm = ({
                 },
               })}
             />
+            {errors.amountReceive && (
+              <p className="font-inter text-xs text-destructive">
+                {errors.amountReceive.message}
+              </p>
+            )}
           </div>
         </div>
       </div>
