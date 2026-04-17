@@ -43,9 +43,9 @@ import { Button } from "@/components/common/glow/button";
 const swapFormSchema = z.object({
     burnAmount: z
         .string()
-        .min(0, { message: "Burn amount is required" })
+        .min(0, { message: "Swap amount is required" })
         .refine((value) => !Number.isNaN(Number(value)) && Number(value) > 0, {
-            message: "Burn amount must be a positive number",
+            message: "Swap amount must be a positive number",
         })
         .refine(
             (value) => {
@@ -53,7 +53,7 @@ const swapFormSchema = z.object({
                 return decimal && decimal?.decimalPlaces() <= 6;
             },
             {
-                message: "Burn amount must have 6 decimals or less",
+                message: "Swap amount must have 6 decimals or less",
             },
         ),
 });

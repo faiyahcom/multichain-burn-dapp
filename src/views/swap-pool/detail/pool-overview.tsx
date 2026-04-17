@@ -78,7 +78,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
               <span>Ratio</span>
               <InfoTooltip
                 side="right"
-                content="Token burn : token reward"
+                content="Token swap : token reward"
                 variant="swap"
                 classNames={{
                   icon: "size-3.5 text-xs",
@@ -91,7 +91,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
           value: cleanRatio,
         },
         {
-          label: "Burn Token",
+          label: "Swap Token",
           // value: `${poolDetail?.pool?.tokenInSymbol}`,
           value: (
             <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         },
       ],
       [
-        { label: "Burn Method", value: "Transfer to Maker" },
+        { label: "Swap Method", value: "Transfer to Maker" },
         {
           label: "Reward Token",
           value: (
