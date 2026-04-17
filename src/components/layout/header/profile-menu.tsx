@@ -21,6 +21,7 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { PROFILE_NAV_ITEMS } from "./glow/header-nav/const";
+import { PLACEHOLDER_AVATAR_URL } from "@/config/constant";
 
 type Props = {};
 
@@ -53,7 +54,7 @@ const ProfileMenu = ({}: Props) => {
     logout();
   };
 
-  const avatar = userApiData?.avatar ?? walletInfo?.icon;
+  const avatar = userApiData?.avatar ?? PLACEHOLDER_AVATAR_URL;
   const name = userApiData?.name ?? walletInfo?.name ?? "Profile";
 
   return (
