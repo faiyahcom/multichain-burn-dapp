@@ -2,9 +2,13 @@ import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
 import { SolanaAdapter } from "@reown/appkit-adapter-solana";
 import { type AppKitNetwork } from "@reown/appkit/networks";
 import { APPKIT_PROJECT_ID } from "@/config/constant";
-import { NETWORK_CONFIGS, type NetworkConfig } from "./networks";
+import {
+  NETWORK_CONFIGS,
+  type NetworkConfig,
+  activeXphereNetwork,
+  ACTIVE_XPHERE_RPC,
+} from "./networks";
 import { http } from "viem";
-import { xphereTestnet } from "@reown/appkit/networks";
 
 if (!APPKIT_PROJECT_ID) {
   // eslint-disable-next-line no-console
@@ -29,7 +33,7 @@ export const wagmiAdapter = new WagmiAdapter({
   networks,
   ssr: false,
   transports: {
-    [xphereTestnet.id]: http("https://rpc.ankr.com/xphere_testnet"),
+    [activeXphereNetwork.id]: http(ACTIVE_XPHERE_RPC),
   },
 });
 

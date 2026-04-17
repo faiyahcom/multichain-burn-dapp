@@ -27,7 +27,7 @@ export default function NetworkSelect() {
   );
 
   const handleNetworkChange = async (network: NetworkConfig) => {
-    const targetNamespace = network.id === "solanaDevnet" ? "solana" : "eip155";
+    const targetNamespace = network.id === "solana" ? "solana" : "eip155";
     const alreadyConnectedToNamespace = targetNamespace === "solana" ? !!solanaAddress : !!evmAddress;
     try {
       if (alreadyConnectedToNamespace) {

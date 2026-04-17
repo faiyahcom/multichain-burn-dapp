@@ -37,7 +37,7 @@ type SystemState = {
 export const useSystemStore = create<SystemState>()(
   persist(
     (set) => ({
-      selectedNetworkId: "ethereumTestnet",
+      selectedNetworkId: "ethereum",
       setSelectedNetworkId: (id) => set({ selectedNetworkId: id }),
 
       switchNetworkRequest: null,

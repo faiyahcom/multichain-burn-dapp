@@ -39,10 +39,10 @@ export const getContractSwapFactory = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       address = MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_SWAP_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       address = MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_SWAP_ADDRESS;
       break;
     default:
@@ -56,10 +56,10 @@ export const getContractSwapRouter = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       address = MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_SWAP_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       address = MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_SWAP_ADDRESS;
       break;
     default:
@@ -73,10 +73,10 @@ export const getContractBurnFactory = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let rawAddress: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       rawAddress = MULTICHAIN_BURN_PROGRAM_XPHERE_FACTORY_BURN_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       rawAddress = MULTICHAIN_BURN_PROGRAM_BSC_FACTORY_BURN_ADDRESS;
       break;
     default:
@@ -91,10 +91,10 @@ export const getContractBurnRouter = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       address = MULTICHAIN_BURN_PROGRAM_XPHERE_ROUTER_BURN_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       address = MULTICHAIN_BURN_PROGRAM_BSC_ROUTER_BURN_ADDRESS;
       break;
     default:
@@ -125,10 +125,10 @@ export const getContractAccessManager = (signer: Signer) => {
   const networkId = useSystemStore.getState().selectedNetworkId;
   let address: string;
   switch (networkId) {
-    case "xphereTestnet":
+    case "xphere":
       address = MULTICHAIN_BURN_PROGRAM_XPHERE_ACCESS_MANAGER_SWAP_ADDRESS;
       break;
-    case "binanceTestnet":
+    case "binance":
       address = MULTICHAIN_BURN_PROGRAM_BSC_ACCESS_MANAGER_SWAP_ADDRESS;
       break;
     default:

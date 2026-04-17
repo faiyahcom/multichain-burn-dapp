@@ -7,6 +7,7 @@ import idl from "@/web3/contracts/multichain_burn_sc_sol.json";
 import {
     SOLANA_BACKEND_CHAIN_ID,
     NETWORK_CONFIGS,
+    IS_MAINNET,
     getRpcUrl,
 } from "@/config/networks";
 import { ZERO_ADDRESS } from "@/config/constant";
@@ -19,7 +20,7 @@ const solanaConfig = NETWORK_CONFIGS.find(
 );
 const SOLANA_RPC_URL =
     (solanaConfig?.appKitNetwork as any)?.rpcUrls?.default?.http?.[0] ??
-    "https://api.devnet.solana.com";
+    (IS_MAINNET ? "https://api.mainnet-beta.solana.com" : "https://api.devnet.solana.com");
 
 // ── Anchor coder for PoolAccount deserialization ─────────────────────────────
 const accountsCoder = new BorshAccountsCoder(idl as Idl);

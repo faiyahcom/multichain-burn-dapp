@@ -69,7 +69,7 @@ const AdminManagementDialogCreate = () => {
         loadingText="Creating..."
         defaultValues={{
           role: "super_admin",
-          networkId: currentNetworkId ?? "ethereumTestnet",
+          networkId: currentNetworkId ?? "ethereum",
         }}
         isLoading={isPending || isCallingSc}
         onSubmit={async (values) => {
@@ -104,7 +104,7 @@ const AdminManagementDialogCreate = () => {
           setIsCallingSc(true);
           try {
             const isUpdated =
-              targetNetworkId === "solanaDevnet"
+              targetNetworkId === "solana"
                 ? await toggleAdminRoleSolana({
                     walletAddress: values.walletAddress,
                     enabled: true,
