@@ -1,0 +1,278 @@
+import { useState } from "react";
+import type { PoolDetailResponse } from "@/types/pool";
+import { ActionBtn } from "../components";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
+import { formatAmount } from "@/utils/helpers/numbers";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import TokenDisplay from "@/components/common/token-display";
+import StakeDialog from "../../stake-dialog";
+import { useStakeEvmFn } from "../../hooks/useStakeEvmFn";
+import { useUnstakeAllEvmFn } from "../../hooks/useUnstakeAllEvmFn";
+import { useClaimAllEvmFn } from "../../hooks/useClaimAllEvmFn";
+import { useQueryClient } from "@tanstack/react-query";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { StatRow } from "@/views/burn-pool/detail/amount-activities/components";
+
+type Props = {
+    poolDetail?: PoolDetailResponse;
+    stakeDisabled?: boolean;
+};
+
+const StakeStats = ({
+    poolDetail,
+    onStakeClick,
+    onClaimClick,
+    onUnstakeClaimClick,
+    claimLoading,
+    unstakeClaimLoading,
+    stakeDisabled,
+}: {
+    poolDetail?: PoolDetailResponse;
+    onStakeClick: () => void;
+    onClaimClick: () => void;
+    onUnstakeClaimClick: () => void;
+    claimLoading: boolean;
+    unstakeClaimLoading: boolean;
+    stakeDisabled?: boolean;
+}) => {
+    const network = poolDetail?.pool?.chainId
+        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
+        : undefined;
+
+    const stakingTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool?.tokenIn,
+        tokenSymbol: poolDetail?.tokenIn?.symbol,
+        tokenName: poolDetail?.tokenIn?.name,
+        customName: poolDetail?.tokenIn?.customName,
+        customSymbol: poolDetail?.tokenIn?.customSymbol,
+        imageUri: poolDetail?.tokenIn?.imageUri,
+    });
+
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
+    });
+
+    const ua = poolDetail?.staking?.user;
+    const tokenInDecimals = poolDetail?.pool?.tokenInDecimals ?? 18;
+    const rewardDecimals = poolDetail?.pool?.rewardTokenDecimals ?? 18;
+
+    const fmtStaking = (val?: string) =>
+        val ? formatAmount(val, tokenInDecimals) : "0";
+    const fmtReward = (val?: string) =>
+        val ? formatAmount(val, rewardDecimals) : "0";
+
+    const canClaim = ua?.availableClaim ?? false;
+    const hasStakes = (poolDetail?.staking?.user?.stakeIds?.length ?? 0) > 0
+        || poolDetail?.staking?.user?.stakeId != null;
+
+    const stakingToken = (
+        <TokenDisplay
+            symbol={stakingTokenDisplay.symbol}
+            customSymbol={undefined}
+            imageUri={stakingTokenDisplay.imageUri ?? undefined}
+            classNames={{
+                img: "size-3.5 md:size-4",
+                container: "inline-flex items-center gap-1",
+            }}
+        />
+    );
+
+    const rewardToken = (
+        <TokenDisplay
+            symbol={rewardTokenDisplay.symbol}
+            customSymbol={undefined}
+            imageUri={rewardTokenDisplay.imageUri ?? undefined}
+            classNames={{
+                img: "size-3.5 md:size-4",
+                container: "inline-flex items-center gap-1",
+            }}
+        />
+    );
+
+    return (
+        <>
+            <StatRow
+                label="Your Total Staked"
+                value={
+                    <span className="inline-flex items-center gap-1.5 md:gap-2.5">
+                        {fmtStaking(ua?.totalStaked)}
+                        <TokenDisplay
+                            symbol={stakingTokenDisplay.symbol}
+                            customSymbol={undefined}
+                            imageUri={stakingTokenDisplay.imageUri ?? undefined}
+                            classNames={{
+                                img: "size-4 md:size-5 2xl:size-5.75",
+                                container: "inline-flex items-center gap-1.5 md:gap-2.5",
+                            }}
+                        />
+                    </span>
+                }
+                className="text-mb-btn-stake"
+                labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
+                valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
+            />
+            <StatRow
+                label="Available to Unstake"
+                value={
+                    <span className="inline-flex items-center gap-1">
+                        {fmtStaking(ua?.availableUnstake)} {stakingToken}
+                    </span>
+                }
+                className="ml-4"
+            />
+            <StatRow
+                label="Your Total Unstaked"
+                value={
+                    <span className="inline-flex items-center gap-1">
+                        {fmtStaking(ua?.totalUnstaked)} {stakingToken}
+                    </span>
+                }
+                className="ml-4"
+            />
+            <StatRow
+                label="Your Reward Accrued"
+                value={
+                    <span className="inline-flex items-center gap-1.5 md:gap-2.5">
+                        {fmtReward(ua?.rewardAccrued)}
+                        <TokenDisplay
+                            symbol={rewardTokenDisplay.symbol}
+                            customSymbol={undefined}
+                            imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                            classNames={{
+                                img: "size-4 md:size-5 2xl:size-5.75",
+                                container: "inline-flex items-center gap-1.5 md:gap-2.5",
+                            }}
+                        />
+                    </span>
+                }
+                className="text-mb-btn-stake"
+                labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
+                valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
+            />
+            <StatRow
+                label="Reward Available to Claim"
+                value={
+                    <span className="inline-flex items-center gap-1">
+                        {fmtReward(ua?.availableClaim)} {rewardToken}
+                    </span>
+                }
+                className="ml-4"
+            />
+            <StatRow
+                label="Your Reward Claimed"
+                value={
+                    <span className="inline-flex items-center gap-1">
+                        {fmtReward(ua?.totalClaimed)} {rewardToken}
+                    </span>
+                }
+                className="ml-4"
+            />
+            <p className="text-xs italic text-mb-gray-b8 md:text-sm 2xl:text-base">
+                Interest stops accruing upon unstaking.
+            </p>
+            <ActionBtn
+                text="Stake"
+                onClick={onStakeClick}
+                disabled={stakeDisabled}
+            />
+            <ActionBtn
+                text="Claim Reward"
+                onClick={onClaimClick}
+                disabled={!canClaim || !hasStakes}
+                isLoading={claimLoading}
+            />
+            <ActionBtn
+                text="Unstake & Claim"
+                onClick={onUnstakeClaimClick}
+                disabled={!hasStakes}
+                isLoading={unstakeClaimLoading}
+            />
+        </>
+    );
+};
+
+const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
+    const [stakeDialogOpen, setStakeDialogOpen] = useState(false);
+    const [claimLoading, setClaimLoading] = useState(false);
+    const [unstakeClaimLoading, setUnstakeClaimLoading] = useState(false);
+
+    const { stakeEvm } = useStakeEvmFn();
+    const { unstakeAllEvm } = useUnstakeAllEvmFn();
+    const { claimAllEvm } = useClaimAllEvmFn();
+    const queryClient = useQueryClient();
+
+    const poolAddress = poolDetail?.pool?.address;
+    const stakeId = poolDetail?.staking?.user?.stakeId;
+
+    const invalidatePool = () => {
+        if (poolAddress) {
+            queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress) });
+        }
+    };
+
+    const handleStakeConfirm = async (amountStr: string) => {
+        if (!poolDetail) return;
+        await stakeEvm({
+            poolAddress: poolDetail.pool.address,
+            stakingToken: poolDetail.pool.tokenIn,
+            amountStr,
+            decimals: poolDetail.pool.tokenInDecimals,
+        });
+        setStakeDialogOpen(false);
+        invalidatePool();
+    };
+
+    const handleClaim = async () => {
+        if (!poolAddress || !stakeId) return;
+        setClaimLoading(true);
+        try {
+            await claimAllEvm({ poolAddress, stakeIds: [stakeId] });
+            invalidatePool();
+        } finally {
+            setClaimLoading(false);
+        }
+    };
+
+    const handleUnstakeClaim = async () => {
+        if (!poolAddress || !stakeId) return;
+        setUnstakeClaimLoading(true);
+        try {
+            await unstakeAllEvm({ poolAddress, stakeIds: [stakeId] });
+            invalidatePool();
+        } finally {
+            setUnstakeClaimLoading(false);
+        }
+    };
+
+    return (
+        <>
+            <PoolChainGuard chainId={poolDetail?.pool?.chainId} variant="stake">
+                <StakeStats
+                    poolDetail={poolDetail}
+                    onStakeClick={() => setStakeDialogOpen(true)}
+                    onClaimClick={handleClaim}
+                    onUnstakeClaimClick={handleUnstakeClaim}
+                    claimLoading={claimLoading}
+                    unstakeClaimLoading={unstakeClaimLoading}
+                    stakeDisabled={stakeDisabled}
+                />
+            </PoolChainGuard>
+            <StakeDialog
+                open={stakeDialogOpen}
+                onOpenChange={setStakeDialogOpen}
+                poolDetail={poolDetail}
+                onConfirm={handleStakeConfirm}
+            />
+        </>
+    );
+};
+
+export default OnGoingStatus;

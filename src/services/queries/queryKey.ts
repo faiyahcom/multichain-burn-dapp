@@ -3,8 +3,8 @@ import type { PoolKindCode } from "@/types/pool";
 export const poolQueryKeys = {
   all: ["pools"] as const,
   detail: (address: string) => ["pools", "detail", address] as const,
-  txns: (address: string, page?: number, excludeKinds?: string) =>
-    ["pools", "txns", address, page, excludeKinds] as const,
+  txns: (address: string, page?: number, excludeKinds?: string, includeKinds?: string) =>
+    ["pools", "txns", address, page, excludeKinds, includeKinds] as const,
   activities: (address: string, page?: number, excludeKinds?: string) =>
     ["pools", "activities", address, page, excludeKinds] as const,
   list: (params?: Record<string, unknown>) =>

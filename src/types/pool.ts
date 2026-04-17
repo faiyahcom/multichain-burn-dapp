@@ -108,8 +108,11 @@ export interface PoolDetailResponse {
         totalStaked: string;
         user?: {
             totalStaked: string;
+            availableUnstake: string;
             totalUnstaked: string;
-            totatClaimed: string; // API typo (missing 'l')
+            rewardAccrued: string;
+            availableClaim: string;
+            totalClaimed: string;
         };
   };
   returningAmountOnCanceling?: {
@@ -137,6 +140,14 @@ export interface PoolTxnsResponse {
     amountOut: string;
     chainId: string;
     poolAddress: string;
+    // Staking-specific (optional, populated only for staking txns)
+    stakeId?: number;
+    unlockDate?: string;
+    interestStartDate?: string;
+    interestEndDate?: string;
+    claimableDate?: string;
+    rewardAmountStr?: string;
+    lockDuration?: string;
   }[];
 }
 
@@ -186,6 +197,16 @@ export const activityKind = {
 
   40: "Pool End",
 } as const;
+
+export type StakePoolStatus =
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "pending"
+  | "upcoming"
+  | "holding"
+  | "ended";
 
 export type ActivityKindKey = keyof typeof activityKind;
 

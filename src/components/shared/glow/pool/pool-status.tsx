@@ -38,6 +38,7 @@ function withVariant<T extends ButtonProps>(
 
 const SwapPoolStatusDisplay = withVariant(PoolStatusDisplay, "swap");
 const BurnPoolStatusDisplay = withVariant(PoolStatusDisplay, "burn");
+const StakePoolStatusDisplay = withVariant(PoolStatusDisplay, "stake");
 
 export {
   PoolStatusDisplay,
@@ -45,4 +46,5 @@ export {
   withVariant,
   SwapPoolStatusDisplay,
   BurnPoolStatusDisplay,
+  StakePoolStatusDisplay,
 };

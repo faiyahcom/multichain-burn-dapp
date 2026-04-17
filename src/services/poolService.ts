@@ -27,12 +27,14 @@ export const poolService = {
     limit: number,
     address: string,
     excludeKinds?: string,
+    includeKinds?: string,
   ) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
     });
     if (excludeKinds) params.set("excludeKinds", excludeKinds);
+    if (includeKinds) params.set("includeKinds", includeKinds);
     const response = await apiClient.get<PoolTxnsResponse>(
       `${POOLS_API_ROUTES.GET_POOL_TXNS(address)}?${params.toString()}`,
     );
