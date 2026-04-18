@@ -97,7 +97,7 @@ const StakePoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                         alt: tokenInDisplay.symbol,
                       }}
                       networkProps={{
-                        networkId: "xphere",
+                        chainId: pool.chainId,
                       }}
                       className="mx-auto"
                     />
