@@ -25,77 +25,84 @@ export const POOL_KIND: Record<number, PoolKind> = {
     3: "launchpad_pool",
 };
 interface TokenInfo {
-    address: string;
-    createdAt: string;
-    name: string;
-    symbol: string;
-    decimals: number;
-    enable: boolean;
-    chainId: string;
-    isDropped: boolean;
-    imageUri: string;
-    customName: string;
-    customSymbol: string;
-    description: string;
-    homepage: string;
-    whitepaper: string;
+  address: string;
+  createdAt: string;
+  name: string;
+  symbol: string;
+  decimals: number;
+  enable: boolean;
+  chainId: string;
+  isDropped: boolean;
+  imageUri: string;
+  customName: string;
+  customSymbol: string;
+  description: string;
+  homepage: string;
+  whitepaper: string;
+  price: string | null;
+  kind: number;
 }
 
 export interface PoolDetailResponse {
-    userAmount?: {
-        address: string;
-        deposited: string;
-        claimed: string;
-        canClaim: boolean;
-    };
-    depositedAmount: string;
-    claimedRewardAmount: string;
+  userAmount?: {
+    address: string;
+    deposited: string;
+    claimed: string;
+    canClaim: boolean;
+  };
+  depositedAmount: string;
+  claimedRewardAmount: string;
+  rewardAmount: string;
+  tokenIn: TokenInfo;
+  tokenOut: TokenInfo;
+  pool: {
+    address: string;
+    name: string;
+    owner: string;
+    rewardToken: string;
+    tokenIn: string;
+    pool_id: string;
+    kind: number;
+    chainId: string;
+    timestamp: string;
+    status: SwapPoolStatus | BurnPoolStatus;
+    currentRewardAmount: string;
+    merkleRootStatus: string;
+    merkleRoot: string | null;
+    adminCloseReason: string | null;
+    rewardTokenSymbol: string;
+    rewardTokenDecimals: number;
+    tokenInSymbol: string;
+    tokenInDecimals: number;
+    burnToken?: string;
+    targetVault?: string;
+    timeStart: string;
+    timeEnd: string;
+    targetAddress: string;
+    assetTypeReward: number;
+    assetTypeIn: number;
+    rewardNumerator: string;
+    rewardDenominator: string;
     rewardAmount: string;
-    tokenIn: TokenInfo;
-    tokenOut: TokenInfo;
-    pool: {
-        address: string;
-        name: string;
-        owner: string;
-        rewardToken: string;
-        tokenIn: string;
-        pool_id: string;
-        kind: number;
-        chainId: string;
-        timestamp: string;
-        status: SwapPoolStatus | BurnPoolStatus;
-        currentRewardAmount: string;
-        merkleRootStatus: string;
-        merkleRoot: string | null;
-        adminCloseReason: string;
-        rewardTokenSymbol: string;
-        rewardTokenDecimals: number;
-        tokenInSymbol: string;
-        tokenInDecimals: number;
-        burnToken?: string;
-        targetVault?: string;
-        timeStart: string;
-        timeEnd: string;
-        targetAddress: string;
-        assetTypeReward: number;
-        assetTypeIn: number;
-        rewardNumerator: string;
-        rewardDenominator: string;
-        rewardAmount: string;
-        settlementFee: string;
-        poolCreationFee: string;
-        isPartner?: boolean;
-        // Staking pool fields
-        apr?: string;
-        lockUpDuration?: string;
-        interestStrartDelay?: string; // API typo (double 'r')
-        interestAccrualDuration?: string;
-        claimStartDelay?: string;
+    settlementFee: string;
+    poolCreationFee: string;
+    isPartner?: boolean;
+    settlementRetryCount?: number;
+    // Staking pool fields
+    apr?: string;
+    lockUpDuration?: string;
+    interestStrartDelay?: string; // API typo (double 'r')
+    interestAccrualDuration?: string;
+    claimStartDelay?: string;
+    minStakingAmount?: string | null;
+    maxStakingAmount?: string | null;
+    stakingLimit?: string | null;
     };
     // Staking pool aggregate data
     staking?: {
         totalStaked: string;
         user?: {
+            address?: string;
             totalStaked: string;
             totalUnstaked: string;
             totatClaimed: string; // API typo (missing 'l')
@@ -175,6 +182,59 @@ export const activityKind = {
 
   40: "Pool End",
 } as const;
+
+export interface MyStakeSnapshot {
+  time: number;
+  stakingAmount: string;
+  unlockDate: number;
+  interestStartDate: number;
+  durationInSecs: number;
+  interestEndDate: number;
+  claimableDate: number;
+  rewardAmount: string;
+  isUnstaked: boolean;
+  tokenReward: string;
+  tokenStake: string;
+  stakeId: number;
+  poolAdress: string;
+}
+
+export interface MyStakesResponse {
+  total: number;
+  page: number;
+  snapshots: MyStakeSnapshot[];
+}
+
+export type StakePoolStatus =
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "pending"
+  | "upcoming"
+  | "holding"
+  | "ended";
+
+export type ActivityKindKey = keyof typeof activityKind;
+
+export const getActivityKindLabel = (kind: ActivityKindKey) => {
+  return activityKind[kind];
+};
+
+type ActivityKind = typeof activityKind;
+
+export function pickActivityKind<K extends keyof ActivityKind>(
+  keys: K[],
+): Pick<ActivityKind, K> {
+  return Object.fromEntries(keys.map((k) => [k, activityKind[k]])) as Pick<
+    ActivityKind,
+    K
+  >;
+}
+
+export const myActivityActions = pickActivityKind([
+  1, 0, 10, 32, 30, 31, 5
+]);
 
 export interface PoolActivitiesResponse {
     page: number;
