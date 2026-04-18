@@ -21,6 +21,7 @@ export const API_ROUTES = {
     STATS: "/pools/stats",
     RECENT_POOLS: "/pools/recent-pools",
     TOGGLE_PARTNER_POOL: (address: string) => `/pools/${address}/partner`,
+    MY_STAKES: "/users/my-stakes"
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",

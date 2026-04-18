@@ -2,7 +2,7 @@ export function formatDuration(seconds: number | bigint | string | undefined | n
     if (seconds === undefined || seconds === null || seconds === "") return "—";
     const s = typeof seconds === "bigint" ? Number(seconds) : Number(seconds);
     if (!isFinite(s) || s < 0) return "—";
-    if (s === 0) return "0";
+    if (s === 0) return "0 day";
     // i64::MAX or very large value → "Infinite"
     if (s >= 9_007_199_254_740_991) return "Infinite";
     const days = Math.floor(s / 86400);

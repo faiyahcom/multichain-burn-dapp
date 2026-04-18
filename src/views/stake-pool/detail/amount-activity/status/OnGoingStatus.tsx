@@ -175,7 +175,7 @@ const StakeStats = ({
                 }
                 className="ml-4"
             />
-            <p className="text-xs italic text-mb-gray-b8 md:text-sm 2xl:text-base">
+            <p className="text-right text-sm md:text-base lg:text-lg 2xl:text-xl">
                 Interest stops accruing upon unstaking.
             </p>
             <ActionBtn
@@ -183,7 +183,7 @@ const StakeStats = ({
                 onClick={onStakeClick}
                 disabled={stakeDisabled}
             />
-            <ActionBtn
+            {/* <ActionBtn
                 text="Claim Reward"
                 onClick={onClaimClick}
                 disabled={!canClaim || !hasStakes}
@@ -194,7 +194,7 @@ const StakeStats = ({
                 onClick={onUnstakeClaimClick}
                 disabled={!hasStakes}
                 isLoading={unstakeClaimLoading}
-            />
+            /> */}
         </>
     );
 };

@@ -34,7 +34,19 @@ import { formatUnits, parseUnits } from "viem";
 import z from "zod";
 import { formatDuration } from "@/utils/helpers/timer";
 
-const createStakeFormSchema = ({ maxAmount }: { maxAmount: string | undefined }) =>
+const createStakeFormSchema = ({
+    maxAmount,
+    minStakingAmount,
+    maxStakingAmount,
+    remainingCapacity,
+    symbol,
+}: {
+    maxAmount: string | undefined;
+    minStakingAmount: string | undefined;
+    maxStakingAmount: string | undefined;
+    remainingCapacity: string | undefined;
+    symbol: string;
+}) =>
     z.object({
         amount: z
             .string()
@@ -54,7 +66,28 @@ const createStakeFormSchema = ({ maxAmount }: { maxAmount: string | undefined })
                     if (maxAmount === undefined || isNaN(Number(maxAmount))) return true;
                     return Number(v) <= Number(maxAmount);
                 },
-                { error: `Amount must not exceed ${maxAmount}` },
+                { error: `Amount exceeds wallet balance (${maxAmount} ${symbol})` },
+            )
+            .refine(
+                (v) => {
+                    if (minStakingAmount === undefined) return true;
+                    return Number(v) >= Number(minStakingAmount);
+                },
+                { error: `Amount is below minimum staking amount (${minStakingAmount} ${symbol})` },
+            )
+            .refine(
+                (v) => {
+                    if (maxStakingAmount === undefined) return true;
+                    return Number(v) <= Number(maxStakingAmount);
+                },
+                { error: `Amount exceeds maximum staking amount (${maxStakingAmount} ${symbol})` },
+            )
+            .refine(
+                (v) => {
+                    if (remainingCapacity === undefined) return true;
+                    return Number(v) <= Number(remainingCapacity);
+                },
+                { error: `Amount exceeds remaining pool capacity (${remainingCapacity} ${symbol})` },
             ),
     });
 
@@ -98,35 +131,6 @@ const SummaryRow = ({
 const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
     const pool = poolDetail?.pool;
 
-    const {
-        formatted: stakingBalanceFormatted,
-        isLoading: isLoadingBalance,
-        refetch: refetchBalance,
-    } = useTokenBalance({
-        tokenAddress: pool?.tokenIn,
-        decimals: pool?.tokenInDecimals,
-        symbol: pool?.tokenInSymbol,
-    });
-
-    const stakeFormSchema = useMemo(
-        () => createStakeFormSchema({ maxAmount: stakingBalanceFormatted }),
-        [stakingBalanceFormatted],
-    );
-
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        reset,
-        watch,
-        formState: { errors, isSubmitting },
-    } = useForm<StakeFormValues>({
-        defaultValues: { amount: "" },
-        resolver: zodResolver(stakeFormSchema),
-    });
-
-    const amountStr = watch("amount");
-
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
@@ -141,14 +145,58 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
         imageUri: poolDetail?.tokenIn?.imageUri,
     });
 
-    const rewardTokenDisplay = resolvePoolTokenDisplay({
-        network,
-        tokenAddress: poolDetail?.pool?.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut?.symbol,
-        tokenName: poolDetail?.tokenOut?.name,
-        customName: poolDetail?.tokenOut?.customName,
-        customSymbol: poolDetail?.tokenOut?.customSymbol,
-        imageUri: poolDetail?.tokenOut?.imageUri,
+    const {
+        formatted: stakingBalanceFormatted,
+        isLoading: isLoadingBalance,
+        refetch: refetchBalance,
+    } = useTokenBalance({
+        tokenAddress: pool?.tokenIn,
+        decimals: pool?.tokenInDecimals,
+        symbol: pool?.tokenInSymbol,
+    });
+
+    const stakingLimits = useMemo(() => {
+        const decimals = pool?.tokenInDecimals;
+        const empty = { min: null, max: null, remaining: null, minFormatted: undefined, maxFormatted: undefined, remainingFormatted: undefined } as const;
+        if (decimals == null) return empty;
+        let min: bigint | null = null;
+        let max: bigint | null = null;
+        let remaining: bigint | null = null;
+        try { if (pool?.minStakingAmount) min = BigInt(pool.minStakingAmount); } catch { /* ignore */ }
+        try { if (pool?.maxStakingAmount) max = BigInt(pool.maxStakingAmount); } catch { /* ignore */ }
+        if (pool?.stakingLimit && pool.stakingLimit !== "0") {
+            try {
+                const limit = BigInt(pool.stakingLimit);
+                const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
+                const r = limit - staked;
+                remaining = r >= 0n ? r : 0n;
+            } catch { /* ignore */ }
+        }
+        const fmt = (raw: bigint | null) =>
+            raw !== null ? formatAmount(raw.toString(), decimals) : undefined;
+        return { min, max, remaining, minFormatted: fmt(min), maxFormatted: fmt(max), remainingFormatted: fmt(remaining) };
+    }, [pool?.minStakingAmount, pool?.maxStakingAmount, pool?.stakingLimit, poolDetail?.staking?.totalStaked, pool?.tokenInDecimals]);
+
+    const stakeFormSchema = useMemo(
+        () => createStakeFormSchema({
+            maxAmount: stakingBalanceFormatted,
+            minStakingAmount: stakingLimits.minFormatted,
+            maxStakingAmount: stakingLimits.maxFormatted,
+            remainingCapacity: stakingLimits.remainingFormatted,
+            symbol: stakingTokenDisplay.symbol,
+        }),
+        [stakingBalanceFormatted, stakingLimits, stakingTokenDisplay.symbol],
+    );
+
+    const {
+        register,
+        handleSubmit,
+        setValue,
+        reset,
+        formState: { errors, isSubmitting },
+    } = useForm<StakeFormValues>({
+        defaultValues: { amount: "" },
+        resolver: zodResolver(stakeFormSchema),
     });
 
     const yourTotalStaked = poolDetail?.staking?.user?.totalStaked
@@ -158,22 +206,26 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
         )
         : "0";
 
-    const insufficientBalanceMessage = useMemo(() => {
-        if (!amountStr || !stakingBalanceFormatted || isLoadingBalance) return undefined;
-        const amountDecimal = safeDecimalParse({ value: amountStr });
-        const balanceDecimal = safeDecimalParse({ value: stakingBalanceFormatted });
-        if (!amountDecimal || !balanceDecimal) return undefined;
-        if (amountDecimal.lte(0) || amountDecimal.lte(balanceDecimal)) return undefined;
-        return `Amount exceeds wallet balance (${stakingBalanceFormatted} ${stakingTokenDisplay.symbol})`;
-    }, [amountStr, stakingBalanceFormatted, isLoadingBalance, stakingTokenDisplay]);
+    const fmtStakingAmt = (raw: string | null | undefined) => {
+        if (!raw || pool?.tokenInDecimals == null) return "Unlimited";
+        return `${formatAmount(raw, pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+    };
 
     const handleSelectPercent = (percent: number) => {
         if (!stakingBalanceFormatted || pool?.tokenInDecimals == null) return;
         try {
             const balanceBase = parseUnits(stakingBalanceFormatted, pool.tokenInDecimals);
             if (balanceBase === 0n) return;
-            const amountBase =
+            let amountBase =
                 percent === 100 ? balanceBase : (balanceBase * BigInt(percent)) / 100n;
+            // Cap at pool's max staking amount
+            if (stakingLimits.max !== null && amountBase > stakingLimits.max) {
+                amountBase = stakingLimits.max;
+            }
+            // Cap at remaining pool capacity
+            if (stakingLimits.remaining !== null && amountBase > stakingLimits.remaining) {
+                amountBase = stakingLimits.remaining;
+            }
             const formatted = formatUnits(amountBase, pool.tokenInDecimals);
             const [integer, decimal] = formatted.split(".");
             const trimmed = decimal ? `${integer}.${decimal.slice(0, 6)}` : integer;
@@ -280,19 +332,12 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 }
                                             />
                                             <SummaryRow
-                                                label="Staking Token"
+                                                label="Min Staking Amount"
                                                 value={
                                                     !pool ? (
-                                                        <Skeleton className="h-5 w-28" />
+                                                        <Skeleton className="h-5 w-24" />
                                                     ) : (
-                                                        <span className="flex items-center gap-2 font-semibold">
-                                                            <TokenImage
-                                                                src={stakingTokenDisplay.imageUri}
-                                                                alt={stakingTokenDisplay.symbol}
-                                                                classNames={{ common: "size-4 sm:size-5" }}
-                                                            />
-                                                            {stakingTokenDisplay.symbol}
-                                                        </span>
+                                                        fmtStakingAmt(pool.minStakingAmount)
                                                     )
                                                 }
                                             />
@@ -307,19 +352,12 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 }
                                             />
                                             <SummaryRow
-                                                label="Reward Token"
+                                                label="Max Staking Amount"
                                                 value={
                                                     !pool ? (
-                                                        <Skeleton className="h-5 w-28" />
+                                                        <Skeleton className="h-5 w-24" />
                                                     ) : (
-                                                        <span className="flex items-center gap-2 font-semibold">
-                                                            <TokenImage
-                                                                src={rewardTokenDisplay.imageUri}
-                                                                alt={rewardTokenDisplay.symbol}
-                                                                classNames={{ common: "size-4 sm:size-5" }}
-                                                            />
-                                                            {rewardTokenDisplay.symbol}
-                                                        </span>
+                                                        fmtStakingAmt(pool.maxStakingAmount)
                                                     )
                                                 }
                                             />
@@ -334,14 +372,12 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 }
                                             />
                                             <SummaryRow
-                                                label="APR"
+                                                label="Pool Limit"
                                                 value={
                                                     !pool ? (
-                                                        <Skeleton className="h-5 w-16" />
-                                                    ) : pool.apr ? (
-                                                        `${shortenNumber({ number: Number(pool.apr) / 100, decimalPlaces: 2 })}%`
+                                                        <Skeleton className="h-5 w-24" />
                                                     ) : (
-                                                        "—"
+                                                        fmtStakingAmt(pool.stakingLimit)
                                                     )
                                                 }
                                             />
@@ -363,13 +399,55 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 }
                                             />
                                             <SummaryRow
-                                                label=""
+                                                label="Remaining Capacity"
+                                                value={
+                                                    !pool ? (
+                                                        <Skeleton className="h-5 w-24" />
+                                                    ) : !pool.stakingLimit || pool.stakingLimit === "0" ? (
+                                                        "Unlimited"
+                                                    ) : stakingLimits.remainingFormatted != null ? (
+                                                        `${stakingLimits.remainingFormatted} ${stakingTokenDisplay.symbol}`
+                                                    ) : (
+                                                        "—"
+                                                    )
+                                                }
+                                            />
+                                            <SummaryRow
+                                                label="Staking Token"
+                                                value={
+                                                    !pool ? (
+                                                        <Skeleton className="h-5 w-28" />
+                                                    ) : (
+                                                        <span className="flex items-center gap-2 font-semibold">
+                                                            <TokenImage
+                                                                src={stakingTokenDisplay.imageUri}
+                                                                alt={stakingTokenDisplay.symbol}
+                                                                classNames={{ common: "size-4 sm:size-5" }}
+                                                            />
+                                                            {stakingTokenDisplay.symbol}
+                                                        </span>
+                                                    )
+                                                }
+                                            />
+                                            <SummaryRow
+                                                label="APR"
+                                                value={
+                                                    !pool ? (
+                                                        <Skeleton className="h-5 w-16" />
+                                                    ) : pool.apr ? (
+                                                        `${shortenNumber({ number: Number(pool.apr) / 100, decimalPlaces: 2 })}%`
+                                                    ) : (
+                                                        "—"
+                                                    )
+                                                }
+                                            />
+                                            <SummaryRow
+                                                label="Interest generated by the APR"
                                                 value={
                                                     <span className="text-mb-gray-b8">
-                                                        Interest generated by the APR
+                                                        {/* Interest generated by the APR */}
                                                     </span>
                                                 }
-                                                className="col-span-2 border-t border-stake-border"
                                             />
                                         </div>
                                     </div>
@@ -442,9 +520,9 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                     </button>
                                                 ))}
                                             </div>
-                                            {(errors.amount || insufficientBalanceMessage) && (
+                                            {errors.amount && (
                                                 <p className="font-inter text-xs text-destructive">
-                                                    {errors.amount?.message ?? insufficientBalanceMessage}
+                                                    {errors.amount.message}
                                                 </p>
                                             )}
                                         </div>

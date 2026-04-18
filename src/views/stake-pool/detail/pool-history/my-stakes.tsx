@@ -11,17 +11,15 @@ import TableSkeleton from "@/components/common/glow/table-skeleton";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import type { PoolDetailResponse } from "@/types/pool";
-import { formatAmount } from "@/utils/helpers/numbers";
-import { chainIdToNetworkConfig } from "@/config/networks";
-import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import CustomPagination from "@/components/common/glow/glow-pagination";
 import GlowContainer from "@/components/common/glow/container";
 import { Button } from "@/components/common/glow/button";
-import { formatTimestamp } from "./transaction-history";
-import { useUnstakeEvmFn } from "../hooks/fn/byStakeId/evm/useUnstakeEvmFn";
-import { useClaimRewardEvmFn } from "../hooks/fn/byStakeId/evm/useClaimRewardEvmFn";
+import { useUnstakeEvmFn } from "../hooks/byStakeId/useUnstakeEvmFn";
+import { useClaimRewardEvmFn } from "../hooks/byStakeId/useClaimRewardEvmFn";
+import { formatDuration } from "@/utils/helpers/timer";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -29,14 +27,14 @@ type Props = {
 
 const DEFAULT_PAGE_SIZE = 5;
 
-// Include only staking-related kinds: 51=Staking, 52=Unstaking, 53=Reward Claimed
-const INCLUDE_KINDS = "51,52,53";
-
-import { formatDuration } from "@/utils/helpers/timer";
-
-const formatDate = (timestamp?: string): string => {
-    if (!timestamp) return "—";
-    return formatTimestamp(timestamp);
+const formatUnixDate = (timestamp?: number): string => {
+    if (timestamp == null) return "—";
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+    });
 };
 
 const MyStakesTable = ({ poolDetail }: Props) => {
@@ -44,96 +42,74 @@ const MyStakesTable = ({ poolDetail }: Props) => {
     const queryClient = useQueryClient();
     const { unstakeEvm } = useUnstakeEvmFn();
     const { claimRewardEvm } = useClaimRewardEvmFn();
-    const [loadingRows, setLoadingRows] = useState<Record<string, "unstake" | "claim" | null>>({});
+    const [loadingRows, setLoadingRows] = useState<
+        Record<number, "unstake" | "claim" | null>
+    >({});
 
-    const { data: poolTxns, isLoading } = useQuery({
-        queryKey: poolQueryKeys.txns(
-            poolDetail?.pool.address || "",
+    const poolAddress = poolDetail?.pool?.address;
+
+    const { data: myStakesData, isLoading } = useQuery({
+        queryKey: poolQueryKeys.myStakes(
+            poolAddress || "",
             page,
-            undefined,
-            INCLUDE_KINDS,
+            DEFAULT_PAGE_SIZE,
         ),
         queryFn: () =>
-            poolService.getPoolTxns(
-                page,
-                DEFAULT_PAGE_SIZE,
-                poolDetail?.pool.address || "",
-                undefined,
-                INCLUDE_KINDS,
-            ),
-        enabled: !!poolDetail?.pool.address,
-        refetchInterval: 2_500,
-    });
-
-    const network = poolDetail?.pool?.chainId
-        ? chainIdToNetworkConfig(poolDetail.pool.chainId)
-        : undefined;
-
-    const stakingTokenDisplay = resolvePoolTokenDisplay({
-        network,
-        tokenAddress: poolDetail?.pool?.tokenIn,
-        tokenSymbol: poolDetail?.tokenIn?.symbol,
-        tokenName: poolDetail?.tokenIn?.name,
-        customName: poolDetail?.tokenIn?.customName,
-        customSymbol: poolDetail?.tokenIn?.customSymbol,
-        imageUri: poolDetail?.tokenIn?.imageUri,
-    });
-
-    const rewardTokenDisplay = resolvePoolTokenDisplay({
-        network,
-        tokenAddress: poolDetail?.pool?.rewardToken,
-        tokenSymbol: poolDetail?.tokenOut?.symbol,
-        tokenName: poolDetail?.tokenOut?.name,
-        customName: poolDetail?.tokenOut?.customName,
-        customSymbol: poolDetail?.tokenOut?.customSymbol,
-        imageUri: poolDetail?.tokenOut?.imageUri,
+            poolService.getMyStakes(poolAddress || "", page, DEFAULT_PAGE_SIZE),
+        enabled: !!poolAddress,
+        refetchInterval: 5_000,
     });
 
     const invalidatePool = () => {
-        if (poolDetail?.pool?.address) {
+        if (poolAddress) {
             queryClient.invalidateQueries({
-                queryKey: poolQueryKeys.detail(poolDetail.pool.address),
+                queryKey: poolQueryKeys.detail(poolAddress),
             });
             queryClient.invalidateQueries({
-                queryKey: poolQueryKeys.txns(poolDetail.pool.address, page, undefined, INCLUDE_KINDS),
+                queryKey: poolQueryKeys.myStakes(poolAddress, page, DEFAULT_PAGE_SIZE),
             });
         }
     };
 
-    const handleUnstakeClaim = async (txId: string, stakeId: number) => {
-        if (!poolDetail?.pool?.address) return;
-        setLoadingRows((prev) => ({ ...prev, [txId]: "unstake" }));
+    const handleUnstakeClaim = async (stakeId: number) => {
+        if (!poolAddress) return;
+        setLoadingRows((prev) => ({ ...prev, [stakeId]: "unstake" }));
         try {
-            await unstakeEvm({ poolAddress: poolDetail.pool.address, stakeId });
+            await unstakeEvm({ poolAddress, stakeId });
             invalidatePool();
         } finally {
-            setLoadingRows((prev) => ({ ...prev, [txId]: null }));
+            setLoadingRows((prev) => ({ ...prev, [stakeId]: null }));
         }
     };
 
-    const handleClaimReward = async (txId: string, stakeId: number) => {
-        if (!poolDetail?.pool?.address) return;
-        setLoadingRows((prev) => ({ ...prev, [txId]: "claim" }));
+    const handleClaimReward = async (stakeId: number) => {
+        if (!poolAddress) return;
+        setLoadingRows((prev) => ({ ...prev, [stakeId]: "claim" }));
         try {
-            await claimRewardEvm({ poolAddress: poolDetail.pool.address, stakeId });
+            await claimRewardEvm({ poolAddress, stakeId });
             invalidatePool();
         } finally {
-            setLoadingRows((prev) => ({ ...prev, [txId]: null }));
+            setLoadingRows((prev) => ({ ...prev, [stakeId]: null }));
         }
     };
 
-    const txns = poolTxns?.txns ?? [];
+    const snapshots = myStakesData?.snapshots ?? [];
     const isClosed = poolDetail?.pool?.status === "closed";
+
+    const stakingSymbol =
+        snapshots[0]?.tokenStake ?? poolDetail?.tokenIn?.symbol ?? "";
+    const rewardSymbol =
+        snapshots[0]?.tokenReward ?? poolDetail?.tokenOut?.symbol ?? "";
 
     const columns = [
         "Time",
-        `Staking Amount (${stakingTokenDisplay.symbol})`,
+        `Staking Amount`,
         "Unlock Date",
         "Interest Start Date",
         "Duration",
         "Interest End Date",
         "Claimable Date",
-        `Reward Amount (${rewardTokenDisplay.symbol})`,
+        `Reward Amount`,
         "Action",
     ];
 
@@ -151,7 +127,7 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                                     <TableHead
                                         key={col}
                                         variant="stake"
-                                        className="whitespace-nowrap font-orbitron text-sm md:text-base lg:text-xl 2xl:text-28px"
+                                        className="font-orbitron text-sm whitespace-nowrap md:text-base lg:text-xl 2xl:text-28px"
                                     >
                                         {col}
                                     </TableHead>
@@ -166,63 +142,53 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                             />
                             <TableNoData
                                 colSpan={columns.length}
-                                data={txns}
+                                data={snapshots}
                                 isLoading={isLoading}
                             />
-                            {txns.map((tx) => {
-                                const stakeAmount =
-                                    tx.amountIn != null && tx.tokenInDecimals != null
-                                        ? formatAmount(tx.amountIn, tx.tokenInDecimals)
-                                        : "—";
-                                const rewardAmount = tx.rewardAmountStr
-                                    ? formatAmount(
-                                        tx.rewardAmountStr,
-                                        poolDetail?.pool?.rewardTokenDecimals ?? 18,
-                                    )
-                                    : "—";
-                                const duration = formatDuration(tx.lockDuration);
-                                const hasStakeId = tx.stakeId != null;
-                                const rowLoading = loadingRows[tx.id];
+                            {snapshots.map((row) => {
+                                const rowLoading = loadingRows[row.stakeId];
 
                                 return (
                                     <TableRow
-                                        key={tx.id}
+                                        key={`${row.stakeId}-${row.time}`}
                                         variant="stake"
                                         className="text-xs md:text-sm lg:text-base 2xl:text-xl"
                                     >
                                         <TableCell className="whitespace-nowrap">
-                                            {formatTimestamp(tx.timestamp)}
+                                            {formatUnixDate(row.time)}
                                         </TableCell>
-                                        <TableCell>{stakeAmount}</TableCell>
-                                        <TableCell className="whitespace-nowrap">
-                                            {formatDate(tx.unlockDate)}
-                                        </TableCell>
-                                        <TableCell className="whitespace-nowrap">
-                                            {formatDate(tx.interestStartDate)}
-                                        </TableCell>
-                                        <TableCell>{duration}</TableCell>
-                                        <TableCell className="whitespace-nowrap">
-                                            {formatDate(tx.interestEndDate)}
-                                        </TableCell>
-                                        <TableCell className="whitespace-nowrap">
-                                            {formatDate(tx.claimableDate)}
-                                        </TableCell>
-                                        <TableCell>{rewardAmount}</TableCell>
                                         <TableCell>
-                                            <div className="flex flex-col gap-1.5">
+                                            {`${shortenNumber({ number: Number(row.stakingAmount) })} ${stakingSymbol}`}
+                                        </TableCell>
+                                        <TableCell className="whitespace-nowrap">
+                                            {formatUnixDate(row.unlockDate)}
+                                        </TableCell>
+                                        <TableCell className="whitespace-nowrap">
+                                            {formatUnixDate(row.interestStartDate)}
+                                        </TableCell>
+                                        <TableCell>{formatDuration(row.durationInSecs)}</TableCell>
+                                        <TableCell className="whitespace-nowrap">
+                                            {formatUnixDate(row.interestEndDate)}
+                                        </TableCell>
+                                        <TableCell className="whitespace-nowrap">
+                                            {formatUnixDate(row.claimableDate)}
+                                        </TableCell>
+                                        <TableCell>{`${shortenNumber({ number: Number(row.rewardAmount) })} ${rewardSymbol}`}</TableCell>
+                                        <TableCell>
+                                            <div className="flex gap-1.5 font-orbitron">
                                                 <Button
                                                     variant="stake"
                                                     hasHover
                                                     size="default"
                                                     disabled={
-                                                        !hasStakeId || isClosed || rowLoading != null
+                                                        row.isUnstaked ||
+                                                        isClosed ||
+                                                        rowLoading != null ||
+                                                        Date.now() / 1000 < row.unlockDate
                                                     }
                                                     isLoading={rowLoading === "unstake"}
-                                                    onClick={() =>
-                                                        tx.stakeId != null &&
-                                                        handleUnstakeClaim(tx.id, tx.stakeId)
-                                                    }
-                                                    className="whitespace-nowrap text-xs md:text-sm"
+                                                    onClick={() => handleUnstakeClaim(row.stakeId)}
+                                                    className="text-xs whitespace-nowrap md:text-sm"
                                                 >
                                                     Unstake &amp; Claim
                                                 </Button>
@@ -231,14 +197,14 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                                                     hasHover
                                                     size="default"
                                                     disabled={
-                                                        !hasStakeId || isClosed || rowLoading != null
+                                                        row.isUnstaked ||
+                                                        isClosed ||
+                                                        rowLoading != null ||
+                                                        Date.now() / 1000 < row.claimableDate
                                                     }
                                                     isLoading={rowLoading === "claim"}
-                                                    onClick={() =>
-                                                        tx.stakeId != null &&
-                                                        handleClaimReward(tx.id, tx.stakeId)
-                                                    }
-                                                    className="whitespace-nowrap text-xs md:text-sm"
+                                                    onClick={() => handleClaimReward(row.stakeId)}
+                                                    className="text-xs whitespace-nowrap md:text-sm"
                                                 >
                                                     Claim Reward
                                                 </Button>
@@ -253,7 +219,7 @@ const MyStakesTable = ({ poolDetail }: Props) => {
             </GlowContainer>
             <CustomPagination
                 currentPage={page}
-                totalCount={poolTxns?.total || 0}
+                totalCount={myStakesData?.total || 0}
                 pageSize={DEFAULT_PAGE_SIZE}
                 onPageChange={(page) => setPage(page)}
                 variant="stake"

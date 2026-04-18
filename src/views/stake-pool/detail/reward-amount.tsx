@@ -3,16 +3,23 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import GlowContainer from "@/components/common/glow/container";
+import { Skeleton } from "@/components/ui/skeleton";
+import { usePoolTotalAccruedEvm } from "./hooks/usePoolTotalAccruedEvm";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
 const RewardAmount = ({ poolDetail }: Props) => {
-    const formattedReward =
-        poolDetail?.pool?.rewardAmount != null
-            ? formatAmount(poolDetail.pool.rewardAmount, poolDetail.pool.rewardTokenDecimals)
-            : "-";
+    const { rawAccrued, isLoading: isLoadingAccrued } = usePoolTotalAccruedEvm({
+        poolAddress: poolDetail?.pool?.address,
+        chainId: poolDetail?.pool?.chainId,
+    });
+
+    const formattedAccrued =
+        rawAccrued !== null && poolDetail?.pool?.rewardTokenDecimals != null
+            ? formatAmount(rawAccrued.toString(), poolDetail.pool.rewardTokenDecimals)
+            : null;
 
     const formattedTotalStaked =
         poolDetail?.staking?.totalStaked != null
@@ -56,10 +63,10 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 <p className="text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">
                     Reward Amount
                 </p>
-                <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
+                {/* <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                     {formattedReward}{" "}
                     <span className="text-mb-gray-b8">{rewardTokenDisplay.symbol}</span>
-                </p>
+                </p> */}
             </div>
 
             <div className="grid grid-cols-1 gap-y-1 md:grid-cols-2 md:space-x-8">
@@ -67,12 +74,32 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     <span className="text-mb-gray-b8">Total Staked Amount:</span>
                     <span>
                         {formattedTotalStaked}{" "}
-                        <span className="text-mb-gray-b8">{stakingTokenDisplay.symbol}</span>
+                        <span>{stakingTokenDisplay.symbol}</span>
                     </span>
                 </p>
                 <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
                     <span className="text-mb-gray-b8">Settlement Fee:</span>
                     <span>{settlementFee}</span>
+                </p>
+                <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                    <span className="text-mb-gray-b8">Total Accrued Amount:</span>
+                    <span>
+                        {isLoadingAccrued ? (
+                            <Skeleton className="h-5 w-24" />
+                        ) : formattedAccrued !== null ? (
+                            <>
+                                {formattedAccrued}{" "}
+                                <span>{rewardTokenDisplay.symbol}</span>
+                            </>
+                        ) : (
+                            "—"
+                        )}
+                    </span>
+                </p>
+                {/* add blank row to maintain grid layout */}
+                <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                    <span className="text-mb-gray-b8">&nbsp;</span>
+                    <span>&nbsp;</span>
                 </p>
             </div>
         </GlowContainer>

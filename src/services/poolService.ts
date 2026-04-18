@@ -12,6 +12,7 @@ import type {
   PoolDetailResponse,
   PoolKindCode,
   PoolTxnsResponse,
+  MyStakesResponse,
 } from "@/types/pool";
 const POOLS_API_ROUTES = API_ROUTES.POOLS;
 
@@ -104,6 +105,17 @@ export const poolService = {
       {
         isPartner,
       },
+    );
+    return response;
+  },
+  getMyStakes: async (poolAddress: string, page: number, limit: number) => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+      poolAddress,
+    });
+    const response = await apiClient.get<MyStakesResponse>(
+      `${POOLS_API_ROUTES.MY_STAKES}?${params.toString()}`,
     );
     return response;
   },

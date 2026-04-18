@@ -10,6 +10,8 @@ export const poolQueryKeys = {
   list: (params?: Record<string, unknown>) =>
     ["pools", "list", params] as const,
   stats: (poolKind: PoolKindCode) => ["pools", "stats", poolKind] as const,
+  myStakes: (address: string, page?: number, limit?: number) =>
+    ["pools", "myStakes", address, page, limit] as const,
   recents: (params?: Record<string, unknown>) =>
     ["pools", "recents", params] as const,
 };

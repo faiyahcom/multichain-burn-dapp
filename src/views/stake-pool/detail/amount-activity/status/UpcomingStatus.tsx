@@ -34,7 +34,7 @@ const UpcomingStatus = ({ poolDetail: _poolDetail }: Props) => {
             >
                 Stake
             </Button>
-            <Button
+            {/* <Button
                 variant="stake"
                 className="my-1.5 w-full py-2 font-orbitron text-base md:my-3 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
                 disabled
@@ -47,7 +47,7 @@ const UpcomingStatus = ({ poolDetail: _poolDetail }: Props) => {
                 disabled
             >
                 Unstake &amp; Claim
-            </Button>
+            </Button> */}
         </>
     );
 };
