@@ -34,6 +34,9 @@ type CreateStakePoolFormValues = {
   budget: string;
 };
 
+// TODO: revert MIN_DAYS back to 1 once testing is done
+const MIN_DAYS = 0;
+
 const CreateStakePoolForm = () => {
   const navigate = useNavigate();
   const { caipAddress } = useAppKitAccount();
@@ -464,13 +467,13 @@ const CreateStakePoolForm = () => {
             <InputGroup className="h-fit">
               <Input
                 type="number"
-                min="1"
+                min={MIN_DAYS}
                 step="any"
                 placeholder="1"
                 aria-invalid={!!errors.lockDuration}
                 {...register("lockDuration", {
                   required: "Lock-up duration is required",
-                  validate: (v) => (Number(v) >= 1 ? true : "Must be ≥ 1"),
+                  validate: (v) => (Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`),
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -518,12 +521,12 @@ const CreateStakePoolForm = () => {
             <InputGroup className="h-fit">
               <Input
                 type="number"
-                min="1"
+                min={MIN_DAYS}
                 step="any"
                 placeholder="0"
                 {...register("interestAccrualDuration", {
                   validate: (v) =>
-                    !v || Number(v) >= 1 ? true : "Must be ≥ 1",
+                    !v || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -543,13 +546,13 @@ const CreateStakePoolForm = () => {
             <InputGroup className="h-fit">
               <Input
                 type="number"
-                min="1"
+                min={MIN_DAYS}
                 step="any"
                 placeholder="1"
                 aria-invalid={!!errors.claimStartDelay}
                 {...register("claimStartDelay", {
                   required: "Claim start delay is required",
-                  validate: (v) => (Number(v) >= 1 ? true : "Must be ≥ 1"),
+                  validate: (v) => (Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`),
                 })}
               />
               <InputGroupAddon align="inline-end">
