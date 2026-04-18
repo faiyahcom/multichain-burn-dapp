@@ -148,9 +148,11 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 className="ml-4"
             />
             {/* Emergency closed warning */}
-            <div className="flex items-start gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-400 md:text-base">
-                <IconExclaimation className="mt-0.5 size-4 shrink-0 md:size-5" />
-                <p>This pool was emergency closed by admin.</p>
+            <div className="inline-flex items-start gap-1">
+                <IconExclaimation className="inline size-5" />
+                <span className="text-sm text-mb-gray-b8">
+                    This pool was emergency closed by admin.
+                </span>
             </div>
             <Button
                 variant="stake"

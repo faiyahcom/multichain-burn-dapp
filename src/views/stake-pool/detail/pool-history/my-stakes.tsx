@@ -127,7 +127,7 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                                     <TableHead
                                         key={col}
                                         variant="stake"
-                                        className="font-orbitron text-sm whitespace-nowrap md:text-base lg:text-xl 2xl:text-28px"
+                                        className="px-4 text-center font-orbitron text-sm md:px-6 md:text-base lg:text-xl 2xl:text-28px"
                                     >
                                         {col}
                                     </TableHead>
@@ -152,7 +152,7 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                                     <TableRow
                                         key={`${row.stakeId}-${row.time}`}
                                         variant="stake"
-                                        className="text-xs md:text-sm lg:text-base 2xl:text-xl"
+                                        className="text-xs md:text-sm lg:text-base 2xl:text-xl [&>td]:px-4 [&>td]:text-center [&>td]:md:px-6"
                                     >
                                         <TableCell className="whitespace-nowrap">
                                             {formatUnixDate(row.time)}

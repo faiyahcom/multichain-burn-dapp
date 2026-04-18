@@ -35,16 +35,26 @@ import z from "zod";
 import { formatDuration } from "@/utils/helpers/timer";
 
 const createStakeFormSchema = ({
-    maxAmount,
-    minStakingAmount,
-    maxStakingAmount,
-    remainingCapacity,
+    decimals,
+    rawBalance,
+    minRaw,
+    maxRaw,
+    remainingRaw,
+    minFormatted,
+    maxFormatted,
+    remainingFormatted,
+    balanceFormatted,
     symbol,
 }: {
-    maxAmount: string | undefined;
-    minStakingAmount: string | undefined;
-    maxStakingAmount: string | undefined;
-    remainingCapacity: string | undefined;
+    decimals: number;
+    rawBalance: bigint | undefined;
+    minRaw: bigint | null;
+    maxRaw: bigint | null;
+    remainingRaw: bigint | null;
+    minFormatted: string | undefined;
+    maxFormatted: string | undefined;
+    remainingFormatted: string | undefined;
+    balanceFormatted: string | undefined;
     symbol: string;
 }) =>
     z.object({
@@ -63,31 +73,31 @@ const createStakeFormSchema = ({
             )
             .refine(
                 (v) => {
-                    if (maxAmount === undefined || isNaN(Number(maxAmount))) return true;
-                    return Number(v) <= Number(maxAmount);
+                    if (rawBalance === undefined) return true;
+                    try { return parseUnits(v, decimals) <= rawBalance; } catch { return false; }
                 },
-                { error: `Amount exceeds wallet balance (${maxAmount} ${symbol})` },
+                { error: `Amount exceeds wallet balance (${balanceFormatted} ${symbol})` },
             )
             .refine(
                 (v) => {
-                    if (minStakingAmount === undefined) return true;
-                    return Number(v) >= Number(minStakingAmount);
+                    if (minRaw === null) return true;
+                    try { return parseUnits(v, decimals) >= minRaw; } catch { return false; }
                 },
-                { error: `Amount is below minimum staking amount (${minStakingAmount} ${symbol})` },
+                { error: `Amount is below minimum staking amount (${minFormatted} ${symbol})` },
             )
             .refine(
                 (v) => {
-                    if (maxStakingAmount === undefined) return true;
-                    return Number(v) <= Number(maxStakingAmount);
+                    if (maxRaw === null) return true;
+                    try { return parseUnits(v, decimals) <= maxRaw; } catch { return false; }
                 },
-                { error: `Amount exceeds maximum staking amount (${maxStakingAmount} ${symbol})` },
+                { error: `Amount exceeds maximum staking amount (${maxFormatted} ${symbol})` },
             )
             .refine(
                 (v) => {
-                    if (remainingCapacity === undefined) return true;
-                    return Number(v) <= Number(remainingCapacity);
+                    if (remainingRaw === null) return true;
+                    try { return parseUnits(v, decimals) <= remainingRaw; } catch { return false; }
                 },
-                { error: `Amount exceeds remaining pool capacity (${remainingCapacity} ${symbol})` },
+                { error: `Amount exceeds remaining pool capacity (${remainingFormatted} ${symbol})` },
             ),
     });
 
@@ -147,6 +157,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
 
     const {
         formatted: stakingBalanceFormatted,
+        balance: stakingBalanceRaw,
         isLoading: isLoadingBalance,
         refetch: refetchBalance,
     } = useTokenBalance({
@@ -179,13 +190,18 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
 
     const stakeFormSchema = useMemo(
         () => createStakeFormSchema({
-            maxAmount: stakingBalanceFormatted,
-            minStakingAmount: stakingLimits.minFormatted,
-            maxStakingAmount: stakingLimits.maxFormatted,
-            remainingCapacity: stakingLimits.remainingFormatted,
+            decimals: pool?.tokenInDecimals ?? 0,
+            rawBalance: stakingBalanceRaw,
+            minRaw: stakingLimits.min,
+            maxRaw: stakingLimits.max,
+            remainingRaw: stakingLimits.remaining,
+            minFormatted: stakingLimits.minFormatted,
+            maxFormatted: stakingLimits.maxFormatted,
+            remainingFormatted: stakingLimits.remainingFormatted,
+            balanceFormatted: stakingBalanceFormatted,
             symbol: stakingTokenDisplay.symbol,
         }),
-        [stakingBalanceFormatted, stakingLimits, stakingTokenDisplay.symbol],
+        [stakingBalanceRaw, stakingBalanceFormatted, stakingLimits, stakingTokenDisplay.symbol, pool?.tokenInDecimals],
     );
 
     const {

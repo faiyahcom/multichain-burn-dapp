@@ -8,7 +8,7 @@ import GlowContainer from "@/components/common/glow/container";
 import CopyableText from "@/components/common/copyable-text";
 import { truncateString } from "@/utils/helpers/string";
 import { formatDuration } from "@/utils/helpers/timer";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -45,17 +45,35 @@ const PoolOverview = ({ poolDetail }: Props) => {
         imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
+    const pool = poolDetail?.pool;
+    const stakePool = pool as any;
+
+    const fmtStakingAmt = (raw: string | null | undefined) => {
+        if (!raw || raw === "0" || pool?.tokenInDecimals == null) return "Unlimited";
+        return `${formatAmount(raw, pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+    };
+
+    const remainingCapacity = useMemo(() => {
+        if (!stakePool?.stakingLimit || stakePool.stakingLimit === "0" || pool?.tokenInDecimals == null)
+            return "Unlimited";
+        try {
+            const limit = BigInt(stakePool.stakingLimit);
+            const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
+            const remaining = limit - staked;
+            return `${formatAmount((remaining >= 0n ? remaining : 0n).toString(), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+        } catch {
+            return "—";
+        }
+    }, [stakePool?.stakingLimit, pool?.tokenInDecimals, poolDetail?.staking?.totalStaked, stakingTokenDisplay.symbol]);
+
     const rows = useMemo(() => {
         if (!poolDetail) return [];
-
-        const pool = poolDetail.pool;
-        const stakePool = pool as any;
 
         return [
             [
                 {
                     label: "Owner Address",
-                    value: pool.owner ? (
+                    value: pool?.owner ? (
                         <CopyableText
                             content={pool.owner}
                             displayText={
@@ -70,28 +88,41 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     ),
                 },
                 {
-                    label: "Interest Accrual Duration",
-                    value:
-                        stakePool.interestAccrualDuration !== undefined
-                            ? formatDuration(stakePool.interestAccrualDuration)
-                            : "—",
+                    label: "Lock-up Duration",
+                    value: stakePool?.lockUpDuration !== undefined
+                        ? formatDuration(stakePool.lockUpDuration)
+                        : "—",
                 },
             ],
             [
                 { label: "Pool Type", value: "Staking Pool" },
                 {
-                    label: "Claim Start Delay",
-                    value:
-                        stakePool.claimStartDelay !== undefined
-                            ? formatDuration(stakePool.claimStartDelay)
-                            : "—",
+                    label: "Interest Start Delay",
+                    value: stakePool?.interestStrartDelay !== undefined
+                        ? formatDuration(stakePool.interestStrartDelay)
+                        : "—",
                 },
             ],
             [
+                { label: "Min Staking Limit", value: fmtStakingAmt(stakePool?.minStakingAmount) },
                 {
-                    label: "APR",
-                    value: formatApr(pool.apr),
+                    label: "Interest Accrual Duration",
+                    value: stakePool?.interestAccrualDuration !== undefined
+                        ? formatDuration(stakePool.interestAccrualDuration)
+                        : "—",
                 },
+            ],
+            [
+                { label: "Max Staking Limit", value: fmtStakingAmt(stakePool?.maxStakingAmount) },
+                {
+                    label: "Claim Start Delay",
+                    value: stakePool?.claimStartDelay !== undefined
+                        ? formatDuration(stakePool.claimStartDelay)
+                        : "—",
+                },
+            ],
+            [
+                { label: "Pool Limit", value: fmtStakingAmt(stakePool?.stakingLimit) },
                 {
                     label: "Network",
                     value: (
@@ -106,13 +137,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
             ],
             [
-                {
-                    label: "Lock-up Duration",
-                    value:
-                        stakePool.lockUpDuration !== undefined
-                            ? formatDuration(stakePool.lockUpDuration)
-                            : "—",
-                },
+                { label: "Remaining Capacity", value: remainingCapacity },
                 {
                     label: "Staking Token",
                     value: (
@@ -133,32 +158,16 @@ const PoolOverview = ({ poolDetail }: Props) => {
             ],
             [
                 {
-                    label: "Interest Start Delay",
-                    value:
-                        stakePool.interestStrartDelay !== undefined
-                            ? formatDuration(stakePool.interestStrartDelay)
-                            : "—",
+                    label: "APR",
+                    value: formatApr(pool?.apr),
                 },
                 {
-                    label: "Reward Token",
-                    value: (
-                        <div className="flex items-center gap-2">
-                            <TokenImage
-                                src={rewardTokenDisplay.imageUri}
-                                alt={rewardTokenDisplay.name}
-                                classNames={{
-                                    common: "size-4 md:size-5 2xl:size-6",
-                                    img: "size-4 md:size-5 2xl:size-6",
-                                    placeholder: "size-4 md:size-5 2xl:size-6",
-                                }}
-                            />
-                            <span>{rewardTokenDisplay.symbol}</span>
-                        </div>
-                    ),
+                    label: "Interest generated by the APR",
+                    value: null,
                 },
             ],
         ];
-    }, [network, poolDetail, rewardTokenDisplay, stakingTokenDisplay]);
+    }, [network, poolDetail, pool, stakePool, rewardTokenDisplay, stakingTokenDisplay, fmtStakingAmt, remainingCapacity]);
 
     return (
         <GlowContainer
@@ -195,11 +204,13 @@ const PoolOverview = ({ poolDetail }: Props) => {
                         {row[1] && (
                             <div className="grid grid-cols-2">
                                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
-                                    {row[1]?.label}:
+                                    {row[1]?.label}{row[1]?.value !== null ? ":" : ""}
                                 </span>
-                                <span className="text-sm font-medium break-all md:text-base lg:text-xl 2xl:text-2xl">
-                                    {row[1]?.value}
-                                </span>
+                                {row[1]?.value !== null && (
+                                    <span className="text-sm font-medium break-all md:text-base lg:text-xl 2xl:text-2xl">
+                                        {row[1]?.value}
+                                    </span>
+                                )}
                             </div>
                         )}
                     </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn } from "../components";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
@@ -8,11 +8,12 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenDisplay from "@/components/common/token-display";
 import StakeDialog from "../../stake-dialog";
 import { useStakeEvmFn } from "../../hooks/useStakeEvmFn";
-import { useUnstakeAllEvmFn } from "../../hooks/useUnstakeAllEvmFn";
-import { useClaimAllEvmFn } from "../../hooks/useClaimAllEvmFn";
+// import { useUnstakeAllEvmFn } from "../../hooks/useUnstakeAllEvmFn";
+// import { useClaimAllEvmFn } from "../../hooks/useClaimAllEvmFn";
 import { useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { StatRow } from "@/views/burn-pool/detail/amount-activities/components";
+import { IconExclaimation } from "@/assets/react";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -22,11 +23,12 @@ type Props = {
 const StakeStats = ({
     poolDetail,
     onStakeClick,
-    onClaimClick,
-    onUnstakeClaimClick,
-    claimLoading,
-    unstakeClaimLoading,
+    // onClaimClick,
+    // onUnstakeClaimClick,
+    // claimLoading,
+    // unstakeClaimLoading,
     stakeDisabled,
+    hasReachedLimit,
 }: {
     poolDetail?: PoolDetailResponse;
     onStakeClick: () => void;
@@ -35,6 +37,7 @@ const StakeStats = ({
     claimLoading: boolean;
     unstakeClaimLoading: boolean;
     stakeDisabled?: boolean;
+    hasReachedLimit?: boolean;
 }) => {
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
@@ -68,10 +71,6 @@ const StakeStats = ({
         val ? formatAmount(val, tokenInDecimals) : "0";
     const fmtReward = (val?: string) =>
         val ? formatAmount(val, rewardDecimals) : "0";
-
-    const canClaim = ua?.availableClaim ?? false;
-    const hasStakes = (poolDetail?.staking?.user?.stakeIds?.length ?? 0) > 0
-        || poolDetail?.staking?.user?.stakeId != null;
 
     const stakingToken = (
         <TokenDisplay
@@ -178,10 +177,18 @@ const StakeStats = ({
             <p className="text-right text-sm md:text-base lg:text-lg 2xl:text-xl">
                 Interest stops accruing upon unstaking.
             </p>
+            {hasReachedLimit && (
+                <div className="inline-flex items-start gap-1">
+                    <IconExclaimation className="inline size-5" />
+                    <span className="text-sm text-mb-gray-b8">
+                        This pool has reached its staking limit and is no longer accepting new stakes
+                    </span>
+                </div>
+            )}
             <ActionBtn
                 text="Stake"
                 onClick={onStakeClick}
-                disabled={stakeDisabled}
+                disabled={stakeDisabled || hasReachedLimit}
             />
             {/* <ActionBtn
                 text="Claim Reward"
@@ -204,13 +211,22 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
     const [claimLoading, setClaimLoading] = useState(false);
     const [unstakeClaimLoading, setUnstakeClaimLoading] = useState(false);
 
+    const hasReachedLimit = useMemo(() => {
+        const stakePool = poolDetail?.pool as any;
+        if (!stakePool?.stakingLimit || stakePool.stakingLimit === "0") return false;
+        try {
+            return BigInt(poolDetail?.staking?.totalStaked ?? "0") >= BigInt(stakePool.stakingLimit);
+        } catch {
+            return false;
+        }
+    }, [poolDetail?.pool, poolDetail?.staking?.totalStaked]);
+
     const { stakeEvm } = useStakeEvmFn();
-    const { unstakeAllEvm } = useUnstakeAllEvmFn();
-    const { claimAllEvm } = useClaimAllEvmFn();
+    // const { unstakeAllEvm } = useUnstakeAllEvmFn();
+    // const { claimAllEvm } = useClaimAllEvmFn();
     const queryClient = useQueryClient();
 
     const poolAddress = poolDetail?.pool?.address;
-    const stakeId = poolDetail?.staking?.user?.stakeId;
 
     const invalidatePool = () => {
         if (poolAddress) {
@@ -231,25 +247,25 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
     };
 
     const handleClaim = async () => {
-        if (!poolAddress || !stakeId) return;
-        setClaimLoading(true);
-        try {
-            await claimAllEvm({ poolAddress, stakeIds: [stakeId] });
-            invalidatePool();
-        } finally {
-            setClaimLoading(false);
-        }
+        // if (!poolAddress || !stakeId) return;
+        // setClaimLoading(true);
+        // try {
+        //     await claimAllEvm({ poolAddress, stakeIds: [stakeId] });
+        //     invalidatePool();
+        // } finally {
+        //     setClaimLoading(false);
+        // }
     };
 
     const handleUnstakeClaim = async () => {
-        if (!poolAddress || !stakeId) return;
-        setUnstakeClaimLoading(true);
-        try {
-            await unstakeAllEvm({ poolAddress, stakeIds: [stakeId] });
-            invalidatePool();
-        } finally {
-            setUnstakeClaimLoading(false);
-        }
+        // if (!poolAddress || !stakeId) return;
+        // setUnstakeClaimLoading(true);
+        // try {
+        //     await unstakeAllEvm({ poolAddress, stakeIds: [stakeId] });
+        //     invalidatePool();
+        // } finally {
+        //     setUnstakeClaimLoading(false);
+        // }
     };
 
     return (
@@ -263,6 +279,7 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
                     claimLoading={claimLoading}
                     unstakeClaimLoading={unstakeClaimLoading}
                     stakeDisabled={stakeDisabled}
+                    hasReachedLimit={hasReachedLimit}
                 />
             </PoolChainGuard>
             <StakeDialog
