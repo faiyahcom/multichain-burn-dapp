@@ -28,6 +28,7 @@ import { truncateString } from "@/utils/helpers/string";
 import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
+import LowRewardNotiSwitch from "../low-reward-noti-switch";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
@@ -64,6 +65,7 @@ const AdminMasterPoolManagementTable = () => {
     "Creator",
     "Time",
     "Network",
+    "Low Reward \nNotification",
     "Partner Burn",
     "Status",
   ];
@@ -73,7 +75,9 @@ const AdminMasterPoolManagementTable = () => {
         <TableHeader>
           <TableRow>
             {columns.map((column, index) => (
-              <TableHead key={index}>{column}</TableHead>
+              <TableHead key={index} className="whitespace-pre-line">
+                {column}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -86,6 +90,7 @@ const AdminMasterPoolManagementTable = () => {
           />
           {pools?.pools?.map((item) => {
             const isBurnPool = item.kind === 0;
+            const isStakePool = item.kind === 2;
 
             return (
               <TableRow
@@ -139,6 +144,16 @@ const AdminMasterPoolManagementTable = () => {
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
+                </TableCell>
+                <TableCell className="text-center">
+                  {isStakePool && (
+                    <LowRewardNotiSwitch
+                      address={item.address}
+                      // TODO: implement
+                      // isLowRewardNotiEnabled={item.isLowRewardNotiEnabled}
+                      classNames={{ btn: "mx-auto" }}
+                    />
+                  )}
                 </TableCell>
                 <TableCell className="text-center">
                   {isBurnPool && (
