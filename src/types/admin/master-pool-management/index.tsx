@@ -144,6 +144,10 @@ export type PoolItemType = {
   isPartner: boolean;
   liquidity: string; // string number
   rewardAmount: string; // string number
+  tokenInEnable: boolean;
+  tokenOutEnable: boolean;
+  apr: string; // divide by 10000 to get display percentage
+  stakedAmount: string;
 };
 
 export type PoolListRequest = PaginationRequest & {
@@ -180,6 +184,7 @@ export type PoolListStatsResponse = {
   totalParticipants: number;
   totalBurned?: string;
   totalSwapVolume?: string;
+  totalStaked?: number;
 };
 
 // user view pool list can only see certain statuses

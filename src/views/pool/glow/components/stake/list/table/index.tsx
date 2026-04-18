@@ -15,7 +15,12 @@ import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-in
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
-import type { PoolItemType } from "@/types/admin/master-pool-management";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import {
+  getPoolStatusLabel,
+  type PoolItemType,
+} from "@/types/admin/master-pool-management";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -59,7 +64,7 @@ const StakePoolListTable: React.FC<Props> = ({ data, isLoading }) => {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {/* <TableSkeleton
+        <TableSkeleton
           colCount={columns.length}
           rowCount={12}
           isLoading={isLoading}
@@ -68,95 +73,131 @@ const StakePoolListTable: React.FC<Props> = ({ data, isLoading }) => {
           colSpan={columns.length}
           data={data}
           isLoading={isLoading}
-        /> */}
-        {/* TODO: implement stake pool list */}
+        />
+        {data?.map((pool) => {
+          const network = chainIdToNetworkConfig(pool.chainId);
 
-        {/* TODO: remove demo data */}
-        {Array.from({ length: 12 }, (_, i) => (
-          <TableRow
-            key={i}
-            className="cursor-pointer font-medium"
-            variant="stake"
-          >
-            <TableCell
-              className="w-(--max-w) min-w-0 text-left"
-              style={
-                {
-                  "--max-w": fixWidth,
-                } as React.CSSProperties
-              }
+          const tokenOutDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: pool.tokenOut,
+            tokenSymbol: pool.tokenOutSymbol,
+            tokenName: pool.tokenOutSymbol,
+            customName: pool.tokenOutSymbolCustom ?? undefined,
+            customSymbol: pool.tokenOutSymbolCustom ?? undefined,
+            imageUri: pool.tokenOutImageUri ?? undefined,
+          });
+
+          const tokenInDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: pool.tokenIn,
+            tokenSymbol: pool.tokenInSymbol,
+            tokenName: pool.tokenInSymbol,
+            customName: pool.tokenInSymbolCustom ?? undefined,
+            customSymbol: pool.tokenInSymbolCustom ?? undefined,
+            imageUri: pool.tokenInImageUri ?? undefined,
+          });
+
+          const apr = Number(pool.apr ?? 0) / 10000;
+          const statusLabel = getPoolStatusLabel(pool.status);
+          const href = `/staking/detail/${pool.address}`;
+
+          return (
+            <TableRow
+              key={pool.address}
+              variant="stake"
+              className="cursor-pointer font-medium"
+              onClick={() => navigate({ to: href })}
             >
-              <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
-                <StakeCategoryIcon className="size-10.75 shrink-0" />
-                {/* max-w - spacing * (10.75 + 3) */}
-                <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
-                  <p
-                    className="max-w-full min-w-0 truncate font-semibold"
-                    title={"YUNA 12"}
-                  >
-                    {"YUNA 12"}
-                  </p>
-                  <CopyableText
-                    content={"0x1234567890123456789012345678901234567890"}
-                    displayText={truncateString({
-                      str: "0x1234567890123456789012345678901234567890",
-                    })}
-                    classNames={{
-                      container: "justify-start",
-                      displayText: "text-base sm:text-xl",
-                    }}
-                  />
-                </div>
-              </div>
-            </TableCell>
-            <TableCell>
-              <StartEndDateDisplay
-                startDate={"1776271167"}
-                endDate={"1776271167"}
-                classNames={{
-                  container: "mx-auto w-max",
-                }}
-              />
-            </TableCell>
-            <TableCell>
-              <TokenOutInInterceptDisplay
-                tokenOutProps={{}}
-                tokenInProps={{}}
-                className="justify-center"
-              />
-            </TableCell>
-            <TableCell>
-              <MetricNumber number={123456} unit="USDT" isShorten />
-            </TableCell>
-            <TableCell>
-              <MetricNumber
-                number={0.5}
-                unit="%"
-                isShorten
-                classNames={{
-                  container: "gap-0",
-                }}
-              />
-            </TableCell>
-            <TableCell>
-              <NetworkDisplay
-                networkId="xphere"
-                classNames={{
-                  container: "flex items-center justify-center gap-3",
-                }}
-              />
-            </TableCell>
-            <TableCell className="w-max max-w-max min-w-max">
-              <Button
-                variant={"stake"}
-                hasGroupHover
-                className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
+              <TableCell
+                className="w-(--max-w) min-w-0 text-left"
+                style={
+                  {
+                    "--max-w": fixWidth,
+                  } as React.CSSProperties
+                }
               >
-                {"Live"}
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+                <div className="flex max-w-(--max-w) min-w-0 items-center gap-3">
+                  <StakeCategoryIcon className="size-10.75 shrink-0" />
+                  {/* max-w - spacing * (10.75 + 3) */}
+                  <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
+                    <p
+                      className="max-w-full min-w-0 truncate font-semibold"
+                      title={pool?.name}
+                    >
+                      {pool?.name}
+                    </p>
+                    <CopyableText
+                      content={pool?.address}
+                      displayText={truncateString({
+                        str: pool?.address,
+                      })}
+                      classNames={{
+                        container: "justify-start",
+                        displayText: "text-base sm:text-xl",
+                      }}
+                    />
+                  </div>
+                </div>
+              </TableCell>
+              <TableCell>
+                <StartEndDateDisplay
+                  startDate={pool?.timeStart}
+                  endDate={pool?.timeEnd}
+                  classNames={{
+                    container: "mx-auto w-max",
+                  }}
+                />
+              </TableCell>
+              <TableCell>
+                <TokenOutInInterceptDisplay
+                  tokenOutProps={{
+                    src: tokenOutDisplay.imageUri,
+                    alt: tokenOutDisplay.symbol,
+                  }}
+                  tokenInProps={{
+                    src: tokenInDisplay.imageUri,
+                    alt: tokenInDisplay.symbol,
+                  }}
+                  className="justify-center"
+                />
+              </TableCell>
+              <TableCell>
+                <MetricNumber
+                  number={pool?.stakedAmount ?? 0}
+                  unit={tokenInDisplay.symbol}
+                  isShorten
+                />
+              </TableCell>
+              <TableCell>
+                <MetricNumber
+                  number={apr}
+                  unit="%"
+                  isShorten
+                  classNames={{
+                    container: "gap-0",
+                  }}
+                />
+              </TableCell>
+              <TableCell>
+                <NetworkDisplay
+                  chainId={pool?.chainId}
+                  classNames={{
+                    container: "flex items-center justify-center gap-3",
+                  }}
+                />
+              </TableCell>
+              <TableCell className="w-max max-w-max min-w-max">
+                <Button
+                  variant={"stake"}
+                  hasGroupHover
+                  className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
+                >
+                  {statusLabel}
+                </Button>
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
