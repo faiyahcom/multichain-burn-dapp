@@ -77,6 +77,23 @@ export const burnPoolStatusColors: Record<BurnPoolStatus, string> = {
   upcoming: "#FFE798",
 };
 
+export const stakePoolStatuses = [
+  "holding",
+  "upcoming",
+  ...swapPoolStatuses,
+] as const;
+export type StakePoolStatus = (typeof stakePoolStatuses)[number];
+export const stakePoolStatusLabels: Record<StakePoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  holding: "Holding",
+  upcoming: "Upcoming",
+};
+export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
+  ...swapPoolStatusColors,
+  holding: "#FFB08E",
+  upcoming: "#FFE798",
+};
+
 export const getPoolStatusColor = (status: AllPoolStatus) => {
   return burnPoolStatusColors[status as BurnPoolStatus] ?? "#7989ba";
 };
@@ -85,7 +102,7 @@ export const getPoolStatusLabel = (status: AllPoolStatus) => {
   return burnPoolStatusLabels[status as BurnPoolStatus] ?? "N/A";
 };
 
-export type AllPoolStatus = BurnPoolStatus | SwapPoolStatus | "draft";
+export type AllPoolStatus = BurnPoolStatus | SwapPoolStatus | StakePoolStatus | "draft";
 
 export type PoolItemType = {
   address: string;
