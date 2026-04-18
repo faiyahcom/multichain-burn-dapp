@@ -27,14 +27,27 @@ type Props = {
 
 const DEFAULT_PAGE_SIZE = 5;
 
-const formatUnixDate = (timestamp?: number): string => {
-    if (timestamp == null) return "—";
-    const date = new Date(timestamp * 1000);
-    return date.toLocaleDateString("en-GB", {
+const formatUnixDateTime = (timestamp?: number): { time: string; date: string } | null => {
+    if (timestamp == null) return null;
+    const d = new Date(timestamp * 1000);
+    const time = d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" });
+    const date = d.toLocaleDateString("en-GB", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
     });
+    return { time, date };
+};
+
+const DateTimeCell = ({ timestamp }: { timestamp?: number }) => {
+    const parts = formatUnixDateTime(timestamp);
+    if (!parts) return <span>—</span>;
+    return (
+        <div className="flex flex-col items-center leading-snug">
+            <span>{parts.time}</span>
+            <span>{parts.date}</span>
+        </div>
+    );
 };
 
 const MyStakesTable = ({ poolDetail }: Props) => {
@@ -155,23 +168,23 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                                         className="text-xs md:text-sm lg:text-base 2xl:text-xl [&>td]:px-4 [&>td]:text-center [&>td]:md:px-6"
                                     >
                                         <TableCell className="whitespace-nowrap">
-                                            {formatUnixDate(row.time)}
+                                            <DateTimeCell timestamp={row.time} />
                                         </TableCell>
                                         <TableCell>
                                             {`${shortenNumber({ number: Number(row.stakingAmount) })} ${stakingSymbol}`}
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap">
-                                            {formatUnixDate(row.unlockDate)}
+                                            <DateTimeCell timestamp={row.unlockDate} />
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap">
-                                            {formatUnixDate(row.interestStartDate)}
+                                            <DateTimeCell timestamp={row.interestStartDate} />
                                         </TableCell>
                                         <TableCell>{formatDuration(row.durationInSecs)}</TableCell>
                                         <TableCell className="whitespace-nowrap">
-                                            {formatUnixDate(row.interestEndDate)}
+                                            <DateTimeCell timestamp={row.interestEndDate} />
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap">
-                                            {formatUnixDate(row.claimableDate)}
+                                            <DateTimeCell timestamp={row.claimableDate} />
                                         </TableCell>
                                         <TableCell>{`${shortenNumber({ number: Number(row.rewardAmount) })} ${rewardSymbol}`}</TableCell>
                                         <TableCell>
