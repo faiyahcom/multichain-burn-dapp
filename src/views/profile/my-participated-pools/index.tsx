@@ -70,7 +70,7 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
   const participatedQueryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
     limit: limit,
-    kind: poolType.toString(),
+    kinds: poolType.toString(),
     includeStatuses: convertArrayToStringParam({ array: filter?.status }),
     chainIds: convertArrayToStringParam({
       array: filter?.network?.map(networkIdToChainId)?.filter(Boolean) ?? [],

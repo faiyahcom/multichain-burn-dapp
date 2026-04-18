@@ -20,7 +20,7 @@ export interface GetParticipatedPoolsByUserParams {
   limit: number;
   includeStatuses?: string; // comma separated
   chainIds?: string; // comma separated
-  kind?: string;
+  kinds?: string;
   search?: string;
   sortBy?: SortBy;
   sortDirection?: SortOrder; // default to desc
@@ -71,6 +71,9 @@ export interface ParticipatedUserPool {
   isPartner: boolean;
   liquidity: string; // string number
   rewardAmount: string; // string number
+
+  stakedAmount: string; // string number
+  apr: string; // divide by 10000 to get display percentage
 }
 
 export type ParticipatedPoolsResponse = PaginationResponse & {

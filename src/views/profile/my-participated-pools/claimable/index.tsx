@@ -57,7 +57,9 @@ const ProfileMyParticipatedPoolsClaimable = () => {
   const queryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
     limit: limit,
-    kind: PoolKindCodeEnum.Burn.toString(), // TODO: update to use filter.poolType
+    kinds: convertArrayToStringParam({
+      array: filter.poolType,
+    }),
     includeStatuses: undefined,
     chainIds: convertArrayToStringParam({
       array: filter?.network?.map(networkIdToChainId)?.filter(Boolean) ?? [],
