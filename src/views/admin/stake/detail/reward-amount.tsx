@@ -13,7 +13,7 @@ type Props = {
 };
 
 const fmt = (raw: string | undefined, decimals: number) =>
-    raw !== undefined ? formatAmount(raw, decimals) : "-";
+    raw !== undefined ? formatAmount(raw, decimals) : "0";
 
 const fmtFee = (fee: string | undefined) =>
     fee !== undefined ? `${Number(fee) / DECIMAL_FEE_PERCENT}%` : "-";
@@ -74,7 +74,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
             { label: "Total Claimed Rewards", value: `${formattedClaimedReward} ${rewardSymbol}` },
         ],
         [
-            { label: "Total Accrued Rewards", value: `${formattedRewardRemaining} ${rewardSymbol}` },
+            { label: "Total Reward Amount", value: `${formattedRewardRemaining} ${rewardSymbol}` },
             { label: "Total Deposited Rewards", value: `${formattedDepositedRewards} ${rewardSymbol}` },
         ],
         [
@@ -100,7 +100,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                     <div className="h-1.5 w-1.5 bg-foreground" />
                     <span>Staked and Reward Amount</span>
                 </div>
-                <p>
+                {/* <p>
                     {!poolDetail ? (
                         <Skeleton className="inline-block h-6 w-28" />
                     ) : (
@@ -108,7 +108,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                             {formattedTotalReward} {rewardSymbol}
                         </>
                     )}
-                </p>
+                </p> */}
             </div>
 
             {isSimple ? (

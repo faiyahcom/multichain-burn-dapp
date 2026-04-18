@@ -8,6 +8,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "usehooks-ts";
+import { formatAmount } from "@/utils/helpers/numbers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -56,6 +57,24 @@ const PoolOverview = ({ poolDetail }: Props) => {
         imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
+    const fmtStakingAmt = (raw: string | null | undefined) => {
+        if (!raw || raw === "0" || pool?.tokenInDecimals == null) return "Unlimited";
+        return `${formatAmount(raw, pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+    };
+
+    const remainingCapacity = useMemo(() => {
+        if (!pool?.stakingLimit || pool.stakingLimit === "0") return "Unlimited";
+        if (pool.tokenInDecimals == null) return "—";
+        try {
+            const limit = BigInt(pool.stakingLimit);
+            const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
+            const remaining = limit - staked;
+            return `${formatAmount((remaining >= 0n ? remaining : 0n).toString(), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+        } catch {
+            return "—";
+        }
+    }, [pool?.stakingLimit, pool?.tokenInDecimals, poolDetail?.staking?.totalStaked, stakingTokenDisplay.symbol]);
+
     const rows = useMemo(() => {
         if (!poolDetail) return [];
 
@@ -90,6 +109,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     label: "Claim Start Delay",
                     value: formatDuration(Number(stakePool?.claimStartDelay)),
                 },
+            ],
+            [
+                { label: "Min Staking Amount", value: fmtStakingAmt(stakePool?.minStakingAmount) },
+                { label: "Max Staking Amount", value: fmtStakingAmt(stakePool?.maxStakingAmount) },
+            ],
+            [
+                { label: "Pool Limit", value: fmtStakingAmt(stakePool?.stakingLimit) },
+                { label: "Remaining Capacity", value: remainingCapacity },
             ],
             [
                 { label: "APR", value: aprDisplay },
@@ -143,7 +170,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
             ],
         ];
-    }, [poolDetail, stakePool, network, stakingTokenDisplay, rewardTokenDisplay, isMobile, pool?.owner]);
+    }, [poolDetail, stakePool, network, stakingTokenDisplay, rewardTokenDisplay, isMobile, pool?.owner, remainingCapacity]);
 
     return (
         <div className="mt-3 w-full py-4">
