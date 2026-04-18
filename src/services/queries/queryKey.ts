@@ -95,4 +95,6 @@ export const dashboardQueryKeys = {
     ["dashboard", "top-pair", params] as const,
   topSwapper: (params?: Record<string, unknown>) =>
     ["dashboard", "top-swapper", params] as const,
+  topStakingPools: (params?: Record<string, unknown>) =>
+    ["dashboard", "top-staking-pools", params] as const,
 };

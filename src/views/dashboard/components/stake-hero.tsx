@@ -4,17 +4,19 @@ import { IconStakeCategory, IconParticipant, IconStack } from "@/assets/react";
 import { useNavigate } from "@tanstack/react-router";
 import StakeStatsImage from "/images/dashboard/stake-stats.png";
 import { HeroStatRow } from "./burn-swap-hero";
-
-// ── Hardcoded stats ────────────────────────────────────────────────────────────
-
-const TOTAL_STAKING_VOLUME = "5,678,901.23";
-const TOTAL_TRANSACTIONS = "1,921";
-const TOTAL_PARTICIPANTS = "1,921";
+import type { StakingSection } from "@/services/dashboardService";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 // ── Stake Hero ─────────────────────────────────────────────────────────────────
 
-const StakeHero = () => {
+const StakeHero = ({ stakingSection }: { stakingSection?: StakingSection }) => {
     const navigate = useNavigate();
+    const stakedVolume = stakingSection?.stakedAmount != null
+        ? shortenNumber({ number: stakingSection.stakedAmount })
+        : "—";
+    const totalTxns = stakingSection?.totalTxns?.toLocaleString() ?? "—";
+    const totalParticipants = stakingSection?.totalParticipant?.toLocaleString() ?? "—";
+
     return (
         <GlowContainer
             className="relative flex flex-col overflow-visible sm:flex-row"
@@ -31,7 +33,7 @@ const StakeHero = () => {
                     hasHover
                     size="big"
                     className="sm:h-57px sm:w-275px h-12 w-full font-orbitron text-lg font-medium text-nowrap 2xl:text-xl"
-                    onClick={() => navigate({ to: "/stake" })}
+                    onClick={() => navigate({ to: "/staking" })}
                 >
                     Join Staking
                 </Button>
@@ -46,22 +48,22 @@ const StakeHero = () => {
                     </p>
                 </div>
                 <p className="font-orbitron text-2xl font-medium text-mb-btn-stake uppercase sm:text-[32px]">
-                    {TOTAL_STAKING_VOLUME}
+                    {stakedVolume}
                 </p>
                 <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
-                    Total Burned Volume
+                    Total Staked Amount
                 </p>
                 <HeroStatRow
                     icon={<IconStack className="text-mb-btn-stake" />}
                     label="Total Transactions"
-                    value={TOTAL_TRANSACTIONS}
+                    value={totalTxns}
                     valueClass="text-mb-btn-stake"
                     iconWrapperClassname="bg-[#34D3D3]/10"
                 />
                 <HeroStatRow
                     icon={<IconParticipant className="text-mb-btn-stake" />}
                     label="Total Participants"
-                    value={TOTAL_PARTICIPANTS}
+                    value={totalParticipants}
                     valueClass="text-mb-btn-stake"
                     iconWrapperClassname="bg-[#34D3D3]/10"
                 />

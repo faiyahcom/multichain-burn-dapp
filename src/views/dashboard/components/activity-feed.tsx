@@ -1,6 +1,7 @@
 import {
   IconBurnCategory,
   IconPairCategory,
+  IconStakeCategory,
   IconSwapCategory,
 } from "@/assets/react";
 import Dot from "@/components/common/glow/dot";
@@ -9,7 +10,8 @@ import TokenDisplay from "@/components/common/token-display";
 import { FEED_PAGE_SIZE, TXN_PAGE_SIZE } from "@/hooks/useScrollingFeed";
 import { cn } from "@/lib/utils";
 import type { ActivityItem } from "@/services/dashboardService";
-import { POOL_KIND } from "@/types/pool";
+import type { StakingActivityItem } from "@/services/dashboardService";
+import { POOL_KIND, PoolKindCodeEnum } from "@/types/pool";
 import { getExplorerUrl } from "@/utils/helpers/networks";
 import { formatAmount } from "@/utils/helpers/numbers";
 import {
@@ -17,7 +19,7 @@ import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import SwapActivityImage from "/images/dashboard/swap-activity.png";
 
 // ── Grid Constants (Responsive & Synced) ──────────────────────────────────────
@@ -28,6 +30,9 @@ const ROW_BURN_GRID =
 
 const ROW_SWAP_GRID =
   "grid grid-cols-[minmax(0,1fr)_90px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_110px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+
+const ROW_STAKE_GRID =
+  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.55fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
 
 // ── Row components ────────────────────────────────────────────────────────────
 
@@ -139,7 +144,21 @@ const TransactionRow = ({ item }: { item: ActivityItem }) => {
   const hash = truncateString({ str: item.hash, left: 8, right: 8 });
   const wallet = truncateString({ str: item.executor, left: 6, right: 6 });
   const time = formatRelativeTime(item.timestamp);
-  const type = POOL_KIND[item.poolKind] === "burn_pool" ? "Burn" : "Swap";
+  const getTypeLabel = () => {
+    switch (item.poolKind) {
+      case PoolKindCodeEnum.Burn:
+        return "Burn";
+      case PoolKindCodeEnum.Swap:
+        return "Swap";
+      case PoolKindCodeEnum.Stake:
+        return "Stake";
+      case PoolKindCodeEnum.Launchpad:
+        return "Launchpad";
+      default:
+        return "Unknown";
+    }
+  };
+  const type = getTypeLabel();
   const fee = formatAmount(item.fee || "0", item.tokenOutDecimals);
   const amountIn = formatAmount(item.amountIn, item.tokenInDecimals);
   const scanUrl = getExplorerUrl(item.chainId, item.hash, "tx");
@@ -356,3 +375,114 @@ export const SwapActivityFeed = ({
     ghostRowClassName={ROW_SWAP_GRID}
   />
 );
+
+// ── Staking row ───────────────────────────────────────────────────────────────
+
+const StakingRow = ({ item }: { item: StakingActivityItem }) => {
+  const navigate = useNavigate();
+  const taker = truncateString({ str: item.executor, left: 4, right: 4 });
+  const label = truncateString({
+    str: item.executorName ?? taker,
+    left: 4,
+    right: 4,
+  });
+  const time = formatTimestampSecondsToDate({
+    timestamp: item.timestamp,
+    formatStr: "HH:mm:ss",
+  });
+  const amount = formatAmount(item.amountIn, item.tokenInDecimals, 3);
+  const poolName = item.pool?.name ?? "";
+
+  return (
+    <div
+      className={cn(ROW_STAKE_GRID, "text-tiny lg:text-sm 2xl:text-md cursor-pointer transition-opacity hover:opacity-70")}
+      onClick={() => {
+        navigate({
+          to: `/staking/detail/${item?.poolAddress}`,
+        });
+      }}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") window.location.assign(`/stake/detail/${item.poolAddress}`); }}
+    >
+      <div className="flex min-w-0 items-center gap-2 md:gap-3">
+        <Dot className="size-2.5 shrink-0 bg-mb-btn-stake md:size-3.25" />
+        <span className="truncate text-mb-gray-b8">
+          Staked by <span className="text-foreground">{poolName || label}</span>
+        </span>
+        <span className="truncate text-mb-gray-b8/60">{taker}</span>
+      </div>
+
+      <div className="flex items-center justify-center gap-1 md:gap-2">
+        <IconStakeCategory className="size-7 shrink-0 md:size-10 2xl:size-10.75" />
+        <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
+      </div>
+
+      <div className="flex items-center justify-end gap-1.5 tabular-nums md:gap-3">
+        <span className="text-right text-mb-btn-stake">
+          {amount} {item.tokenInCustomSymbol ?? item.tokenInSymbol}
+        </span>
+        <TokenDisplay
+          symbol={item.tokenInSymbol}
+          customSymbol={item.tokenInCustomSymbol ?? undefined}
+          imageUri={item.tokenInImage ?? undefined}
+          classNames={{ img: "size-5 md:size-7 2xl:size-8.5" }}
+          hasSymbol={false}
+        />
+      </div>
+    </div>
+  );
+};
+
+interface StakingFeedProps {
+  visibleItems: StakingActivityItem[];
+  animKey: number;
+}
+
+export const StakingActivityFeed = ({ visibleItems, animKey }: StakingFeedProps) => {
+  const slots = Array.from({ length: FEED_PAGE_SIZE }, (_, i) => visibleItems[i] ?? null);
+  const isEmpty = visibleItems.length === 0;
+
+  return (
+    <div className="flex flex-col gap-4 overflow-hidden">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 md:gap-3">
+          <IconStakeCategory className="size-7 md:size-10 2xl:size-10.75" />
+          <p className="text-base font-medium tracking-wide uppercase md:text-xl 2xl:text-2xl">
+            Staking Activity
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Dot className="size-2.5 bg-mb-live-green md:size-3.25" pulse />
+          <span className="font-inter text-base font-semibold text-mb-live-green md:text-xl 2xl:text-2xl">
+            Live
+          </span>
+        </div>
+      </div>
+
+      {isEmpty ? (
+        <NoData classNames={{ container: "sm:py-12.5" }} text="No data" />
+      ) : (
+        <div
+          key={animKey}
+          className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-x-40 2xl:gap-y-4"
+        >
+          {slots.map((item, i) =>
+            item ? (
+              <div key={item.id} className="py-0 2xl:py-1">
+                <StakingRow item={item} />
+              </div>
+            ) : (
+              <div
+                key={`ghost-${i}`}
+                className={cn("pointer-events-none invisible py-1.5 2xl:py-[11.5px]", ROW_STAKE_GRID)}
+              >
+                &nbsp;
+              </div>
+            ),
+          )}
+        </div>
+      )}
+    </div>
+  );
+};

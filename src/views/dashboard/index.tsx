@@ -6,6 +6,7 @@ import { TickerBanner } from "@/views/dashboard/components/ticker-banner";
 import {
   BurnActivityFeed,
   SwapActivityFeed,
+  StakingActivityFeed,
   TransactionFeed,
 } from "@/views/dashboard/components/activity-feed";
 import { BurnSwapHero } from "@/views/dashboard/components/burn-swap-hero";
@@ -50,15 +51,21 @@ const HomeDashboard = () => {
     () => latestActivityData?.transactions ?? [],
     [latestActivityData],
   );
+  const stakingItems = useMemo(
+    () => latestActivityData?.stakingActivities ?? [],
+    [latestActivityData],
+  );
 
   const burnFeed = useScrollingFeed(burnItems);
   const swapFeed = useScrollingFeed(swapItems);
   const txnFeed = useScrollingFeed(txnItems, 6);
+  const stakingFeed = useScrollingFeed(stakingItems);
 
   useActivityStream({
     onBurnActivity: (item) => burnFeed.addItems([item]),
     onSwapActivity: (item) => swapFeed.addItems([item]),
     onTransaction: (item) => txnFeed.addItems([item]),
+    onStakingActivity: (item) => stakingFeed.addItems([item]),
   });
 
   const { data: topSwapperData } = useQuery({
@@ -70,6 +77,12 @@ const HomeDashboard = () => {
   const { data: topPairData } = useQuery({
     queryKey: dashboardQueryKeys.topPair({ limit: 6 }),
     queryFn: () => dashboardService.getTopPair({ limit: 6 }),
+  });
+
+  const { data: topStakingData } = useQuery({
+    queryKey: dashboardQueryKeys.topStakingPools({ limit: DEFAULT_POOL_LIMIT }),
+    queryFn: () =>
+      dashboardService.getTopStakingPools({ limit: DEFAULT_POOL_LIMIT }),
   });
 
   const tickerItems = data
@@ -100,8 +113,8 @@ const HomeDashboard = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <StakeHero />
-        <TopStakingPools data={topSwapperData} />
+        <StakeHero stakingSection={data?.stakingSection}/>
+        <TopStakingPools pools={topStakingData?.topStakingPools} />
       </div>
 
       <GlowContainer className="px-5 py-4.5" variant="burn">
@@ -114,6 +127,12 @@ const HomeDashboard = () => {
         <SwapActivityFeed
           visibleItems={swapFeed.visibleItems}
           animKey={swapFeed.animKey}
+        />
+      </GlowContainer>
+      <GlowContainer className="px-5 py-4.5" variant="stake">
+        <StakingActivityFeed
+          visibleItems={stakingFeed.visibleItems}
+          animKey={stakingFeed.animKey}
         />
       </GlowContainer>
       <TopPairSection data={topPairData} />

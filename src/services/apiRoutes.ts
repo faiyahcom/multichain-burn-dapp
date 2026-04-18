@@ -65,6 +65,7 @@ export const API_ROUTES = {
     PARTNER_POOLS: "/general/partner-pools",
     TOP_PAIR: "/general/top-pair",
     TOP_SWAPPER: "/general/top-swapper",
+    TOP_STAKING_POOLS: "/general/top-staking-pools",
   },
   FEE: {
     LIST: "/fee",
