@@ -31,7 +31,7 @@ type CreateSwapPoolFormValues = {
   ratio: string;
   budget: string;
   tokenReward: string;
-  amountReceive: string; // This is only for the UI, not for the API, this is what client requested (MB-1054)
+  amountPay: string; // This is only for the UI, not for the API, this is what client requested (MB-1054)
 };
 
 type Props = {
@@ -74,7 +74,7 @@ const CreateSwapPoolForm = ({
       ratio: undefined,
       tokenReward: undefined,
       budget: undefined,
-      amountReceive: undefined,
+      amountPay: undefined,
     },
   });
 
@@ -162,8 +162,6 @@ const CreateSwapPoolForm = ({
   };
 
   const handleOnChangeBudget = (value: string) => {
-    setValue("budget", value, { shouldValidate: true });
-
     if (!!value && ratio) {
       const budgetNumber = Number(value);
       const [rawNumerator, rawDenominator] = ratio
@@ -173,19 +171,15 @@ const CreateSwapPoolForm = ({
       const denominator = Number(rawDenominator || 0);
 
       if (numerator && denominator && budgetNumber) {
-        const numberAmountReceive = (budgetNumber * denominator) / numerator;
-        setValue(
-          "amountReceive",
-          Number(numberAmountReceive.toFixed(6)).toString(),
-          { shouldValidate: true },
-        );
+        const numberAmountPay = (budgetNumber / denominator) * numerator;
+        setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
+          shouldValidate: true,
+        });
       }
     }
   };
 
   const handleOnChangeRatio = (value: string) => {
-    setValue("ratio", value, { shouldValidate: true });
-
     const [rawNumerator, rawDenominator] = value
       .split(":")
       .map((v) => v.trim());
@@ -194,28 +188,24 @@ const CreateSwapPoolForm = ({
     const budgetNumber = Number(budget || 0);
 
     if (numerator && denominator && budgetNumber) {
-      const numberAmountReceive = (budgetNumber * denominator) / numerator;
-      setValue(
-        "amountReceive",
-        Number(numberAmountReceive.toFixed(6)).toString(),
-        { shouldValidate: true },
-      );
+      const numberAmountPay = (budgetNumber / denominator) * numerator;
+      setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
+        shouldValidate: true,
+      });
     }
   };
 
-  const handleOnChangeAmountReceive = (value: string) => {
-    setValue("amountReceive", value, { shouldValidate: true });
-
+  const handleOnChangeAmountPay = (value: string) => {
     if (!!value && ratio) {
-      const amountReceiveNumber = Number(value);
+      const amountPayNumber = Number(value);
       const [rawNumerator, rawDenominator] = ratio
         .split(":")
         .map((v) => v.trim());
       const numerator = Number(rawNumerator || 0);
       const denominator = Number(rawDenominator || 0);
 
-      if (numerator && denominator && amountReceiveNumber) {
-        const numberBudget = (amountReceiveNumber * numerator) / denominator;
+      if (numerator && denominator && amountPayNumber) {
+        const numberBudget = (amountPayNumber / numerator) * denominator;
         setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
           shouldValidate: true,
         });
@@ -385,48 +375,48 @@ const CreateSwapPoolForm = ({
           <Input
             variant="swap"
             placeholder="0.0"
-            aria-invalid={!!errors.budget}
+            aria-invalid={!!errors.amountPay}
             className={cn(
               "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-[23px]",
             )}
             type="number"
             step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-            {...register("budget", {
+            {...register("amountPay", {
               onChange: (e) => {
-                handleOnChangeBudget(e.target.value);
+                handleOnChangeAmountPay(e.target.value);
               },
-              required: "Budget is required",
+              required: "Amount to receive is required",
               validate: {
                 validNumber: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal?.isFinite()
                     ? true
-                    : "Budget must be a valid number";
+                    : "Amount to receive must be a valid number";
                 },
                 moreThanZero: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal?.isZero()
-                    ? "Budget must be greater than zero"
+                    ? "Amount to receive must be greater than zero"
                     : true;
                 },
                 notNegative: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal?.isNegative()
-                    ? "Budget must be positive"
+                    ? "Amount to receive must be positive"
                     : true;
                 },
                 maxDecimals: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal && decimal.decimalPlaces() <= 6
                     ? true
-                    : "Budget must have 6 decimals or less";
+                    : "Amount to receive must have 6 decimals or less";
                 },
               },
             })}
           />
-          {errors.budget && (
+          {errors.amountPay && (
             <p className="font-inter text-xs text-destructive">
-              {errors.budget.message}
+              {errors.amountPay.message}
             </p>
           )}
         </div>
@@ -477,8 +467,8 @@ const CreateSwapPoolForm = ({
         </div>
 
         <div className="flex flex-wrap gap-4 md:grid md:grid-cols-2 md:gap-6">
-          <div className="flex w-full flex-col justify-end gap-2">
-            <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
               Network
             </span>
             <div
@@ -503,48 +493,48 @@ const CreateSwapPoolForm = ({
             <Input
               variant="swap"
               placeholder="0.0"
-              aria-invalid={!!errors.amountReceive}
+              aria-invalid={!!errors.budget}
               className={cn(
                 "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-[23px]",
               )}
               type="number"
               step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-              {...register("amountReceive", {
+              {...register("budget", {
                 onChange: (e) => {
-                  handleOnChangeAmountReceive(e.target.value);
+                  handleOnChangeBudget(e.target.value);
                 },
-                required: "Amount to receive is required",
+                required: "Budget is required",
                 validate: {
                   validNumber: (value) => {
                     const decimal = safeDecimalParse({ value });
                     return decimal?.isFinite()
                       ? true
-                      : "Amount to receive must be a valid number";
+                      : "Budget must be a valid number";
                   },
                   moreThanZero: (value) => {
                     const decimal = safeDecimalParse({ value });
                     return decimal?.isZero()
-                      ? "Amount to receive must be greater than zero"
+                      ? "Budget must be greater than zero"
                       : true;
                   },
                   notNegative: (value) => {
                     const decimal = safeDecimalParse({ value });
                     return decimal?.isNegative()
-                      ? "Amount to receive must be positive"
+                      ? "Budget must be positive"
                       : true;
                   },
                   maxDecimals: (value) => {
                     const decimal = safeDecimalParse({ value });
                     return decimal && decimal.decimalPlaces() <= 6
                       ? true
-                      : "Amount to receive must have 6 decimals or less";
+                      : "Budget must have 6 decimals or less";
                   },
                 },
               })}
             />
-            {errors.amountReceive && (
+            {errors.budget && (
               <p className="font-inter text-xs text-destructive">
-                {errors.amountReceive.message}
+                {errors.budget.message}
               </p>
             )}
           </div>
