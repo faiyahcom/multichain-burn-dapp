@@ -385,31 +385,31 @@ const CreateSwapPoolForm = ({
               onChange: (e) => {
                 handleOnChangeAmountPay(e.target.value);
               },
-              required: "Amount to receive is required",
+              required: "Amount pay is required",
               validate: {
                 validNumber: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal?.isFinite()
                     ? true
-                    : "Amount to receive must be a valid number";
+                    : "Amount pay must be a valid number";
                 },
                 moreThanZero: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal?.isZero()
-                    ? "Amount to receive must be greater than zero"
+                    ? "Amount pay must be greater than zero"
                     : true;
                 },
                 notNegative: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal?.isNegative()
-                    ? "Amount to receive must be positive"
+                    ? "Amount pay must be positive"
                     : true;
                 },
                 maxDecimals: (value) => {
                   const decimal = safeDecimalParse({ value });
                   return decimal && decimal.decimalPlaces() <= 6
                     ? true
-                    : "Amount to receive must have 6 decimals or less";
+                    : "Amount pay must have 6 decimals or less";
                 },
               },
             })}
