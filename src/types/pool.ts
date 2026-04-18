@@ -298,7 +298,9 @@ export function pickActivityKind<K extends keyof ActivityKind>(
   >;
 }
 
-export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
+export const myActivityActions = pickActivityKind([
+  1, 0, 10, 32, 30, 31, 5, 33, 34,
+]);
 
 export interface PoolActivitiesResponse {
   page: number;
