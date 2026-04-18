@@ -6,7 +6,7 @@ import type {
   SortOrder,
 } from "@/types/common";
 
-// 0 - burn pool | 1 - swap pool
+// 0 - burn pool | 1 - swap pool | 2 - stake pool | 3 - launchpad
 export const poolTypes = [0, 1, 2, 3] as const;
 export type PoolType = (typeof poolTypes)[number];
 export const poolTypeLabels: Record<PoolType, string> = {
