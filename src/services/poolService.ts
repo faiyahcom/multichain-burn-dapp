@@ -108,14 +108,20 @@ export const poolService = {
     );
     return response;
   },
-  getMyStakes: async (poolAddress: string, page: number, limit: number) => {
-    const params = new URLSearchParams({
-      page: String(page),
-      limit: String(limit),
-      poolAddress,
-    });
+  getMyStakes: async (
+    poolAddress: string | undefined,
+    page: number,
+    limit: number,
+  ) => {
     const response = await apiClient.get<MyStakesResponse>(
-      `${POOLS_API_ROUTES.MY_STAKES}?${params.toString()}`,
+      `${POOLS_API_ROUTES.MY_STAKES}`,
+      {
+        params: {
+          page: String(page),
+          limit: String(limit),
+          poolAddress: poolAddress,
+        },
+      },
     );
     return response;
   },

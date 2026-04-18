@@ -2,7 +2,6 @@ import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import type { NetworkConfig } from "@/config/networks";
 
 type DisplayToken = {
-  customSymbol: string | undefined;
   imageUri: string;
   name: string;
   symbol: string;

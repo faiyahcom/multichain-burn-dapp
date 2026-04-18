@@ -108,19 +108,19 @@ export interface PoolDetailResponse {
     minStakingAmount?: string | null;
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
+  };
+  // Staking pool aggregate data
+  staking?: {
+    totalStaked: string;
+    user?: {
+      address?: string;
+      totalStaked: string;
+      availableUnstake: string;
+      totalUnstaked: string;
+      rewardAccrued: string;
+      availableClaim: string;
+      totalClaimed: string;
     };
-    // Staking pool aggregate data
-    staking?: {
-        totalStaked: string;
-        user?: {
-            address?: string;
-            totalStaked: string;
-            availableUnstake: string;
-            totalUnstaked: string;
-            rewardAccrued: string;
-            availableClaim: string;
-            totalClaimed: string;
-        };
   };
   returningAmountOnCanceling?: {
     amount: string;
@@ -159,16 +159,16 @@ export interface PoolTxnsResponse {
 }
 
 export const txnKind = {
-    1: "Taker Deposit",
-    2: "Refund to Whitelist User",
-    3: "Maker Deposit Reward",
-    4: "Taker Claim Reward",
-    5: "Refund to Maker",
-    6: "Burn Success",
-    7: "Stake",
-    8: "Claim",
-    9: "Unstake & Claim",
-    10: "Emergency Withdraw"
+  1: "Taker Deposit",
+  2: "Refund to Whitelist User",
+  3: "Maker Deposit Reward",
+  4: "Taker Claim Reward",
+  5: "Refund to Maker",
+  6: "Burn Success",
+  7: "Stake",
+  8: "Claim",
+  9: "Unstake & Claim",
+  10: "Emergency Withdraw",
 } as const;
 
 export const activityKind = {
@@ -219,6 +219,50 @@ export interface MyStakeSnapshot {
   tokenStake: string;
   stakeId: number;
   poolAdress: string;
+  customSymbolStake: string;
+  customSymbolReward: string;
+  imageUriStake: string;
+  imageUriReward: string;
+  pool: {
+    address: string;
+    name: string;
+    owner: string;
+    rewardToken: string;
+    tokenIn: string;
+    pool_id: string;
+    kind: PoolKindCode;
+    chainId: string;
+    timestamp: string; // timestamp seconds
+    status: StakePoolStatus;
+    currentRewardAmount: string;
+    merkleRootStatus: string;
+    merkleRoot: string | null;
+    adminCloseReason: string | null;
+    settlementRetryCount: number;
+    rewardTokenSymbol: string;
+    rewardTokenDecimals: number;
+    tokenInSymbol: string;
+    tokenInDecimals: number;
+    timeStart: string;
+    timeEnd: string;
+    targetAddress: string;
+    assetTypeReward: number;
+    assetTypeIn: number;
+    rewardNumerator: string;
+    rewardDenominator: string;
+    rewardAmount: string;
+    settlementFee: string;
+    poolCreationFee: string;
+    apr: string; // divide by 10000 to get display percentage
+    lockUpDuration: string;
+    interestStrartDelay: string;
+    interestAccrualDuration: string;
+    claimStartDelay: string;
+    minStakingAmount: string | null;
+    maxStakingAmount: string | null;
+    stakingLimit: string | null;
+    isPartner: boolean;
+  };
 }
 
 export interface MyStakesResponse {
@@ -254,9 +298,7 @@ export function pickActivityKind<K extends keyof ActivityKind>(
   >;
 }
 
-export const myActivityActions = pickActivityKind([
-  1, 0, 10, 32, 30, 31, 5
-]);
+export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
 
 export interface PoolActivitiesResponse {
   page: number;

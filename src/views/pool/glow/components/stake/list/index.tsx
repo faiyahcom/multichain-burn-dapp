@@ -43,7 +43,10 @@ const StakePoolList = () => {
   });
 
   return (
-    <GlowContainer variant="stake" className="px-2.5 py-3 sm:px-5 sm:py-6">
+    <GlowContainer
+      variant="stake"
+      className="space-y-5 px-2.5 py-3 sm:space-y-10 sm:px-5 sm:py-6"
+    >
       {filter.listLayout === "list" && (
         <StakePoolListTable
           data={poolList?.pools}

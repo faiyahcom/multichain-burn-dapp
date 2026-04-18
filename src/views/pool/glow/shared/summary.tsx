@@ -30,7 +30,7 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
         break;
 
       case PoolKindCodeEnum.Stake:
-        totalVolume = "123456789"; // TODO: implement API for stake pool
+        totalVolume = overallStats?.totalStaked?.toString() ?? "0";
         break;
 
       case PoolKindCodeEnum.Launchpad:
