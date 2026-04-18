@@ -50,6 +50,8 @@ interface TokenInfo {
   description: string;
   homepage: string;
   whitepaper: string;
+  price: string | null;
+  kind: number;
 }
 
 export interface PoolDetailResponse {
@@ -78,7 +80,7 @@ export interface PoolDetailResponse {
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
-    adminCloseReason: string;
+    adminCloseReason: string | null;
     rewardTokenSymbol: string;
     rewardTokenDecimals: number;
     tokenInSymbol: string;
@@ -96,17 +98,22 @@ export interface PoolDetailResponse {
     settlementFee: string;
     poolCreationFee: string;
     isPartner?: boolean;
-        // Staking pool fields
-        apr?: string;
-        lockUpDuration?: string;
-        interestStrartDelay?: string; // API typo (double 'r')
-        interestAccrualDuration?: string;
-        claimStartDelay?: string;
+    settlementRetryCount?: number;
+    // Staking pool fields
+    apr?: string;
+    lockUpDuration?: string;
+    interestStrartDelay?: string; // API typo (double 'r')
+    interestAccrualDuration?: string;
+    claimStartDelay?: string;
+    minStakingAmount?: string | null;
+    maxStakingAmount?: string | null;
+    stakingLimit?: string | null;
     };
     // Staking pool aggregate data
     staking?: {
         totalStaked: string;
         user?: {
+            address?: string;
             totalStaked: string;
             availableUnstake: string;
             totalUnstaked: string;
@@ -197,6 +204,28 @@ export const activityKind = {
 
   40: "Pool End",
 } as const;
+
+export interface MyStakeSnapshot {
+  time: number;
+  stakingAmount: string;
+  unlockDate: number;
+  interestStartDate: number;
+  durationInSecs: number;
+  interestEndDate: number;
+  claimableDate: number;
+  rewardAmount: string;
+  isUnstaked: boolean;
+  tokenReward: string;
+  tokenStake: string;
+  stakeId: number;
+  poolAdress: string;
+}
+
+export interface MyStakesResponse {
+  total: number;
+  page: number;
+  snapshots: MyStakeSnapshot[];
+}
 
 export type StakePoolStatus =
   | "on_going"
