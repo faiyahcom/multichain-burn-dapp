@@ -91,7 +91,7 @@ function UserSwapPools({ mode = "participated", title }: Props) {
   const participatedQueryParams: GetParticipatedPoolsByUserParams = {
     page,
     limit: LIMIT,
-    kind: "1",
+    kinds: "1",
     includeStatuses: convertArrayToStringParam({ array: selectedStatuses }),
     chainIds: convertArrayToStringParam({
       array: selectedNetworks.map(networkIdToChainId),

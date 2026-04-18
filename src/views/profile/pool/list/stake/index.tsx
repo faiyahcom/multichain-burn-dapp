@@ -14,12 +14,15 @@ import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-in
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
-import type { PoolItemType } from "@/types/admin/master-pool-management";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import type { ParticipatedUserPool } from "@/services/userService";
+import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
-  data?: PoolItemType[];
+  data?: ParticipatedUserPool[];
   isLoading?: boolean;
   limit?: number;
 }
@@ -60,7 +63,7 @@ const ProfilePoolListStake: React.FC<Props> = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {/* <TableSkeleton
+        <TableSkeleton
           colCount={columns.length}
           rowCount={limit}
           isLoading={isLoading}
@@ -69,79 +72,120 @@ const ProfilePoolListStake: React.FC<Props> = ({
           colSpan={columns.length}
           data={data}
           isLoading={isLoading}
-        /> */}
+        />
 
-        {/* TODO: implement stake pool list */}
+        {data?.map((pool) => {
+          const network = chainIdToNetworkConfig(pool.chainId);
 
-        {/* TODO: remove demo data */}
-        {Array.from({ length: limit }, (_, i) => (
-          <TableRow
-            key={i}
-            className="cursor-pointer font-medium"
-            variant="pair"
-          >
-            <TableCell className="min-w-0 space-y-1 text-left">
-              <p className="max-w-38.75 min-w-0 truncate" title={"YUNA 12"}>
-                {"YUNA 12"}
-              </p>
-              <CopyableText
-                content={"0x1234567890123456789012345678901234567890"}
-                displayText={truncateString({
-                  str: "0x1234567890123456789012345678901234567890",
-                })}
-                classNames={{
-                  container: "justify-start",
-                }}
-              />
-            </TableCell>
-            <TableCell>
-              <StartEndDateDisplay
-                startDate={"1776271167"}
-                endDate={"1776271167"}
-                classNames={{
-                  container: "mx-auto w-max",
-                }}
-              />
-            </TableCell>
-            <TableCell>
-              <TokenOutInInterceptDisplay
-                tokenOutProps={{}}
-                tokenInProps={{}}
-                className="justify-center"
-              />
-            </TableCell>
-            <TableCell>
-              <MetricNumber number={123456} unit="USDT" isShorten />
-            </TableCell>
-            <TableCell>
-              <MetricNumber
-                number={0.5}
-                unit="%"
-                isShorten
-                classNames={{
-                  container: "gap-0",
-                }}
-              />
-            </TableCell>
-            <TableCell>
-              <NetworkDisplay
-                networkId="xphere"
-                classNames={{
-                  container: "flex items-center justify-center gap-3",
-                }}
-              />
-            </TableCell>
-            <TableCell className="w-max max-w-max min-w-max">
-              <Button
-                variant={"pair"}
-                hasGroupHover
-                className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
-              >
-                {"Live"}
-              </Button>
-            </TableCell>
-          </TableRow>
-        ))}
+          const tokenOutDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: pool.tokenOut,
+            tokenSymbol: pool.tokenOutSymbol,
+            tokenName: pool.tokenOutSymbol,
+            customName: pool.tokenOutSymbolCustom ?? undefined,
+            customSymbol: pool.tokenOutSymbolCustom ?? undefined,
+            imageUri: pool.tokenOutImageUri ?? undefined,
+          });
+
+          const tokenInDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: pool.tokenIn,
+            tokenSymbol: pool.tokenInSymbol,
+            tokenName: pool.tokenInSymbol,
+            customName: pool.tokenInSymbolCustom ?? undefined,
+            customSymbol: pool.tokenInSymbolCustom ?? undefined,
+            imageUri: pool.tokenInImageUri ?? undefined,
+          });
+
+          return (
+            <TableRow
+              key={pool.address}
+              className={"cursor-pointer"}
+              onClick={() => {
+                navigate({
+                  to: `/staking/detail/$address`,
+                  params: {
+                    address: pool.address,
+                  },
+                });
+              }}
+              variant="pair"
+            >
+              <TableCell className="min-w-0 space-y-1 text-left">
+                <p className="max-w-38.75 min-w-0 truncate" title={pool.name}>
+                  {pool.name}
+                </p>
+                <CopyableText
+                  content={pool.address}
+                  displayText={truncateString({
+                    str: pool.address,
+                  })}
+                  classNames={{
+                    container: "justify-start",
+                  }}
+                />
+              </TableCell>
+              <TableCell>
+                <StartEndDateDisplay
+                  startDate={pool.timeStart}
+                  endDate={pool.timeEnd}
+                  classNames={{
+                    container: "mx-auto w-max",
+                  }}
+                />
+              </TableCell>
+              <TableCell>
+                <TokenOutInInterceptDisplay
+                  tokenOutProps={{
+                    src: tokenOutDisplay.imageUri,
+                    alt: tokenOutDisplay.symbol,
+                    classNames: {
+                      common: "sm:size-7 z-0",
+                    },
+                  }}
+                  tokenInProps={{
+                    src: tokenInDisplay.imageUri,
+                    alt: tokenInDisplay.symbol,
+                    classNames: {
+                      common: "sm:size-7 sm:-ml-[9px] z-10",
+                    },
+                  }}
+                  className="justify-center"
+                />
+              </TableCell>
+              <TableCell>
+                <MetricNumber number={123456} unit="USDT" isShorten />
+              </TableCell>
+              <TableCell>
+                <MetricNumber
+                  number={0.5}
+                  unit="%"
+                  isShorten
+                  classNames={{
+                    container: "gap-0",
+                  }}
+                />
+              </TableCell>
+              <TableCell>
+                <NetworkDisplay
+                  chainId={pool.chainId}
+                  classNames={{
+                    container: "flex items-center justify-center gap-3",
+                  }}
+                />
+              </TableCell>
+              <TableCell className="w-max max-w-max min-w-max">
+                <Button
+                  variant={"pair"}
+                  hasGroupHover
+                  className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
+                >
+                  {getPoolStatusLabel(pool.status)}
+                </Button>
+              </TableCell>
+            </TableRow>
+          );
+        })}
       </TableBody>
     </Table>
   );
