@@ -71,6 +71,9 @@ export interface ParticipatedUserPool {
   isPartner: boolean;
   liquidity: string; // string number
   rewardAmount: string; // string number
+
+  stakedAmount: string; // string number
+  apr: string; // divide by 10000 to get display percentage
 }
 
 export type ParticipatedPoolsResponse = PaginationResponse & {

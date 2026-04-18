@@ -97,6 +97,8 @@ const ProfilePoolListStake: React.FC<Props> = ({
             imageUri: pool.tokenInImageUri ?? undefined,
           });
 
+          const apr = Number(pool.apr ?? 0) / 10000;
+
           return (
             <TableRow
               key={pool.address}
@@ -154,11 +156,15 @@ const ProfilePoolListStake: React.FC<Props> = ({
                 />
               </TableCell>
               <TableCell>
-                <MetricNumber number={123456} unit="USDT" isShorten />
+                <MetricNumber
+                  number={pool.stakedAmount}
+                  unit={tokenInDisplay.symbol}
+                  isShorten
+                />
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={0.5}
+                  number={apr}
                   unit="%"
                   isShorten
                   classNames={{
