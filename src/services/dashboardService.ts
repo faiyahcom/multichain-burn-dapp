@@ -178,6 +178,7 @@ export interface TopStakingPool {
   rewardToken: string;
   rewardTokenSymbol: string;
   rewardTokenDecimals: number;
+  rewardTokenImageUri: string | null;
   tokenIn: string;
   tokenInSymbol: string;
   tokenInDecimals: number;

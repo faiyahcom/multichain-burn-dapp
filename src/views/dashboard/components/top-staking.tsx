@@ -84,7 +84,7 @@ const StakePoolCard = ({ pool, rank }: { pool: TopStakingPool; rank: number }) =
                 <TokenDisplay
                     symbol={pool.tokenInSymbol}
                     customSymbol={undefined}
-                    imageUri={undefined}
+                    imageUri={pool?.rewardTokenImageUri ?? undefined}
                     classNames={{ img: "size-8.5 lg:size-7 2xl:size-11" }}
                     hasSymbol={false}
                 />
