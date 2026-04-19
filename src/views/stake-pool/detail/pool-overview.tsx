@@ -9,6 +9,7 @@ import CopyableText from "@/components/common/copyable-text";
 import { truncateString } from "@/utils/helpers/string";
 import { formatDuration } from "@/utils/helpers/timer";
 import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -17,7 +18,7 @@ type Props = {
 const formatApr = (apr?: string): string => {
     if (!apr) return "—";
     // APR is in basis points: 1000 = 10%
-    return `${shortenNumber({ number: Number(apr) / 100, decimalPlaces: 2 })}%`;
+    return `${shortenNumber({ number: Number(apr) / DECIMAL_FEE_PERCENT, decimalPlaces: 2 })}%`;
 };
 
 const PoolOverview = ({ poolDetail }: Props) => {

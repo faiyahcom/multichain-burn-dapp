@@ -414,7 +414,7 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
       </div>
 
       <div className="flex items-center justify-center gap-1 md:gap-2">
-        <IconStakeCategory className="size-7 shrink-0 md:size-10 2xl:size-10.75" />
+        <IconStakeCategory className="size-5 shrink-0 md:size-10 2xl:size-10.75" />
         <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
       </div>
 
