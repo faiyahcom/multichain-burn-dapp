@@ -31,19 +31,23 @@ export const API_ROUTES = {
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
     CHECK_USER: "/whitelist-users/check-user",
-    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
+    UPDATE_USER_INFO: (address: string, chainId: string) =>
+      `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },
   ADMINS: {
     LIST: "/admins",
     UPSERT_USER: "/admins/user",
-    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
+    DELETE: (chainId: string, address: string) =>
+      `/admins/${chainId}/${address}`,
     NOTIFICATIONS: {
       LIST: "/admins/notifications",
       MARK_READ: "/admins/notifications/mark-read",
       STREAM: "/admins/notifications-stream",
     },
+    TOGGLE_LOW_REWARD_NOTI: (poolAddress: string) =>
+      `/admins/pools/${poolAddress}/low-reward-noti`,
   },
   PAIRS: {
     LIST: "/pairs",

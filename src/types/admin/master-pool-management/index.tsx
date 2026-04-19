@@ -102,7 +102,11 @@ export const getPoolStatusLabel = (status: AllPoolStatus) => {
   return burnPoolStatusLabels[status as BurnPoolStatus] ?? "N/A";
 };
 
-export type AllPoolStatus = BurnPoolStatus | SwapPoolStatus | StakePoolStatus | "draft";
+export type AllPoolStatus =
+  | BurnPoolStatus
+  | SwapPoolStatus
+  | StakePoolStatus
+  | "draft";
 
 export type PoolItemType = {
   address: string;
@@ -130,6 +134,7 @@ export type PoolItemType = {
   rewardNumerator: string;
   rewardDenominator: string;
   isPartner: boolean;
+  lowRewardNotiEnabled: boolean;
 };
 
 export type PoolListRequest = PaginationRequest & {

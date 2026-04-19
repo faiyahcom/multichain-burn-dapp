@@ -171,8 +171,7 @@ const AdminMasterPoolManagementTable = () => {
                     <LowRewardNotiSwitch
                       address={item.address}
                       chainId={item.chainId}
-                      // TODO: implement
-                      // isLowRewardNotiEnabled={item.isLowRewardNotiEnabled}
+                      isLowRewardNotiEnabled={item.lowRewardNotiEnabled}
                       classNames={{ btn: "mx-auto" }}
                     />
                   )}
