@@ -18,17 +18,33 @@ export const poolService = {
     );
     return response;
   },
-  getPoolTxns: async (page: number, limit: number, address: string, excludeKinds?: string) => {
-    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-    if (excludeKinds) params.set('excludeKinds', excludeKinds);
+  getPoolTxns: async (
+    page: number,
+    limit: number,
+    address: string,
+    excludeKinds?: string,
+  ) => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (excludeKinds) params.set("excludeKinds", excludeKinds);
     const response = await apiClient.get<PoolTxnsResponse>(
       `${POOLS_API_ROUTES.GET_POOL_TXNS(address)}?${params.toString()}`,
     );
     return response;
   },
-  getPoolActivities: async (page: number, limit: number, address: string, excludeKinds?: string) => {
-    const params = new URLSearchParams({ page: String(page), limit: String(limit) });
-    if (excludeKinds) params.set('excludeKinds', excludeKinds);
+  getPoolActivities: async (
+    page: number,
+    limit: number,
+    address: string,
+    excludeKinds?: string,
+  ) => {
+    const params = new URLSearchParams({
+      page: String(page),
+      limit: String(limit),
+    });
+    if (excludeKinds) params.set("excludeKinds", excludeKinds);
     const response = await apiClient.get<PoolActivitiesResponse>(
       `${POOLS_API_ROUTES.GET_POOL_ACTIVITIES(address)}?${params.toString()}`,
     );

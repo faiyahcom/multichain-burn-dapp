@@ -39,3 +39,13 @@ export interface MarkReadRequest {
 export interface MarkReadResponse {
   updated: number;
 }
+
+export interface ToggleLowRewardNotiRequest {
+  poolAddress: string;
+  enabled: boolean;
+}
+
+export interface ToggleLowRewardNotiResponse {
+  poolAddress: string;
+  enabled: boolean;
+}
