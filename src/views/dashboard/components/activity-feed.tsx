@@ -439,50 +439,13 @@ interface StakingFeedProps {
   animKey: number;
 }
 
-export const StakingActivityFeed = ({ visibleItems, animKey }: StakingFeedProps) => {
-  const slots = Array.from({ length: FEED_PAGE_SIZE }, (_, i) => visibleItems[i] ?? null);
-  const isEmpty = visibleItems.length === 0;
-
-  return (
-    <div className="flex flex-col gap-4 overflow-hidden">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2 md:gap-3">
-          <IconStakeCategory className="size-7 md:size-10 2xl:size-10.75" />
-          <p className="text-base font-medium tracking-wide uppercase md:text-xl 2xl:text-2xl">
-            Staking Activity
-          </p>
-        </div>
-        <div className="flex items-center gap-2">
-          <Dot className="size-2.5 bg-mb-live-green md:size-3.25" pulse />
-          <span className="font-inter text-base font-semibold text-mb-live-green md:text-xl 2xl:text-2xl">
-            Live
-          </span>
-        </div>
-      </div>
-
-      {isEmpty ? (
-        <NoData classNames={{ container: "sm:py-12.5" }} text="No data" />
-      ) : (
-        <div
-          key={animKey}
-          className="grid animate-feed-jump-in grid-cols-1 gap-y-0 lg:grid-cols-2 lg:gap-x-24 2xl:gap-x-40 2xl:gap-y-4"
-        >
-          {slots.map((item, i) =>
-            item ? (
-              <div key={item.id} className="py-0 2xl:py-1">
-                <StakingRow item={item} />
-              </div>
-            ) : (
-              <div
-                key={`ghost-${i}`}
-                className={cn("pointer-events-none invisible py-1.5 2xl:py-[11.5px]", ROW_STAKE_GRID)}
-              >
-                &nbsp;
-              </div>
-            ),
-          )}
-        </div>
-      )}
-    </div>
-  );
-};
+export const StakingActivityFeed = ({ visibleItems, animKey }: StakingFeedProps) => (
+  <ActivityFeed
+    title="Staking Activity"
+    icon={<IconStakeCategory className="size-7 md:size-10 2xl:size-10.75" />}
+    items={visibleItems as unknown as ActivityItem[]}
+    animKey={animKey}
+    renderRow={(item) => <StakingRow item={item as unknown as StakingActivityItem} />}
+    ghostRowClassName={ROW_STAKE_GRID}
+  />
+);
