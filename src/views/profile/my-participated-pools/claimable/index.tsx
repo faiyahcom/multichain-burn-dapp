@@ -47,8 +47,8 @@ const ProfileMyParticipatedPoolsClaimable = () => {
     "Pool",
     "Pool Type",
     "Pair",
-    "Amount Burned",
-    "Claimable Reward",
+    "Amount \nDeposited",
+    "Claimable \nReward",
     "Action",
   ];
 
@@ -88,6 +88,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
               <TableHead
                 key={column}
                 variant="pair"
+                className="whitespace-pre-line"
                 style={{
                   width: cellWidth,
                 }}

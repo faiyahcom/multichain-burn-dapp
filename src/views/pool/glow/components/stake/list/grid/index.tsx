@@ -9,6 +9,7 @@ import {
   getPoolStatusLabel,
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { renderBurnPoolTime } from "@/views/pool/glow/shared/helpers";
@@ -102,7 +103,10 @@ const StakePoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       className="mx-auto"
                     />
                     <MetricNumber
-                      number={pool.stakedAmount}
+                      number={sciToFormatted(
+                        pool.stakedAmount,
+                        pool.tokenInDecimals,
+                      )}
                       unit={tokenInDisplay.symbol}
                       isShorten
                     />

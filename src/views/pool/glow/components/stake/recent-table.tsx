@@ -21,6 +21,8 @@ import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
 import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
+import { PoolKindCodeEnum } from "@/types/pool";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
@@ -32,8 +34,15 @@ const StakeRecentPoolsTable = ({}: {}) => {
   const isAuthenticated = _hasHydrated && !!user?.address;
 
   const { data: recentPools, isPending: isRecentPoolsPending } = useQuery({
-    queryKey: poolQueryKeys.myStakes("", 1, 2),
-    queryFn: () => poolService.getMyStakes(undefined, 1, 2),
+    queryKey: poolQueryKeys.recents({
+      user: user?.address,
+      poolKind: PoolKindCodeEnum.Stake,
+    }),
+    queryFn: () =>
+      poolService.getRecentPools({
+        poolKind: PoolKindCodeEnum.Stake,
+        user: user?.address,
+      }),
     enabled: isAuthenticated,
   });
 
@@ -81,7 +90,7 @@ const StakeRecentPoolsTable = ({}: {}) => {
             {isAuthenticated && (
               <TableNoData
                 colSpan={columns.length}
-                data={recentPools?.snapshots}
+                data={recentPools?.pools}
                 isLoading={isRecentPoolsPending}
                 text="No pools found"
               />
@@ -96,37 +105,37 @@ const StakeRecentPoolsTable = ({}: {}) => {
               </TableRow>
             )}
             {isAuthenticated &&
-              recentPools?.snapshots?.map((snapshot) => {
-                const network = chainIdToNetworkConfig(snapshot?.pool?.chainId);
+              recentPools?.pools?.map((pool) => {
+                const network = chainIdToNetworkConfig(pool?.chainId);
 
                 const tokenInDisplay = resolvePoolTokenDisplay({
                   network,
-                  tokenAddress: snapshot?.pool?.tokenIn,
-                  tokenSymbol: snapshot?.pool?.tokenInSymbol,
-                  tokenName: snapshot?.pool?.tokenInSymbol,
-                  customName: snapshot?.customSymbolStake,
-                  customSymbol: snapshot?.customSymbolStake,
-                  imageUri: snapshot?.imageUriStake,
+                  tokenAddress: pool?.tokenIn,
+                  tokenSymbol: pool?.tokenInSymbol,
+                  tokenName: pool?.tokenInSymbol,
+                  customName: pool?.tokenInSymbolCustom ?? undefined,
+                  customSymbol: pool?.tokenInSymbolCustom ?? undefined,
+                  imageUri: pool?.tokenInImageUri ?? undefined,
                 });
 
                 const tokenRewardDisplay = resolvePoolTokenDisplay({
                   network,
-                  tokenAddress: snapshot?.pool?.rewardToken,
-                  tokenSymbol: snapshot?.pool?.rewardTokenSymbol,
-                  tokenName: snapshot?.pool?.rewardTokenSymbol,
-                  customName: snapshot?.customSymbolReward,
-                  customSymbol: snapshot?.customSymbolReward,
-                  imageUri: snapshot?.imageUriReward,
+                  tokenAddress: pool?.tokenOut,
+                  tokenSymbol: pool?.tokenOutSymbol,
+                  tokenName: pool?.tokenOutSymbol,
+                  customName: pool?.tokenOutSymbolCustom ?? undefined,
+                  customSymbol: pool?.tokenOutSymbolCustom ?? undefined,
+                  imageUri: pool?.tokenOutImageUri ?? undefined,
                 });
 
-                const apr = Number(snapshot?.pool?.apr ?? 0) / 10000;
-                const statusLabel = getPoolStatusLabel(snapshot?.pool?.status);
+                const apr = Number(pool?.apr ?? 0) / 10000;
+                const statusLabel = getPoolStatusLabel(pool?.status);
 
-                const href = `/staking/detail/${snapshot?.poolAdress}`;
+                const href = `/staking/detail/${pool?.address}`;
 
                 return (
                   <TableRow
-                    key={snapshot?.poolAdress}
+                    key={pool?.address}
                     className="cursor-pointer font-medium"
                     onClick={() => {
                       navigate({
@@ -149,14 +158,14 @@ const StakeRecentPoolsTable = ({}: {}) => {
                         <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
                           <p
                             className="max-w-full min-w-0 truncate font-semibold"
-                            title={snapshot?.pool?.name}
+                            title={pool?.name}
                           >
-                            {snapshot?.pool?.name}
+                            {pool?.name}
                           </p>
                           <CopyableText
-                            content={snapshot?.poolAdress}
+                            content={pool?.address}
                             displayText={truncateString({
-                              str: snapshot?.poolAdress,
+                              str: pool?.address,
                             })}
                             classNames={{
                               container: "justify-start",
@@ -168,8 +177,8 @@ const StakeRecentPoolsTable = ({}: {}) => {
                     </TableCell>
                     <TableCell>
                       <StartEndDateDisplay
-                        startDate={snapshot?.pool?.timeStart}
-                        endDate={snapshot?.pool?.timeEnd}
+                        startDate={pool?.timeStart}
+                        endDate={pool?.timeEnd}
                         classNames={{
                           container: "mx-auto w-max",
                         }}
@@ -190,7 +199,10 @@ const StakeRecentPoolsTable = ({}: {}) => {
                     </TableCell>
                     <TableCell>
                       <MetricNumber
-                        number={snapshot?.stakingAmount ?? 0}
+                        number={sciToFormatted(
+                          pool?.stakedAmount,
+                          pool?.tokenInDecimals,
+                        )}
                         unit={tokenInDisplay.symbol}
                         isShorten
                       />
@@ -207,7 +219,7 @@ const StakeRecentPoolsTable = ({}: {}) => {
                     </TableCell>
                     <TableCell>
                       <NetworkDisplay
-                        chainId={snapshot?.pool?.chainId}
+                        chainId={pool?.chainId}
                         classNames={{
                           container: "flex items-center justify-center gap-3",
                         }}
