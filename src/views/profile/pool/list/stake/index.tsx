@@ -17,6 +17,7 @@ import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { ParticipatedUserPool } from "@/services/userService";
 import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
@@ -157,7 +158,10 @@ const ProfilePoolListStake: React.FC<Props> = ({
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={pool.stakedAmount}
+                  number={sciToFormatted(
+                    pool.stakedAmount,
+                    pool.tokenInDecimals,
+                  )}
                   unit={tokenInDisplay.symbol}
                   isShorten
                 />

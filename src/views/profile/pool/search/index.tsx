@@ -11,9 +11,8 @@ import {
   getPoolStatusLabel,
   poolTypeLabels,
   swapPoolStatuses,
-  userViewStakePoolStatuses,
   type AllPoolStatus,
-  type PoolType,
+  type PoolType
 } from "@/types/admin/master-pool-management";
 import type { SortBy } from "@/types/common";
 import { PoolKindCodeEnum } from "@/types/pool";
@@ -51,7 +50,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
       case PoolKindCodeEnum.Stake:
         if (profileType === "my-create-pools") statuses = []; // user cannot create stake pool
         if (profileType === "my-participated-pools")
-          statuses = [...userViewStakePoolStatuses];
+          statuses = [...swapPoolStatuses]; // For participated pools, user cannot join "holding" and "upcoming" status, so basically it is the same as swap pool
         break;
       case PoolKindCodeEnum.Launchpad:
         statuses = []; // TODO: implement launchpad pool search

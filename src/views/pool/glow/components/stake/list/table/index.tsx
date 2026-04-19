@@ -20,6 +20,7 @@ import {
   getPoolStatusLabel,
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
@@ -163,7 +164,10 @@ const StakePoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               </TableCell>
               <TableCell>
                 <MetricNumber
-                  number={pool?.stakedAmount ?? 0}
+                  number={sciToFormatted(
+                    pool?.stakedAmount,
+                    pool?.tokenInDecimals,
+                  )}
                   unit={tokenInDisplay.symbol}
                   isShorten
                 />

@@ -1,6 +1,6 @@
 import { NETWORK_CONFIGS } from "@/config/networks";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
-import { userViewStakePoolStatuses } from "@/types/admin/master-pool-management";
+import { swapPoolStatuses } from "@/types/admin/master-pool-management";
 import { create } from "zustand";
 
 type MyParticipatedPoolsStakeSearchFilterState = {
@@ -13,7 +13,7 @@ export const useMyParticipatedPoolsStakeSearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      status: [...userViewStakePoolStatuses],
+      status: [...swapPoolStatuses],
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "stakedAmount",
       sortOrder: "desc",
