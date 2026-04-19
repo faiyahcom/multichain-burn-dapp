@@ -1,16 +1,15 @@
 import { NETWORK_CONFIGS } from "@/config/networks";
 import {
   burnPoolStatuses,
-  type BurnPoolStatus,
+  type AllPoolStatus,
   type PoolTypeOptionValue,
-  type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
 import { create } from "zustand";
 
 type MasterPoolManagementSearchFilterType = {
   page: number;
   type?: PoolTypeOptionValue;
-  status?: (SwapPoolStatus | BurnPoolStatus)[];
+  status?: AllPoolStatus[];
   network?: string[];
   text?: string;
 };
@@ -25,7 +24,7 @@ export const useMasterPoolManagementSearchFilterStore =
     filter: {
       page: 1,
       type: "all",
-      status: [...burnPoolStatuses],
+      status: [...burnPoolStatuses], // use burn pool statuses because that has all statuses, except "draft"
       network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
     },

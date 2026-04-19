@@ -49,7 +49,12 @@ export function PoolChainGuard({ chainId, children, classNames }: Props) {
           icon: cn("size-6", classNames?.icon),
         }}
         color="#966EFF"
-        btnProps={{ onClick: () => open() }}
+        btnProps={{
+          onClick: (e) => {
+            e.stopPropagation();
+            open();
+          },
+        }}
       />
     );
   }
@@ -78,8 +83,10 @@ export function PoolChainGuard({ chainId, children, classNames }: Props) {
         }}
         color="#FF8E97"
         btnProps={{
-          onClick: () =>
-            openSwitchNetworkModal(currentNetworkId, poolNetworkId!),
+          onClick: (e) => {
+            e.stopPropagation();
+            openSwitchNetworkModal(currentNetworkId, poolNetworkId!);
+          },
         }}
       />
     );

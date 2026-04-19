@@ -32,6 +32,7 @@ import LowRewardNotiSwitch from "../low-reward-noti-switch";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
+  const isStakePool = filter.type === "2";
   const queryClient = useQueryClient();
   const limit = 20;
   const navigate = useNavigate();
@@ -42,7 +43,7 @@ const AdminMasterPoolManagementTable = () => {
       return poolService.getPoolList({
         page: filter.page,
         limit: limit,
-        excludeStatuses: "draft", // admin does not want to see draft pools
+        excludeStatuses: isStakePool ? undefined : "draft", // admin does not need to see users' draft pools, except for admin's draft stake pools
         includeStatuses: convertArrayToStringParam({ array: filter.status }),
         chainIds: convertArrayToStringParam({
           array: filter.network?.map((network) => networkIdToChainId(network)),
@@ -169,6 +170,7 @@ const AdminMasterPoolManagementTable = () => {
                   {isStakePool && (
                     <LowRewardNotiSwitch
                       address={item.address}
+                      chainId={item.chainId}
                       // TODO: implement
                       // isLowRewardNotiEnabled={item.isLowRewardNotiEnabled}
                       classNames={{ btn: "mx-auto" }}
