@@ -25,6 +25,7 @@ import { PoolKindCodeEnum } from "@/types/pool";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 
@@ -128,7 +129,7 @@ const StakeRecentPoolsTable = ({}: {}) => {
                   imageUri: pool?.tokenOutImageUri ?? undefined,
                 });
 
-                const apr = Number(pool?.apr ?? 0) / 10000;
+                const apr = Number(pool?.apr ?? 0) / DECIMAL_FEE_PERCENT;
                 const statusLabel = getPoolStatusLabel(pool?.status);
 
                 const href = `/staking/detail/${pool?.address}`;

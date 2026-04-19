@@ -23,6 +23,7 @@ import {
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
@@ -98,7 +99,7 @@ const StakePoolListTable: React.FC<Props> = ({ data, isLoading }) => {
             imageUri: pool.tokenInImageUri ?? undefined,
           });
 
-          const apr = Number(pool.apr ?? 0) / 10000;
+          const apr = Number(pool.apr ?? 0) / DECIMAL_FEE_PERCENT;
           const statusLabel = getPoolStatusLabel(pool.status);
           const href = `/staking/detail/${pool.address}`;
 
