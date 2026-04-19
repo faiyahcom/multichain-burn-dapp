@@ -8,81 +8,68 @@ import SingleSelect from "@/components/common/single-select";
 import { Button } from "@/components/ui/button";
 import { useMasterPoolManagementSearchFilterStore } from "@/stores/admin/master-pool-management/search-filter-store";
 import {
-  burnPoolStatusColors,
   burnPoolStatuses,
-  burnPoolStatusLabels,
+  getPoolStatusColor,
+  getPoolStatusLabel,
   poolTypeOptions,
-  poolTypes,
-  swapPoolStatusColors,
+  stakePoolStatuses,
   swapPoolStatuses,
-  swapPoolStatusLabels,
+  type AllPoolStatus,
   type BurnPoolStatus,
   type PoolTypeOptionValue,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
 import { useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
+import { useMemo } from "react";
 
 const AdminMasterPoolManagementSearch = () => {
   const navigate = useNavigate();
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
-  const statusOptions: MultipleSelectOption[] =
-    filter.type === poolTypes[1].toString()
-      ? swapPoolStatuses.map((status) => ({
-        label: swapPoolStatusLabels[status],
-        value: status,
-        icon: ({ className }: { className?: string }) => (
-          <LetterIcon
-            letter={status.slice(0, 1).toUpperCase()}
-            color={swapPoolStatusColors[status]}
-            className={className}
-          />
-        ),
-      }))
-      : burnPoolStatuses.map((status) => ({
-        label: burnPoolStatusLabels[status],
-        value: status,
-        icon: ({ className }: { className?: string }) => (
-          <LetterIcon
-            letter={status.slice(0, 1).toUpperCase()}
-            color={burnPoolStatusColors[status]}
-            className={className}
-          />
-        ),
-      }));
+
+  const poolTypeOptionToPoolStatues = (
+    poolType: PoolTypeOptionValue,
+  ): AllPoolStatus[] => {
+    switch (poolType) {
+      case "all":
+      case "partner":
+      case "0": // burn pool
+        return [...burnPoolStatuses];
+      case "1": // swap pool
+        return [...swapPoolStatuses];
+      case "2": // stake pool
+        return ["draft", ...stakePoolStatuses];
+      case "3": // launchpad
+        return [...burnPoolStatuses]; // TODO: subject to change
+
+      default:
+        return [];
+    }
+  };
+
+  const statusOptions: MultipleSelectOption[] = useMemo(() => {
+    const filterType = filter.type as PoolTypeOptionValue | undefined;
+    if (!filterType) return [];
+    const statuses = poolTypeOptionToPoolStatues(filterType);
+    return statuses.map((status) => ({
+      label: getPoolStatusLabel(status),
+      value: status,
+      icon: ({ className }: { className?: string }) => (
+        <LetterIcon
+          letter={status.slice(0, 1).toUpperCase()}
+          color={getPoolStatusColor(status)}
+          className={className}
+        />
+      ),
+    }));
+  }, [filter.type]);
 
   const handleSelectType = (value: PoolTypeOptionValue) => {
-    // swap pool has fewer statuses than burn pool
-    // filter out statuses that don't exist in the selected pool type
-    if (value === poolTypes[1].toString()) {
-      const newStatuses =
-        filter.status?.filter((status) =>
-          swapPoolStatuses.includes(status as SwapPoolStatus),
-        ) ?? [];
-      setFilter({ type: value, status: newStatuses });
-      return;
-    }
+    const currentPoolType = filter.type;
+    if (currentPoolType === value) return; // do nothing if the same
 
-    // partner burn is a subset of burn pools — treat like burn pool for statuses
-    if (value === "partner") {
-      if (filter.status?.length === swapPoolStatuses.length) {
-        setFilter({ type: value, status: [...burnPoolStatuses] });
-        return;
-      }
-      setFilter({ type: value });
-      return;
-    }
-
-    // if switching from swap pool to burn pool or all types
-    // and all swap statuses were selected, expand to all burn pool statuses
-    if (value === poolTypes[0].toString() || value === "all") {
-      if (filter.status?.length === swapPoolStatuses.length) {
-        setFilter({ type: value, status: [...burnPoolStatuses] });
-        return;
-      }
-    }
-
-    setFilter({ type: value });
+    const statuses = poolTypeOptionToPoolStatues(value);
+    setFilter({ type: value, status: statuses });
   };
 
   return (
