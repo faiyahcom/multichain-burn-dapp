@@ -39,9 +39,17 @@ const STAKE_POOL_STATUS = {
 };
 
 const secsToDays = (secs: string | undefined): string => {
-    if (!secs) return "";
+    if (secs === undefined || secs === null) return "";
     const n = Number(secs);
-    if (!isFinite(n) || n <= 0) return "0";
+    if (!isFinite(n)) return "";
+    if (n < 0) return "0";
+    return String(n / 86400);
+};
+
+const fmtDisplayDays = (secs: string | number | undefined | null): string => {
+    if (secs == null) return "0";
+    const n = Number(secs);
+    if (!isFinite(n)) return "0";
     return String(n / 86400);
 };
 
@@ -52,6 +60,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
     const navigate = useNavigate();
     const queryClient = useQueryClient();
     const inFlightRef = useRef(false);
+    const submitAttemptedRef = useRef(false);
 
     const { editPool: editPoolEvm } = useEditStakePoolEvmFn();
     const { editPool: editPoolSol } = useEditStakePoolSolFn();
@@ -62,7 +71,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
     });
 
     const pool = poolDetail?.pool;
-    const stakePool = pool as any;
+    const stakePool = pool;
     const isSolana = pool?.chainId === SOLANA_BACKEND_CHAIN_ID;
     const safeStatus: BurnPoolStatus = (pool?.status as BurnPoolStatus) ?? "draft";
     const statusDisplay = STAKE_POOL_STATUS[safeStatus] ?? STAKE_POOL_STATUS["draft"];
@@ -73,8 +82,10 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
         setValue,
         watch,
         reset,
+        getValues,
         formState: { errors, isSubmitting },
     } = useForm<EditStakeFormValues>({
+        mode: "onChange",
         defaultValues: {
             poolName: "",
             apr: "",
@@ -82,9 +93,9 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
             interestStartDelay: "",
             interestAccrualDuration: "",
             claimStartDelay: "",
-            minStakingAmount: "0",
-            maxStakingAmount: "0",
-            stakingLimit: "0",
+            minStakingAmount: "",
+            maxStakingAmount: "",
+            stakingLimit: "",
         },
     });
 
@@ -101,17 +112,17 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
             apr: aprDisplay,
             lockDuration: secsToDays(stakePool?.lockUpDuration),
             interestStartDelay: secsToDays(stakePool?.interestStrartDelay),
-            interestAccrualDuration: secsToDays(stakePool?.interestAccrualDuration),
+            interestAccrualDuration: stakePool?.interestAccrualDuration && stakePool?.interestAccrualDuration !== "0" ? secsToDays(stakePool?.interestAccrualDuration) : "",
             claimStartDelay: secsToDays(stakePool?.claimStartDelay),
             minStakingAmount: stakePool?.minStakingAmount && stakePool.minStakingAmount !== "0" && pool.tokenInDecimals != null
                 ? formatAmount(stakePool.minStakingAmount, pool.tokenInDecimals)
-                : "0",
+                : "",
             maxStakingAmount: stakePool?.maxStakingAmount && stakePool.maxStakingAmount !== "0" && pool.tokenInDecimals != null
                 ? formatAmount(stakePool.maxStakingAmount, pool.tokenInDecimals)
-                : "0",
+                : "",
             stakingLimit: stakePool?.stakingLimit && stakePool.stakingLimit !== "0" && pool.tokenInDecimals != null
                 ? formatAmount(stakePool.stakingLimit, pool.tokenInDecimals)
-                : "0",
+                : "",
         });
     }, [pool?.address]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -210,7 +221,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
             {/* Pool Overview */}
             <PoolOverview poolDetail={poolDetail} />
 
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form onSubmit={(e) => { submitAttemptedRef.current = true; handleSubmit(onSubmit)(e); }}>
                 {/* ── Schedule ─────────────────────────────────────── */}
                 <div className="mt-3 grid grid-cols-1 gap-x-6 sm:grid-cols-2">
                     {/* Current Schedule */}
@@ -243,7 +254,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                         </div>
                         <div className="grid grid-cols-1 gap-x-4 max-md:gap-y-2 md:grid-cols-2">
                             <div className="space-y-1">
-                                <span className="text-base text-greyed">Start Time:</span>
+                                <span className="text-base text-greyed">Start Time: <span className="text-destructive">*</span></span>
                                 <DatePicker
                                     value={startTime}
                                     onChange={(d) => d && setValue("startTime", d)}
@@ -251,14 +262,19 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                 />
                                 <input
                                     type="hidden"
-                                    {...register("startTime", { required: "Start time is required" })}
+                                    {...register("startTime", {
+                                        validate: (v) =>
+                                            !submitAttemptedRef.current || !!v
+                                                ? true
+                                                : "Start time is required",
+                                    })}
                                 />
                                 {errors.startTime && (
                                     <p className="text-xs text-destructive">{errors.startTime.message}</p>
                                 )}
                             </div>
                             <div className="space-y-1">
-                                <span className="text-base text-greyed">End Time:</span>
+                                <span className="text-base text-greyed">End Time: <span className="text-destructive">*</span></span>
                                 <DatePicker
                                     value={endTime}
                                     onChange={(d) => d && setValue("endTime", d)}
@@ -269,11 +285,12 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                 <input
                                     type="hidden"
                                     {...register("endTime", {
-                                        required: "End time is required",
-                                        validate: (v) =>
-                                            !startTime || v > startTime
+                                        validate: (v) => {
+                                            if (!v) return submitAttemptedRef.current ? "End time is required" : true;
+                                            return !startTime || v > startTime
                                                 ? true
-                                                : "End time must be after start time",
+                                                : "End time must be after start time";
+                                        },
                                     })}
                                 />
                                 {errors.endTime && (
@@ -308,27 +325,27 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Lock-up Duration:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {Number(stakePool?.lockUpDuration) / 86400 || "—"} days
+                                    {fmtDisplayDays(stakePool?.lockUpDuration)} days
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Interest Start Delay:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {Number(stakePool?.interestStrartDelay) / 86400 || "—"} days
+                                    {fmtDisplayDays(stakePool?.interestStrartDelay)} days
                                 </span>
                             </div>
                             {!isSolana && (
                                 <div className="grid grid-cols-2">
                                     <span className="text-xl text-greyed">Interest Accrual:</span>
                                     <span className="text-xl text-black max-sm:text-right">
-                                        {Number(stakePool?.interestAccrualDuration) / 86400 || "—"} days
+                                        {fmtDisplayDays(stakePool?.interestAccrualDuration)} days
                                     </span>
                                 </div>
                             )}
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Claim Start Delay:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {Number(stakePool?.claimStartDelay) / 86400 || "—"} days
+                                    {fmtDisplayDays(stakePool?.claimStartDelay)} days
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
@@ -369,7 +386,9 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                     aria-invalid={!!errors.poolName}
                                     {...register("poolName", {
                                         validate: (v) =>
-                                            v.trim().length >= 3 ? true : "At least 3 characters required",
+                                            !v.trim() || v.trim().length >= 3
+                                                ? true
+                                                : "At least 3 characters required",
                                     })}
                                 />
                                 {errors.poolName && (
@@ -379,16 +398,25 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
 
                             {/* APR */}
                             <div className="space-y-1">
-                                <span className="text-base text-greyed">APR (%):</span>
+                                <span className="text-base text-greyed">APR (%): <span className="text-destructive">*</span></span>
                                 <Input
                                     type="number"
                                     min="0"
                                     step="any"
-                                    placeholder="e.g. 12"
+                                    placeholder="0"
                                     aria-invalid={!!errors.apr}
                                     {...register("apr", {
-                                        required: "APR is required",
-                                        validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                        validate: {
+                                            required: (v) =>
+                                                !submitAttemptedRef.current || v !== ""
+                                                    ? true
+                                                    : "APR is required",
+                                            gte0: (v) => !v || Number(v) >= 0 ? true : "Must be ≥ 0",
+                                            decimals: (v) =>
+                                                !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                    ? true
+                                                    : "Max 6 decimal places allowed",
+                                        },
                                     })}
                                 />
                                 {errors.apr && (
@@ -399,14 +427,23 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                             {/* Durations row */}
                             <div className="grid grid-cols-2 gap-x-3">
                                 <div className="space-y-1">
-                                    <span className="text-base text-greyed">Lock-up Duration (days):</span>
+                                    <span className="text-base text-greyed">Lock-up Duration (days): <span className="text-destructive">*</span></span>
                                     <Input
                                         type="number"
                                         min="0"
                                         step="any"
                                         placeholder="0"
+                                        aria-invalid={!!errors.lockDuration}
                                         {...register("lockDuration", {
-                                            validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                            validate: {
+                                                required: (v) =>
+                                                    !submitAttemptedRef.current || v !== "" ? true : "Lock-up duration is required",
+                                                gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
+                                                decimals: (v) =>
+                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                        ? true
+                                                        : "Max 6 decimal places allowed",
+                                            },
                                         })}
                                     />
                                     {errors.lockDuration && (
@@ -414,14 +451,23 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                     )}
                                 </div>
                                 <div className="space-y-1">
-                                    <span className="text-base text-greyed">Claim Start Delay (days):</span>
+                                    <span className="text-base text-greyed">Claim Start Delay (days): <span className="text-destructive">*</span></span>
                                     <Input
                                         type="number"
                                         min="0"
                                         step="any"
                                         placeholder="0"
+                                        aria-invalid={!!errors.claimStartDelay}
                                         {...register("claimStartDelay", {
-                                            validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                            validate: {
+                                                required: (v) =>
+                                                    !submitAttemptedRef.current || v !== "" ? true : "Claim start delay is required",
+                                                gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
+                                                decimals: (v) =>
+                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                        ? true
+                                                        : "Max 6 decimal places allowed",
+                                            },
                                         })}
                                     />
                                     {errors.claimStartDelay && (
@@ -432,14 +478,23 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
 
                             <div className="grid grid-cols-2 gap-x-3">
                                 <div className="space-y-1">
-                                    <span className="text-base text-greyed">Interest Start Delay (days):</span>
+                                    <span className="text-base text-greyed">Interest Start Delay (days): <span className="text-destructive">*</span></span>
                                     <Input
                                         type="number"
                                         min="0"
                                         step="any"
                                         placeholder="0"
+                                        aria-invalid={!!errors.interestStartDelay}
                                         {...register("interestStartDelay", {
-                                            validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                            validate: {
+                                                required: (v) =>
+                                                    !submitAttemptedRef.current || v !== "" ? true : "Interest start delay is required",
+                                                gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
+                                                decimals: (v) =>
+                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                        ? true
+                                                        : "Max 6 decimal places allowed",
+                                            },
                                         })}
                                     />
                                     {errors.interestStartDelay && (
@@ -453,7 +508,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                             type="number"
                                             min="0"
                                             step="any"
-                                            placeholder="0 = infinite"
+                                            placeholder="0"
                                             {...register("interestAccrualDuration", {
                                                 validate: (v) =>
                                                     v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
@@ -503,10 +558,16 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                         type="number"
                                         min="0"
                                         step="any"
-                                        placeholder="0.00"
+                                        placeholder="0"
                                         aria-invalid={!!errors.minStakingAmount}
                                         {...register("minStakingAmount", {
-                                            validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                            validate: {
+                                                gte0: (v) => (Number(v) >= 0 ? true : "Must be \u2265 0"),
+                                                decimals: (v) =>
+                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                        ? true
+                                                        : "Max 6 decimal places allowed",
+                                            },
                                         })}
                                     />
                                     {errors.minStakingAmount && (
@@ -521,10 +582,24 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                         type="number"
                                         min="0"
                                         step="any"
-                                        placeholder="0.00 (unlimited)"
+                                        placeholder="0"
                                         aria-invalid={!!errors.maxStakingAmount}
                                         {...register("maxStakingAmount", {
-                                            validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                            validate: {
+                                                gte0: (v) => (Number(v) >= 0 ? true : "Must be \u2265 0"),
+                                                gtZero: (v) =>
+                                                    !v || Number(v) > 0 ? true : "Must be greater than 0",
+                                                gtMin: (v) => {
+                                                    const min = getValues("minStakingAmount");
+                                                    if (v && min && Number(v) <= Number(min))
+                                                        return "Must be greater than min staking amount";
+                                                    return true;
+                                                },
+                                                decimals: (v) =>
+                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                        ? true
+                                                        : "Max 6 decimal places allowed",
+                                            },
                                         })}
                                     />
                                     {errors.maxStakingAmount && (
@@ -542,10 +617,16 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                         type="number"
                                         min="0"
                                         step="any"
-                                        placeholder="0.00 (unlimited)"
+                                        placeholder="0"
                                         aria-invalid={!!errors.stakingLimit}
                                         {...register("stakingLimit", {
-                                            validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                                            validate: {
+                                                gte0: (v) => (Number(v) >= 0 ? true : "Must be \u2265 0"),
+                                                decimals: (v) =>
+                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                        ? true
+                                                        : "Max 6 decimal places allowed",
+                                            },
                                         })}
                                     />
                                     {errors.stakingLimit && (

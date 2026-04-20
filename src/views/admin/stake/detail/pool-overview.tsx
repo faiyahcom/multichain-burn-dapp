@@ -16,9 +16,9 @@ type Props = {
 
 /** Formats a duration in seconds into a human-readable string. */
 function formatDuration(seconds: number | bigint | undefined | null): string {
-    if (seconds === undefined || seconds === null) return "—";
+    if (seconds === undefined || seconds === null) return "0 day";
     const s = typeof seconds === "bigint" ? Number(seconds) : seconds;
-    if (!isFinite(s) || s <= 0) return s === 0 ? "0" : "—";
+    if (!isFinite(s) || s <= 0) return "0 day";
     // i64::MAX or very large value → "Infinite"
     if (s >= 9_007_199_254_740_991) return "Infinite";
     const days = Math.floor(s / 86400);
@@ -36,7 +36,9 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const pool = poolDetail?.pool;
     const stakePool = pool as any;
 
-    const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+    const network = pool?.chainId
+        ? chainIdToNetworkConfig(pool.chainId)
+        : undefined;
 
     const stakingTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -58,7 +60,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
     });
 
     const fmtStakingAmt = (raw: string | null | undefined) => {
-        if (!raw || raw === "0" || pool?.tokenInDecimals == null) return "Unlimited";
+        if (!raw || raw === "0" || pool?.tokenInDecimals == null)
+            return "Unlimited";
         return `${formatAmount(raw, pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
     };
 
@@ -73,7 +76,12 @@ const PoolOverview = ({ poolDetail }: Props) => {
         } catch {
             return "—";
         }
-    }, [pool?.stakingLimit, pool?.tokenInDecimals, poolDetail?.staking?.totalStaked, stakingTokenDisplay.symbol]);
+    }, [
+        pool?.stakingLimit,
+        pool?.tokenInDecimals,
+        poolDetail?.staking?.totalStaked,
+        stakingTokenDisplay.symbol,
+    ]);
 
     const rows = useMemo(() => {
         if (!poolDetail) return [];
@@ -111,8 +119,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
             ],
             [
-                { label: "Min Staking Amount", value: fmtStakingAmt(stakePool?.minStakingAmount) },
-                { label: "Max Staking Amount", value: fmtStakingAmt(stakePool?.maxStakingAmount) },
+                {
+                    label: "Min Staking Amount",
+                    value: fmtStakingAmt(stakePool?.minStakingAmount),
+                },
+                {
+                    label: "Max Staking Amount",
+                    value: fmtStakingAmt(stakePool?.maxStakingAmount),
+                },
             ],
             [
                 { label: "Pool Limit", value: fmtStakingAmt(stakePool?.stakingLimit) },
@@ -142,7 +156,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
                             <TokenImage
                                 src={stakingTokenDisplay.imageUri}
                                 alt={stakingTokenDisplay.name}
-                                classNames={{ common: "size-6", img: "size-6", placeholder: "size-6" }}
+                                classNames={{
+                                    common: "size-6",
+                                    img: "size-6",
+                                    placeholder: "size-6",
+                                }}
                             />
                             <span>{stakingTokenDisplay.symbol}</span>
                         </div>
@@ -162,7 +180,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
                             <TokenImage
                                 src={rewardTokenDisplay.imageUri}
                                 alt={rewardTokenDisplay.name}
-                                classNames={{ common: "size-6", img: "size-6", placeholder: "size-6" }}
+                                classNames={{
+                                    common: "size-6",
+                                    img: "size-6",
+                                    placeholder: "size-6",
+                                }}
                             />
                             <span>{rewardTokenDisplay.symbol}</span>
                         </div>
@@ -170,7 +192,16 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
             ],
         ];
-    }, [poolDetail, stakePool, network, stakingTokenDisplay, rewardTokenDisplay, isMobile, pool?.owner, remainingCapacity]);
+    }, [
+        poolDetail,
+        stakePool,
+        network,
+        stakingTokenDisplay,
+        rewardTokenDisplay,
+        isMobile,
+        pool?.owner,
+        remainingCapacity,
+    ]);
 
     return (
         <div className="mt-3 w-full py-4">

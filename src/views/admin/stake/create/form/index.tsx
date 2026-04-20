@@ -51,6 +51,7 @@ const CreateStakePoolForm = () => {
     useCreateStakePoolEvmFn();
   const submitActionRef = useRef<"draft" | "submit">("draft");
   const inFlightRef = useRef(false);
+  const submitAttemptedRef = useRef(false);
 
   const {
     register,
@@ -61,6 +62,7 @@ const CreateStakePoolForm = () => {
     getValues,
     formState: { errors, isSubmitting },
   } = useForm<CreateStakePoolFormValues>({
+    mode: "onChange",
     defaultValues: {
       poolName: "",
       startTime: undefined,
@@ -71,13 +73,13 @@ const CreateStakePoolForm = () => {
       stakingLimit: "",
       rewardToken: "",
       lockDuration: "",
-      interestStartDelay: "0",
+      interestStartDelay: "",
       interestAccrualDuration: "",
       claimStartDelay: "",
-      apr: "12",
+      apr: "",
       lowRewardNotification: true,
       networkId: selectedNetworkId,
-      budget: "0.0",
+      budget: "",
     },
   });
 
@@ -190,13 +192,13 @@ const CreateStakePoolForm = () => {
           {...register("poolName", {
             validate: {
               required: (v) =>
-                v.trim().length > 0 ? true : "Pool name is required",
+                !submitAttemptedRef.current || v.trim().length > 0 ? true : "Pool name is required",
               minLength: (v) =>
-                v.trim().length >= 3
+                !v.trim() || v.trim().length >= 3
                   ? true
                   : "Pool name must be at least 3 characters",
               maxLength: (v) =>
-                v.trim().length <= 50
+                !v.trim() || v.trim().length <= 50
                   ? true
                   : "Pool name must be at most 50 characters",
             },
@@ -229,8 +231,8 @@ const CreateStakePoolForm = () => {
             <input
               type="hidden"
               {...register("startTime", {
-                required: "Start time is required",
                 validate: (v) => {
+                  if (!v) return submitAttemptedRef.current ? "Start time is required" : true;
                   if (v <= new Date())
                     return "Start time must be in the future";
                   if (endTime && v >= endTime)
@@ -263,8 +265,8 @@ const CreateStakePoolForm = () => {
             <input
               type="hidden"
               {...register("endTime", {
-                required: "End time is required",
                 validate: (v) => {
+                  if (!v) return submitAttemptedRef.current ? "End time is required" : true;
                   if (v <= new Date()) return "End time must be in the future";
                   if (startTime && v <= startTime)
                     return "End time must be after start time";
@@ -302,7 +304,8 @@ const CreateStakePoolForm = () => {
           <input
             type="hidden"
             {...register("stakingToken", {
-              required: "Staking token is required",
+              validate: (v) =>
+                !submitAttemptedRef.current || !!v ? true : "Staking token is required",
             })}
           />
           <p className="text-[11px]">Select from whitelist tokens only</p>
@@ -322,11 +325,16 @@ const CreateStakePoolForm = () => {
                 type="number"
                 min="0"
                 step="any"
-                placeholder="0.00"
+                placeholder="0"
                 aria-invalid={!!errors.minStakingAmount}
                 {...register("minStakingAmount", {
-                  required: "Min staking amount is required",
-                  validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                  validate: {
+                    gte0: (v) => !v || Number(v) >= 0 ? true : "Must be ≥ 0",
+                    decimals: (v) =>
+                      !v || !v.includes(".") || v.split(".")[1].length <= 6
+                        ? true
+                        : "Max 6 decimal places allowed",
+                  },
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -360,15 +368,32 @@ const CreateStakePoolForm = () => {
                 type="number"
                 min="0"
                 step="any"
-                placeholder="0.00"
+                placeholder="0"
                 aria-invalid={!!errors.maxStakingAmount}
                 {...register("maxStakingAmount", {
-                  validate: (v) => {
-                    if (v && Number(v) < 0) return "Must be \u2265 0";
-                    const limit = Number(getValues("stakingLimit"));
-                    if (v && limit > 0 && Number(v) > limit)
-                      return "Max staking amount must be \u2264 staking limit";
-                    return true;
+                  validate: {
+                    gte0: (v) => {
+                      if (v && Number(v) < 0) return "Must be \u2265 0";
+                      return true;
+                    },
+                    gtZero: (v) =>
+                      !v || Number(v) > 0 ? true : "Must be greater than 0",
+                    gtMin: (v) => {
+                      const min = getValues("minStakingAmount");
+                      if (v && min && Number(v) < Number(min))
+                        return "Must be greater than or equal to min staking amount";
+                      return true;
+                    },
+                    lteLimit: (v) => {
+                      const limit = Number(getValues("stakingLimit"));
+                      if (v && limit > 0 && Number(v) > limit)
+                        return "Max staking amount must be \u2264 staking limit";
+                      return true;
+                    },
+                    decimals: (v) =>
+                      !v || !v.includes(".") || v.split(".")[1].length <= 6
+                        ? true
+                        : "Max 6 decimal places allowed",
                   },
                 })}
               />
@@ -405,16 +430,22 @@ const CreateStakePoolForm = () => {
             type="number"
             min="0"
             step="any"
-            placeholder="0.001"
+            placeholder="0"
             aria-invalid={!!errors.stakingLimit}
             {...register("stakingLimit", {
-              required: "Staking limit is required",
-              validate: (v) => {
-                if (Number(v) <= 0) return "Staking limit must be > 0";
-                const max = Number(getValues("maxStakingAmount"));
-                if (max > 0 && Number(v) < max)
-                  return "Staking limit must be \u2265 max staking amount";
-                return true;
+              validate: {
+                gtZero: (v) =>
+                  !v || Number(v) > 0 ? true : "Staking limit must be > 0",
+                gteMax: (v) => {
+                  const max = Number(getValues("maxStakingAmount"));
+                  if (max > 0 && Number(v) < max)
+                    return "Staking limit must be \u2265 max staking amount";
+                  return true;
+                },
+                decimals: (v) =>
+                  !v || !v.includes(".") || v.split(".")[1].length <= 6
+                    ? true
+                    : "Max 6 decimal places allowed",
               },
             })}
           />
@@ -447,7 +478,8 @@ const CreateStakePoolForm = () => {
           <input
             type="hidden"
             {...register("rewardToken", {
-              required: "Reward token is required",
+              validate: (v) =>
+                !submitAttemptedRef.current || !!v ? true : "Reward token is required",
             })}
           />
           <p className="text-[11px]">Select from whitelist tokens only</p>
@@ -469,11 +501,18 @@ const CreateStakePoolForm = () => {
                 type="number"
                 min={MIN_DAYS}
                 step="any"
-                placeholder="1"
+                placeholder="0"
                 aria-invalid={!!errors.lockDuration}
                 {...register("lockDuration", {
-                  required: "Lock-up duration is required",
-                  validate: (v) => (Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`),
+                  validate: {
+                    required: (v) =>
+                      !submitAttemptedRef.current || v !== "" ? true : "Lock-up duration is required",
+                    gte0: (v) => v === "" || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
+                    decimals: (v) =>
+                      !v || !v.includes(".") || v.split(".")[1].length <= 6
+                        ? true
+                        : "Max 6 decimal places allowed",
+                  },
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -498,8 +537,17 @@ const CreateStakePoolForm = () => {
                 placeholder="0"
                 aria-invalid={!!errors.interestStartDelay}
                 {...register("interestStartDelay", {
-                  required: "Interest start delay is required",
-                  validate: (v) => (Number(v) >= 0 ? true : "Must be ≥ 0"),
+                  validate: {
+                    required: (v) =>
+                      !submitAttemptedRef.current || v !== ""
+                        ? true
+                        : "Interest start delay is required",
+                    gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
+                    decimals: (v) =>
+                      !v || !v.includes(".") || v.split(".")[1].length <= 6
+                        ? true
+                        : "Max 6 decimal places allowed",
+                  },
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -525,8 +573,13 @@ const CreateStakePoolForm = () => {
                 step="any"
                 placeholder="0"
                 {...register("interestAccrualDuration", {
-                  validate: (v) =>
-                    !v || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
+                  validate: {
+                    gte0: (v) => !v || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
+                    decimals: (v) =>
+                      !v || !v.includes(".") || v.split(".")[1].length <= 6
+                        ? true
+                        : "Max 6 decimal places allowed",
+                  },
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -548,11 +601,18 @@ const CreateStakePoolForm = () => {
                 type="number"
                 min={MIN_DAYS}
                 step="any"
-                placeholder="1"
+                placeholder="0"
                 aria-invalid={!!errors.claimStartDelay}
                 {...register("claimStartDelay", {
-                  required: "Claim start delay is required",
-                  validate: (v) => (Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`),
+                  validate: {
+                    required: (v) =>
+                      !submitAttemptedRef.current || v !== "" ? true : "Claim start delay is required",
+                    gte0: (v) => v === "" || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
+                    decimals: (v) =>
+                      !v || !v.includes(".") || v.split(".")[1].length <= 6
+                        ? true
+                        : "Max 6 decimal places allowed",
+                  },
                 })}
               />
               <InputGroupAddon align="inline-end">
@@ -577,11 +637,18 @@ const CreateStakePoolForm = () => {
               type="number"
               min="0"
               step="any"
-              placeholder="12"
+              placeholder="0"
               aria-invalid={!!errors.apr}
               {...register("apr", {
-                required: "APR is required",
-                validate: (v) => (Number(v) > 0 ? true : "APR must be > 0"),
+                validate: {
+                  required: (v) =>
+                    !submitAttemptedRef.current || v !== "" ? true : "APR is required",
+                  gtZero: (v) => !v || Number(v) > 0 ? true : "APR must be > 0",
+                  decimals: (v) =>
+                    !v || !v.includes(".") || v.split(".")[1].length <= 6
+                      ? true
+                      : "Max 6 decimal places allowed",
+                },
               })}
             />
             <InputGroupAddon align="inline-end">
@@ -615,11 +682,16 @@ const CreateStakePoolForm = () => {
             type="number"
             min="0"
             step="any"
-            placeholder="0.0"
+            placeholder="0"
             aria-invalid={!!errors.budget}
             {...register("budget", {
-              required: "Budget is required",
-              validate: (v) => (Number(v) >= 0 ? true : "Budget must be ≥ 0"),
+              validate: {
+                gte0: (v) => v === "" || Number(v) >= 0 ? true : "Budget must be ≥ 0",
+                decimals: (v) =>
+                  !v || !v.includes(".") || v.split(".")[1].length <= 6
+                    ? true
+                    : "Max 6 decimal places allowed",
+              },
             })}
             className="max-w-xs"
           />
@@ -668,6 +740,7 @@ const CreateStakePoolForm = () => {
             type: "button",
             disabled: isSubmitting,
             onClick: () => {
+              submitAttemptedRef.current = true;
               submitActionRef.current = "draft";
               handleSubmit(onSubmit)();
             },
@@ -690,6 +763,7 @@ const CreateStakePoolForm = () => {
             type: "button",
             disabled: isSubmitting,
             onClick: () => {
+              submitAttemptedRef.current = true;
               submitActionRef.current = "submit";
               handleSubmit(onSubmit)();
             },
