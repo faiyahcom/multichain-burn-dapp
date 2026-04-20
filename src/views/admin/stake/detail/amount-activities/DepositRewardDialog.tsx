@@ -103,7 +103,7 @@ type Props = {
 
 const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onConfirm }: Props) => {
     const pool = poolDetail?.pool;
-    const stakePool = pool as any;
+    const stakePool = pool;
 
     const {
         formatted: rewardBalanceFormatted,
@@ -313,7 +313,7 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                             <Skeleton className="h-5 w-24" />
                                         ) : (
                                             // API field has a typo: "interestStrartDelay"
-                                            formatDuration(Number(stakePool?.interestStrartDelay))
+                                            formatDuration(Number(stakePool?.interestStartDelay))
                                         )
                                     }
                                 />

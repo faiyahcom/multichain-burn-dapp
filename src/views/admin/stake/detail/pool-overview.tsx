@@ -173,7 +173,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 {
                     label: "Interest Start Delay",
                     // API field has a typo: "interestStrartDelay"
-                    value: formatDuration(Number(stakePool?.interestStrartDelay)),
+                    value: formatDuration(Number(stakePool?.interestStartDelay)),
                 },
                 {
                     label: "Reward Token",
