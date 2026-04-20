@@ -439,10 +439,10 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                                 required: (v) =>
                                                     !submitAttemptedRef.current || v !== "" ? true : "Lock-up duration is required",
                                                 gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
-                                                decimals: (v) =>
-                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
-                                                        ? true
-                                                        : "Max 6 decimal places allowed",
+                                                // decimals: (v) =>
+                                                //     !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                //         ? true
+                                                //         : "Max 6 decimal places allowed",
                                             },
                                         })}
                                     />
@@ -463,10 +463,10 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                                 required: (v) =>
                                                     !submitAttemptedRef.current || v !== "" ? true : "Claim start delay is required",
                                                 gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
-                                                decimals: (v) =>
-                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
-                                                        ? true
-                                                        : "Max 6 decimal places allowed",
+                                                // decimals: (v) =>
+                                                //     !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                //         ? true
+                                                //         : "Max 6 decimal places allowed",
                                             },
                                         })}
                                     />
@@ -490,10 +490,10 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                                 required: (v) =>
                                                     !submitAttemptedRef.current || v !== "" ? true : "Interest start delay is required",
                                                 gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
-                                                decimals: (v) =>
-                                                    !v || !v.includes(".") || v.split(".")[1].length <= 6
-                                                        ? true
-                                                        : "Max 6 decimal places allowed",
+                                                // decimals: (v) =>
+                                                //     !v || !v.includes(".") || v.split(".")[1].length <= 6
+                                                //         ? true
+                                                //         : "Max 6 decimal places allowed",
                                             },
                                         })}
                                     />

@@ -505,10 +505,10 @@ const CreateStakePoolForm = () => {
                     required: (v) =>
                       !submitAttemptedRef.current || v !== "" ? true : "Lock-up duration is required",
                     gte0: (v) => v === "" || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
-                    decimals: (v) =>
-                      !v || !v.includes(".") || v.split(".")[1].length <= 6
-                        ? true
-                        : "Max 6 decimal places allowed",
+                    // decimals: (v) =>
+                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
+                    //     ? true
+                    //     : "Max 6 decimal places allowed",
                   },
                 })}
               />
@@ -540,10 +540,10 @@ const CreateStakePoolForm = () => {
                         ? true
                         : "Interest start delay is required",
                     gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
-                    decimals: (v) =>
-                      !v || !v.includes(".") || v.split(".")[1].length <= 6
-                        ? true
-                        : "Max 6 decimal places allowed",
+                    // decimals: (v) =>
+                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
+                    //     ? true
+                    //     : "Max 6 decimal places allowed",
                   },
                 })}
               />
@@ -572,10 +572,10 @@ const CreateStakePoolForm = () => {
                 {...register("interestAccrualDuration", {
                   validate: {
                     gte0: (v) => !v || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
-                    decimals: (v) =>
-                      !v || !v.includes(".") || v.split(".")[1].length <= 6
-                        ? true
-                        : "Max 6 decimal places allowed",
+                    // decimals: (v) =>
+                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
+                    //     ? true
+                    //     : "Max 6 decimal places allowed",
                   },
                 })}
               />
@@ -605,10 +605,10 @@ const CreateStakePoolForm = () => {
                     required: (v) =>
                       !submitAttemptedRef.current || v !== "" ? true : "Claim start delay is required",
                     gte0: (v) => v === "" || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
-                    decimals: (v) =>
-                      !v || !v.includes(".") || v.split(".")[1].length <= 6
-                        ? true
-                        : "Max 6 decimal places allowed",
+                    // decimals: (v) =>
+                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
+                    //     ? true
+                    //     : "Max 6 decimal places allowed",
                   },
                 })}
               />
