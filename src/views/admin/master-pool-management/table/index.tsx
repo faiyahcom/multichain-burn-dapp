@@ -152,7 +152,7 @@ const AdminMasterPoolManagementTable = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {isBurnPool && (
+                  {(isBurnPool || isStakePool) && (
                     <StartEndDateDisplay
                       startDate={item.timeStart}
                       endDate={item.timeEnd}
