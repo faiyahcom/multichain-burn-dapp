@@ -50,16 +50,24 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const pool = poolDetail?.pool;
     const stakePool = pool as any;
 
-    const isSameToken = !!(pool?.rewardToken && pool?.tokenIn &&
-        pool.rewardToken.toLowerCase() === pool.tokenIn.toLowerCase());
+    const isSameToken = !!(
+        pool?.rewardToken &&
+        pool?.tokenIn &&
+        pool.rewardToken.toLowerCase() === pool.tokenIn.toLowerCase()
+    );
 
     const fmtStakingAmt = (raw: string | null | undefined) => {
-        if (!raw || raw === "0" || pool?.tokenInDecimals == null) return "Unlimited";
+        if (!raw || raw === "0" || pool?.tokenInDecimals == null)
+            return "Unlimited";
         return `${formatAmount(raw, pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
     };
 
     const remainingCapacity = useMemo(() => {
-        if (!stakePool?.stakingLimit || stakePool.stakingLimit === "0" || pool?.tokenInDecimals == null)
+        if (
+            !stakePool?.stakingLimit ||
+            stakePool.stakingLimit === "0" ||
+            pool?.tokenInDecimals == null
+        )
             return "Unlimited";
         try {
             const limit = BigInt(stakePool.stakingLimit);
@@ -69,7 +77,12 @@ const PoolOverview = ({ poolDetail }: Props) => {
         } catch {
             return "—";
         }
-    }, [stakePool?.stakingLimit, pool?.tokenInDecimals, poolDetail?.staking?.totalStaked, stakingTokenDisplay.symbol]);
+    }, [
+        stakePool?.stakingLimit,
+        pool?.tokenInDecimals,
+        poolDetail?.staking?.totalStaked,
+        stakingTokenDisplay.symbol,
+    ]);
 
     const rows = useMemo(() => {
         if (!poolDetail) return [];
@@ -86,7 +99,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
                             }
                             classNames={{
                                 container: "justify-end text-right",
-                                displayText: "text-foreground font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl"
+                                displayText:
+                                    "text-foreground font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl",
                             }}
                         />
                     ) : (
@@ -95,36 +109,51 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
                 {
                     label: "Lock-up Duration",
-                    value: stakePool?.lockUpDuration !== undefined
-                        ? formatDuration(stakePool.lockUpDuration)
-                        : "—",
+                    value:
+                        stakePool?.lockUpDuration !== undefined
+                            ? formatDuration(stakePool.lockUpDuration)
+                            : "—",
                 },
             ],
             [
                 { label: "Pool Type", value: "Staking Pool" },
                 {
                     label: "Interest Start Delay",
-                    value: (stakePool?.interestStartDelay ?? stakePool?.interestStrartDelay) !== undefined
-                        ? formatDuration(stakePool.interestStartDelay ?? stakePool.interestStrartDelay)
-                        : "—",
+                    value:
+                        (stakePool?.interestStartDelay ??
+                            stakePool?.interestStrartDelay) !== undefined
+                            ? formatDuration(
+                                stakePool.interestStartDelay ?? stakePool.interestStrartDelay,
+                            )
+                            : "—",
                 },
             ],
             [
-                { label: "Min Staking Limit", value: fmtStakingAmt(stakePool?.minStakingAmount) },
+                {
+                    label: "Min Staking Limit",
+                    value: fmtStakingAmt(stakePool?.minStakingAmount),
+                },
                 {
                     label: "Interest Accrual Duration",
-                    value: stakePool?.interestAccrualDuration !== undefined
-                        ? formatDuration(stakePool.interestAccrualDuration)
-                        : "—",
+                    value:
+                        stakePool?.interestAccrualDuration !== undefined
+                            ? stakePool.interestAccrualDuration === "0"
+                                ? "Unlimited"
+                                : formatDuration(stakePool.interestAccrualDuration)
+                            : "—",
                 },
             ],
             [
-                { label: "Max Staking Limit", value: fmtStakingAmt(stakePool?.maxStakingAmount) },
+                {
+                    label: "Max Staking Limit",
+                    value: fmtStakingAmt(stakePool?.maxStakingAmount),
+                },
                 {
                     label: "Claim Start Delay",
-                    value: stakePool?.claimStartDelay !== undefined
-                        ? formatDuration(stakePool.claimStartDelay)
-                        : "—",
+                    value:
+                        stakePool?.claimStartDelay !== undefined
+                            ? formatDuration(stakePool.claimStartDelay)
+                            : "—",
                 },
             ],
             [
@@ -191,7 +220,17 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     },
             ],
         ];
-    }, [network, poolDetail, pool, stakePool, isSameToken, rewardTokenDisplay, stakingTokenDisplay, fmtStakingAmt, remainingCapacity]);
+    }, [
+        network,
+        poolDetail,
+        pool,
+        stakePool,
+        isSameToken,
+        rewardTokenDisplay,
+        stakingTokenDisplay,
+        fmtStakingAmt,
+        remainingCapacity,
+    ]);
 
     return (
         <GlowContainer
@@ -214,24 +253,29 @@ const PoolOverview = ({ poolDetail }: Props) => {
             <div className="space-y-2">
                 {rows.map((row, rowIndex) => (
                     <div
-                        className="grid grid-cols-1 gap-y-1 space-x-2 md:grid-cols-2 md:space-x-6 2xl:space-x-8"
+                        className="grid grid-cols-1 space-x-2 gap-y-1 md:grid-cols-2 md:space-x-6 2xl:space-x-8"
                         key={rowIndex}
                     >
                         <div className="grid grid-cols-2">
                             <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                                 {row[0]?.label}:
                             </span>
-                            <span className="text-sm flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
+                            <span className="flex justify-end text-sm md:text-base lg:text-xl 2xl:text-2xl">
                                 {row[0]?.value}
                             </span>
                         </div>
                         {row[1] && (
-                            <div className={cn("grid grid-cols-2", { "grid-cols-1": row[1]?.value === null })}>
+                            <div
+                                className={cn("grid grid-cols-2", {
+                                    "grid-cols-1": row[1]?.value === null,
+                                })}
+                            >
                                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
-                                    {row[1]?.label}{row[1]?.value !== null ? ":" : ""}
+                                    {row[1]?.label}
+                                    {row[1]?.value !== null ? ":" : ""}
                                 </span>
                                 {row[1]?.value !== null && (
-                                    <span className="text-sm font-medium flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
+                                    <span className="flex justify-end text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                                         {row[1]?.value}
                                     </span>
                                 )}

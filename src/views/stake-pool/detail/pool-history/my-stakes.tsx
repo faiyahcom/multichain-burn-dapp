@@ -2,12 +2,12 @@ import { Button } from "@/components/common/glow/button";
 import GlowContainer from "@/components/common/glow/container";
 import CustomPagination from "@/components/common/glow/glow-pagination";
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
 } from "@/components/common/glow/table";
 import TableSkeleton from "@/components/common/glow/table-skeleton";
 import NoData from "@/components/common/no-data";
@@ -46,7 +46,7 @@ const formatUnixDateTime = (
 
 const DateTimeCell = ({ timestamp }: { timestamp?: number }) => {
   const parts = formatUnixDateTime(timestamp);
-  if (!parts) return <span>—</span>;
+  if (!parts) return <span>Unlimited</span>;
   return (
     <div className="flex flex-col items-center leading-snug">
       <span>{parts.time}</span>
@@ -178,7 +178,11 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                   <TableCell className="whitespace-nowrap">
                     <DateTimeCell timestamp={row.interestStartDate} />
                   </TableCell>
-                  <TableCell>{formatDuration(row.durationInSecs)}</TableCell>
+                  <TableCell>
+                    {row.durationInSecs === 0
+                      ? "Unlimited"
+                      : formatDuration(row.durationInSecs)}
+                  </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <DateTimeCell timestamp={row.interestEndDate} />
                   </TableCell>
