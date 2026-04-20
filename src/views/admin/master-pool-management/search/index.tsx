@@ -6,7 +6,10 @@ import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import SingleSelect from "@/components/common/single-select";
 import { Button } from "@/components/ui/button";
+import { authService, isSuperAdminRole } from "@/services/authService";
+import { authQueryKeys } from "@/services/queries/queryKey";
 import { useMasterPoolManagementSearchFilterStore } from "@/stores/admin/master-pool-management/search-filter-store";
+import { useAuthStore } from "@/stores/authStore";
 import {
   burnPoolStatuses,
   getPoolStatusColor,
@@ -19,6 +22,7 @@ import {
   type PoolTypeOptionValue,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 import { useMemo } from "react";
@@ -26,6 +30,18 @@ import { useMemo } from "react";
 const AdminMasterPoolManagementSearch = () => {
   const navigate = useNavigate();
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
+  const { user } = useAuthStore();
+
+  const { data: userApiData } = useQuery({
+    queryKey: authQueryKeys.me({
+      address: user?.address,
+    }),
+    queryFn: async () => {
+      return authService.getCurrentUser();
+    },
+    enabled: !!user?.address,
+  });
+  const isSuperAdmin = isSuperAdminRole(userApiData);
 
   const poolTypeOptionToPoolStatues = (
     poolType: PoolTypeOptionValue,
@@ -76,18 +92,21 @@ const AdminMasterPoolManagementSearch = () => {
     <div className="space-y-9.5 px-4 pt-4 md:pt-12.75 md:pr-12.75 md:pl-21">
       <div className="flex flex-col justify-between md:flex-row">
         <h1 className="text-3xl font-semibold">Master Pool Management</h1>
-        <Button
-          variant={"mb-primary"}
-          size={"mb-square-btn"}
-          onClick={() => {
-            navigate({
-              to: "/admin/stake/create",
-            });
-          }}
-        >
-          <span className="">Create Staking Pool</span>{" "}
-          <PlusIcon className="size-3.75" />
-        </Button>
+        {/* Only super admin can create pool */}
+        {user && isSuperAdmin && (
+          <Button
+            variant={"mb-primary"}
+            size={"mb-square-btn"}
+            onClick={() => {
+              navigate({
+                to: "/admin/stake/create",
+              });
+            }}
+          >
+            <span className="">Create Staking Pool</span>{" "}
+            <PlusIcon className="size-3.75" />
+          </Button>
+        )}
       </div>
       <div className="flex flex-col justify-between gap-2.5 md:flex-row md:items-center">
         <SingleSelect
