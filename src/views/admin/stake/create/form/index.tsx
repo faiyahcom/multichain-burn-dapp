@@ -30,7 +30,6 @@ type CreateStakePoolFormValues = {
   claimStartDelay: string;
   apr: string;
   lowRewardNotification: boolean;
-  networkId: string;
   budget: string;
 };
 
@@ -78,7 +77,6 @@ const CreateStakePoolForm = () => {
       claimStartDelay: "",
       apr: "",
       lowRewardNotification: true,
-      networkId: selectedNetworkId,
       budget: "",
     },
   });
@@ -87,8 +85,7 @@ const CreateStakePoolForm = () => {
   const rewardToken = watch("rewardToken");
   const startTime = watch("startTime");
   const endTime = watch("endTime");
-  const networkId = watch("networkId");
-  const network = NETWORK_CONFIGS.find((n) => n.id === networkId);
+  const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
 
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
   const { data: whitelistTokensData } = useGetWhitelistTokens({
