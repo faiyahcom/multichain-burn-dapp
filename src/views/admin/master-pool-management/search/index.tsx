@@ -54,7 +54,7 @@ const AdminMasterPoolManagementSearch = () => {
       case "1": // swap pool
         return [...swapPoolStatuses];
       case "2": // stake pool
-        return ["draft", ...stakePoolStatuses];
+        return [...stakePoolStatuses];
       case "3": // launchpad
         return [...burnPoolStatuses]; // TODO: subject to change
 
