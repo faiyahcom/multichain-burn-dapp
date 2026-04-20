@@ -408,11 +408,18 @@ const AdminManagementTable = () => {
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
                       <ActionIconButton
-                        onClick={() =>
-                          setEditingAdmin({
-                            admin,
-                            isSelfAdmin,
-                          })
+                        onClick={() => {
+                          const adminNetworkIds = admin.networkIds ?? [];
+                          const targetNetworkId = getAdminTargetNetworkId(admin);
+                          if (currentNetworkId && adminNetworkIds.includes(currentNetworkId)) {
+                            setEditingAdmin({
+                              admin,
+                              isSelfAdmin,
+                            })
+                          } else if (targetNetworkId) {
+                            openSwitchNetworkModal(currentNetworkId, targetNetworkId)
+                          }
+                        }
                         }
                       >
                         <PencilIcon className="size-4" />

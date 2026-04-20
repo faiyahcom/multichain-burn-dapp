@@ -312,7 +312,16 @@ const AdminWhitelistTokenTable = () => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
-                      <button onClick={() => setEditToken(item)}>
+                      <button onClick={() => {
+                        if (currentNetworkId) {
+                          const tokenNetworkId = chainIdToNetworkConfig(item.chainId)?.id;
+                          if (networkIdToChainId(currentNetworkId) == item.chainId) {
+                            setEditToken(item)
+                          } else if (tokenNetworkId) {
+                            openSwitchNetworkModal(currentNetworkId, tokenNetworkId)
+                          }
+                        }
+                      }}>
                         <PencilIcon className="size-4" />
                       </button>
                       <button onClick={() => setDetailToken(item)}>
