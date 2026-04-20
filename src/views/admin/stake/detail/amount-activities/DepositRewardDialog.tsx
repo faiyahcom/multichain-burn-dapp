@@ -238,6 +238,8 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                     value={
                                         !pool ? (
                                             <Skeleton className="h-5 w-24" />
+                                        ) : !stakePool?.interestAccrualDuration || stakePool?.interestAccrualDuration === "0" ? (
+                                            "Unlimited"
                                         ) : (
                                             formatDuration(Number(stakePool?.interestAccrualDuration))
                                         )

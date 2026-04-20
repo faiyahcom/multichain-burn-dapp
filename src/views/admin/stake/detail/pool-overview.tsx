@@ -108,7 +108,9 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 },
                 {
                     label: "Interest Accrual Duration",
-                    value: formatDuration(Number(stakePool?.interestAccrualDuration)),
+                    value: !stakePool?.interestAccrualDuration || stakePool?.interestAccrualDuration === "0"
+                        ? "Unlimited"
+                        : formatDuration(Number(stakePool?.interestAccrualDuration)),
                 },
             ],
             [

@@ -146,6 +146,14 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
                 }}
                 onTransfer={handleTransfer}
             />
+            {poolDetail?.pool?.adminCloseReason && (
+                <div className="flex gap-1 text-[15px]">
+                    <span className="font-medium text-foreground">
+                        Reason close pool:{" "}
+                    </span>
+                    <p className="text-greyed">{poolDetail?.pool?.adminCloseReason}</p>
+                </div>
+            )}
         </PoolChainGuard>
     );
 };

@@ -13,6 +13,7 @@ import { useEmergencyCloseSolFn } from "./hooks/useEmergencyCloseSolFn";
 import { useEmergencyCloseEvmFn } from "./hooks/useEmergencyCloseEvmFn";
 import { useDepositRewardSolFn } from "./hooks/useDepositRewardSolFn";
 import { useDepositRewardEvmFn } from "./hooks/useDepositRewardEvmFn";
+import { poolService } from "@/services/poolService";
 
 export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
     const { caipAddress } = useAppKitAccount();
@@ -77,12 +78,15 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
         invalidatePoolQueries(pool.address);
     };
 
-    const handleEmergencyClose = async () => {
+    const handleEmergencyClose = async (reason?: string) => {
         if (!pool?.address) return;
         if (isSolana) {
             await emergencyCloseSol({ poolAddress: pool.address });
         } else {
             await emergencyCloseEvm({ poolAddress: pool.address });
+        }
+        if (reason?.trim()) {
+            await poolService.postReasonClosePool(pool.address, reason);
         }
         invalidatePoolQueries(pool.address);
     };

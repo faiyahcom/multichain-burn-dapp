@@ -68,6 +68,30 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const formattedRewardRemaining =
         vaultBalance?.rewardBalance ?? fmt(pool?.currentRewardAmount, rewardDec);
 
+    // Reward Deficit = Total Reward Amount - Total Claimed Rewards
+    // Total Reward Amount: if reward token == staking token → deposited + staked; else → deposited
+    const isSameToken = !!(
+        pool?.rewardToken &&
+        pool?.tokenIn &&
+        pool?.rewardToken === pool?.tokenIn
+    );
+    let formattedRewardDeficit = "0";
+    try {
+        const depositedRaw = BigInt(pool?.rewardAmount ?? "0");
+        const totalStakedRaw = BigInt(staking?.totalStaked ?? "0");
+        const claimedRaw = BigInt(staking?.user?.totatClaimed ?? "0");
+        const totalRewardAmountRaw = isSameToken
+            ? depositedRaw + totalStakedRaw
+            : depositedRaw;
+        const deficitRaw = totalRewardAmountRaw - claimedRaw;
+        formattedRewardDeficit = formatAmount(
+            (deficitRaw > 0n ? deficitRaw : 0n).toString(),
+            rewardDec,
+        );
+    } catch {
+        formattedRewardDeficit = "0";
+    }
+
     const extendedRows = [
         [
             { label: "Total Staked Amount", value: `${formattedTotalStaked} ${stakingSymbol}` },
@@ -76,6 +100,10 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
         [
             { label: "Total Reward Amount", value: `${formattedRewardRemaining} ${rewardSymbol}` },
             { label: "Total Deposited Rewards", value: `${formattedDepositedRewards} ${rewardSymbol}` },
+        ],
+        [
+            { label: "Reward Deficit", value: `${formattedRewardDeficit} ${rewardSymbol}` },
+            null,
         ],
         [
             {
