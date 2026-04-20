@@ -645,7 +645,10 @@ const CreateStakePoolForm = () => {
           btnProps={{
             type: "button",
             disabled: isSubmitting,
-            onClick: () => reset(),
+            onClick: () => {
+              reset()
+              navigate({ to: "/admin/master-pool-management" })
+            },
           }}
         />
         <AnimateIconButton
