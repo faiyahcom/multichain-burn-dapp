@@ -1,4 +1,4 @@
-import { formatAmount } from "@/utils/helpers/numbers";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
@@ -13,7 +13,7 @@ type Props = {
 };
 
 const fmt = (raw: string | undefined, decimals: number) =>
-    raw !== undefined ? formatAmount(raw, decimals) : "0";
+    raw !== undefined ? sciToFormatted(raw, decimals) : "0";
 
 const fmtFee = (fee: string | undefined) =>
     fee !== undefined ? `${Number(fee) / DECIMAL_FEE_PERCENT}%` : "-";
@@ -24,7 +24,9 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const isSimple = false;
     const isMobile = useMediaQuery("(max-width: 640px)");
 
-    const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+    const network = pool?.chainId
+        ? chainIdToNetworkConfig(pool.chainId)
+        : undefined;
 
     const stakingTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -51,7 +53,10 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const stakingDec = pool?.tokenInDecimals ?? 0;
 
     // Reward amount header value
-    const formattedTotalReward = fmt(pool?.rewardAmount, rewardDec)?.toUpperCase();
+    const formattedTotalReward = fmt(
+        pool?.rewardAmount,
+        rewardDec,
+    )?.toUpperCase();
 
     // Settlement fee
     const settlementFee = fmtFee(pool?.settlementFee);
@@ -70,11 +75,14 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
 
     // Reward Deficit = Total Reward Amount - Total Claimed Rewards
     // Total Reward Amount: if reward token == staking token → deposited + staked; else → deposited
+    // TH1: Reward Token == Stake Token → Total Reward Amount = totalStaked + rewardAmount (same decimals)
+    // TH2: Reward Token != Stake Token → Total Reward Amount = rewardAmount
     const isSameToken = !!(
         pool?.rewardToken &&
         pool?.tokenIn &&
         pool?.rewardToken === pool?.tokenIn
     );
+    let formattedTotalRewardAmount = "0";
     let formattedRewardDeficit = "0";
     try {
         const depositedRaw = BigInt(pool?.rewardAmount ?? "0");
@@ -83,27 +91,40 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
         const totalRewardAmountRaw = isSameToken
             ? depositedRaw + totalStakedRaw
             : depositedRaw;
+        formattedTotalRewardAmount = sciToFormatted(
+            totalRewardAmountRaw.toString(),
+            rewardDec,
+        );
         const deficitRaw = totalRewardAmountRaw - claimedRaw;
-        formattedRewardDeficit = formatAmount(
+        formattedRewardDeficit = sciToFormatted(
             (deficitRaw > 0n ? deficitRaw : 0n).toString(),
             rewardDec,
         );
     } catch {
+        formattedTotalRewardAmount = "0";
         formattedRewardDeficit = "0";
     }
 
     const extendedRows = [
         [
-            { label: "Total Staked Amount", value: `${formattedTotalStaked} ${stakingSymbol}` },
-            { label: "Total Claimed Rewards", value: `${formattedClaimedReward} ${rewardSymbol}` },
+            {
+                label: "Total Staked Amount",
+                value: `${formattedTotalStaked} ${stakingSymbol}`,
+            },
+            {
+                label: "Total Claimed Rewards",
+                value: `${formattedClaimedReward} ${rewardSymbol}`,
+            },
         ],
         [
-            { label: "Total Reward Amount", value: `${formattedRewardRemaining} ${rewardSymbol}` },
-            { label: "Total Deposited Rewards", value: `${formattedDepositedRewards} ${rewardSymbol}` },
-        ],
-        [
-            { label: "Reward Deficit", value: `${formattedRewardDeficit} ${rewardSymbol}` },
-            null,
+            {
+                label: "Total Reward Amount",
+                value: `${formattedTotalRewardAmount} ${rewardSymbol}`,
+            },
+            {
+                label: "Total Deposited Rewards",
+                value: `${formattedDepositedRewards} ${rewardSymbol}`,
+            },
         ],
         [
             {
@@ -117,7 +138,10 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                     </span>
                 ),
             },
-            null,
+            {
+                label: "Reward Deficit",
+                value: `${formattedRewardDeficit} ${rewardSymbol}`,
+            },
         ],
     ];
 
@@ -151,7 +175,11 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                                     <>
                                         {settlementFee}{" "}
                                         <span className="text-sm">
-                                            ({isMobile ? "system collected" : "collected by the system"})
+                                            (
+                                            {isMobile
+                                                ? "system collected"
+                                                : "collected by the system"}
+                                            )
                                         </span>
                                     </>
                                 )}
@@ -166,14 +194,22 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">{row?.[0]?.label}:</span>
                                 <span className="text-xl text-foreground max-sm:text-right">
-                                    {!poolDetail ? <Skeleton className="h-5 w-24" /> : row?.[0]?.value}
+                                    {!poolDetail ? (
+                                        <Skeleton className="h-5 w-24" />
+                                    ) : (
+                                        row?.[0]?.value
+                                    )}
                                 </span>
                             </div>
                             {row?.[1] && (
                                 <div className="grid grid-cols-2">
                                     <span className="text-xl text-greyed">{row[1].label}:</span>
                                     <span className="text-xl text-foreground max-sm:text-right">
-                                        {!poolDetail ? <Skeleton className="h-5 w-24" /> : row[1].value}
+                                        {!poolDetail ? (
+                                            <Skeleton className="h-5 w-24" />
+                                        ) : (
+                                            row[1].value
+                                        )}
                                     </span>
                                 </div>
                             )}
