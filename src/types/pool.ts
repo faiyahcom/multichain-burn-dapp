@@ -201,7 +201,7 @@ export const activityKind = {
   31: "Claim reward",
   32: "Swap",
   33: "Stake",
-  34: "Unstake",
+  34: "Unstake & Claim",
   35: "Claim Stake reward",
 
   40: "Pool End",
