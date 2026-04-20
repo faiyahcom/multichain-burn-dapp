@@ -111,7 +111,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
             endTime: new Date(Number(pool.timeEnd) * 1000),
             apr: aprDisplay,
             lockDuration: secsToDays(stakePool?.lockUpDuration),
-            interestStartDelay: secsToDays(stakePool?.interestStrartDelay),
+            interestStartDelay: secsToDays(stakePool?.interestStartDelay),
             interestAccrualDuration: stakePool?.interestAccrualDuration && stakePool?.interestAccrualDuration !== "0" ? secsToDays(stakePool?.interestAccrualDuration) : "",
             claimStartDelay: secsToDays(stakePool?.claimStartDelay),
             minStakingAmount: stakePool?.minStakingAmount && stakePool.minStakingAmount !== "0" && pool.tokenInDecimals != null
@@ -331,7 +331,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Interest Start Delay:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {fmtDisplayDays(stakePool?.interestStrartDelay)} days
+                                    {fmtDisplayDays(stakePool?.interestStartDelay)} days
                                 </span>
                             </div>
                             {!isSolana && (

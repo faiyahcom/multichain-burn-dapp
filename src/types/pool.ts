@@ -91,7 +91,7 @@ export interface PoolDetailResponse {
     // Staking pool fields
     apr?: string;
     lockUpDuration?: string;
-    interestStrartDelay?: string; // API typo (double 'r')
+    interestStartDelay?: string; // API typo (double 'r')
     interestAccrualDuration?: string;
     claimStartDelay?: string;
     minStakingAmount?: string | null;
@@ -105,7 +105,7 @@ export interface PoolDetailResponse {
             address?: string;
             totalStaked: string;
             totalUnstaked: string;
-            totatClaimed: string; // API typo (missing 'l')
+            totalClaimed: string; // API typo (missing 'l')
         };
     };
     returningAmountOnCanceling?: {

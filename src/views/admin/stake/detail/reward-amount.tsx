@@ -60,7 +60,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const staking = poolDetail?.staking;
     const formattedTotalStaked = fmt(staking?.totalStaked, stakingDec);
     // API has a typo: "totatClaimed" (missing 'l')
-    const formattedClaimedReward = fmt(staking?.user?.totatClaimed, rewardDec);
+    const formattedClaimedReward = fmt(staking?.user?.totalClaimed, rewardDec);
     // depositedRewards not in new API — fall back to pool rewardAmount
     const formattedDepositedRewards = fmt(pool?.rewardAmount, rewardDec);
 
@@ -79,7 +79,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     try {
         const depositedRaw = BigInt(pool?.rewardAmount ?? "0");
         const totalStakedRaw = BigInt(staking?.totalStaked ?? "0");
-        const claimedRaw = BigInt(staking?.user?.totatClaimed ?? "0");
+        const claimedRaw = BigInt(staking?.user?.totalClaimed ?? "0");
         const totalRewardAmountRaw = isSameToken
             ? depositedRaw + totalStakedRaw
             : depositedRaw;
