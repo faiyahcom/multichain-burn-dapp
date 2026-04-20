@@ -35,6 +35,7 @@ export const useBurnPoolListSearchFilterStore =
       sortBy: "volume",
       sortOrder: "desc",
       listLayout: "card",
+      kind: 0,
     },
     setFilter: (filter) =>
       set((state) => ({
@@ -52,6 +53,7 @@ export const useSwapPoolListSearchFilterStore =
       sortBy: "liquidity",
       sortOrder: "desc",
       listLayout: "card",
+      kind: 1,
     },
     setFilter: (filter) =>
       set((state) => ({
@@ -69,6 +71,7 @@ export const useStakePoolListSearchFilterStore =
       sortBy: "stakedAmount",
       sortOrder: "desc",
       listLayout: "card",
+      kind: 2,
     },
     setFilter: (filter) =>
       set((state) => ({
