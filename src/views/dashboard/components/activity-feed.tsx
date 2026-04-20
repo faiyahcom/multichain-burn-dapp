@@ -2,6 +2,7 @@ import {
   IconBurnCategory,
   IconPairCategory,
   IconStakeCategory,
+  IconStakeComingSoon,
   IconSwapCategory,
 } from "@/assets/react";
 import Dot from "@/components/common/glow/dot";
@@ -394,16 +395,10 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
   const poolName = item.pool?.name ?? "";
 
   return (
-    <div
-      className={cn(ROW_STAKE_GRID, "text-tiny lg:text-sm 2xl:text-md cursor-pointer transition-opacity hover:opacity-70")}
-      onClick={() => {
-        navigate({
-          to: `/staking/detail/${item?.poolAddress}`,
-        });
-      }}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") window.location.assign(`/stake/detail/${item.poolAddress}`); }}
+    <Link
+      className={cn(ROW_STAKE_GRID, "py-1 text-tiny lg:text-sm 2xl:text-md")}
+      to="/staking/detail/$address"
+      params={{ address: item.poolAddress }}
     >
       <div className="flex min-w-0 items-center gap-2 md:gap-3">
         <Dot className="size-2.5 shrink-0 bg-mb-btn-stake md:size-3.25" />
@@ -414,7 +409,7 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
       </div>
 
       <div className="flex items-center justify-center gap-1 md:gap-2">
-        <IconStakeCategory className="size-5 shrink-0 md:size-10 2xl:size-10.75" />
+        <IconStakeComingSoon className="size-5 shrink-0 md:size-7 2xl:size-8" />
         <span className="text-mb-gray-b8/60 tabular-nums">{time}</span>
       </div>
 
@@ -430,7 +425,7 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
           hasSymbol={false}
         />
       </div>
-    </div>
+    </Link>
   );
 };
 
@@ -439,13 +434,18 @@ interface StakingFeedProps {
   animKey: number;
 }
 
-export const StakingActivityFeed = ({ visibleItems, animKey }: StakingFeedProps) => (
+export const StakingActivityFeed = ({
+  visibleItems,
+  animKey,
+}: StakingFeedProps) => (
   <ActivityFeed
     title="Staking Activity"
-    icon={<IconStakeCategory className="size-7 md:size-10 2xl:size-10.75" />}
+    icon={<IconStakeCategory className={"size-7 md:size-10 2xl:size-10.75"} />}
     items={visibleItems as unknown as ActivityItem[]}
     animKey={animKey}
-    renderRow={(item) => <StakingRow item={item as unknown as StakingActivityItem} />}
+    renderRow={(item) => (
+      <StakingRow item={item as unknown as StakingActivityItem} />
+    )}
     ghostRowClassName={ROW_STAKE_GRID}
   />
 );

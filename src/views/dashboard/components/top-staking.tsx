@@ -13,6 +13,7 @@ import type { TopStakingPool } from "@/services/dashboardService";
 import { shortenNumber } from "@/utils/helpers/numbers";
 import TokenDisplay from "@/components/common/token-display";
 import { useNavigate } from "@tanstack/react-router";
+import StakeCategoryIcon from "@/components/common/glow/icon/stake-category-icon";
 
 const RANK_ICONS = [
     <IconTop1 key="1" className="size-4" />,
@@ -124,7 +125,7 @@ const ComingSoonCard = () => (
             />
             <div className="bg-mb-stake-overlay/72 absolute inset-0" />
         </div>
-        <IconStakeComingSoon className="absolute top-1/2 left-1/2 size-18 -translate-x-1/2 -translate-y-1/2 transform opacity-60 sm:size-9 2xl:size-18" />
+        <IconStakeComingSoon className="absolute top-1/2 left-1/2 size-18 -translate-x-1/2 -translate-y-1/2 transform opacity-50 sm:size-9 2xl:size-18" />
         <p className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 transform font-inter text-[15px] font-medium text-nowrap sm:text-tiny 2xl:text-[15px]">
             Coming soon
         </p>
@@ -136,7 +137,7 @@ const ComingSoonCard = () => (
 export const TopStakingPools = ({ pools }: { pools?: TopStakingPool[] }) => (
     <GlowContainer className="px-5 py-6.25" variant="stake">
         <div className="mb-8 flex items-center gap-3">
-            <IconStakeCategory className="size-10.75" />
+            <StakeCategoryIcon className="size-10" />
             <p className="text-2xl font-medium text-nowrap">TOP STAKING POOLS</p>
         </div>
 

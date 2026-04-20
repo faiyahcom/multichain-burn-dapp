@@ -1,11 +1,12 @@
 import GlowContainer from "@/components/common/glow/container";
 import { Button } from "@/components/common/glow/button";
-import { IconStakeCategory, IconParticipant, IconStack } from "@/assets/react";
+import { IconParticipant, IconStack } from "@/assets/react";
 import { useNavigate } from "@tanstack/react-router";
 import StakeStatsImage from "/images/dashboard/stake-stats.png";
 import { HeroStatRow } from "./burn-swap-hero";
 import type { StakingSection } from "@/services/dashboardService";
 import { shortenNumber } from "@/utils/helpers/numbers";
+import StakeCategoryIcon from "@/components/common/glow/icon/stake-category-icon";
 
 // ── Stake Hero ─────────────────────────────────────────────────────────────────
 
@@ -42,7 +43,7 @@ const StakeHero = ({ stakingSection }: { stakingSection?: StakingSection }) => {
             {/* Right panel — stats */}
             <div className="mx-5 flex min-w-0 flex-1 flex-col justify-center space-y-2.5 py-4 font-inter sm:mr-5 sm:ml-7 sm:py-0">
                 <div className="flex items-center gap-2">
-                    <IconStakeCategory className="size-7.25" />
+                    <StakeCategoryIcon className="size-7.25" />
                     <p className="font-orbitron text-lg font-medium 2xl:text-xl">
                         TOTAL STAKING
                     </p>
