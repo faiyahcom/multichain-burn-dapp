@@ -12,17 +12,17 @@ import { Route } from "@/routes/pair-detail/$chainId/$tokenIn/$tokenOut";
 import { pairService } from "@/services/pairService";
 import { pairQueryKeys } from "@/services/queries/queryKey";
 import { usePairDetailSearchFilterStore } from "@/stores/pair-detail/search-filter-store";
-import { PoolKindCodeEnum } from "@/types/pool";
 import {
   burnPoolStatusLabels,
-  poolTypeShortenOptions,
+  poolTypeLabels,
   swapPoolStatusLabels,
   userViewBurnPoolStatuses,
   userViewSwapPoolStatuses,
   type BurnPoolStatus,
   type PoolType,
-  type SwapPoolStatus,
+  type SwapPoolStatus
 } from "@/types/admin/master-pool-management";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useQuery } from "@tanstack/react-query";
 
@@ -30,6 +30,16 @@ const PairDetailGlowSearch = () => {
   const { filter, setFilter } = usePairDetailSearchFilterStore();
   const { chainId, tokenIn, tokenOut } = Route.useParams();
   const isBurnPool = filter.type === PoolKindCodeEnum.Burn;
+
+  // Only burn pool and swap pool are considered as pair
+  const poolOptions = [PoolKindCodeEnum.Burn, PoolKindCodeEnum.Swap].map(
+    (type) => {
+      return {
+        label: poolTypeLabels[type],
+        value: type.toString(),
+      };
+    },
+  );
 
   const { data: pairDetail, isPending: isPairDetailPending } = useQuery({
     queryKey: pairQueryKeys.detail({
@@ -130,7 +140,7 @@ const PairDetailGlowSearch = () => {
         </div>
 
         <RadioGroupButton
-          options={poolTypeShortenOptions}
+          options={poolOptions}
           selected={filter.type?.toString()}
           onChange={(value) => handleSelectType(Number(value) as PoolType)}
           variant="pair"
