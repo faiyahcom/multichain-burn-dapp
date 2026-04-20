@@ -298,7 +298,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                         <TableHead>Status</TableHead>
                         <TableHead>Address</TableHead>
                         <TableHead className="text-center">Network</TableHead>
-                        <TableHead>Description</TableHead>
+                        <TableHead>Total Tokens Transferred</TableHead>
                         <TableHead>Added</TableHead>
                         <TableHead>Action</TableHead>
                     </TableRow>
