@@ -1,28 +1,28 @@
 export type SwapPoolStatus =
-    | "on_going"
-    | "canceled"
-    | "closed"
-    | "draft"
-    | "ended";
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "ended";
 export type BurnPoolStatus =
-    | "on_going"
-    | "canceled"
-    | "closed"
-    | "draft"
-    | "pending"
-    | "upcoming"
-    | "holding"
-    | "ended";
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "pending"
+  | "upcoming"
+  | "holding"
+  | "ended";
 export type PoolKind =
-    | "burn_pool"
-    | "swap_pool"
-    | "staking_pool"
-    | "launchpad_pool";
+  | "burn_pool"
+  | "swap_pool"
+  | "staking_pool"
+  | "launchpad_pool";
 export const POOL_KIND: Record<number, PoolKind> = {
-    0: "burn_pool",
-    1: "swap_pool",
-    2: "staking_pool",
-    3: "launchpad_pool",
+  0: "burn_pool",
+  1: "swap_pool",
+  2: "staking_pool",
+  3: "launchpad_pool",
 };
 interface TokenInfo {
   address: string;
@@ -97,56 +97,60 @@ export interface PoolDetailResponse {
     minStakingAmount?: string | null;
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
+  };
+  // Staking pool aggregate data
+  staking?: {
+    totalStaked: string;
+    totalUnstaked?: string;
+    totalClaimed?: string;
+    currentStaked?: string;
+    remainingStaked?: string;
+    user?: {
+      address?: string;
+      totalStaked: string;
+      totalUnstaked: string;
+      totalClaimed: string; // API typo (missing 'l')
     };
-    // Staking pool aggregate data
-    staking?: {
-        totalStaked: string;
-        user?: {
-            address?: string;
-            totalStaked: string;
-            totalUnstaked: string;
-            totalClaimed: string; // API typo (missing 'l')
-        };
-    };
-    returningAmountOnCanceling?: {
-        amount: string;
-        to: string;
-    };
+  };
+  returningAmountOnCanceling?: {
+    amount: string;
+    to: string;
+  };
 }
 
 export interface PoolTxnsResponse {
-    page: number;
-    total: number;
-    txns: {
-        id: string;
-        hash: string;
-        log_ix: number;
-        kind: keyof typeof txnKind;
-        timestamp: string;
-        tokenIn: string;
-        tokenInSymbol: string;
-        tokenInDecimals: number;
-        amountIn: string;
-        tokenOut: string;
-        tokenOutSymbol: string;
-        tokenOutDecimals: number;
-        amountOut: string;
-        chainId: string;
-        poolAddress: string;
-    }[];
+  page: number;
+  total: number;
+  txns: {
+    id: string;
+    hash: string;
+    log_ix: number;
+    kind: keyof typeof txnKind;
+    timestamp: string;
+    tokenIn: string;
+    tokenInSymbol: string;
+    tokenInDecimals: number;
+    amountIn: string;
+    tokenOut: string;
+    tokenOutSymbol: string;
+    tokenOutDecimals: number;
+    amountOut: string;
+    chainId: string;
+    poolAddress: string;
+  }[];
 }
 
 export const txnKind = {
-    1: "Taker Deposit",
-    2: "Refund to Whitelist User",
-    3: "Maker Deposit Reward",
-    4: "Taker Claim Reward",
-    5: "Refund to Maker",
-    6: "Burn Success",
-    7: "Stake",
-    8: "Claim",
-    9: "Unstake & Claim",
-    10: "Emergency Withdraw"
+  1: "Taker Deposit",
+  2: "Refund to Whitelist User",
+  3: "Maker Deposit Reward",
+  4: "Taker Claim Reward",
+  5: "Refund to Maker",
+  6: "Burn Success",
+  7: "Stake",
+  8: "Claim",
+  9: "Unstake & Claim",
+  10: "Emergency Withdraw",
 } as const;
 
 export const activityKind = {
@@ -232,20 +236,18 @@ export function pickActivityKind<K extends keyof ActivityKind>(
   >;
 }
 
-export const myActivityActions = pickActivityKind([
-  1, 0, 10, 32, 30, 31, 5
-]);
+export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
 
 export interface PoolActivitiesResponse {
-    page: number;
-    total: number;
-    activities: {
-        id: string;
-        hash: string;
-        log_ix: number;
-        timestamp: string;
-        actor: string;
-        kind: keyof typeof activityKind;
-        poolAddress: string;
-    }[];
+  page: number;
+  total: number;
+  activities: {
+    id: string;
+    hash: string;
+    log_ix: number;
+    timestamp: string;
+    actor: string;
+    kind: keyof typeof activityKind;
+    poolAddress: string;
+  }[];
 }
