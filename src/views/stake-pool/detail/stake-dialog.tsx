@@ -343,7 +343,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                     !pool ? (
                                                         <Skeleton className="h-5 w-20" />
                                                     ) : (
-                                                        formatDuration(pool.interestStrartDelay)
+                                                        formatDuration(pool.interestStartDelay ?? pool.interestStrartDelay)
                                                     )
                                                 }
                                             />

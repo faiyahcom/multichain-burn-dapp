@@ -103,6 +103,7 @@ export interface PoolDetailResponse {
     apr?: string;
     lockUpDuration?: string;
     interestStrartDelay?: string; // API typo (double 'r')
+    interestStartDelay?: string; // correct spelling
     interestAccrualDuration?: string;
     claimStartDelay?: string;
     minStakingAmount?: string | null;
@@ -112,6 +113,7 @@ export interface PoolDetailResponse {
   // Staking pool aggregate data
   staking?: {
     totalStaked: string;
+    totalRewardAccrued?: string;
     user?: {
       address?: string;
       totalStaked: string;

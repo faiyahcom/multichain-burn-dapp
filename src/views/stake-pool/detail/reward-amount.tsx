@@ -3,22 +3,15 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import GlowContainer from "@/components/common/glow/container";
-import { Skeleton } from "@/components/ui/skeleton";
-import { usePoolTotalAccruedEvm } from "./hooks/usePoolTotalAccruedEvm";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
 const RewardAmount = ({ poolDetail }: Props) => {
-    const { rawAccrued, isLoading: isLoadingAccrued } = usePoolTotalAccruedEvm({
-        poolAddress: poolDetail?.pool?.address,
-        chainId: poolDetail?.pool?.chainId,
-    });
-
     const formattedAccrued =
-        rawAccrued !== null && poolDetail?.pool?.rewardTokenDecimals != null
-            ? formatAmount(rawAccrued.toString(), poolDetail.pool.rewardTokenDecimals)
+        poolDetail?.staking?.totalRewardAccrued != null && poolDetail?.pool?.rewardTokenDecimals != null
+            ? formatAmount(poolDetail.staking.totalRewardAccrued, poolDetail.pool.rewardTokenDecimals)
             : null;
 
     const formattedTotalStaked =
@@ -84,9 +77,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
                     <span className="text-mb-gray-b8">Total Accrued Amount:</span>
                     <span>
-                        {isLoadingAccrued ? (
-                            <Skeleton className="h-5 w-24" />
-                        ) : formattedAccrued !== null ? (
+                        {formattedAccrued !== null ? (
                             <>
                                 {formattedAccrued}{" "}
                                 <span>{rewardTokenDisplay.symbol}</span>
