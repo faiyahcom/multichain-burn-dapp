@@ -1,4 +1,4 @@
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { formatAmount } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
@@ -13,7 +13,7 @@ type Props = {
 };
 
 const fmt = (raw: string | undefined, decimals: number) =>
-    raw !== undefined ? sciToFormatted(raw, decimals) : "0";
+    raw !== undefined ? formatAmount(raw, decimals) : "0";
 
 const fmtFee = (fee: string | undefined) =>
     fee !== undefined ? `${Number(fee) / DECIMAL_FEE_PERCENT}%` : "-";
@@ -91,12 +91,12 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
         const totalRewardAmountRaw = isSameToken
             ? depositedRaw + totalStakedRaw
             : depositedRaw;
-        formattedTotalRewardAmount = sciToFormatted(
+        formattedTotalRewardAmount = formatAmount(
             totalRewardAmountRaw.toString(),
             rewardDec,
         );
         const deficitRaw = totalRewardAmountRaw - claimedRaw;
-        formattedRewardDeficit = sciToFormatted(
+        formattedRewardDeficit = formatAmount(
             (deficitRaw > 0n ? deficitRaw : 0n).toString(),
             rewardDec,
         );
