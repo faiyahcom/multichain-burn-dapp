@@ -84,9 +84,10 @@ const PoolOverview = ({ poolDetail }: Props) => {
                             displayText={
                                 truncateString({ str: pool.owner, left: 6, right: 4 }) || "—"
                             }
-                            classNames={{ 
+                            classNames={{
                                 container: "justify-end text-right",
-                                displayText: "text-foreground font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl" }}
+                                displayText: "text-foreground font-inter text-sm md:text-base lg:text-xl 2xl:text-2xl"
+                            }}
                         />
                     ) : (
                         "—"
@@ -131,7 +132,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 {
                     label: "Network",
                     value: (
-                        <div className="flex items-center gap-2">
+                        <div className="flex h-fit items-center gap-2">
                             <NetworkIcon
                                 networkId={network?.id || ("" as NetworkId)}
                                 className="size-4 md:size-5 2xl:size-6"
@@ -146,7 +147,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 {
                     label: "Staking Token",
                     value: (
-                        <div className="flex items-center gap-2">
+                        <div className="flex h-fit items-center gap-2">
                             <TokenImage
                                 src={stakingTokenDisplay.imageUri}
                                 alt={stakingTokenDisplay.name}
@@ -174,7 +175,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     : {
                         label: "Reward Token",
                         value: (
-                            <div className="flex items-center gap-2">
+                            <div className="flex h-fit items-center gap-2">
                                 <TokenImage
                                     src={rewardTokenDisplay.imageUri}
                                     alt={rewardTokenDisplay.name}
@@ -220,7 +221,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                             <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                                 {row[0]?.label}:
                             </span>
-                            <span className="text-sm flex items-center justify-end md:text-base lg:text-xl 2xl:text-2xl">
+                            <span className="text-sm flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
                                 {row[0]?.value}
                             </span>
                         </div>
@@ -230,7 +231,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                                     {row[1]?.label}{row[1]?.value !== null ? ":" : ""}
                                 </span>
                                 {row[1]?.value !== null && (
-                                <span className="text-sm font-medium flex items-center justify-end md:text-base lg:text-xl 2xl:text-2xl">
+                                    <span className="text-sm font-medium flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
                                         {row[1]?.value}
                                     </span>
                                 )}
