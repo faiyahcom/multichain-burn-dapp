@@ -6,7 +6,7 @@ import { createFileRoute, redirect } from "@tanstack/react-router";
 export const Route = createFileRoute("/admin/draft-pools/")({
   beforeLoad: () => {
     const role = useAuthStore.getState().user?.role;
-    if (role !== "super_admin") {
+    if (role !== "admin" && role !== "super_admin") {
       throw redirect({ to: "/" });
     }
   },

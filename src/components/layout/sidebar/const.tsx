@@ -201,7 +201,7 @@ export const adminNavItems: NavItem[] = [
     label: "Draft Pools",
     section: navSection.admin,
     to: "/admin/draft-pools",
-    allowedRoles: ["super_admin"],
+    allowedRoles: ["admin", "super_admin"],
   },
   {
     label: "Revenue & Fee Stats",
