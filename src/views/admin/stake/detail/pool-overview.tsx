@@ -67,14 +67,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
 
     const remainingCapacity = useMemo(() => {
         if (!pool?.stakingLimit || pool.stakingLimit === "0") return "Unlimited";
-        if (pool.tokenInDecimals == null) return "—";
+        if (pool.tokenInDecimals == null) return "Unlimited";
         try {
             const limit = BigInt(pool.stakingLimit);
             const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
             const remaining = limit - staked;
             return `${formatAmount((remaining >= 0n ? remaining : 0n).toString(), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
         } catch {
-            return "—";
+            return "Unlimited";
         }
     }, [
         pool?.stakingLimit,
