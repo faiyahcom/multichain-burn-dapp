@@ -52,6 +52,8 @@ export const getAdminPoolHref = ({
       return `/admin/burn/detail/${address}`;
     case 1:
       return `/admin/swap/detail/${address}`;
+    case 2:
+      return `/admin/stake/detail/${address}`;
     default:
       return "#";
   }
