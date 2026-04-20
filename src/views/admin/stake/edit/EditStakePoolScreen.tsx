@@ -12,7 +12,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { sciToFormatted } from "@/utils/helpers/numbers";
 import { useEditStakePoolEvmFn } from "./useEditStakePoolEvmFn";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
 import PoolOverview from "../detail/pool-overview";
@@ -39,10 +39,10 @@ const STAKE_POOL_STATUS = {
 };
 
 const secsToDays = (secs: string | undefined): string => {
-    if (secs === undefined || secs === null) return "";
+    if (secs === undefined || secs === null) return "0";
     const n = Number(secs);
-    if (!isFinite(n)) return "";
-    if (n < 0) return "0";
+    if (!isFinite(n)) return "0";
+    if (n <= 0) return "0";
     return String(n / 86400);
 };
 
@@ -115,13 +115,13 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
             interestAccrualDuration: stakePool?.interestAccrualDuration && stakePool?.interestAccrualDuration !== "0" ? secsToDays(stakePool?.interestAccrualDuration) : "",
             claimStartDelay: secsToDays(stakePool?.claimStartDelay),
             minStakingAmount: stakePool?.minStakingAmount && stakePool.minStakingAmount !== "0" && pool.tokenInDecimals != null
-                ? formatAmount(stakePool.minStakingAmount, pool.tokenInDecimals)
+                ? sciToFormatted(stakePool.minStakingAmount, pool.tokenInDecimals)
                 : "",
             maxStakingAmount: stakePool?.maxStakingAmount && stakePool.maxStakingAmount !== "0" && pool.tokenInDecimals != null
-                ? formatAmount(stakePool.maxStakingAmount, pool.tokenInDecimals)
+                ? sciToFormatted(stakePool.maxStakingAmount, pool.tokenInDecimals)
                 : "",
             stakingLimit: stakePool?.stakingLimit && stakePool.stakingLimit !== "0" && pool.tokenInDecimals != null
-                ? formatAmount(stakePool.stakingLimit, pool.tokenInDecimals)
+                ? sciToFormatted(stakePool.stakingLimit, pool.tokenInDecimals)
                 : "",
         });
     }, [pool?.address]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -187,7 +187,7 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
 
     const fmtCurrentAmt = (raw: string | null | undefined) => {
         if (!raw || raw === "0" || pool?.tokenInDecimals == null) return "Unlimited";
-        return formatAmount(raw, pool.tokenInDecimals);
+        return sciToFormatted(raw, pool.tokenInDecimals);
     };
 
     if (isLoading || !pool) return <div className="p-8">Loading...</div>;
@@ -590,9 +590,9 @@ export default function EditStakePoolScreen({ poolAddress }: { poolAddress: stri
                                                 gtZero: (v) =>
                                                     !v || Number(v) > 0 ? true : "Must be greater than 0",
                                                 gtMin: (v) => {
-                                                    const min = getValues("minStakingAmount");
-                                                    if (v && min && Number(v) <= Number(min))
-                                                        return "Must be greater than min staking amount";
+                                                    const max = Number(getValues("maxStakingAmount"));
+                                                    if (max > 0 && Number(v) < max)
+                                                        return "Staking limit must be \u2265 max staking amount";
                                                     return true;
                                                 },
                                                 decimals: (v) =>
