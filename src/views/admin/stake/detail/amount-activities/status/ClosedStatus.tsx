@@ -13,6 +13,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { useStakePoolComputedBalancesEvm } from "../hooks/useStakePoolComputedBalancesEvm";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -45,6 +46,7 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
         customSymbol: poolDetail?.tokenIn?.customSymbol,
         imageUri: poolDetail?.tokenIn?.imageUri,
     });
+    
     const rewardTokenDisplay = resolvePoolTokenDisplay({
         network: networkConfig,
         tokenAddress: poolDetail?.pool?.rewardToken,
@@ -58,23 +60,35 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
     const tokenInSymbolDisplay = stakingTokenDisplay.symbol;
     const rewardTokenSymbolDisplay = rewardTokenDisplay.symbol;
 
-    const onChainReward = vaultBalance?.rewardBalance;
-    const onChainDeposit = vaultBalance?.depositBalance;
     const refetchVaultBalance = vaultBalance?.refetch;
+    const computedEvmBalances = useStakePoolComputedBalancesEvm({
+        poolAddress: pool?.address,
+        chainId: pool?.chainId,
+        rewardToken: pool?.rewardToken,
+        tokenIn: pool?.tokenIn,
+        rewardTokenDecimals: pool?.rewardTokenDecimals,
+        tokenInDecimals: pool?.tokenInDecimals,
+        enabled: !isSolana,
+    });
 
     const formattedRewardAvailableBackend =
         pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
             ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
             : undefined;
     const formattedRewardAvailable =
-        onChainReward !== undefined ? onChainReward : formattedRewardAvailableBackend;
+        isSolana
+            ? (vaultBalance?.rewardBalance ?? formattedRewardAvailableBackend)
+            : computedEvmBalances.formattedCurrentRewardAmount;
 
     const formattedDepositAvailableBackend =
         poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
             ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
             : undefined;
+
     const formattedDepositAvailable =
-        onChainDeposit !== undefined ? onChainDeposit : formattedDepositAvailableBackend;
+        isSolana
+            ? (vaultBalance?.depositBalance ?? formattedDepositAvailableBackend)
+            : computedEvmBalances.formattedCurrentDepositAmount;
 
     const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
         if (!pool) return;
@@ -97,6 +111,7 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
         }
         invalidatePoolQueries(pool.address);
         refetchVaultBalance?.();
+        await computedEvmBalances.refetch();
     };
 
     return (
