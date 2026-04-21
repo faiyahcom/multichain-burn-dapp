@@ -13,6 +13,7 @@ import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
 import DepositRewardDialog from "../DepositRewardDialog";
+import { useStakePoolComputedBalancesEvm } from "../hooks/useStakePoolComputedBalancesEvm";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -55,23 +56,36 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
     });
     const tokenInSymbolDisplay = stakingTokenDisplay.symbol;
 
-    const onChainReward = vaultBalance?.rewardBalance;
-    const onChainDeposit = vaultBalance?.depositBalance;
     const refetchVaultBalance = vaultBalance?.refetch;
+    const computedEvmBalances = useStakePoolComputedBalancesEvm({
+        poolAddress: pool?.address,
+        chainId: pool?.chainId,
+        rewardToken: pool?.rewardToken,
+        tokenIn: pool?.tokenIn,
+        rewardTokenDecimals: pool?.rewardTokenDecimals,
+        tokenInDecimals: pool?.tokenInDecimals,
+        enabled: !isSolana,
+    });
 
     const formattedRewardAvailable =
-        onChainReward !== undefined
-            ? onChainReward
-            : pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
-              ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
-              : undefined;
+        isSolana
+            ? (
+                vaultBalance?.rewardBalance ??
+                (pool?.currentRewardAmount && pool?.rewardTokenDecimals !== undefined
+                    ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
+                    : undefined)
+            )
+            : computedEvmBalances.formattedCurrentRewardAmount;
 
     const formattedDepositAvailable =
-        onChainDeposit !== undefined
-            ? onChainDeposit
-            : poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
-              ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
-              : undefined;
+        isSolana
+            ? (
+                vaultBalance?.depositBalance ??
+                (poolDetail?.depositedAmount && pool?.tokenInDecimals !== undefined
+                    ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
+                    : undefined)
+            )
+            : computedEvmBalances.formattedCurrentDepositAmount;
 
     const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
         if (!pool) return;
@@ -94,6 +108,7 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
         }
         invalidatePoolQueries(pool.address);
         refetchVaultBalance?.();
+        await computedEvmBalances.refetch();
     };
 
     return (
