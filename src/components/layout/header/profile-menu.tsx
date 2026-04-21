@@ -22,6 +22,7 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { PROFILE_NAV_ITEMS } from "./glow/header-nav/const";
+import { PLACEHOLDER_AVATAR_URL } from "@/config/constant";
 
 type Props = {};
 

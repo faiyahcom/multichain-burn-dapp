@@ -147,7 +147,7 @@ const HeroSwapMiniForm = () => {
                     })
                 }
             >
-                Create Pool
+                Create Swap
             </Button>
         </div>
     );
