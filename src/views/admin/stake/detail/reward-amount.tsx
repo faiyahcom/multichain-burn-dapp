@@ -18,9 +18,8 @@ const fmt = (raw: string | undefined, decimals: number) =>
 const fmtFee = (fee: string | undefined) =>
     fee !== undefined ? `${Number(fee) / DECIMAL_FEE_PERCENT}%` : "-";
 
-const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
+const StakedRewardAmount = ({ poolDetail }: Props) => {
     const pool = poolDetail?.pool;
-    const status = (pool?.status ?? "draft") as string;
     const isSimple = false;
     const isMobile = useMediaQuery("(max-width: 640px)");
 
@@ -65,14 +64,14 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     const staking = poolDetail?.staking;
     const formattedTotalStaked = fmt(staking?.totalStaked, stakingDec);
     // API has a typo: "totatClaimed" (missing 'l')
-    const formattedClaimedReward = fmt(staking?.user?.totalClaimed, rewardDec);
+    const formattedClaimedReward = fmt(poolDetail?.claimedRewardAmount, rewardDec);
     // depositedRewards not in new API — fall back to pool rewardAmount
     const formattedDepositedRewards = fmt(pool?.rewardAmount, rewardDec);
 
     // Current vault balances (live)
-    const formattedRewardRemaining =
-        vaultBalance?.rewardBalance ?? fmt(pool?.currentRewardAmount, rewardDec);
+    const formattedRewardRemaining = fmt(pool?.currentRewardAmount, rewardDec);
 
+    const formattedRewardAccrued = fmt(poolDetail?.staking?.totalRewardAccrued, rewardDec);
     // Reward Deficit = Total Reward Amount - Total Claimed Rewards
     // Total Reward Amount: if reward token == staking token → deposited + staked; else → deposited
     // TH1: Reward Token == Stake Token → Total Reward Amount = totalStaked + rewardAmount (same decimals)
@@ -119,11 +118,21 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
         [
             {
                 label: "Total Reward Amount",
-                value: `${formattedTotalRewardAmount} ${rewardSymbol}`,
+                value: `${formattedTotalReward} ${rewardSymbol}`,
             },
             {
                 label: "Total Deposited Rewards",
                 value: `${formattedDepositedRewards} ${rewardSymbol}`,
+            },
+        ],
+        [
+            {
+                label: "Total Reward Accrued",
+                value: `${formattedRewardAccrued} ${rewardSymbol}`,
+            },
+            {
+                label: "Reward Deficit",
+                value: `${formattedRewardDeficit} ${rewardSymbol}`,
             },
         ],
         [
@@ -138,11 +147,7 @@ const StakedRewardAmount = ({ poolDetail, vaultBalance }: Props) => {
                     </span>
                 ),
             },
-            {
-                label: "Reward Deficit",
-                value: `${formattedRewardDeficit} ${rewardSymbol}`,
-            },
-        ],
+        ]
     ];
 
     return (
