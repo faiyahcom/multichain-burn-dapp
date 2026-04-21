@@ -216,7 +216,8 @@ const MyStakesTable = ({ poolDetail }: Props) => {
                           row.isUnstaked ||
                           isClosed ||
                           rowLoading != null ||
-                          Date.now() / 1000 < row.claimableDate
+                          Date.now() / 1000 < row.claimableDate ||
+                          Number(row.rewardAmount) === 0
                         }
                         isLoading={rowLoading === "claim"}
                         onClick={() => handleClaimReward(row.stakeId)}
