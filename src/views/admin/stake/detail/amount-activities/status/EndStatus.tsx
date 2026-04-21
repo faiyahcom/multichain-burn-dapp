@@ -87,12 +87,6 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
             )
             : computedEvmBalances.formattedCurrentDepositAmount;
 
-    // const handleDepositRewardAndRefetch = async (amount: string) => {
-    //     await handleDepositRewardWithAmount(amount);
-    //     refetchVaultBalance?.();
-    //     await computedEvmBalances.refetch();
-    // };
-
     const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
         if (!pool) return;
         if (isSolana) {
