@@ -127,7 +127,7 @@ const MyStakesTable = ({ poolDetail }: Props) => {
     "Duration",
     "Interest End Date",
     "Claimable Date",
-    `Reward Amount`,
+    `Claimable Amount`,
     "Action",
   ];
 
