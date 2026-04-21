@@ -2,7 +2,8 @@ import { useState, useMemo } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn } from "../components";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
-import { formatAmount } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
+import { formatAmount, safeDecimal } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenDisplay from "@/components/common/token-display";
@@ -215,7 +216,7 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
         const stakePool = poolDetail?.pool as any;
         if (!stakePool?.stakingLimit || stakePool.stakingLimit === "0") return false;
         try {
-            return BigInt(poolDetail?.staking?.totalStaked ?? "0") >= BigInt(stakePool.stakingLimit);
+            return safeDecimal(poolDetail?.staking?.totalStaked).gte(safeDecimal(stakePool.stakingLimit));
         } catch {
             return false;
         }

@@ -8,7 +8,8 @@ import GlowContainer from "@/components/common/glow/container";
 import CopyableText from "@/components/common/copyable-text";
 import { truncateString } from "@/utils/helpers/string";
 import { formatDuration } from "@/utils/helpers/timer";
-import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
+import { formatAmount, safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
 import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 import { cn } from "@/lib/utils";
 
@@ -70,10 +71,10 @@ const PoolOverview = ({ poolDetail }: Props) => {
         )
             return "Unlimited";
         try {
-            const limit = BigInt(stakePool.stakingLimit);
-            const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
-            const remaining = limit - staked;
-            return `${formatAmount((remaining >= 0n ? remaining : 0n).toString(), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+            const limit = safeDecimal(stakePool.stakingLimit);
+            const staked = safeDecimal(poolDetail?.staking?.totalStaked);
+            const remaining = limit.sub(staked);
+            return `${formatAmount(Decimal.max(0, remaining).toFixed(0, Decimal.ROUND_DOWN), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
         } catch {
             return "—";
         }

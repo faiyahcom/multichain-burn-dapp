@@ -24,6 +24,7 @@ import type { PoolDetailResponse } from "@/types/pool";
 import {
     formatAmount,
     safeDecimalParse,
+    safeBigInt,
     shortenNumber,
 } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -173,12 +174,12 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
         let min: bigint | null = null;
         let max: bigint | null = null;
         let remaining: bigint | null = null;
-        try { if (pool?.minStakingAmount) min = BigInt(pool.minStakingAmount); } catch { /* ignore */ }
-        try { if (pool?.maxStakingAmount) max = BigInt(pool.maxStakingAmount); } catch { /* ignore */ }
+        try { if (pool?.minStakingAmount) min = safeBigInt(pool.minStakingAmount); } catch { /* ignore */ }
+        try { if (pool?.maxStakingAmount) max = safeBigInt(pool.maxStakingAmount); } catch { /* ignore */ }
         if (pool?.stakingLimit && pool.stakingLimit !== "0") {
             try {
-                const limit = BigInt(pool.stakingLimit);
-                const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
+                const limit = safeBigInt(pool.stakingLimit);
+                const staked = safeBigInt(poolDetail?.staking?.totalStaked);
                 const r = limit - staked;
                 remaining = r >= 0n ? r : 0n;
             } catch { /* ignore */ }
