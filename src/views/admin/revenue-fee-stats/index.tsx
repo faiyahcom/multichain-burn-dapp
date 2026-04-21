@@ -54,7 +54,11 @@ const AdminRevenueFeeStats = () => {
   const kindsParam =
     activeTab === "creation"
       ? [feeTxnKind.createBurnPool, feeTxnKind.createSwapPool].join(",")
-      : [feeTxnKind.claimBurnReward, feeTxnKind.swap].join(",");
+      : [
+          feeTxnKind.claimBurnReward,
+          feeTxnKind.swap,
+          feeTxnKind.claimStakeReward,
+        ].join(",");
 
   const statsParams = { chainId, from: fromParam, to: toParam };
   const listParams = {
