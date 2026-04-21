@@ -28,7 +28,7 @@ export interface GetFeeListRequest {
     chainId: string;
     from?: string;
     to?: string;
-    kinds?: string; // string arrays split by comma, e.g. "1,2" for creation fees, "3,4" for settlement fees
+    kinds?: string; // string arrays split by comma, e.g. "1,2" for creation fees, "3,4,5" for settlement fees
 }
 
 export interface GetStatsRequest {
@@ -62,7 +62,8 @@ export const feeTxnKind = {
     createBurnPool: 1, // creation fee
     createSwapPool: 2, // creation fee
     claimBurnReward: 3, // settlement fee
-    swap: 4 // settlement fee
+    swap: 4, // settlement fee
+    claimStakeReward: 5, // settlement fee
 } as const
 
 // ─── Service ──────────────────────────────────────────────────────────────────
