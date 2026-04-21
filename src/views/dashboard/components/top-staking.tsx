@@ -1,6 +1,5 @@
 import GlowContainer from "@/components/common/glow/container";
 import {
-    IconStakeCategory,
     IconStakeComingSoon,
     IconTop1,
     IconTop2,
@@ -67,11 +66,12 @@ const StakePoolCard = ({ pool, rank }: { pool: TopStakingPool; rank: number }) =
 
             <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-1 p-1.5 text-center font-inter sm:gap-0 sm:px-1 sm:py-1.5 2xl:gap-1 2xl:px-2 2xl:py-2">
                 {/* Rank + name */}
-                <div className="relative flex w-full items-center justify-center">
-                    <div className="absolute left-1">{RANK_ICONS[rank] ?? null}</div>
-                    <p className="text-xs font-semibold sm:text-tiny 2xl:text-xs truncate max-w-[80%]">
+                <div className="relative flex w-full items-center justify-between gap-1 px-1">
+                    <div className="w-4 shrink-0">{RANK_ICONS[rank] ?? null}</div>
+                    <p className="text-xs font-semibold sm:text-tiny 2xl:text-xs flex-1 truncate min-w-0">
                         {pool.name || pool.tokenInSymbol}
                     </p>
+                    <div className="w-4 min-w-0 shrink" />
                 </div>
 
                 {/* Staked amount */}
