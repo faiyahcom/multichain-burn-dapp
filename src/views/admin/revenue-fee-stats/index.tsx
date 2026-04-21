@@ -6,7 +6,6 @@ import {
   chainIdToNetworkConfig,
   NETWORK_CONFIGS,
   networkIdToChainId,
-  type nativeCurrency,
 } from "@/config/networks";
 import { useNativePrices } from "@/hooks/useNativePrices";
 import { feeService, feeTxnKind } from "@/services/feeService";
@@ -280,6 +279,7 @@ const AdminRevenueFeeStats = () => {
         listRows={feeRows}
         chainId={chainId}
         onClose={() => setDialogType(null)}
+        networkId={networkId}
       />
     </div>
   );
