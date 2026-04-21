@@ -75,7 +75,7 @@ const MyStakesTable = ({ poolDetail }: Props) => {
     queryFn: () =>
       poolService.getMyStakes(poolAddress || "", page, DEFAULT_PAGE_SIZE),
     enabled: !!poolAddress,
-    refetchInterval: 5_000,
+    refetchInterval: 2_500,
   });
 
   const invalidatePool = () => {
