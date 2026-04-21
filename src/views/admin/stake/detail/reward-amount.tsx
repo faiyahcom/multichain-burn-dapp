@@ -85,17 +85,18 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
     let formattedTotalRewardAmount = "0";
     let formattedRewardDeficit = "0";
     try {
-        const deposited = safeDecimal(pool?.rewardAmount);
+        const totalReward = safeDecimal(pool?.rewardAmount);
         const totalStaked = safeDecimal(staking?.totalStaked);
         const claimed = safeDecimal(staking?.user?.totalClaimed);
+        const settlementFeeTotal = safeDecimal(pool?.settlementFeeTotal); 
         const totalRewardAmount = isSameToken
-            ? deposited.add(totalStaked)
-            : deposited;
+            ? totalReward.sub(totalStaked)
+            : totalReward;
         formattedTotalRewardAmount = formatAmount(
             totalRewardAmount.toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
         );
-        const deficit = totalRewardAmount.sub(claimed);
+        const deficit = totalRewardAmount.sub(claimed).sub(settlementFeeTotal);
         formattedRewardDeficit = formatAmount(
             Decimal.max(0, deficit).toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
