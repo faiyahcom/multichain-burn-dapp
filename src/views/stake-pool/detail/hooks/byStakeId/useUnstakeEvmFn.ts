@@ -3,7 +3,9 @@ import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { getContractStakeFactory } from "@/web3/contracts/multichainBurnContractEVM";
-import { getErrorMessage } from "@/utils/helpers/error-message";
+
+const UNSTAKE_ERROR_MESSAGE =
+  "Failed to unstake your token. Please try again.";
 
 export const useUnstakeEvmFn = () => {
     const { isConnected } = useAppKitAccount();
@@ -30,10 +32,8 @@ export const useUnstakeEvmFn = () => {
                 });
 
                 return receipt.hash;
-            } catch (error: any) {
-                toast.error("Failed to unstake", {
-                    description: getErrorMessage({ error }),
-                });
+            } catch (error: unknown) {
+                toast.error(UNSTAKE_ERROR_MESSAGE);
                 throw error;
             }
         },

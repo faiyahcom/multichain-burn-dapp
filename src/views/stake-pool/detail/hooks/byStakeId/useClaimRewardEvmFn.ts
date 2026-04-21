@@ -3,7 +3,9 @@ import { toast } from "@/components/common/custom-toast";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { getContractStakeFactory } from "@/web3/contracts/multichainBurnContractEVM";
-import { getErrorMessage } from "@/utils/helpers/error-message";
+
+const CLAIM_REWARD_ERROR_MESSAGE =
+  "Failed to claim your reward. Please try again.";
 
 export const useClaimRewardEvmFn = () => {
     const { isConnected } = useAppKitAccount();
@@ -30,10 +32,8 @@ export const useClaimRewardEvmFn = () => {
                 });
 
                 return receipt.hash;
-            } catch (error: any) {
-                toast.error("Failed to claim reward", {
-                    description: getErrorMessage({ error }),
-                });
+            } catch (error: unknown) {
+                toast.error(CLAIM_REWARD_ERROR_MESSAGE);
                 throw error;
             }
         },
