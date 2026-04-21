@@ -197,8 +197,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Claim reward, Unstake
-  if ([31, 34].includes(kind)) {
+  // Claim reward (burn & stake), Unstake & Claim
+  if ([31, 35, 34].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountOut}
