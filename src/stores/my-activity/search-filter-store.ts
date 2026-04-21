@@ -1,10 +1,10 @@
-import { myActivityActions, type ActivityKindKey } from "@/types/pool";
+import { myActivityActions, type ActivityKeyList } from "@/types/pool";
 import { create } from "zustand";
 
 type MyActivitySearchFilterType = {
   page: number;
   text?: string;
-  activityKind?: ActivityKindKey[];
+  activityKind?: ActivityKeyList[];
 };
 
 type MyActivitySearchFilterState = {
@@ -17,9 +17,7 @@ export const useMyActivitySearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      activityKind: Object.keys(myActivityActions).map(
-        (key) => Number(key) as ActivityKindKey,
-      ),
+      activityKind: [...myActivityActions],
     },
     setFilter: (filter) =>
       set((state) => ({

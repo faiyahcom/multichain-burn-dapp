@@ -198,7 +198,7 @@ export const activityKind = {
 
   // User actions
   30: "Deposit burn token",
-  31: "Claim reward",
+  31: "Claim Burn reward",
   32: "Swap",
   33: "Stake",
   34: "Unstake & Claim",
@@ -289,20 +289,38 @@ export const getActivityKindLabel = (kind: ActivityKindKey) => {
   return activityKind[kind];
 };
 
-type ActivityKind = typeof activityKind;
+type ActivityKindKeyStr = `${ActivityKindKey}`;
 
-export function pickActivityKind<K extends keyof ActivityKind>(
-  keys: K[],
-): Pick<ActivityKind, K> {
-  return Object.fromEntries(keys.map((k) => [k, activityKind[k]])) as Pick<
-    ActivityKind,
-    K
-  >;
-}
+export type ActivityKeyList =
+  | ActivityKindKeyStr
+  | `${ActivityKindKeyStr},${ActivityKindKeyStr}`;
 
-export const myActivityActions = pickActivityKind([
-  1, 0, 10, 32, 30, 31, 5, 33, 34,
-]);
+export const myActivityActions = [
+  "1",
+  "0",
+  "10",
+  "32",
+  "30",
+  "31,35", // both claim burn and claim stake
+  "5",
+  "33",
+  "34",
+] as const satisfies ReadonlyArray<ActivityKeyList>;
+export type MyActivityAction = (typeof myActivityActions)[number];
+export const myActivityActionLabels: Record<MyActivityAction, string> = {
+  "1": "Create swap pool",
+  "0": "Create burn pool",
+  "10": "Deposit reward token",
+  "32": "Swap",
+  "30": "Deposit burn token",
+  "31,35": "Claim reward",
+  "5": "Cancel pool",
+  "33": "Stake",
+  "34": "Unstake & Claim",
+};
+export const getMyActivityActionLabel = (kind: MyActivityAction) => {
+  return myActivityActionLabels[kind];
+};
 
 export interface PoolActivitiesResponse {
   page: number;
