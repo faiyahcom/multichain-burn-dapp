@@ -88,6 +88,7 @@ export interface PoolDetailResponse {
     poolCreationFee: string;
     isPartner?: boolean;
     settlementRetryCount?: number;
+    lowRewardNotiEnabled?: boolean;
     // Staking pool fields
     apr?: string;
     lockUpDuration?: string;

@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import type { PoolDetailResponse } from "@/types/pool";
-import { ActionBtn, AmountInput } from "../components";
+import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
 import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
 import { formatAmount } from "@/utils/helpers/numbers";
@@ -12,6 +12,7 @@ import { AssetTypeEnum } from "@/web3/helpers";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
+import DepositRewardDialog from "../DepositRewardDialog";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -23,9 +24,7 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
         pool,
         depositRewardOpen,
         setDepositRewardOpen,
-        depositRewardInput,
-        setDepositRewardInput,
-        handleDepositReward,
+        handleDepositRewardWithAmount,
         transferDialogOpen,
         setTransferDialogOpen,
         invalidatePoolQueries,
@@ -103,14 +102,14 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
                 letter="D"
                 text="Deposit Reward"
                 color="#FFC198"
-                onClick={() => setDepositRewardOpen((o) => !o)}
+                onClick={() => setDepositRewardOpen(true)}
             />
-            <AmountInput
+            <DepositRewardDialog
                 open={depositRewardOpen}
-                value={depositRewardInput}
-                onChange={setDepositRewardInput}
-                onConfirm={handleDepositReward}
-                placeholder={`Amount (${rewardTokenSymbolDisplay})`}
+                onOpenChange={setDepositRewardOpen}
+                poolDetail={poolDetail}
+                vaultBalance={vaultBalance}
+                onConfirm={handleDepositRewardWithAmount}
             />
             <ActionBtn
                 letter="T"

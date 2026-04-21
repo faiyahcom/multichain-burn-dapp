@@ -10,6 +10,7 @@ import ScanLink from "@/components/common/scan-link";
 import { useOnChainVaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { StartsInCountdown, EndsInCountdown } from "@/components/shared/countdown";
+import LowRewardNotiSwitch from "@/views/admin/master-pool-management/low-reward-noti-switch";
 
 type Props = {
     address: string;

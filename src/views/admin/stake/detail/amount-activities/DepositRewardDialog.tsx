@@ -33,7 +33,13 @@ import { formatUnits } from "viem";
 // ─── Duration helper ─────────────────────────────────────────────────────────
 
 function formatDuration(seconds: number | undefined | null): string {
-    if (seconds === undefined || seconds === null || !isFinite(seconds) || seconds < 0) return "—";
+    if (
+        seconds === undefined ||
+        seconds === null ||
+        !isFinite(seconds) ||
+        seconds < 0
+    )
+        return "—";
     if (seconds === 0) return "0";
     if (seconds >= 9_007_199_254_740_991) return "Infinite";
     const days = Math.floor(seconds / 86400);
@@ -48,7 +54,13 @@ function formatDuration(seconds: number | undefined | null): string {
 
 // ─── Summary row ─────────────────────────────────────────────────────────────
 
-const SummaryRow = ({ label, value }: { label: string; value: React.ReactNode }) => (
+const SummaryRow = ({
+    label,
+    value,
+}: {
+    label: string;
+    value: React.ReactNode;
+}) => (
     <div className="flex items-center justify-between px-6 py-4">
         <div className="text-base text-secondary-text">{label}</div>
         <div>
@@ -101,7 +113,13 @@ type Props = {
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
-const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onConfirm }: Props) => {
+const DepositRewardDialog = ({
+    open,
+    onOpenChange,
+    poolDetail,
+    vaultBalance,
+    onConfirm,
+}: Props) => {
     const pool = poolDetail?.pool;
     const stakePool = pool;
 
@@ -134,7 +152,9 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
 
     const amountStr = watch("amount");
 
-    const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+    const network = pool?.chainId
+        ? chainIdToNetworkConfig(pool.chainId)
+        : undefined;
 
     const stakingTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -157,26 +177,34 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
 
     const isNativeReward = pool?.assetTypeReward === AssetTypeEnum.NATIVE;
     const rewardSymbol = isNativeReward
-        ? (network?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
+        ? (network?.appKitNetwork.nativeCurrency.symbol ??
+            pool?.rewardTokenSymbol ??
+            "")
         : rewardTokenDisplay.symbol;
 
-    const aprDisplay = stakePool?.apr !== undefined
-        ? `${(Number(stakePool.apr) / 100).toFixed(2)}%`
-        : "—";
+    const aprDisplay =
+        stakePool?.apr !== undefined
+            ? `${(Number(stakePool.apr) / 100).toFixed(2)}%`
+            : "—";
 
     const currentRewardFormatted = useMemo(() => {
         if (!pool) return "-";
-        const raw = vaultBalance?.rewardBalance ?? (() => {
-            const raw = Number(pool.currentRewardAmount) / Math.pow(10, pool.rewardTokenDecimals);
-            return `${shortenNumber({ number: raw })} ${rewardSymbol}`;
-        })();
+        const raw = shortenNumber({
+            number: Number(
+                formatUnits(
+                    BigInt(pool.currentRewardAmount.toString()),
+                    pool.rewardTokenDecimals,
+                ) ?? 0,
+            ),
+        });
         return typeof raw === "string"
             ? `${raw} ${rewardSymbol}`
             : `${raw} ${rewardSymbol}`;
     }, [pool, vaultBalance, rewardSymbol]);
 
     const insufficientBalance = useMemo(() => {
-        if (!amountStr || !rewardBalanceFormatted || isLoadingRewardBalance) return undefined;
+        if (!amountStr || !rewardBalanceFormatted || isLoadingRewardBalance)
+            return undefined;
         const a = safeDecimalParse({ value: amountStr });
         const b = safeDecimalParse({ value: rewardBalanceFormatted });
         if (!a || !b) return undefined;
@@ -187,12 +215,19 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
     const handleSelectPercent = (percent: number) => {
         if (!rewardBalanceFormatted || pool?.rewardTokenDecimals == null) return;
         try {
-            const balBN = new BN(toBaseUnits(rewardBalanceFormatted, pool.rewardTokenDecimals));
+            const balBN = new BN(
+                toBaseUnits(rewardBalanceFormatted, pool.rewardTokenDecimals),
+            );
             if (balBN.isZero()) return;
             const amtBN = percent === 100 ? balBN : balBN.muln(percent).divn(100);
-            const formatted = formatUnits(BigInt(amtBN.toString()), pool.rewardTokenDecimals);
+            const formatted = formatUnits(
+                BigInt(amtBN.toString()),
+                pool.rewardTokenDecimals,
+            );
             const [int, dec] = formatted.split(".");
-            setValue("amount", dec ? `${int}.${dec.slice(0, 6)}` : int, { shouldValidate: true });
+            setValue("amount", dec ? `${int}.${dec.slice(0, 6)}` : int, {
+                shouldValidate: true,
+            });
         } catch {
             /* ignore */
         }
@@ -231,24 +266,28 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                             <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l-4 [&>*:nth-child(even)]:border-inactive [&>*:nth-child(n+3)]:border-t-4 [&>*:nth-child(n+3)]:border-inactive">
                                 <SummaryRow
                                     label="Pool Name"
-                                    value={!pool ? <Skeleton className="h-5 w-28" /> : (pool.name ?? "—")}
+                                    value={
+                                        !pool ? (
+                                            <Skeleton className="h-5 w-28" />
+                                        ) : (
+                                            (pool.name ?? "—")
+                                        )
+                                    }
                                 />
                                 <SummaryRow
                                     label="Interest Accrual Duration:"
                                     value={
                                         !pool ? (
                                             <Skeleton className="h-5 w-24" />
-                                        ) : !stakePool?.interestAccrualDuration || stakePool?.interestAccrualDuration === "0" ? (
+                                        ) : !stakePool?.interestAccrualDuration ||
+                                            stakePool?.interestAccrualDuration === "0" ? (
                                             "Unlimited"
                                         ) : (
                                             formatDuration(Number(stakePool?.interestAccrualDuration))
                                         )
                                     }
                                 />
-                                <SummaryRow
-                                    label="Pool Type:"
-                                    value="Staking Pool"
-                                />
+                                <SummaryRow label="Pool Type:" value="Staking Pool" />
                                 <SummaryRow
                                     label="Claim Start Delay:"
                                     value={
@@ -272,7 +311,7 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                             <span className="flex items-center gap-2 font-semibold">
                                                 <NetworkIcon
                                                     networkId={network?.id || ("" as NetworkId)}
-                                                    classNames={{ icon: "size-5" }}
+                                                    className="size-5"
                                                 />
                                                 {network?.label ?? "—"}
                                             </span>
@@ -299,7 +338,11 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                                 <TokenImage
                                                     src={stakingTokenDisplay.imageUri}
                                                     alt={stakingTokenDisplay.symbol}
-                                                    classNames={{ common: "size-5", img: "size-5", placeholder: "size-5" }}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
                                                 />
                                                 {stakingTokenDisplay.symbol}
                                             </span>
@@ -327,7 +370,11 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                                 <TokenImage
                                                     src={rewardTokenDisplay.imageUri}
                                                     alt={rewardTokenDisplay.symbol}
-                                                    classNames={{ common: "size-5", img: "size-5", placeholder: "size-5" }}
+                                                    classNames={{
+                                                        common: "size-5",
+                                                        img: "size-5",
+                                                        placeholder: "size-5",
+                                                    }}
                                                 />
                                                 {rewardSymbol}
                                             </span>
@@ -367,9 +414,8 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                 </div>
 
                                 <div
-                                    className={`relative flex items-center ${
-                                        errors.amount ? "ring-1 ring-destructive" : ""
-                                    }`}
+                                    className={`relative flex items-center ${errors.amount ? "ring-1 ring-destructive" : ""
+                                        }`}
                                 >
                                     <Input
                                         {...register("amount")}
@@ -382,17 +428,25 @@ const DepositRewardDialog = ({ open, onOpenChange, poolDetail, vaultBalance, onC
                                         <TokenImage
                                             src={rewardTokenDisplay.imageUri}
                                             alt={rewardTokenDisplay.symbol}
-                                            classNames={{ common: "size-5", img: "size-5", placeholder: "size-5" }}
+                                            classNames={{
+                                                common: "size-5",
+                                                img: "size-5",
+                                                placeholder: "size-5",
+                                            }}
                                         />
                                         <span>{rewardSymbol}</span>
                                     </div>
                                 </div>
 
                                 {errors.amount && (
-                                    <p className="text-xs text-destructive">{errors.amount.message}</p>
+                                    <p className="text-xs text-destructive">
+                                        {errors.amount.message}
+                                    </p>
                                 )}
                                 {insufficientBalance && (
-                                    <p className="text-xs text-destructive">{insufficientBalance}</p>
+                                    <p className="text-xs text-destructive">
+                                        {insufficientBalance}
+                                    </p>
                                 )}
 
                                 <div className="flex gap-2">

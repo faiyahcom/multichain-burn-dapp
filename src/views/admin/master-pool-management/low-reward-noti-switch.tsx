@@ -13,6 +13,7 @@ interface Props {
   classNames?: {
     btn?: string;
   };
+  onSuccess?: () => void;
 }
 
 const LowRewardNotiSwitch: React.FC<Props> = ({
@@ -20,6 +21,7 @@ const LowRewardNotiSwitch: React.FC<Props> = ({
   chainId,
   isLowRewardNotiEnabled,
   classNames,
+  onSuccess,
 }) => {
   const queryClient = useQueryClient();
 
@@ -37,6 +39,7 @@ const LowRewardNotiSwitch: React.FC<Props> = ({
         queryKey: poolQueryKeys.list().filter(Boolean),
         exact: false,
       });
+      onSuccess?.();
       toast.success(
         `Low reward notification ${data.enabled ? "enabled" : "disabled"}`,
       );
