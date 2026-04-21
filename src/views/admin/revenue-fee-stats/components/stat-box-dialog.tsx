@@ -12,6 +12,8 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import type { GetFeeStatsResponse } from "@/services/feeService";
 import type { FeeRow } from "./fee-table";
 import TokenDisplay from "@/components/common/token-display";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { NETWORK_CONFIGS } from "@/config/networks";
 
 export type TabType = "creation" | "settlement";
 
@@ -35,6 +37,7 @@ export interface StatBoxDialogProps {
   listRows: FeeRow[];
   chainId: string;
   onClose: () => void;
+  networkId?: string;
 }
 
 const StatBoxDialog = ({
@@ -43,7 +46,9 @@ const StatBoxDialog = ({
   listRows,
   chainId,
   onClose,
+  networkId,
 }: StatBoxDialogProps) => {
+  const networkConfig = NETWORK_CONFIGS.find((n) => n.id === networkId);
   const meta = type ? STAT_DIALOG_META[type] : null;
 
   const creationBreakdown = useMemo(() => {
@@ -145,25 +150,37 @@ const StatBoxDialog = ({
                   No data available
                 </p>
               ) : (
-                settlementBreakdown.map((item) => (
-                  <div
-                    key={item.token_address}
-                    className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-15px"
-                  >
-                    <div className="flex items-center justify-center gap-2">
-                      <TokenDisplay
-                        symbol={item.custom_symbol ?? item.symbol}
-                        imageUri={item.image_uri ?? undefined}
-                        classNames={{
-                          img: "size-5 rounded-full object-cover",
-                        }}
-                        hasSymbol={false}
-                      />
-                      <span>{item.custom_symbol ?? item.symbol}</span>
+                settlementBreakdown.map((item) => {
+                  const tokenDisplay = resolvePoolTokenDisplay({
+                    network: networkConfig,
+                    tokenAddress: item.token_address,
+                    tokenSymbol: item.custom_symbol ?? item.symbol,
+                    tokenName: item.custom_name ?? undefined,
+                    customName: item.custom_name ?? undefined,
+                    customSymbol: item.custom_symbol ?? undefined,
+                    imageUri: item.image_uri ?? undefined,
+                  });
+
+                  return (
+                    <div
+                      key={item.token_address}
+                      className="grid grid-cols-2 rounded-5px bg-inactive/50 py-1.75 *:text-center *:text-15px"
+                    >
+                      <div className="flex items-center justify-center gap-2">
+                        <TokenDisplay
+                          symbol={tokenDisplay.symbol}
+                          imageUri={tokenDisplay.imageUri}
+                          classNames={{
+                            img: "size-5 rounded-full object-cover",
+                          }}
+                          hasSymbol={false}
+                        />
+                        <span>{tokenDisplay.symbol}</span>
+                      </div>
+                      <div>{formatAmount(item.amount, item.decimals)}</div>
                     </div>
-                    <div>{formatAmount(item.amount, item.decimals)}</div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             {settlementBreakdown.length > 0 && (
