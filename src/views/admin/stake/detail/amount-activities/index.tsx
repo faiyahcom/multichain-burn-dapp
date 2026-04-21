@@ -24,7 +24,7 @@ const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
         switch (status) {
             case "draft":
                 return (
-                    <DraftStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />
+                    <DraftStatus poolDetail={poolDetail} />
                 );
 
             case "pending":
@@ -33,12 +33,12 @@ const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
 
             case "upcoming":
                 return (
-                    <UpcomingStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />
+                    <UpcomingStatus poolDetail={poolDetail} />
                 );
 
             case "on_going":
                 return (
-                    <LiveStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />
+                    <LiveStatus poolDetail={poolDetail} />
                 );
 
             case "ended":

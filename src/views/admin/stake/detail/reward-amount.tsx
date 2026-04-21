@@ -1,4 +1,5 @@
-import { formatAmount } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
+import { formatAmount, safeDecimal } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { VaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
@@ -84,19 +85,19 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
     let formattedTotalRewardAmount = "0";
     let formattedRewardDeficit = "0";
     try {
-        const depositedRaw = BigInt(pool?.rewardAmount ?? "0");
-        const totalStakedRaw = BigInt(staking?.totalStaked ?? "0");
-        const claimedRaw = BigInt(staking?.user?.totalClaimed ?? "0");
-        const totalRewardAmountRaw = isSameToken
-            ? depositedRaw + totalStakedRaw
-            : depositedRaw;
+        const deposited = safeDecimal(pool?.rewardAmount);
+        const totalStaked = safeDecimal(staking?.totalStaked);
+        const claimed = safeDecimal(staking?.user?.totalClaimed);
+        const totalRewardAmount = isSameToken
+            ? deposited.add(totalStaked)
+            : deposited;
         formattedTotalRewardAmount = formatAmount(
-            totalRewardAmountRaw.toString(),
+            totalRewardAmount.toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
         );
-        const deficitRaw = totalRewardAmountRaw - claimedRaw;
+        const deficit = totalRewardAmount.sub(claimed);
         formattedRewardDeficit = formatAmount(
-            (deficitRaw > 0n ? deficitRaw : 0n).toString(),
+            Decimal.max(0, deficit).toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
         );
     } catch {

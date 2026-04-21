@@ -8,7 +8,8 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "usehooks-ts";
-import { formatAmount } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
+import { formatAmount, safeDecimal } from "@/utils/helpers/numbers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -69,10 +70,10 @@ const PoolOverview = ({ poolDetail }: Props) => {
         if (!pool?.stakingLimit || pool.stakingLimit === "0") return "Unlimited";
         if (pool.tokenInDecimals == null) return "Unlimited";
         try {
-            const limit = BigInt(pool.stakingLimit);
-            const staked = BigInt(poolDetail?.staking?.totalStaked ?? "0");
-            const remaining = limit - staked;
-            return `${formatAmount((remaining >= 0n ? remaining : 0n).toString(), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
+            const limit = safeDecimal(pool.stakingLimit);
+            const staked = safeDecimal(poolDetail?.staking?.totalStaked);
+            const remaining = limit.sub(staked);
+            return `${formatAmount(Decimal.max(0, remaining).toFixed(0, Decimal.ROUND_DOWN), pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
         } catch {
             return "Unlimited";
         }

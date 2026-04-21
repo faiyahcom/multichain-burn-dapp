@@ -20,10 +20,11 @@ import {
     toBaseUnits,
     shortenNumber,
     safeDecimalParse,
+    safeDecimal,
 } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
 import { AssetTypeEnum } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
-import type { VaultBalance } from "./hooks/useOnChainVaultBalance";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
@@ -107,7 +108,6 @@ type Props = {
     open: boolean;
     onOpenChange: (open: boolean) => void;
     poolDetail?: PoolDetailResponse;
-    vaultBalance?: VaultBalance;
     onConfirm: (amount: string) => Promise<void>;
 };
 
@@ -117,7 +117,6 @@ const DepositRewardDialog = ({
     open,
     onOpenChange,
     poolDetail,
-    vaultBalance,
     onConfirm,
 }: Props) => {
     const pool = poolDetail?.pool;
@@ -190,17 +189,12 @@ const DepositRewardDialog = ({
     const currentRewardFormatted = useMemo(() => {
         if (!pool) return "-";
         const raw = shortenNumber({
-            number: Number(
-                formatUnits(
-                    BigInt(pool.currentRewardAmount.toString()),
-                    pool.rewardTokenDecimals,
-                ) ?? 0,
-            ),
+            number: safeDecimal(pool.currentRewardAmount)
+                .div(new Decimal(10).pow(pool.rewardTokenDecimals ?? 0))
+                .toNumber(),
         });
-        return typeof raw === "string"
-            ? `${raw} ${rewardSymbol}`
-            : `${raw} ${rewardSymbol}`;
-    }, [pool, vaultBalance, rewardSymbol]);
+        return `${raw} ${rewardSymbol}`;
+    }, [pool, rewardSymbol]);
 
     const insufficientBalance = useMemo(() => {
         if (!amountStr || !rewardBalanceFormatted || isLoadingRewardBalance)

@@ -4,15 +4,13 @@ import { ActionBtn } from "../components";
 import { useAmountActivity } from "../use-amount-activity";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import DepositRewardDialog from "../DepositRewardDialog";
-import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
 import ClosePoolDialog from "@/components/shared/close-pool-dialog";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
-    vaultBalance?: VaultBalance;
 };
 
-const LiveStatus = ({ poolDetail, vaultBalance }: Props) => {
+const LiveStatus = ({ poolDetail }: Props) => {
     const {
         depositRewardOpen,
         setDepositRewardOpen,
@@ -40,7 +38,6 @@ const LiveStatus = ({ poolDetail, vaultBalance }: Props) => {
                 open={depositRewardOpen}
                 onOpenChange={setDepositRewardOpen}
                 poolDetail={poolDetail}
-                vaultBalance={vaultBalance}
                 onConfirm={handleDepositRewardWithAmount}
             />
             <ClosePoolDialog

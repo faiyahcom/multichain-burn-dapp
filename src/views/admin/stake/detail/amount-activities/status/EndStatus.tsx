@@ -123,7 +123,6 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
                 open={depositRewardOpen}
                 onOpenChange={setDepositRewardOpen}
                 poolDetail={poolDetail}
-                vaultBalance={vaultBalance}
                 onConfirm={handleDepositRewardWithAmount}
             />
             <ActionBtn
