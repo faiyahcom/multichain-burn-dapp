@@ -46,8 +46,7 @@ const CreateStakePoolForm = () => {
 
   const { createPool: createPoolSol, submitPool: submitPoolSol } =
     useCreateStakePoolSolFn();
-  const { createPool: createPoolEvm } =
-    useCreateStakePoolEvmFn();
+  const { createPool: createPoolEvm } = useCreateStakePoolEvmFn();
   const submitActionRef = useRef<"draft" | "submit">("draft");
   const inFlightRef = useRef(false);
   const submitAttemptedRef = useRef(false);
@@ -189,7 +188,9 @@ const CreateStakePoolForm = () => {
           {...register("poolName", {
             validate: {
               required: (v) =>
-                !submitAttemptedRef.current || v.trim().length > 0 ? true : "Pool name is required",
+                !submitAttemptedRef.current || v.trim().length > 0
+                  ? true
+                  : "Pool name is required",
               minLength: (v) =>
                 !v.trim() || v.trim().length >= 3
                   ? true
@@ -229,7 +230,10 @@ const CreateStakePoolForm = () => {
               type="hidden"
               {...register("startTime", {
                 validate: (v) => {
-                  if (!v) return submitAttemptedRef.current ? "Start time is required" : true;
+                  if (!v)
+                    return submitAttemptedRef.current
+                      ? "Start time is required"
+                      : true;
                   if (v <= new Date())
                     return "Start time must be in the future";
                   if (endTime && v >= endTime)
@@ -263,7 +267,10 @@ const CreateStakePoolForm = () => {
               type="hidden"
               {...register("endTime", {
                 validate: (v) => {
-                  if (!v) return submitAttemptedRef.current ? "End time is required" : true;
+                  if (!v)
+                    return submitAttemptedRef.current
+                      ? "End time is required"
+                      : true;
                   if (v <= new Date()) return "End time must be in the future";
                   if (startTime && v <= startTime)
                     return "End time must be after start time";
@@ -302,7 +309,9 @@ const CreateStakePoolForm = () => {
             type="hidden"
             {...register("stakingToken", {
               validate: (v) =>
-                !submitAttemptedRef.current || !!v ? true : "Staking token is required",
+                !submitAttemptedRef.current || !!v
+                  ? true
+                  : "Staking token is required",
             })}
           />
           <p className="text-[11px]">Select from whitelist tokens only</p>
@@ -325,12 +334,15 @@ const CreateStakePoolForm = () => {
                 placeholder="0"
                 aria-invalid={!!errors.minStakingAmount}
                 {...register("minStakingAmount", {
-                  validate: {
-                    gte0: (v) => !v || Number(v) >= 0 ? true : "Must be ≥ 0",
-                    decimals: (v) =>
-                      !v || !v.includes(".") || v.split(".")[1].length <= 6
-                        ? true
-                        : "Max 6 decimal places allowed",
+                  validate: (v) => {
+                    if (!v || v === "") return true;
+                    const max = Number(getValues("maxStakingAmount"));
+                    if (max && max > 0 && Number(v) > max)
+                      return "Min staking amount must be \u2264 max staking amount";
+                    if (Number(v) < 0) return "Must be ≥ 0";
+                    if (v.includes(".") && v.split(".")[1].length > 6)
+                      return "Max 6 decimal places allowed";
+                    return true;
                   },
                 })}
               />
@@ -368,29 +380,18 @@ const CreateStakePoolForm = () => {
                 placeholder="0"
                 aria-invalid={!!errors.maxStakingAmount}
                 {...register("maxStakingAmount", {
-                  validate: {
-                    gte0: (v) => {
-                      if (v && Number(v) < 0) return "Must be \u2265 0";
-                      return true;
-                    },
-                    gtZero: (v) =>
-                      !v || Number(v) > 0 ? true : "Must be greater than 0",
-                    gtMin: (v) => {
-                      const min = getValues("minStakingAmount");
-                      if (v && min && Number(v) < Number(min))
-                        return "Must be greater than or equal to min staking amount";
-                      return true;
-                    },
-                    lteLimit: (v) => {
-                      const limit = Number(getValues("stakingLimit"));
-                      if (v && limit > 0 && Number(v) > limit)
-                        return "Max staking amount must be \u2264 staking limit";
-                      return true;
-                    },
-                    decimals: (v) =>
-                      !v || !v.includes(".") || v.split(".")[1].length <= 6
-                        ? true
-                        : "Max 6 decimal places allowed",
+                  validate: (v) => {
+                    if (!v || v === "") return true;
+                    if (Number(v) <= 0) return "Must be greater than 0";
+                    const min = getValues("minStakingAmount");
+                    if (min && Number(v) < Number(min))
+                      return "Must be greater than or equal to min staking amount";
+                    const limit = Number(getValues("stakingLimit"));
+                    if (limit > 0 && Number(v) > limit)
+                      return "Max staking amount must be \u2264 staking limit";
+                    if (v.includes(".") && v.split(".")[1].length > 6)
+                      return "Max 6 decimal places allowed";
+                    return true;
                   },
                 })}
               />
@@ -430,19 +431,15 @@ const CreateStakePoolForm = () => {
             placeholder="0"
             aria-invalid={!!errors.stakingLimit}
             {...register("stakingLimit", {
-              validate: {
-                gtZero: (v) =>
-                  !v || Number(v) > 0 ? true : "Staking limit must be > 0",
-                gteMax: (v) => {
-                  const max = Number(getValues("maxStakingAmount"));
-                  if (max > 0 && Number(v) < max)
-                    return "Staking limit must be \u2265 max staking amount";
-                  return true;
-                },
-                decimals: (v) =>
-                  !v || !v.includes(".") || v.split(".")[1].length <= 6
-                    ? true
-                    : "Max 6 decimal places allowed",
+              validate: (v) => {
+                if (!v || v === "") return true;
+                if (Number(v) <= 0) return "Staking limit must be > 0";
+                const max = Number(getValues("maxStakingAmount"));
+                if (max > 0 && Number(v) < max)
+                  return "Staking limit must be \u2265 max staking amount";
+                if (v.includes(".") && v.split(".")[1].length > 6)
+                  return "Max 6 decimal places allowed";
+                return true;
               },
             })}
           />
@@ -476,7 +473,9 @@ const CreateStakePoolForm = () => {
             type="hidden"
             {...register("rewardToken", {
               validate: (v) =>
-                !submitAttemptedRef.current || !!v ? true : "Reward token is required",
+                !submitAttemptedRef.current || !!v
+                  ? true
+                  : "Reward token is required",
             })}
           />
           <p className="text-[11px]">Select from whitelist tokens only</p>
@@ -503,8 +502,13 @@ const CreateStakePoolForm = () => {
                 {...register("lockDuration", {
                   validate: {
                     required: (v) =>
-                      !submitAttemptedRef.current || v !== "" ? true : "Lock-up duration is required",
-                    gte0: (v) => v === "" || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
+                      !submitAttemptedRef.current || v !== ""
+                        ? true
+                        : "Lock-up duration is required",
+                    gte0: (v) =>
+                      v === "" || Number(v) >= MIN_DAYS
+                        ? true
+                        : `Must be ≥ ${MIN_DAYS}`,
                     // decimals: (v) =>
                     //   !v || !v.includes(".") || v.split(".")[1].length <= 6
                     //     ? true
@@ -539,7 +543,8 @@ const CreateStakePoolForm = () => {
                       !submitAttemptedRef.current || v !== ""
                         ? true
                         : "Interest start delay is required",
-                    gte0: (v) => v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
+                    gte0: (v) =>
+                      v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
                     // decimals: (v) =>
                     //   !v || !v.includes(".") || v.split(".")[1].length <= 6
                     //     ? true
@@ -570,12 +575,10 @@ const CreateStakePoolForm = () => {
                 step="any"
                 placeholder="0"
                 {...register("interestAccrualDuration", {
-                  validate: {
-                    gte0: (v) => !v || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
-                    // decimals: (v) =>
-                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
-                    //     ? true
-                    //     : "Max 6 decimal places allowed",
+                  validate: (v) => {
+                    if (!v) return true;
+                    if (Number(v) < MIN_DAYS) return `Must be ≥ ${MIN_DAYS}`;
+                    return true;
                   },
                 })}
               />
@@ -603,8 +606,13 @@ const CreateStakePoolForm = () => {
                 {...register("claimStartDelay", {
                   validate: {
                     required: (v) =>
-                      !submitAttemptedRef.current || v !== "" ? true : "Claim start delay is required",
-                    gte0: (v) => v === "" || Number(v) >= MIN_DAYS ? true : `Must be ≥ ${MIN_DAYS}`,
+                      !submitAttemptedRef.current || v !== ""
+                        ? true
+                        : "Claim start delay is required",
+                    gte0: (v) =>
+                      v === "" || Number(v) >= MIN_DAYS
+                        ? true
+                        : `Must be ≥ ${MIN_DAYS}`,
                     // decimals: (v) =>
                     //   !v || !v.includes(".") || v.split(".")[1].length <= 6
                     //     ? true
@@ -639,8 +647,11 @@ const CreateStakePoolForm = () => {
               {...register("apr", {
                 validate: {
                   required: (v) =>
-                    !submitAttemptedRef.current || v !== "" ? true : "APR is required",
-                  gtZero: (v) => !v || Number(v) > 0 ? true : "APR must be > 0",
+                    !submitAttemptedRef.current || v !== ""
+                      ? true
+                      : "APR is required",
+                  gtZero: (v) =>
+                    !v || Number(v) > 0 ? true : "APR must be > 0",
                   decimals: (v) =>
                     !v || !v.includes(".") || v.split(".")[1].length <= 6
                       ? true
@@ -682,12 +693,12 @@ const CreateStakePoolForm = () => {
             placeholder="0"
             aria-invalid={!!errors.budget}
             {...register("budget", {
-              validate: {
-                gte0: (v) => v === "" || Number(v) >= 0 ? true : "Budget must be ≥ 0",
-                decimals: (v) =>
-                  !v || !v.includes(".") || v.split(".")[1].length <= 6
-                    ? true
-                    : "Max 6 decimal places allowed",
+              validate: (v) => {
+                if (!v) return true;
+                if (Number(v) < 0) return "Budget must be ≥ 0";
+                if (v.includes(".") && v.split(".")[1].length > 6)
+                  return "Max 6 decimal places allowed";
+                return true;
               },
             })}
             className="max-w-xs"
@@ -715,8 +726,8 @@ const CreateStakePoolForm = () => {
             type: "button",
             disabled: isSubmitting,
             onClick: () => {
-              reset()
-              navigate({ to: "/admin/master-pool-management" })
+              reset();
+              navigate({ to: "/admin/master-pool-management" });
             },
           }}
         />
