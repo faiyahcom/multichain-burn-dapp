@@ -201,7 +201,7 @@ export const activityKind = {
   31: "Claim Burn reward",
   32: "Swap",
   33: "Stake",
-  34: "Unstake & Claim",
+  34: "Unstake",
   35: "Claim Stake reward",
 
   40: "Pool End",
@@ -316,7 +316,7 @@ export const myActivityActionLabels: Record<MyActivityAction, string> = {
   "31,35": "Claim reward",
   "5": "Cancel pool",
   "33": "Stake",
-  "34": "Unstake & Claim",
+  "34": "Unstake",
 };
 export const getMyActivityActionLabel = (kind: MyActivityAction) => {
   return myActivityActionLabels[kind];
