@@ -27,6 +27,7 @@ import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whit
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
 import { Route as AdminTransferHistoryIndexRouteImport } from './routes/admin/transfer-history/index'
 import { Route as AdminRevenueFeeStatsIndexRouteImport } from './routes/admin/revenue-fee-stats/index'
+import { Route as AdminMinRatioIndexRouteImport } from './routes/admin/min-ratio/index'
 import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
 import { Route as AdminFeeSettingsManagementIndexRouteImport } from './routes/admin/fee-settings-management/index'
 import { Route as AdminDraftPoolsIndexRouteImport } from './routes/admin/draft-pools/index'
@@ -136,6 +137,11 @@ const AdminRevenueFeeStatsIndexRoute =
     path: '/admin/revenue-fee-stats/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminMinRatioIndexRoute = AdminMinRatioIndexRouteImport.update({
+  id: '/admin/min-ratio/',
+  path: '/admin/min-ratio/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminMasterPoolManagementIndexRoute =
   AdminMasterPoolManagementIndexRouteImport.update({
     id: '/admin/master-pool-management/',
@@ -225,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/admin/draft-pools': typeof AdminDraftPoolsIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
+  '/admin/min-ratio': typeof AdminMinRatioIndexRoute
   '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
@@ -258,6 +265,7 @@ export interface FileRoutesByTo {
   '/admin/draft-pools': typeof AdminDraftPoolsIndexRoute
   '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
+  '/admin/min-ratio': typeof AdminMinRatioIndexRoute
   '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
@@ -292,6 +300,7 @@ export interface FileRoutesById {
   '/admin/draft-pools/': typeof AdminDraftPoolsIndexRoute
   '/admin/fee-settings-management/': typeof AdminFeeSettingsManagementIndexRoute
   '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
+  '/admin/min-ratio/': typeof AdminMinRatioIndexRoute
   '/admin/revenue-fee-stats/': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history/': typeof AdminTransferHistoryIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/admin/draft-pools'
     | '/admin/fee-settings-management'
     | '/admin/master-pool-management'
+    | '/admin/min-ratio'
     | '/admin/revenue-fee-stats'
     | '/admin/transfer-history'
     | '/admin/whitelist-token'
@@ -360,6 +370,7 @@ export interface FileRouteTypes {
     | '/admin/draft-pools'
     | '/admin/fee-settings-management'
     | '/admin/master-pool-management'
+    | '/admin/min-ratio'
     | '/admin/revenue-fee-stats'
     | '/admin/transfer-history'
     | '/admin/whitelist-token'
@@ -393,6 +404,7 @@ export interface FileRouteTypes {
     | '/admin/draft-pools/'
     | '/admin/fee-settings-management/'
     | '/admin/master-pool-management/'
+    | '/admin/min-ratio/'
     | '/admin/revenue-fee-stats/'
     | '/admin/transfer-history/'
     | '/admin/whitelist-token/'
@@ -427,6 +439,7 @@ export interface RootRouteChildren {
   AdminDraftPoolsIndexRoute: typeof AdminDraftPoolsIndexRoute
   AdminFeeSettingsManagementIndexRoute: typeof AdminFeeSettingsManagementIndexRoute
   AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
+  AdminMinRatioIndexRoute: typeof AdminMinRatioIndexRoute
   AdminRevenueFeeStatsIndexRoute: typeof AdminRevenueFeeStatsIndexRoute
   AdminTransferHistoryIndexRoute: typeof AdminTransferHistoryIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
@@ -570,6 +583,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRevenueFeeStatsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/min-ratio/': {
+      id: '/admin/min-ratio/'
+      path: '/admin/min-ratio'
+      fullPath: '/admin/min-ratio'
+      preLoaderRoute: typeof AdminMinRatioIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/master-pool-management/': {
       id: '/admin/master-pool-management/'
       path: '/admin/master-pool-management'
@@ -683,6 +703,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminDraftPoolsIndexRoute: AdminDraftPoolsIndexRoute,
   AdminFeeSettingsManagementIndexRoute: AdminFeeSettingsManagementIndexRoute,
   AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
+  AdminMinRatioIndexRoute: AdminMinRatioIndexRoute,
   AdminRevenueFeeStatsIndexRoute: AdminRevenueFeeStatsIndexRoute,
   AdminTransferHistoryIndexRoute: AdminTransferHistoryIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
