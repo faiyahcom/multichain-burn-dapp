@@ -170,8 +170,8 @@ const AdminMinRatioList = () => {
                 <TableRow
                   key={`${pairConfig.chainId}-${pairConfig.tokenIn}-${pairConfig.tokenOut}`}
                 >
-                  <TableCell className="w-75 xl:w-100">
-                    <div className="flex min-w-0 items-center gap-3.25 pl-15.75">
+                  <TableCell className="sm:w-75 xl:w-100">
+                    <div className="flex min-w-0 items-center gap-3.25 sm:pl-15.75">
                       <div className="flex shrink-0 items-center gap-px">
                         <TokenImage
                           src={tokenOutDisplay.imageUri}
