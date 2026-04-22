@@ -25,20 +25,10 @@ import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
 import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
-import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
-import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
-import { Route as AdminTransferHistoryIndexRouteImport } from './routes/admin/transfer-history/index'
-import { Route as AdminRevenueFeeStatsIndexRouteImport } from './routes/admin/revenue-fee-stats/index'
-import { Route as AdminMasterPoolManagementIndexRouteImport } from './routes/admin/master-pool-management/index'
-import { Route as AdminFeeSettingsManagementIndexRouteImport } from './routes/admin/fee-settings-management/index'
-import { Route as AdminAdminManagementIndexRouteImport } from './routes/admin/admin-management/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as StakingDetailAddressRouteImport } from './routes/staking/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
-import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
-import { Route as AdminBurnEditAddressRouteImport } from './routes/admin/burn/edit/$address'
-import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -122,47 +112,6 @@ const BurnCreateIndexRoute = BurnCreateIndexRouteImport.update({
   path: '/burn/create/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminWhitelistUserIndexRoute = AdminWhitelistUserIndexRouteImport.update({
-  id: '/admin/whitelist-user/',
-  path: '/admin/whitelist-user/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminWhitelistTokenIndexRoute =
-  AdminWhitelistTokenIndexRouteImport.update({
-    id: '/admin/whitelist-token/',
-    path: '/admin/whitelist-token/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AdminTransferHistoryIndexRoute =
-  AdminTransferHistoryIndexRouteImport.update({
-    id: '/admin/transfer-history/',
-    path: '/admin/transfer-history/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AdminRevenueFeeStatsIndexRoute =
-  AdminRevenueFeeStatsIndexRouteImport.update({
-    id: '/admin/revenue-fee-stats/',
-    path: '/admin/revenue-fee-stats/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AdminMasterPoolManagementIndexRoute =
-  AdminMasterPoolManagementIndexRouteImport.update({
-    id: '/admin/master-pool-management/',
-    path: '/admin/master-pool-management/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AdminFeeSettingsManagementIndexRoute =
-  AdminFeeSettingsManagementIndexRouteImport.update({
-    id: '/admin/fee-settings-management/',
-    path: '/admin/fee-settings-management/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const AdminAdminManagementIndexRoute =
-  AdminAdminManagementIndexRouteImport.update({
-    id: '/admin/admin-management/',
-    path: '/admin/admin-management/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const SwapDetailAddressRoute = SwapDetailAddressRouteImport.update({
   id: '/swap/detail/$address',
   path: '/swap/detail/$address',
@@ -184,21 +133,6 @@ const PairDetailChainIdTokenInTokenOutRoute =
     path: '/pair-detail/$chainId/$tokenIn/$tokenOut',
     getParentRoute: () => rootRouteImport,
   } as any)
-const AdminSwapDetailAddressRoute = AdminSwapDetailAddressRouteImport.update({
-  id: '/admin/swap/detail/$address',
-  path: '/admin/swap/detail/$address',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminBurnEditAddressRoute = AdminBurnEditAddressRouteImport.update({
-  id: '/admin/burn/edit/$address',
-  path: '/admin/burn/edit/$address',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminBurnDetailAddressRoute = AdminBurnDetailAddressRouteImport.update({
-  id: '/admin/burn/detail/$address',
-  path: '/admin/burn/detail/$address',
-  getParentRoute: () => rootRouteImport,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -218,18 +152,8 @@ export interface FileRoutesByFullPath {
   '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
-  '/admin/admin-management': typeof AdminAdminManagementIndexRoute
-  '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
-  '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
-  '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
-  '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
-  '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
-  '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/burn/create': typeof BurnCreateIndexRoute
   '/swap/create': typeof SwapCreateIndexRoute
-  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
-  '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
-  '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesByTo {
@@ -250,18 +174,8 @@ export interface FileRoutesByTo {
   '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
-  '/admin/admin-management': typeof AdminAdminManagementIndexRoute
-  '/admin/fee-settings-management': typeof AdminFeeSettingsManagementIndexRoute
-  '/admin/master-pool-management': typeof AdminMasterPoolManagementIndexRoute
-  '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
-  '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
-  '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
-  '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/burn/create': typeof BurnCreateIndexRoute
   '/swap/create': typeof SwapCreateIndexRoute
-  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
-  '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
-  '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesById {
@@ -283,18 +197,8 @@ export interface FileRoutesById {
   '/burn/detail/$address': typeof BurnDetailAddressRoute
   '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
-  '/admin/admin-management/': typeof AdminAdminManagementIndexRoute
-  '/admin/fee-settings-management/': typeof AdminFeeSettingsManagementIndexRoute
-  '/admin/master-pool-management/': typeof AdminMasterPoolManagementIndexRoute
-  '/admin/revenue-fee-stats/': typeof AdminRevenueFeeStatsIndexRoute
-  '/admin/transfer-history/': typeof AdminTransferHistoryIndexRoute
-  '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
-  '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
   '/burn/create/': typeof BurnCreateIndexRoute
   '/swap/create/': typeof SwapCreateIndexRoute
-  '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
-  '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
-  '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
 }
 export interface FileRouteTypes {
@@ -317,18 +221,8 @@ export interface FileRouteTypes {
     | '/burn/detail/$address'
     | '/staking/detail/$address'
     | '/swap/detail/$address'
-    | '/admin/admin-management'
-    | '/admin/fee-settings-management'
-    | '/admin/master-pool-management'
-    | '/admin/revenue-fee-stats'
-    | '/admin/transfer-history'
-    | '/admin/whitelist-token'
-    | '/admin/whitelist-user'
     | '/burn/create'
     | '/swap/create'
-    | '/admin/burn/detail/$address'
-    | '/admin/burn/edit/$address'
-    | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -349,18 +243,8 @@ export interface FileRouteTypes {
     | '/burn/detail/$address'
     | '/staking/detail/$address'
     | '/swap/detail/$address'
-    | '/admin/admin-management'
-    | '/admin/fee-settings-management'
-    | '/admin/master-pool-management'
-    | '/admin/revenue-fee-stats'
-    | '/admin/transfer-history'
-    | '/admin/whitelist-token'
-    | '/admin/whitelist-user'
     | '/burn/create'
     | '/swap/create'
-    | '/admin/burn/detail/$address'
-    | '/admin/burn/edit/$address'
-    | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   id:
     | '__root__'
@@ -381,18 +265,8 @@ export interface FileRouteTypes {
     | '/burn/detail/$address'
     | '/staking/detail/$address'
     | '/swap/detail/$address'
-    | '/admin/admin-management/'
-    | '/admin/fee-settings-management/'
-    | '/admin/master-pool-management/'
-    | '/admin/revenue-fee-stats/'
-    | '/admin/transfer-history/'
-    | '/admin/whitelist-token/'
-    | '/admin/whitelist-user/'
     | '/burn/create/'
     | '/swap/create/'
-    | '/admin/burn/detail/$address'
-    | '/admin/burn/edit/$address'
-    | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
   fileRoutesById: FileRoutesById
 }
@@ -414,18 +288,8 @@ export interface RootRouteChildren {
   BurnDetailAddressRoute: typeof BurnDetailAddressRoute
   StakingDetailAddressRoute: typeof StakingDetailAddressRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
-  AdminAdminManagementIndexRoute: typeof AdminAdminManagementIndexRoute
-  AdminFeeSettingsManagementIndexRoute: typeof AdminFeeSettingsManagementIndexRoute
-  AdminMasterPoolManagementIndexRoute: typeof AdminMasterPoolManagementIndexRoute
-  AdminRevenueFeeStatsIndexRoute: typeof AdminRevenueFeeStatsIndexRoute
-  AdminTransferHistoryIndexRoute: typeof AdminTransferHistoryIndexRoute
-  AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
-  AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
   BurnCreateIndexRoute: typeof BurnCreateIndexRoute
   SwapCreateIndexRoute: typeof SwapCreateIndexRoute
-  AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
-  AdminBurnEditAddressRoute: typeof AdminBurnEditAddressRoute
-  AdminSwapDetailAddressRoute: typeof AdminSwapDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
 }
 
@@ -543,55 +407,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BurnCreateIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/whitelist-user/': {
-      id: '/admin/whitelist-user/'
-      path: '/admin/whitelist-user'
-      fullPath: '/admin/whitelist-user'
-      preLoaderRoute: typeof AdminWhitelistUserIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/whitelist-token/': {
-      id: '/admin/whitelist-token/'
-      path: '/admin/whitelist-token'
-      fullPath: '/admin/whitelist-token'
-      preLoaderRoute: typeof AdminWhitelistTokenIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/transfer-history/': {
-      id: '/admin/transfer-history/'
-      path: '/admin/transfer-history'
-      fullPath: '/admin/transfer-history'
-      preLoaderRoute: typeof AdminTransferHistoryIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/revenue-fee-stats/': {
-      id: '/admin/revenue-fee-stats/'
-      path: '/admin/revenue-fee-stats'
-      fullPath: '/admin/revenue-fee-stats'
-      preLoaderRoute: typeof AdminRevenueFeeStatsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/master-pool-management/': {
-      id: '/admin/master-pool-management/'
-      path: '/admin/master-pool-management'
-      fullPath: '/admin/master-pool-management'
-      preLoaderRoute: typeof AdminMasterPoolManagementIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/fee-settings-management/': {
-      id: '/admin/fee-settings-management/'
-      path: '/admin/fee-settings-management'
-      fullPath: '/admin/fee-settings-management'
-      preLoaderRoute: typeof AdminFeeSettingsManagementIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/admin-management/': {
-      id: '/admin/admin-management/'
-      path: '/admin/admin-management'
-      fullPath: '/admin/admin-management'
-      preLoaderRoute: typeof AdminAdminManagementIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/swap/detail/$address': {
       id: '/swap/detail/$address'
       path: '/swap/detail/$address'
@@ -620,27 +435,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PairDetailChainIdTokenInTokenOutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/admin/swap/detail/$address': {
-      id: '/admin/swap/detail/$address'
-      path: '/admin/swap/detail/$address'
-      fullPath: '/admin/swap/detail/$address'
-      preLoaderRoute: typeof AdminSwapDetailAddressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/burn/edit/$address': {
-      id: '/admin/burn/edit/$address'
-      path: '/admin/burn/edit/$address'
-      fullPath: '/admin/burn/edit/$address'
-      preLoaderRoute: typeof AdminBurnEditAddressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/burn/detail/$address': {
-      id: '/admin/burn/detail/$address'
-      path: '/admin/burn/detail/$address'
-      fullPath: '/admin/burn/detail/$address'
-      preLoaderRoute: typeof AdminBurnDetailAddressRouteImport
-      parentRoute: typeof rootRouteImport
-    }
   }
 }
 
@@ -662,18 +456,8 @@ const rootRouteChildren: RootRouteChildren = {
   BurnDetailAddressRoute: BurnDetailAddressRoute,
   StakingDetailAddressRoute: StakingDetailAddressRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
-  AdminAdminManagementIndexRoute: AdminAdminManagementIndexRoute,
-  AdminFeeSettingsManagementIndexRoute: AdminFeeSettingsManagementIndexRoute,
-  AdminMasterPoolManagementIndexRoute: AdminMasterPoolManagementIndexRoute,
-  AdminRevenueFeeStatsIndexRoute: AdminRevenueFeeStatsIndexRoute,
-  AdminTransferHistoryIndexRoute: AdminTransferHistoryIndexRoute,
-  AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
-  AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
   BurnCreateIndexRoute: BurnCreateIndexRoute,
   SwapCreateIndexRoute: SwapCreateIndexRoute,
-  AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
-  AdminBurnEditAddressRoute: AdminBurnEditAddressRoute,
-  AdminSwapDetailAddressRoute: AdminSwapDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
 }
 export const routeTree = rootRouteImport
