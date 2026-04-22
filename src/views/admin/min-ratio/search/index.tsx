@@ -13,7 +13,14 @@ const AdminMinRatioSearch = () => {
         <div className="space-y-1">
           <h1 className="text-3xl font-semibold">Min Ratio</h1>
         </div>
-        <Button variant={"mb-primary"} size={"mb-square-btn"}>
+        <Button
+          variant={"mb-primary"}
+          size={"mb-square-btn"}
+          aria-label="Add new Min Ratio"
+          onClick={() => {
+            // TODO: Implement add new min ratio action
+          }}
+        >
           <span className="max-md:sr-only">Add new Min Ratio</span>
           <PlusIcon className="size-3.75" />
         </Button>
