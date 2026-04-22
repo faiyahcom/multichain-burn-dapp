@@ -200,7 +200,7 @@ const AdminMinRatioList = () => {
                     <NetworkDisplay chainId={pairConfig.chainId?.toString()} />
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center gap-1">
+                    <div className="flex flex-col items-center justify-center gap-1 sm:flex-row">
                       <RatioDisplay
                         inSymbol={tokenInDisplay.symbol}
                         outSymbol={tokenOutDisplay.symbol}
