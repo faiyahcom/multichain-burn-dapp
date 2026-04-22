@@ -154,6 +154,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                         {fmtReward(ua?.totalSettlementFee)} {rewardToken}
                     </span>
                 }
+                className="ml-4"
             />
             {/* Emergency closed warning */}
             <div className="inline-flex items-start gap-1">

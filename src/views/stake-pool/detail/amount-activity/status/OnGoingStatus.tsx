@@ -182,6 +182,7 @@ const StakeStats = ({
                         {fmtReward(ua?.totalSettlementFee)} {rewardToken}
                     </span>
                 }
+                className="ml-4"
             />
 
             <p className="text-right text-sm md:text-base lg:text-lg 2xl:text-xl">
