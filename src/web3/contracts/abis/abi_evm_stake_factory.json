@@ -114,6 +114,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "stakeId",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "time",
         "type": "uint256"
       }
@@ -250,8 +256,45 @@
       },
       {
         "indexed": false,
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "remainingReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardDebt",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "time",
+        "type": "uint256"
+      }
+    ],
+    "name": "StakingPoolEmergencyWithdrawnRewardToken",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": true,
         "internalType": "address",
-        "name": "token",
+        "name": "pool",
+        "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "by",
         "type": "address"
       },
       {
@@ -263,11 +306,17 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "totalStaked",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "time",
         "type": "uint256"
       }
     ],
-    "name": "StakingPoolEmergencyWithdrawn",
+    "name": "StakingPoolEmergencyWithdrawnStakingToken",
     "type": "event"
   },
   {
@@ -331,7 +380,19 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "feeAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "remainingReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardDebt",
         "type": "uint256"
       },
       {
@@ -369,6 +430,12 @@
         "indexed": false,
         "internalType": "uint256",
         "name": "remainingReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardDebt",
         "type": "uint256"
       },
       {
@@ -412,6 +479,24 @@
         "indexed": false,
         "internalType": "uint256",
         "name": "rewardAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "feeAmount",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "remainingReward",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "rewardDebt",
         "type": "uint256"
       },
       {
@@ -758,8 +843,26 @@
         "type": "address"
       },
       {
+        "internalType": "address[]",
+        "name": "_to",
+        "type": "address[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "_amount",
+        "type": "uint256[]"
+      }
+    ],
+    "name": "emergencyWithdrawRewardToken",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
         "internalType": "address",
-        "name": "_token",
+        "name": "_pool",
         "type": "address"
       },
       {
@@ -773,7 +876,7 @@
         "type": "uint256[]"
       }
     ],
-    "name": "emergencyWithdraw",
+    "name": "emergencyWithdrawStakingToken",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -872,6 +975,19 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "_implementation",
+        "type": "address"
+      }
+    ],
+    "name": "setPoolImplementation",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
         "name": "_pool",
         "type": "address"
       },
@@ -903,25 +1019,6 @@
     "name": "submitPool",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_pool",
-        "type": "address"
-      }
-    ],
-    "name": "totalPendingReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "pendingReward",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {

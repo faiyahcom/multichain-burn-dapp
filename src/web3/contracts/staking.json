@@ -2672,6 +2672,10 @@
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "is_reward",
+          "type": "bool"
         }
       ]
     }
@@ -3196,6 +3200,14 @@
           {
             "name": "staking_limit",
             "type": "u64"
+          },
+          {
+            "name": "staking_remaining",
+            "type": "u64"
+          },
+          {
+            "name": "reward_remaining",
+            "type": "u64"
           }
         ]
       }
@@ -3307,6 +3319,10 @@
           },
           {
             "name": "delay_claim",
+            "type": "i64"
+          },
+          {
+            "name": "interest_duration",
             "type": "i64"
           }
         ]
