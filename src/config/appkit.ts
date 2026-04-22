@@ -46,5 +46,8 @@ export const appKitConfig = {
   projectId: APPKIT_PROJECT_ID ?? "",
   features: {
     analytics: true,
+    email: false,
+    socials: [],
+    emailShowWallets: false,
   },
 };
