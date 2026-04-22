@@ -21,7 +21,7 @@ export const API_ROUTES = {
     STATS: "/pools/stats",
     RECENT_POOLS: "/pools/recent-pools",
     TOGGLE_PARTNER_POOL: (address: string) => `/pools/${address}/partner`,
-    MY_STAKES: "/users/my-stakes"
+    MY_STAKES: "/users/my-stakes",
   },
   WHITELIST: {
     GET_LIST_TOKENS: "/whitelist-tokens",
@@ -75,5 +75,15 @@ export const API_ROUTES = {
     LIST: "/users/notifications",
     STREAM: "/users/notifications-stream",
     MARK_READ: "/users/notifications/mark-read",
+  },
+  PAIR_CONFIGS: {
+    CREATE: "/pair-configs",
+    DETAIL: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+    LIST: "/pair-configs",
+    UPDATE: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+    DELETE: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
   },
 } as const;
