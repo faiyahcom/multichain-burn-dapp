@@ -391,7 +391,11 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
     timestamp: item.timestamp,
     formatStr: "HH:mm:ss",
   });
-  const amount = formatAmount(item.amountIn, item.tokenInDecimals, 3);
+  const amount = formatAmount(
+    item.amountIn,
+    item.tokenInDecimals,
+    Number(item.amountIn) >= 10 ? 3 : 6,
+  );
   const poolName = item.pool?.name ?? "";
 
   return (

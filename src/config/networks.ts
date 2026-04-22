@@ -103,7 +103,7 @@ const TESTNET_CONFIGS: readonly NetworkConfig[] = [
     backendChainId: String(bscTestnet.id),
     iconSrc: "/network/binance.png",
     color: "#f9b845",
-    shortLabel: "BNB",
+    shortLabel: "tBNB",
     scanUrl: "https://testnet.bscscan.com",
   },
   {
