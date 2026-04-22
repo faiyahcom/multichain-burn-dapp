@@ -47,5 +47,8 @@ export const appKitConfig = {
   allowUnsupportedChain: true,
   features: {
     analytics: true,
+    email: false,
+    socials: [],
+    emailShowWallets: false,
   },
 };
