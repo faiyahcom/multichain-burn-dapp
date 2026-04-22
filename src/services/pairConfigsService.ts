@@ -122,7 +122,7 @@ export const pairConfigsService = {
     const response = await apiClient.get<PairConfigDetailResponse>(
       API_ROUTES.PAIR_CONFIGS.DETAIL(request.tokenIn, request.tokenOut),
       {
-        param: {
+        params: {
           chainId: request.chainId,
         },
       },

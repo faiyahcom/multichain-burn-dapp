@@ -26,6 +26,7 @@ import { useSystemStore } from "@/stores/systemStore";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { shortenNumber } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -166,7 +167,9 @@ const AdminMinRatioList = () => {
               });
 
               return (
-                <TableRow key={`${pairConfig.tokenIn}-${pairConfig.tokenOut}`}>
+                <TableRow
+                  key={`${pairConfig.chainId}-${pairConfig.tokenIn}-${pairConfig.tokenOut}`}
+                >
                   <TableCell className="w-75 xl:w-100">
                     <div className="flex min-w-0 items-center gap-3.25 pl-15.75">
                       <div className="flex shrink-0 items-center gap-px">
@@ -197,12 +200,21 @@ const AdminMinRatioList = () => {
                     <NetworkDisplay chainId={pairConfig.chainId?.toString()} />
                   </TableCell>
                   <TableCell>
-                    <RatioDisplay
-                      inSymbol={tokenInDisplay.symbol}
-                      outSymbol={tokenOutDisplay.symbol}
-                      inValue={pairConfig.ratioNumerator}
-                      outValue={pairConfig.ratioDenominator}
-                    />
+                    <div className="flex items-center justify-center gap-1">
+                      <RatioDisplay
+                        inSymbol={tokenInDisplay.symbol}
+                        outSymbol={tokenOutDisplay.symbol}
+                        inValue={pairConfig.ratioNumerator}
+                        outValue={pairConfig.ratioDenominator}
+                      />
+                      <span className="text-secondary-foreground">
+                        (
+                        {shortenNumber({
+                          number: Number(pairConfig.ratio),
+                        })}
+                        )
+                      </span>
+                    </div>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
@@ -250,7 +262,7 @@ const AdminMinRatioList = () => {
 
         <CustomPagination
           currentPage={filter.page}
-          totalCount={listPairConfigsData?.pairConfigs?.length ?? 0}
+          totalCount={listPairConfigsData?.total ?? 0}
           pageSize={limit}
           onPageChange={(page) => setFilter({ page })}
         />
