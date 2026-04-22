@@ -23,6 +23,7 @@ type Props = {
   onChange: (address: string) => void;
   disabledAddress?: string;
   poolKind?: number;
+  btnProps?: React.ComponentProps<typeof Button>;
 };
 
 const resolveSymbol = (token: { symbol: string; customSymbol?: string }) =>
@@ -36,6 +37,7 @@ const WhitelistTokenSelect = ({
   onChange,
   disabledAddress,
   poolKind,
+  btnProps,
 }: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
@@ -75,11 +77,11 @@ const WhitelistTokenSelect = ({
   // Native token entry shown at top of list
   const nativeToken = nativeCurrency
     ? {
-      address: nativeAddress,
-      name: nativeCurrency.name,
-      symbol: nativeCurrency.symbol,
-      imageUri: networkConfig?.iconSrc ?? "",
-    }
+        address: nativeAddress,
+        name: nativeCurrency.name,
+        symbol: nativeCurrency.symbol,
+        imageUri: networkConfig?.iconSrc ?? "",
+      }
     : null;
 
   // Show native token if search text is empty or matches native token symbol or name
@@ -97,8 +99,8 @@ const WhitelistTokenSelect = ({
     value === nativeAddress
       ? nativeToken
       : whitelistTokens?.whitelistTokens.find(
-        (token) => token.address === value,
-      );
+          (token) => token.address === value,
+        );
 
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
@@ -106,6 +108,7 @@ const WhitelistTokenSelect = ({
         <Button
           variant="outline"
           className="flex items-center justify-between gap-2 rounded-lg bg-inactive text-sm font-normal text-foreground hover:bg-inactive/80"
+          {...btnProps}
         >
           {value && selectedDetail ? (
             <div className="flex items-center gap-4">

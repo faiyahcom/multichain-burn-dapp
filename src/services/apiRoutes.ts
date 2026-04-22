@@ -64,4 +64,14 @@ export const API_ROUTES = {
   GENERAL: {
     NATIVE_PRICES: "/general/native-prices",
   },
+  PAIR_CONFIGS: {
+    CREATE: "/pair-configs",
+    DETAIL: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+    LIST: "/pair-configs",
+    UPDATE: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+    DELETE: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+  },
 } as const;

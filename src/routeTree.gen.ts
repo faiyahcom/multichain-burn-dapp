@@ -35,12 +35,14 @@ import { Route as AdminAdminManagementIndexRouteImport } from './routes/admin/ad
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as AdminStakeCreateIndexRouteImport } from './routes/admin/stake/create/index'
+import { Route as AdminMinRatioCreateIndexRouteImport } from './routes/admin/min-ratio/create/index'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
 import { Route as AdminStakeEditAddressRouteImport } from './routes/admin/stake/edit/$address'
 import { Route as AdminStakeDetailAddressRouteImport } from './routes/admin/stake/detail/$address'
 import { Route as AdminBurnEditAddressRouteImport } from './routes/admin/burn/edit/$address'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
+import { Route as AdminMinRatioEditChainIdTokenInTokenOutRouteImport } from './routes/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -180,6 +182,12 @@ const AdminStakeCreateIndexRoute = AdminStakeCreateIndexRouteImport.update({
   path: '/admin/stake/create/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMinRatioCreateIndexRoute =
+  AdminMinRatioCreateIndexRouteImport.update({
+    id: '/admin/min-ratio/create/',
+    path: '/admin/min-ratio/create/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PairDetailChainIdTokenInTokenOutRoute =
   PairDetailChainIdTokenInTokenOutRouteImport.update({
     id: '/pair-detail/$chainId/$tokenIn/$tokenOut',
@@ -211,6 +219,12 @@ const AdminBurnDetailAddressRoute = AdminBurnDetailAddressRouteImport.update({
   path: '/admin/burn/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMinRatioEditChainIdTokenInTokenOutRoute =
+  AdminMinRatioEditChainIdTokenInTokenOutRouteImport.update({
+    id: '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut',
+    path: '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -244,7 +258,9 @@ export interface FileRoutesByFullPath {
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/min-ratio/create': typeof AdminMinRatioCreateIndexRoute
   '/admin/stake/create': typeof AdminStakeCreateIndexRoute
+  '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -278,7 +294,9 @@ export interface FileRoutesByTo {
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/min-ratio/create': typeof AdminMinRatioCreateIndexRoute
   '/admin/stake/create': typeof AdminStakeCreateIndexRoute
+  '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -313,7 +331,9 @@ export interface FileRoutesById {
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/min-ratio/create/': typeof AdminMinRatioCreateIndexRoute
   '/admin/stake/create/': typeof AdminStakeCreateIndexRoute
+  '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -349,7 +369,9 @@ export interface FileRouteTypes {
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/min-ratio/create'
     | '/admin/stake/create'
+    | '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -383,7 +405,9 @@ export interface FileRouteTypes {
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/min-ratio/create'
     | '/admin/stake/create'
+    | '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
   id:
     | '__root__'
     | '/'
@@ -417,7 +441,9 @@ export interface FileRouteTypes {
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/min-ratio/create/'
     | '/admin/stake/create/'
+    | '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -452,7 +478,9 @@ export interface RootRouteChildren {
   AdminStakeEditAddressRoute: typeof AdminStakeEditAddressRoute
   AdminSwapDetailAddressRoute: typeof AdminSwapDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
+  AdminMinRatioCreateIndexRoute: typeof AdminMinRatioCreateIndexRoute
   AdminStakeCreateIndexRoute: typeof AdminStakeCreateIndexRoute
+  AdminMinRatioEditChainIdTokenInTokenOutRoute: typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -639,6 +667,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStakeCreateIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/min-ratio/create/': {
+      id: '/admin/min-ratio/create/'
+      path: '/admin/min-ratio/create'
+      fullPath: '/admin/min-ratio/create'
+      preLoaderRoute: typeof AdminMinRatioCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pair-detail/$chainId/$tokenIn/$tokenOut': {
       id: '/pair-detail/$chainId/$tokenIn/$tokenOut'
       path: '/pair-detail/$chainId/$tokenIn/$tokenOut'
@@ -681,6 +716,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminBurnDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': {
+      id: '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
+      path: '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
+      fullPath: '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
+      preLoaderRoute: typeof AdminMinRatioEditChainIdTokenInTokenOutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -716,7 +758,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminStakeEditAddressRoute: AdminStakeEditAddressRoute,
   AdminSwapDetailAddressRoute: AdminSwapDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
+  AdminMinRatioCreateIndexRoute: AdminMinRatioCreateIndexRoute,
   AdminStakeCreateIndexRoute: AdminStakeCreateIndexRoute,
+  AdminMinRatioEditChainIdTokenInTokenOutRoute:
+    AdminMinRatioEditChainIdTokenInTokenOutRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
