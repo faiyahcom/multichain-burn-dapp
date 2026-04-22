@@ -292,16 +292,31 @@ export default function EditStakePoolScreen({
                                 </span>
                                 <DatePicker
                                     value={startTime}
-                                    onChange={(d) => d && setValue("startTime", d)}
-                                    disabled={(d) => d < today}
+                                    onChange={(date) =>
+                                        setValue("startTime", date as Date, {
+                                            shouldValidate: true,
+                                        })
+                                    }
+                                    disabled={(date) => {
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+                                        return date < today || (endTime ? date > endTime : false);
+                                    }}
                                 />
                                 <input
                                     type="hidden"
                                     {...register("startTime", {
-                                        validate: (v) =>
-                                            !submitAttemptedRef.current || !!v
-                                                ? true
-                                                : "Start time is required",
+                                        validate: (v) => {
+                                            if (!v)
+                                                return submitAttemptedRef.current
+                                                    ? "Start time is required"
+                                                    : true;
+                                            if (v <= new Date())
+                                                return "Start time must be in the future";
+                                            if (endTime && v >= endTime)
+                                                return "Start time must be before end time";
+                                            return true;
+                                        },
                                     })}
                                 />
                                 {errors.startTime && (
@@ -316,10 +331,16 @@ export default function EditStakePoolScreen({
                                 </span>
                                 <DatePicker
                                     value={endTime}
-                                    onChange={(d) => d && setValue("endTime", d)}
-                                    disabled={(d) =>
-                                        d < today || (startTime ? d < startTime : false)
+                                    onChange={(date) =>
+                                        setValue("endTime", date as Date, {
+                                            shouldValidate: true,
+                                        })
                                     }
+                                    disabled={(date) => {
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+                                        return date < today || (startTime ? date < startTime : false);
+                                    }}
                                 />
                                 <input
                                     type="hidden"
@@ -329,9 +350,10 @@ export default function EditStakePoolScreen({
                                                 return submitAttemptedRef.current
                                                     ? "End time is required"
                                                     : true;
-                                            return !startTime || v > startTime
-                                                ? true
-                                                : "End time must be after start time";
+                                            if (v <= new Date()) return "End time must be in the future";
+                                            if (startTime && v <= startTime)
+                                                return "End time must be after start time";
+                                            return true;
                                         },
                                     })}
                                 />
@@ -430,15 +452,27 @@ export default function EditStakePoolScreen({
                         <div className="space-y-3">
                             {/* Pool Name */}
                             <div className="space-y-1">
-                                <span className="text-base text-greyed">Pool Name:</span>
+                                <span className="text-base text-greyed">
+                                    Pool Name: <span className="text-destructive">*</span>
+                                </span>
                                 <Input
                                     placeholder="Pool name"
                                     aria-invalid={!!errors.poolName}
                                     {...register("poolName", {
-                                        validate: (v) =>
-                                            !v.trim() || v.trim().length >= 3
-                                                ? true
-                                                : "At least 3 characters required",
+                                        validate: {
+                                            required: (v) =>
+                                                !submitAttemptedRef.current || v.trim().length > 0
+                                                    ? true
+                                                    : "Pool name is required",
+                                            minLength: (v) =>
+                                                !v.trim() || v.trim().length >= 3
+                                                    ? true
+                                                    : "Pool name must be at least 3 characters",
+                                            maxLength: (v) =>
+                                                !v.trim() || v.trim().length <= 50
+                                                    ? true
+                                                    : "Pool name must be at most 50 characters",
+                                        },
                                     })}
                                 />
                                 {errors.poolName && (
@@ -465,8 +499,8 @@ export default function EditStakePoolScreen({
                                                 !submitAttemptedRef.current || v !== ""
                                                     ? true
                                                     : "APR is required",
-                                            gte0: (v) =>
-                                                !v || Number(v) >= 0 ? true : "Must be ≥ 0",
+                                            gtZero: (v) =>
+                                                !v || Number(v) > 0 ? true : "APR must be > 0",
                                             decimals: (v) =>
                                                 !v || !v.includes(".") || v.split(".")[1].length <= 6
                                                     ? true
@@ -655,7 +689,11 @@ export default function EditStakePoolScreen({
                                             validate: (v) => {
                                                 if (!v) return true;
                                                 if (Number(v) < 0) return "Must be \u2265 0";
-                                                if (v.includes(".") && v.split(".")[1].length > 6) return "Max 6 decimal places allowed";
+                                                const max = Number(getValues("maxStakingAmount"));
+                                                if (max && max > 0 && Number(v) > max)
+                                                    return "Min staking amount must be \u2264 max staking amount";
+                                                if (v.includes(".") && v.split(".")[1].length > 6)
+                                                    return "Max 6 decimal places allowed";
                                                 return true;
                                             },
                                         })}
@@ -681,8 +719,13 @@ export default function EditStakePoolScreen({
                                                 if (!v) return true;
                                                 if (Number(v) <= 0) return "Must be greater than 0";
                                                 const min = getValues("minStakingAmount");
-                                                if (min && Number(v) < Number(min)) return "Must be greater than or equal to min staking amount";
-                                                if (v.includes(".") && v.split(".")[1].length > 6) return "Max 6 decimal places allowed";
+                                                if (min && Number(v) < Number(min))
+                                                    return "Must be greater than or equal to min staking amount";
+                                                const limit = Number(getValues("stakingLimit"));
+                                                if (limit > 0 && Number(v) > limit)
+                                                    return "Max staking amount must be \u2264 staking limit";
+                                                if (v.includes(".") && v.split(".")[1].length > 6)
+                                                    return "Max 6 decimal places allowed";
                                                 return true;
                                             },
                                         })}
@@ -709,8 +752,10 @@ export default function EditStakePoolScreen({
                                                 if (!v) return true;
                                                 if (Number(v) < 0) return "Must be \u2265 0";
                                                 const max = Number(getValues("maxStakingAmount"));
-                                                if (max > 0 && Number(v) < max) return "Staking limit must be \u2265 max staking amount";
-                                                if (v.includes(".") && v.split(".")[1].length > 6) return "Max 6 decimal places allowed";
+                                                if (max > 0 && Number(v) < max)
+                                                    return "Staking limit must be \u2265 max staking amount";
+                                                if (v.includes(".") && v.split(".")[1].length > 6)
+                                                    return "Max 6 decimal places allowed";
                                                 return true;
                                             },
                                         })}
