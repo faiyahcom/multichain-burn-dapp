@@ -105,7 +105,7 @@ const CreateSwapPoolForm = ({
     isEnabled: isDetailPairConfigEnabled,
   } = useQuery({
     queryKey: pairConfigsQueryKeys.detail({
-      chainId: network?.id,
+      chainId: chainId,
       tokenIn: selectedTokenBurn,
       tokenOut: selectedTokenReward,
     }),
@@ -119,10 +119,7 @@ const CreateSwapPoolForm = ({
     enabled: shouldCheckMinRatio,
     retry: false,
   });
-  const {
-    mutateAsync: getPairConfigDetailMutateAsync,
-    data: pairConfigDetailData,
-  } = useMutation({
+  const { mutateAsync: getPairConfigDetailMutateAsync } = useMutation({
     mutationFn: async (request: PairConfigDetailRequest) => {
       return await pairConfigsService.detailPairConfig(request);
     },
@@ -199,8 +196,12 @@ const CreateSwapPoolForm = ({
       toast.error("Invalid ratio format. Please use `X:Y`.");
       return;
     }
-    await getPairConfigDetailMutateAsync({
-      chainId: chainId!,
+    if (!chainId) {
+      toast.error("Invalid network configuration");
+      return;
+    }
+    const pairConfigDetailData = await getPairConfigDetailMutateAsync({
+      chainId: chainId,
       tokenIn: values.tokenBurn,
       tokenOut: values.tokenReward,
     });
