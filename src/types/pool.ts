@@ -99,12 +99,13 @@ export interface PoolDetailResponse {
     minStakingAmount?: string | null;
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
-    settlementFeeTotal?: string | null;
+    settlementFeeTotal?: string;
   };
   // Staking pool aggregate data
   staking?: {
     totalStaked: string;
     totalRewardAccrued?: string;
+    totalUnstaked?: string;
     user?: {
       address?: string;
       totalStaked: string;
@@ -113,6 +114,7 @@ export interface PoolDetailResponse {
       rewardAccrued: string;
       availableClaim: string;
       totalClaimed: string;
+      totalSettlementFee: string;
     };
   };
   returningAmountOnCanceling?: {

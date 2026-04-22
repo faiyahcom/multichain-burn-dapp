@@ -65,14 +65,21 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
     const staking = poolDetail?.staking;
     const formattedTotalStaked = fmt(staking?.totalStaked, stakingDec);
     // API has a typo: "totatClaimed" (missing 'l')
-    const formattedClaimedReward = fmt(poolDetail?.claimedRewardAmount, rewardDec);
+    const formattedClaimedReward = fmt(
+        poolDetail?.claimedRewardAmount,
+        rewardDec,
+    );
     // depositedRewards not in new API — fall back to pool rewardAmount
     const formattedDepositedRewards = fmt(pool?.rewardAmount, rewardDec);
+    const formattedSettlementFeeTotal = fmt(pool?.settlementFeeTotal, rewardDec);
 
     // Current vault balances (live)
     const formattedRewardRemaining = fmt(pool?.currentRewardAmount, rewardDec);
 
-    const formattedRewardAccrued = fmt(poolDetail?.staking?.totalRewardAccrued, rewardDec);
+    const formattedRewardAccrued = fmt(
+        poolDetail?.staking?.totalRewardAccrued,
+        rewardDec,
+    );
     // Reward Deficit = Total Reward Amount - Total Claimed Rewards
     // Total Reward Amount: if reward token == staking token → deposited + staked; else → deposited
     // TH1: Reward Token == Stake Token → Total Reward Amount = totalStaked + rewardAmount (same decimals)
@@ -87,20 +94,27 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
     try {
         const totalReward = safeDecimal(pool?.rewardAmount);
         const totalStaked = safeDecimal(staking?.totalStaked);
-        const claimed = safeDecimal(staking?.user?.totalClaimed);
-        const settlementFeeTotal = safeDecimal(pool?.settlementFeeTotal); 
+        const claimed = safeDecimal(poolDetail?.claimedRewardAmount);
+        const settlementFeeTotal = safeDecimal(pool?.settlementFeeTotal);
+        const totalUnstaked = safeDecimal(staking?.totalUnstaked ?? "0");
         const totalRewardAmount = isSameToken
-            ? totalReward.sub(totalStaked)
+            ? totalReward.add(totalStaked)
             : totalReward;
         formattedTotalRewardAmount = formatAmount(
             totalRewardAmount.toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
         );
-        const deficit = totalRewardAmount.sub(claimed).sub(settlementFeeTotal);
+        const deficit = isSameToken
+            ? totalRewardAmount
+                .sub(claimed)
+                .sub(settlementFeeTotal)
+                .sub(totalUnstaked)
+            : totalRewardAmount.sub(claimed).sub(settlementFeeTotal);
         formattedRewardDeficit = formatAmount(
             Decimal.max(0, deficit).toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
         );
+        console.log("Computed Total Reward Amount:", deficit);
     } catch {
         formattedTotalRewardAmount = "0";
         formattedRewardDeficit = "0";
@@ -120,7 +134,7 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
         [
             {
                 label: "Total Reward Amount",
-                value: `${formattedTotalReward} ${rewardSymbol}`,
+                value: `${formattedTotalRewardAmount} ${rewardSymbol}`,
             },
             {
                 label: "Total Deposited Rewards",
@@ -143,13 +157,17 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
                 value: (
                     <span className="inline-flex flex-col gap-1 text-xl text-foreground sm:flex-row sm:items-center">
                         {settlementFee}{" "}
-                        <span className="text-sm whitespace-nowrap">
+                        <span className="text-sm">
                             ({isMobile ? "system collected" : "collected by the system"})
                         </span>
                     </span>
                 ),
             },
-        ]
+            {
+                label: "Total Settlement Fee",
+                value: `${formattedSettlementFeeTotal} ${rewardSymbol}`,
+            },
+        ],
     ];
 
     return (
