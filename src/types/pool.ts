@@ -122,6 +122,7 @@ export interface PoolDetailResponse {
       rewardAccrued: string;
       availableClaim: string;
       totalClaimed: string;
+      totalSettlementFee: string;
     };
   };
   returningAmountOnCanceling?: {

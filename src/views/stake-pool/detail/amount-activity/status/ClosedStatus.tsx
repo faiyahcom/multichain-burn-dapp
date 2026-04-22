@@ -147,6 +147,14 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 }
                 className="ml-4"
             />
+            <StatRow
+                label="Total Fee"
+                value={
+                    <span className="inline-flex items-center gap-1">
+                        {fmtReward(ua?.totalSettlementFee)} {rewardToken}
+                    </span>
+                }
+            />
             {/* Emergency closed warning */}
             <div className="inline-flex items-start gap-1">
                 <IconExclaimation className="inline size-5" />

@@ -175,6 +175,15 @@ const StakeStats = ({
                 }
                 className="ml-4"
             />
+            <StatRow
+                label="Total Fee"
+                value={
+                    <span className="inline-flex items-center gap-1">
+                        {fmtReward(ua?.totalSettlementFee)} {rewardToken}
+                    </span>
+                }
+            />
+
             <p className="text-right text-sm md:text-base lg:text-lg 2xl:text-xl">
                 Interest stops accruing upon unstaking.
             </p>
@@ -182,7 +191,8 @@ const StakeStats = ({
                 <div className="inline-flex items-start gap-1">
                     <IconExclaimation className="inline size-5" />
                     <span className="text-sm text-mb-gray-b8">
-                        This pool has reached its staking limit and is no longer accepting new stakes
+                        This pool has reached its staking limit and is no longer accepting
+                        new stakes
                     </span>
                 </div>
             )}
@@ -214,9 +224,12 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
 
     const hasReachedLimit = useMemo(() => {
         const stakePool = poolDetail?.pool as any;
-        if (!stakePool?.stakingLimit || stakePool.stakingLimit === "0") return false;
+        if (!stakePool?.stakingLimit || stakePool.stakingLimit === "0")
+            return false;
         try {
-            return safeDecimal(poolDetail?.staking?.totalStaked).gte(safeDecimal(stakePool.stakingLimit));
+            return safeDecimal(poolDetail?.staking?.totalStaked).gte(
+                safeDecimal(stakePool.stakingLimit),
+            );
         } catch {
             return false;
         }
@@ -231,7 +244,9 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
 
     const invalidatePool = () => {
         if (poolAddress) {
-            queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress) });
+            queryClient.invalidateQueries({
+                queryKey: poolQueryKeys.detail(poolAddress),
+            });
         }
     };
 
