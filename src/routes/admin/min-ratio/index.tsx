@@ -1,4 +1,5 @@
 import { useAuthStore } from "@/stores/authStore";
+import AdminMinRatioList from "@/views/admin/min-ratio/list";
 import AdminMinRatioSearch from "@/views/admin/min-ratio/search";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
@@ -16,6 +17,7 @@ function RouteComponent() {
   return (
     <div className="space-y-5.5">
       <AdminMinRatioSearch />
+      <AdminMinRatioList />
     </div>
   );
 }
