@@ -66,9 +66,11 @@ export const useBatchTransferEvmFn = () => {
                     throw new Error("Total requested exceeds vault balance");
                 }
 
-                // Staking EVM: emergencyWithdraw(pool, token, tos[], amounts[])
+                // Staking EVM: split into emergencyWithdrawRewardToken / emergencyWithdrawStakingToken
                 const contract = getContractStakeFactory(signer);
-                const tx = await contract.emergencyWithdraw(poolAddress, tokenAddress, tos, amounts);
+                const tx = mode === "reward"
+                    ? await contract.emergencyWithdrawRewardToken(poolAddress, tos, amounts)
+                    : await contract.emergencyWithdrawStakingToken(poolAddress, tos, amounts);
                 const receipt = await tx.wait();
 
                 toast.success(

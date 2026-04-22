@@ -199,9 +199,10 @@ export const useBatchTransferSolFn = () => {
                         );
                     }
 
-                    // withdraw_tokens(token_mint, amount)
+                    // withdraw_tokens(token_mint, amount, is_reward)
+                    const isReward = mode === "reward";
                     const ix = await program.methods
-                        .withdrawTokens(tokenMint, rawAmount)
+                        .withdrawTokens(tokenMint, rawAmount, isReward)
                         .accounts({
                             admin: adminPubkey,
                             burnFactory: burnFactoryPDA,
