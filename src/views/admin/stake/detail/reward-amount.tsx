@@ -72,9 +72,20 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
     // depositedRewards not in new API — fall back to pool rewardAmount
     const formattedDepositedRewards = fmt(pool?.rewardAmount, rewardDec);
     const formattedSettlementFeeTotal = fmt(pool?.settlementFeeTotal, rewardDec);
-
+    const formattedTotalUnstaked = fmt(staking?.totalUnstaked, stakingDec);
     // Current vault balances (live)
+    const isNegativeRemaining = safeDecimal(
+        pool?.currentRewardAmount ?? "0",
+    ).isNegative();
     const formattedRewardRemaining = fmt(pool?.currentRewardAmount, rewardDec);
+    const absRewardRemainingFormatted = isNegativeRemaining
+        ? fmt(
+            safeDecimal(pool?.currentRewardAmount ?? "0")
+                .abs()
+                .toString(),
+            rewardDec,
+        )
+        : formattedRewardRemaining;
 
     const formattedRewardAccrued = fmt(
         poolDetail?.staking?.totalRewardAccrued,
@@ -111,7 +122,7 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
                 .sub(totalUnstaked)
             : totalRewardAmount.sub(claimed).sub(settlementFeeTotal);
         formattedRewardDeficit = formatAmount(
-            Decimal.max(0, deficit).toFixed(0, Decimal.ROUND_DOWN),
+            deficit.toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,
         );
         console.log("Computed Total Reward Amount:", deficit);
@@ -133,9 +144,10 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
         ],
         [
             {
-                label: "Total Reward Amount",
-                value: `${formattedTotalRewardAmount} ${rewardSymbol}`,
+                label: "Total Unstaked Amount",
+                value: `${formattedTotalUnstaked} ${stakingSymbol}`,
             },
+
             {
                 label: "Total Deposited Rewards",
                 value: `${formattedDepositedRewards} ${rewardSymbol}`,
@@ -143,12 +155,22 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
         ],
         [
             {
+                label: "Total Reward Amount",
+                value: `${formattedTotalRewardAmount} ${rewardSymbol}`,
+            },
+            {
                 label: "Total Reward Accrued",
                 value: `${formattedRewardAccrued} ${rewardSymbol}`,
             },
+        ],
+        [
             {
-                label: "Reward Deficit",
+                label: "Available to Claim",
                 value: `${formattedRewardDeficit} ${rewardSymbol}`,
+            },
+            {
+                label: "Total Settlement Fee",
+                value: `${formattedSettlementFeeTotal} ${rewardSymbol}`,
             },
         ],
         [
@@ -162,10 +184,6 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
                         </span>
                     </span>
                 ),
-            },
-            {
-                label: "Total Settlement Fee",
-                value: `${formattedSettlementFeeTotal} ${rewardSymbol}`,
             },
         ],
     ];
