@@ -4653,6 +4653,22 @@
               {
                 "name": "min_staking_amount",
                 "type": "u64"
+              },
+              {
+                "name": "delay_claim",
+                "type": "i64"
+              },
+              {
+                "name": "delay_accumulate",
+                "type": "i64"
+              },
+              {
+                "name": "interest_duration",
+                "type": "i64"
+              },
+              {
+                "name": "staking_limit",
+                "type": "u64"
               }
             ]
           },
@@ -4666,6 +4682,10 @@
               {
                 "name": "pool_id",
                 "type": "u64"
+              },
+              {
+                "name": "stake_id",
+                "type": "pubkey"
               },
               {
                 "name": "user",
@@ -4702,6 +4722,10 @@
               },
               {
                 "name": "user",
+                "type": "pubkey"
+              },
+              {
+                "name": "stake_id",
                 "type": "pubkey"
               },
               {
@@ -4763,6 +4787,14 @@
                 "type": "u64"
               },
               {
+                "name": "stake_id",
+                "type": "pubkey"
+              },
+              {
+                "name": "stake_index",
+                "type": "u64"
+              },
+              {
                 "name": "executor",
                 "type": "pubkey"
               },
@@ -4818,6 +4850,10 @@
               {
                 "name": "recipient",
                 "type": "pubkey"
+              },
+              {
+                "name": "is_reward",
+                "type": "bool"
               }
             ]
           },
@@ -4921,6 +4957,10 @@
               {
                 "name": "executor",
                 "type": "pubkey"
+              },
+              {
+                "name": "interest_duration",
+                "type": "i64"
               }
             ]
           },
@@ -5072,6 +5112,22 @@
           {
             "name": "min_staking_amount",
             "type": "u64"
+          },
+          {
+            "name": "delay_claim",
+            "type": "i64"
+          },
+          {
+            "name": "delay_accumulate",
+            "type": "i64"
+          },
+          {
+            "name": "interest_duration",
+            "type": "i64"
+          },
+          {
+            "name": "staking_limit",
+            "type": "u64"
           }
         ]
       }
@@ -5156,6 +5212,10 @@
           {
             "name": "executor",
             "type": "pubkey"
+          },
+          {
+            "name": "interest_duration",
+            "type": "i64"
           }
         ]
       }
@@ -5171,6 +5231,14 @@
           },
           {
             "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "stake_id",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_index",
             "type": "u64"
           },
           {
@@ -5268,6 +5336,10 @@
           {
             "name": "recipient",
             "type": "pubkey"
+          },
+          {
+            "name": "is_reward",
+            "type": "bool"
           }
         ]
       }
@@ -5287,6 +5359,10 @@
           },
           {
             "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_id",
             "type": "pubkey"
           },
           {
@@ -5323,6 +5399,10 @@
           },
           {
             "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "stake_id",
             "type": "pubkey"
           },
           {

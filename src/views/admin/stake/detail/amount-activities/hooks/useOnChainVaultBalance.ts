@@ -114,8 +114,8 @@ export function useOnChainVaultBalance(params: {
                             accountInfo.data,
                         );
                         // Staking PoolAccount uses `reward_balance` and `deposit_balance`
-                        rewardRaw = poolAccount.reward_balance.toString();
-                        depositRaw = poolAccount.deposit_balance.toString();
+                        rewardRaw = poolAccount.reward_remaining.toString();
+                        depositRaw = poolAccount.staking_remaining.toString();
 
                         if (poolAccount.is_collected === true) {
                             depositRaw = "0";

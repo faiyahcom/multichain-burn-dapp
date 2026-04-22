@@ -111,7 +111,7 @@ export const useStakePoolComputedBalancesEvm = ({
       return undefined;
 
     if (isSameToken) {
-      return currentRewardAmountRaw < 0n ? totalStaked + totalReward : totalStaked;
+      return currentRewardAmountRaw < 0n ? totalStaked + currentRewardAmountRaw : totalStaked;
     }
 
     return totalStaked;
@@ -124,8 +124,10 @@ export const useStakePoolComputedBalancesEvm = ({
     )
       return undefined;
 
-    return formatAmount(currentRewardAmountRaw.toString(), rewardTokenDecimals);
-  }, [currentRewardAmountRaw, rewardTokenDecimals]);
+    const displayReward =
+      isSameToken && currentRewardAmountRaw < 0n ? 0n : currentRewardAmountRaw;
+    return formatAmount(displayReward.toString(), rewardTokenDecimals);
+  }, [currentRewardAmountRaw, isSameToken, rewardTokenDecimals]);
 
   const formattedCurrentDepositAmount = useMemo(() => {
     if (
