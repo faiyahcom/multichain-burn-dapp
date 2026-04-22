@@ -2,9 +2,11 @@ import NetworkMultipleSelect from "@/components/common/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import { Button } from "@/components/ui/button";
 import { useMinRatioSearchFilterStore } from "@/stores/admin/min-ratio/search-filter-store";
+import { useNavigate } from "@tanstack/react-router";
 import { PlusIcon } from "lucide-react";
 
 const AdminMinRatioSearch = () => {
+  const navigate = useNavigate();
   const { filter, setFilter } = useMinRatioSearchFilterStore();
 
   return (
@@ -18,7 +20,9 @@ const AdminMinRatioSearch = () => {
           size={"mb-square-btn"}
           aria-label="Add new Min Ratio"
           onClick={() => {
-            // TODO: Implement add new min ratio action
+            navigate({
+              to: "/admin/min-ratio/create",
+            });
           }}
         >
           <span className="max-md:sr-only">Add new Min Ratio</span>
