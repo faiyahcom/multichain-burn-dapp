@@ -1,7 +1,7 @@
 import { toast } from "@/components/common/custom-toast";
 import type { AdminManagementRole } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
   getMultichainBurnProgram,
   type BrowserWallet,
@@ -95,15 +95,11 @@ export const useToggleAdminRoleSolanaFn = () => {
         tx.feePayer = programContext.walletPublicKey;
 
         const signedTx = await programContext.provider.signTransaction(tx);
-        const signature = await programContext.connection.sendRawTransaction(
-          signedTx.serialize(),
+        const signature = await sendAndConfirmTransactionSafe(
+            programContext.connection,
+            signedTx.serialize(),
+            { blockhash, lastValidBlockHeight },
         );
-
-        await confirmTransactionSafe(programContext.connection, {
-          signature,
-          blockhash,
-          lastValidBlockHeight,
-        });
 
         toast.success(
           `${role === "super_admin" ? "Super admin" : "Admin"} ${enabled ? "enabled" : "disabled"} successfully!`,
@@ -144,15 +140,11 @@ export const useToggleAdminRoleSolanaFn = () => {
         tx.feePayer = programContext.walletPublicKey;
 
         const signedTx = await programContext.provider.signTransaction(tx);
-        const signature = await programContext.connection.sendRawTransaction(
-          signedTx.serialize(),
+        const signature = await sendAndConfirmTransactionSafe(
+            programContext.connection,
+            signedTx.serialize(),
+            { blockhash, lastValidBlockHeight },
         );
-
-        await confirmTransactionSafe(programContext.connection, {
-          signature,
-          blockhash,
-          lastValidBlockHeight,
-        });
 
         toast.success("Admin role updated successfully!", {
           description: `Tx: ${signature}`,

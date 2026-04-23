@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -90,14 +90,11 @@ export const useDepositRewardSolFn = () => {
                     tx.feePayer = walletPublicKey;
 
                     const signedTx = await provider.signTransaction(tx);
-                    signature = await connection.sendRawTransaction(
+                    signature = await sendAndConfirmTransactionSafe(
+                        connection,
                         signedTx.serialize(),
+                        { blockhash, lastValidBlockHeight },
                     );
-                    await confirmTransactionSafe(connection, {
-                        signature,
-                        blockhash,
-                        lastValidBlockHeight,
-                    });
                 } else {
                     const rewardMint = new PublicKey(rewardToken);
                     const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
@@ -150,14 +147,11 @@ export const useDepositRewardSolFn = () => {
                     tx.feePayer = walletPublicKey;
 
                     const signedTx = await provider.signTransaction(tx);
-                    signature = await connection.sendRawTransaction(
+                    signature = await sendAndConfirmTransactionSafe(
+                        connection,
                         signedTx.serialize(),
+                        { blockhash, lastValidBlockHeight },
                     );
-                    await confirmTransactionSafe(connection, {
-                        signature,
-                        blockhash,
-                        lastValidBlockHeight,
-                    });
                 }
 
                 toast.success("Reward deposited successfully!", {

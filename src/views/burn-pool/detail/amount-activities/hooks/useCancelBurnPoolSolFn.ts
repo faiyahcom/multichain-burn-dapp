@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -138,15 +138,11 @@ export const useCancelBurnPoolSolFn = () => {
                 tx.feePayer = walletPublicKey;
 
                 const signedTx = await provider.signTransaction(tx);
-                const signature = await connection.sendRawTransaction(
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
                     signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
                 );
-
-                await confirmTransactionSafe(connection, {
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
 
                 toast.success("Pool cancelled successfully!", {
                     description: `Tx: ${signature}`,
