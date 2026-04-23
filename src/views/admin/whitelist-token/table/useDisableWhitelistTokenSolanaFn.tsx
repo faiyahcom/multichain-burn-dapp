@@ -21,7 +21,7 @@ import { PublicKey, SystemProgram, Transaction } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 
 export const useDisableWhitelistTokenSolanaFn = () => {
   const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
@@ -75,16 +75,12 @@ export const useDisableWhitelistTokenSolanaFn = () => {
 
         // Send – skip preflight to avoid "already processed" errors from
         // the RPC caching the simulated tx hash.
-        const signature = await connection.sendRawTransaction(
+        const signature = await sendAndConfirmTransactionSafe(
+          connection,
           signedTx.serialize(),
+          { blockhash, lastValidBlockHeight },
           { skipPreflight: true, maxRetries: 3 },
         );
-
-        await confirmTransactionSafe(connection, {
-          signature,
-          blockhash,
-          lastValidBlockHeight,
-        });
 
         toast.success("Token whitelist disabled successfully!", {
           description: `Tx: ${signature}`,

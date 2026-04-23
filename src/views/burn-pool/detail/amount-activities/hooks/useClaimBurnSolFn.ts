@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -115,14 +115,11 @@ export const useClaimBurnSolFn = () => {
                     tx.feePayer = walletPublicKey;
 
                     const signedTx = await provider.signTransaction(tx);
-                    signature = await connection.sendRawTransaction(
+                    signature = await sendAndConfirmTransactionSafe(
+                        connection,
                         signedTx.serialize(),
+                        { blockhash, lastValidBlockHeight },
                     );
-                    await confirmTransactionSafe(connection, {
-                        signature,
-                        blockhash,
-                        lastValidBlockHeight,
-                    });
                 } else {
                     // ── claim_reward_spl ────────────────────────────────────
                     const rewardMint = new PublicKey(poolDetail.pool.rewardToken);
@@ -189,14 +186,11 @@ export const useClaimBurnSolFn = () => {
                     tx.feePayer = walletPublicKey;
 
                     const signedTx = await provider.signTransaction(tx);
-                    signature = await connection.sendRawTransaction(
+                    signature = await sendAndConfirmTransactionSafe(
+                        connection,
                         signedTx.serialize(),
+                        { blockhash, lastValidBlockHeight },
                     );
-                    await confirmTransactionSafe(connection, {
-                        signature,
-                        blockhash,
-                        lastValidBlockHeight,
-                    });
                 }
 
                 toast.success("Reward claimed successfully!", {
