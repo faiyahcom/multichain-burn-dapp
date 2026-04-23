@@ -25,6 +25,7 @@ import {
     getTokenProgramFromAssetType,
 } from "@/web3/helpers";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 
 export type CreateBurnPoolSolParams = {
     poolName: string;
@@ -163,7 +164,7 @@ export const useCreateBurnPoolSolFn = () => {
                     signedTx.serialize(),
                 );
 
-                await connection.confirmTransaction({
+                await confirmTransactionSafe(connection, {
                     signature,
                     blockhash,
                     lastValidBlockHeight,

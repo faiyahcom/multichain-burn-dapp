@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
     PublicKey,
     SystemProgram,
@@ -238,7 +239,7 @@ export const useCreateStakePoolSolFn = () => {
                 // sendRawTransaction afterwards results in "already processed".
                 const signature = await provider.sendTransaction(tx, connection);
 
-                await connection.confirmTransaction({
+                await confirmTransactionSafe(connection, {
                     signature,
                     blockhash,
                     lastValidBlockHeight,
@@ -300,7 +301,7 @@ export const useCreateStakePoolSolFn = () => {
 
                 const signature = await provider.sendTransaction(tx, connection);
 
-                await connection.confirmTransaction({
+                await confirmTransactionSafe(connection, {
                     signature,
                     blockhash,
                     lastValidBlockHeight,

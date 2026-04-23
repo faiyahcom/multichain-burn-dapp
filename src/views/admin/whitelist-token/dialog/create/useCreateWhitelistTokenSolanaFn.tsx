@@ -12,6 +12,7 @@ import { PublicKey, Transaction } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import type { PoolType } from "@/types/admin/master-pool-management";
 
 // Maps numeric pool types to the Anchor enum variant object expected by the IDL.
@@ -111,7 +112,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           { skipPreflight: true, maxRetries: 3 },
         );
 
-        await connection.confirmTransaction({
+        await confirmTransactionSafe(connection, {
           signature,
           blockhash,
           lastValidBlockHeight,
