@@ -12,7 +12,7 @@ import { FEED_PAGE_SIZE, TXN_PAGE_SIZE } from "@/hooks/useScrollingFeed";
 import { cn } from "@/lib/utils";
 import type { ActivityItem } from "@/services/dashboardService";
 import type { StakingActivityItem } from "@/services/dashboardService";
-import { POOL_KIND, PoolKindCodeEnum } from "@/types/pool";
+import { PoolKindCodeEnum } from "@/types/pool";
 import { getExplorerUrl } from "@/utils/helpers/networks";
 import { formatAmount, safeBigInt } from "@/utils/helpers/numbers";
 import {
@@ -20,7 +20,7 @@ import {
   formatTimestampSecondsToDate,
   truncateString,
 } from "@/utils/helpers/string";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import SwapActivityImage from "/images/dashboard/swap-activity.png";
 import { formatUnits } from "ethers";
 
@@ -381,7 +381,6 @@ export const SwapActivityFeed = ({
 // ── Staking row ───────────────────────────────────────────────────────────────
 
 const StakingRow = ({ item }: { item: StakingActivityItem }) => {
-  const navigate = useNavigate();
   const taker = truncateString({ str: item.executor, left: 4, right: 4 });
   const label = truncateString({
     str: item.executorName ?? taker,
@@ -397,7 +396,6 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
     item.tokenInDecimals,
     Number(formatUnits(safeBigInt(item.amountIn), item.tokenInDecimals)) >= 10 ? 6 : 3,
   );
-  const poolName = item.pool?.name ?? "";
 
   return (
     <Link
@@ -407,10 +405,10 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
     >
       <div className="flex min-w-0 items-center gap-2 md:gap-3">
         <Dot className="size-2.5 shrink-0 bg-mb-btn-stake md:size-3.25" />
-        <span className="truncate text-mb-gray-b8">
-          Staked by <span className="text-foreground">{poolName || label}</span>
+        <span className="truncate text-mb-gray-b8 max-w-1/2">
+          Staked by <span className="text-foreground">{label || taker}</span>
         </span>
-        <span className="truncate text-mb-gray-b8/60">{taker}</span>
+        <span className="truncate text-mb-gray-b8/60 max-w-1/3">{taker}</span>
       </div>
 
       <div className="flex items-center justify-center gap-1 md:gap-2">
