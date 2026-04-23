@@ -394,7 +394,7 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
   const amount = formatAmount(
     item.amountIn,
     item.tokenInDecimals,
-    Number(formatUnits(safeBigInt(item.amountIn), item.tokenInDecimals)) >= 10 ? 6 : 3,
+    Number(formatUnits(safeBigInt(item.amountIn), item.tokenInDecimals)) >= 10 ? 3 : 6,
   );
 
   return (
