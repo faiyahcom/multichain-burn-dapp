@@ -74,6 +74,9 @@ export const getPoolHref = (
     case PoolKindCodeEnum.Swap:
       return `/swap/detail/${address}`;
 
+    case PoolKindCodeEnum.Stake:
+      return `/staking/detail/${address}`;
+
     default:
       void (kind satisfies never); // exhaustive check
       return "";

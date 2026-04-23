@@ -1,4 +1,4 @@
-import type { BurnPoolStatus, SwapPoolStatus } from "@/types/pool";
+import type { BurnPoolStatus, StakePoolStatus, SwapPoolStatus } from "@/types/pool";
 
 export const tokenStatus = ["all", "enable", "disable"] as const;
 export type TokenStatus = (typeof tokenStatus)[number];
@@ -67,4 +67,8 @@ export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
     color: "#FFB08E",
     letter: "H",
   },
+};
+
+export const STAKE_POOL_STATUS: Record<StakePoolStatus, any> = {
+  ...BURN_POOL_STATUS,
 };

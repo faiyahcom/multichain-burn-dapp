@@ -1,0 +1,84 @@
+import GlowContainer from "@/components/common/glow/container";
+import LayoutPicker from "@/components/common/glow/layout-picker";
+import MultipleSelect from "@/components/common/glow/multiple-select";
+import NetworkMultipleSelect from "@/components/common/glow/network-multiple-select";
+import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
+import SortSelect from "@/components/common/glow/sort-select";
+import { useStakePoolListSearchFilterStore } from "@/stores/pool-list/search-filter-store";
+import {
+  stakePoolStatusLabels,
+  userViewStakePoolStatuses,
+  type StakePoolStatus,
+} from "@/types/admin/master-pool-management";
+
+const StakeSearch = () => {
+  const { filter, setFilter } = useStakePoolListSearchFilterStore();
+
+  const statusOptions = userViewStakePoolStatuses.map((status) => ({
+    label: stakePoolStatusLabels[status],
+    value: status,
+  }));
+
+  return (
+    <GlowContainer
+      variant="stake"
+      className="flex flex-col gap-3 p-3 md:p-6 1440px:flex-row"
+    >
+      <SearchTextDebouncedInput
+        variant="stake"
+        inputProps={{
+          placeholder: "Search",
+        }}
+        value={filter.text}
+        onValueChange={(value) => setFilter({ text: value })}
+      />
+      <NetworkMultipleSelect
+        variant="stake"
+        selected={filter.network}
+        onChange={(value) => setFilter({ network: value })}
+        otherProps={{
+          classNames: {
+            btn: "1440px:max-w-[400px]",
+          },
+        }}
+      />
+      <MultipleSelect
+        variant="stake"
+        options={statusOptions}
+        selected={filter.status as string[]}
+        onChange={(value) => setFilter({ status: value as StakePoolStatus[] })}
+        showIconsInTriggerIfAny={false}
+        placeholder="Status"
+        placeholderMultiple="Status"
+        classNames={{
+          btn: "w-full 1440px:max-w-50",
+          content: "font-inter",
+        }}
+      />
+      <SortSelect
+        options={["stakedAmount", "apr"]}
+        sortBy={filter.sortBy ?? "none"}
+        sortOrder={filter.sortOrder}
+        setSortBy={(sortBy) => setFilter({ sortBy })}
+        setSortOrder={(sortOrder) => setFilter({ sortOrder })}
+        variant="stake"
+        classNames={{
+          content: "font-inter",
+          btn: "w-full 1440px:w-max 1440px:max-w-79",
+        }}
+      />
+      <LayoutPicker
+        layout={filter.listLayout}
+        setLayout={(layout) => setFilter({ listLayout: layout })}
+        variant="stake"
+        hasContainer
+        classNames={{
+          container: "max-1440px:w-full",
+          btn: "max-1440px:flex-1",
+        }}
+      />
+    </GlowContainer>
+  );
+};
+
+export default StakeSearch;

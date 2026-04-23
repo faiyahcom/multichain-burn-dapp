@@ -8,6 +8,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import {
+  poolTypes,
+  poolTypeLabels,
+  type PoolType,
+} from "@/types/admin/master-pool-management";
 import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -24,6 +29,7 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import ImageUpload from "./image-upload";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
+import { useTokenDecimals } from "@/hooks/useTokenDecimals";
 import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
 import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
@@ -48,6 +54,9 @@ const whitelistTokenSchema = z.object({
   symbol: z.string().min(1, { error: "Symbol is required" }),
   address: z.string().min(1, { error: "Address is required" }),
   networkId: z.enum(networkIdValues),
+  poolTypes: z
+    .array(z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]))
+    .min(1, { error: "At least one pool type is required" }),
   image: z
     .file()
     .mime(["image/png", "image/jpeg", "image/svg+xml"], {
@@ -82,13 +91,14 @@ const AdminWhitelistTokenDialogCreate = () => {
 
   const queryClient = useQueryClient();
 
-  const { control, handleSubmit, resetField, reset, setValue } =
+  const { control, handleSubmit, resetField, reset, setValue, watch } =
     useForm<WhitelistTokenFormValues>({
       defaultValues: {
         name: "",
         symbol: "",
         address: "",
         networkId: currentNetworkId ?? undefined,
+        poolTypes: [] as PoolType[],
         image: undefined,
         description: "",
         homepageLink: "",
@@ -96,6 +106,11 @@ const AdminWhitelistTokenDialogCreate = () => {
       },
       resolver: zodResolver(whitelistTokenSchema),
     });
+
+  const watchedAddress = watch("address");
+  const watchedNetworkId = watch("networkId");
+  const { decimals: onChainDecimals, isLoading: isDecimalsLoading } =
+    useTokenDecimals({ address: watchedAddress, networkId: watchedNetworkId });
 
   // Sync form field whenever the wallet switches network
   useEffect(() => {
@@ -130,6 +145,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       formData.append("description", data.description);
       formData.append("homepage", data.homepageLink);
       formData.append("whitepaper", data.docLink);
+      formData.append("kind", data.poolTypes.join(","));
       // default to enable and not dropped
       formData.append("enable", booleanString[4]);
       formData.append("isDropped", booleanString[5]);
@@ -156,6 +172,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     if (isSolana) {
       const result = await createWhitelistTokenSolana({
         tokenAddress: data.address,
+        poolTypes: data.poolTypes,
       });
       if (result) {
         createWhitelistTokenMutation(data);
@@ -164,6 +181,7 @@ const AdminWhitelistTokenDialogCreate = () => {
     if (isEvm) {
       const result = await createWhitelistTokenEvm({
         tokenAddress: data.address,
+        poolTypes: data.poolTypes,
       });
       if (result) {
         createWhitelistTokenMutation(data);
@@ -262,6 +280,22 @@ const AdminWhitelistTokenDialogCreate = () => {
                 </Field>
               )}
             />
+            <Field>
+              <FieldLabel>Decimal</FieldLabel>
+              <Input
+                value={
+                  isDecimalsLoading
+                    ? "Loading..."
+                    : onChainDecimals != null
+                      ? String(onChainDecimals)
+                      : ""
+                }
+                // placeholder="Auto-fetched from on-chain"
+                className="px-5 placeholder:text-15px placeholder:text-secondary-text bg-inactive cursor-not-allowed"
+                readOnly
+                disabled
+              />
+            </Field>
             <Controller
               control={control}
               name="networkId"
@@ -301,6 +335,49 @@ const AdminWhitelistTokenDialogCreate = () => {
                       />
                     ))}
                   </div>
+                </Field>
+              )}
+            />
+            <Controller
+              control={control}
+              name="poolTypes"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="gap-3.25">
+                  <FieldLabel htmlFor={field.name}>
+                    Pool type<span className="text-md-required-red">*</span>
+                  </FieldLabel>
+                  <div className="flex items-center gap-2.25">
+                    {poolTypes.map((type) => {
+                      const selected = (field.value ?? []).includes(type);
+                      return (
+                        <AnimateIconButton
+                          key={type}
+                          variant="letter-icon"
+                          iconLetter={poolTypeLabels[type][0]}
+                          isActive={selected}
+                          btnProps={{
+                            type: "button",
+                            onClick: () => {
+                              const current = field.value ?? [];
+                              field.onChange(
+                                selected
+                                  ? current.filter((t) => t !== type)
+                                  : [...current, type],
+                              );
+                            },
+                          }}
+                          text={poolTypeLabels[type]}
+                          color="#9072f9"
+                          classNames={{
+                            btn: "after:text-primary-foreground",
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
                 </Field>
               )}
             />

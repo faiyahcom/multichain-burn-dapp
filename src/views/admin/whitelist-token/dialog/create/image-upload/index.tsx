@@ -7,18 +7,26 @@ interface Props {
   img?: File;
   onChange?: (img?: File) => void;
   placeholder?: string;
+  /** Pre-existing image URL (e.g. from server) shown when no File is selected */
+  initialUrl?: string;
+  /** Called when the user removes the pre-existing image */
+  onRemoveInitialUrl?: () => void;
 }
 
-const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder }) => {
+const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder, initialUrl, onRemoveInitialUrl }) => {
   const id = useId();
   const [url, setUrl] = useState<string>("");
+  const [showInitial, setShowInitial] = useState<boolean>(!!initialUrl);
 
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    setShowInitial(false);
     onChange?.(file);
   };
 
   const handleRemove = () => {
+    setShowInitial(false);
+    onRemoveInitialUrl?.();
     onChange?.(undefined);
   };
 
@@ -30,6 +38,7 @@ const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder }) => {
         URL.revokeObjectURL(url);
       }
       setUrl(newObjectUrl);
+      setShowInitial(false);
     } else {
       if (url) {
         URL.revokeObjectURL(url);
@@ -45,14 +54,21 @@ const ImageUpload: React.FC<Props> = ({ img, onChange, placeholder }) => {
     };
   }, [img]);
 
-  if (url) {
+  // Reset showInitial when initialUrl changes (e.g. dialog re-opens with new token)
+  useEffect(() => {
+    setShowInitial(!!initialUrl);
+  }, [initialUrl]);
+
+  const displayUrl = url || (showInitial ? initialUrl : "");
+
+  if (displayUrl) {
     return (
       <>
         <label
           htmlFor={id}
           className="relative aspect-square size-17.75! cursor-pointer overflow-hidden rounded-md-plus"
         >
-          <img src={url} alt="Image" className="h-full w-full object-cover" />
+          <img src={displayUrl} alt="Image" className="h-full w-full object-cover" />
           <Button
             size={"icon-xs"}
             className="absolute top-1 right-1 bg-mb-danger hover:bg-mb-danger"

@@ -10,6 +10,8 @@ import { PoolKindCodeEnum, type PoolKindCode } from "@/types/pool";
 export const poolTypes = [
   PoolKindCodeEnum.Burn,
   PoolKindCodeEnum.Swap,
+  PoolKindCodeEnum.Stake,
+  PoolKindCodeEnum.Launchpad,
 ] as const;
 export type PoolType = PoolKindCode;
 export const isPoolType = (value: unknown): value is PoolType =>
@@ -18,6 +20,8 @@ export const isPoolType = (value: unknown): value is PoolType =>
 export const poolTypeLabels: Record<PoolType, string> = {
   [PoolKindCodeEnum.Burn]: "Burn pool",
   [PoolKindCodeEnum.Swap]: "Swap pool",
+  [PoolKindCodeEnum.Stake]: "Staking pool",
+  [PoolKindCodeEnum.Launchpad]: "Launchpad pool",
 };
 
 export const poolTypeOptionValues = [
@@ -81,6 +85,23 @@ export const burnPoolStatusColors: Record<BurnPoolStatus, string> = {
   upcoming: "#FFE798",
 };
 
+export const stakePoolStatuses = [
+  "holding",
+  "upcoming",
+  ...swapPoolStatuses,
+] as const;
+export type StakePoolStatus = (typeof stakePoolStatuses)[number];
+export const stakePoolStatusLabels: Record<StakePoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  holding: "Holding",
+  upcoming: "Upcoming",
+};
+export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
+  ...swapPoolStatusColors,
+  holding: "#FFB08E",
+  upcoming: "#FFE798",
+};
+
 export const getPoolStatusColor = (status: AllPoolStatus) => {
   return burnPoolStatusColors[status as BurnPoolStatus] ?? "#7989ba";
 };
@@ -89,7 +110,11 @@ export const getPoolStatusLabel = (status: AllPoolStatus) => {
   return burnPoolStatusLabels[status as BurnPoolStatus] ?? "N/A";
 };
 
-export type AllPoolStatus = BurnPoolStatus | SwapPoolStatus | "draft";
+export type AllPoolStatus =
+  | BurnPoolStatus
+  | SwapPoolStatus
+  | StakePoolStatus
+  | "draft";
 
 export type PoolItemType = {
   address: string;
@@ -119,6 +144,10 @@ export type PoolItemType = {
   isPartner: boolean;
   liquidity: string; // string number
   rewardAmount: string; // string number
+  tokenInEnable: boolean;
+  tokenOutEnable: boolean;
+  apr: string; // divide by 10000 to get display percentage
+  stakedAmount: string;
 };
 
 export type PoolListRequest = PaginationRequest & {
@@ -155,6 +184,7 @@ export type PoolListStatsResponse = {
   totalParticipants: number;
   totalBurned?: string;
   totalSwapVolume?: string;
+  totalStaked?: number;
 };
 
 // user view pool list can only see certain statuses
@@ -165,7 +195,6 @@ export const userViewBurnPoolStatuses = [
   "on_going",
   "ended",
 ] as const;
-export type UserViewBurnPoolStatus = (typeof userViewBurnPoolStatuses)[number];
 export const userHiddenBurnPoolStatuses = [
   ...burnPoolStatuses.filter(
     (status) =>
@@ -181,6 +210,22 @@ export const userHiddenSwapPoolStatuses = [
   ...swapPoolStatuses.filter(
     (status) =>
       !(userViewSwapPoolStatuses as ReadonlyArray<SwapPoolStatus>).includes(
+        status,
+      ),
+  ),
+  "draft",
+] as const;
+
+export const userViewStakePoolStatuses = [
+  "on_going",
+  "closed",
+  "upcoming",
+  "ended",
+] as const;
+export const userHiddenStakePoolStatuses = [
+  ...stakePoolStatuses.filter(
+    (status) =>
+      !(userViewStakePoolStatuses as ReadonlyArray<StakePoolStatus>).includes(
         status,
       ),
   ),

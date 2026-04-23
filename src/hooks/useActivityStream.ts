@@ -1,14 +1,14 @@
 import { useEffect, useRef } from "react";
 import { API_BASE_URL } from "@/config/constant";
 import { API_ROUTES } from "@/services/apiRoutes";
-import type { ActivityItem } from "@/services/dashboardService";
+import type { ActivityItem, StakingActivityItem } from "@/services/dashboardService";
 
 // ─── SSE payload shapes ───────────────────────────────────────────────────────
 
-/** burn_activity / swap_activity events carry a camelCase-enriched ActivityItem. */
+/** burn_activity / swap_activity / staking_activity events carry a camelCase-enriched activity item. */
 interface ActivityPayload {
-    event: "burn_activity" | "swap_activity";
-    activity: ActivityItem;
+    event: "burn_activity" | "swap_activity" | "staking_activity";
+    activity: ActivityItem & StakingActivityItem;
 }
 
 /**
@@ -47,6 +47,8 @@ export interface ActivityStreamCallbacks {
     onSwapActivity?: (item: ActivityItem) => void;
     /** Called for `transaction` events. */
     onTransaction?: (item: ActivityItem) => void;
+    /** Called for `staking_activity` events. */
+    onStakingActivity?: (item: StakingActivityItem) => void;
 }
 
 /**
@@ -76,10 +78,16 @@ export function useActivityStream(callbacks: ActivityStreamCallbacks) {
 
         const handleActivity = (payload: ActivityPayload) => {
             const item = payload.activity;
-            if (payload.event === "burn_activity") {
-                cbRef.current.onBurnActivity?.(item);
-            } else {
-                cbRef.current.onSwapActivity?.(item);
+            switch (payload.event) {
+                case "burn_activity":
+                    cbRef.current.onBurnActivity?.(item);
+                    break;
+                case "swap_activity":
+                    cbRef.current.onSwapActivity?.(item);
+                    break;
+                case "staking_activity":
+                    cbRef.current.onStakingActivity?.(item);
+                    break;
             }
         };
 
@@ -114,6 +122,9 @@ export function useActivityStream(callbacks: ActivityStreamCallbacks) {
             });
             es.addEventListener("transaction", (e: Event) => {
                 try { handleTransaction(JSON.parse((e as MessageEvent).data) as TransactionPayload); } catch { /* ignore */ }
+            });
+            es.addEventListener("staking_activity", (e: Event) => {
+                try { handleActivity(JSON.parse((e as MessageEvent).data) as ActivityPayload); } catch { /* ignore */ }
             });
 
             // Fallback: generic `message` event — dispatch by the `event` field inside the JSON.

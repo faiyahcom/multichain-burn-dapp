@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey, SystemProgram, TransactionInstruction } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -251,15 +252,11 @@ export const useCreateSwapPoolSolanaFn = () => {
                 const signedTx = await provider.signTransaction(tx);
 
                 // Send
-                const signature = await connection.sendRawTransaction(
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
                     signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
                 );
-
-                await connection.confirmTransaction({
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
 
                 toast.success("Pool created successfully!", {
                     description: `Tx: ${signature}`,

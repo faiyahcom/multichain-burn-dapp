@@ -11,7 +11,7 @@ import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { truncateString } from "@/utils/helpers/string";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, use } from "react";
 import { Spinner } from "@/components/ui/spinner";
 import TokenDisplay from "../token-display";
 import { cn } from "@/lib/utils";
@@ -23,6 +23,7 @@ import {
 } from "./container";
 import { ChevronDownIcon } from "lucide-react";
 import TokenImage from "../token-image";
+import { PoolKindCodeEnum } from "@/types/pool";
 
 export type TokenOption = {
   address: string;
@@ -53,7 +54,7 @@ type Props = {
   onChange: (token: TokenOption) => void;
   disabledAddress?: string;
   classNames?: WhitelistTokenSelectClassNames;
-  variant?: "pair" | "burn" | "swap";
+  variant?: "pair" | "burn" | "swap" | "stake";
   hasDropdownIcon?: boolean;
   showDetail?: boolean;
 };
@@ -83,12 +84,26 @@ const WhitelistTokenSelect = ({
   const isSolana = selectedNetworkId === "solana";
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
 
+  const kinds = useMemo(() => {
+    switch (variant) {
+      case "burn":
+        return [PoolKindCodeEnum.Burn].join(",");
+      case "swap":
+        return [PoolKindCodeEnum.Swap].join(",");
+      case "stake":
+        return [PoolKindCodeEnum.Stake].join(",");
+      default:
+        return undefined;
+    }
+  }, [variant]);
+
   const { data: whitelistTokens, isPending: isLoading } = useGetWhitelistTokens(
     {
       search: textSearch || undefined,
       chainIds: networkConfig?.backendChainId,
       active: "1",
       isDropped: "0",
+      kinds: kinds,
     },
   );
 

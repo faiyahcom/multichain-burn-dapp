@@ -17,6 +17,12 @@ export interface SectionStats {
   totalPools: number;
 }
 
+export interface StakingSection {
+  stakedAmount: number;
+  totalTxns: number;
+  totalParticipant: number;
+}
+
 export interface StatsStickerResponse {
   tvl: string;
   volume: string;
@@ -25,6 +31,7 @@ export interface StatsStickerResponse {
   totalPools: number;
   burnSection: SectionStats;
   swapSection: SectionStats;
+  stakingSection?: StakingSection;
 }
 
 export interface ActivityItem {
@@ -63,6 +70,40 @@ export interface LatestActivityResponse {
   burnActivities: ActivityItem[];
   swapActivities: ActivityItem[];
   transactions: ActivityItem[];
+  stakingActivities: StakingActivityItem[];
+}
+
+export interface StakingActivityItem {
+  id: string;
+  hash: string;
+  log_ix: number;
+  kind: number;
+  timestamp: string;
+  tokenIn: string;
+  tokenInSymbol: string;
+  tokenInDecimals: number;
+  amountIn: string;
+  tokenOut: string;
+  tokenOutSymbol: string;
+  tokenOutDecimals: number;
+  amountOut: string;
+  chainId: string;
+  poolAddress: string;
+  poolKind: number;
+  recipient: string;
+  executor: string;
+  fee: string;
+  stakeId: number;
+  stakeDate: string;
+  isUnstaked: boolean;
+  pool?: { name: string | null };
+  executorName: string | null;
+  tokenInCustomName: string | null;
+  tokenInCustomSymbol: string | null;
+  tokenInImage: string | null;
+  tokenOutCustomName: string | null;
+  tokenOutCustomSymbol: string | null;
+  tokenOutImage: string | null;
 }
 
 export interface PartnerPool {
@@ -126,6 +167,35 @@ export interface TopSwapperResponse {
   topSwapper: TopSwapper[];
 }
 
+export interface TopStakingPool {
+  address: string;
+  name: string;
+  owner: string;
+  chainId: string;
+  status: string;
+  apr: string;
+  lockUpDuration: string;
+  rewardToken: string;
+  rewardTokenSymbol: string;
+  rewardTokenDecimals: number;
+  rewardTokenImageUri: string | null;
+  tokenIn: string;
+  tokenInSymbol: string;
+  tokenInDecimals: number;
+  timeStart: string;
+  timeEnd: string;
+  stakingLimit: string;
+  stakingAmount: number;
+  minStakingAmount: string;
+  maxStakingAmount: string;
+  isPartner: boolean;
+  pool_id: string;
+}
+
+export interface TopStakingPoolsResponse {
+  topStakingPools: TopStakingPool[];
+}
+
 export interface LimitRequest {
   limit?: number;
   page?: number;
@@ -165,6 +235,14 @@ export const dashboardService = {
   getTopSwapper: async (params?: LimitRequest) => {
     const response = await apiClient.get<TopSwapperResponse>(
       API_ROUTES.GENERAL.TOP_SWAPPER,
+      { params },
+    );
+    return response;
+  },
+
+  getTopStakingPools: async (params?: LimitRequest) => {
+    const response = await apiClient.get<TopStakingPoolsResponse>(
+      API_ROUTES.GENERAL.TOP_STAKING_POOLS,
       { params },
     );
     return response;

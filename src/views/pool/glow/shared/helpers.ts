@@ -12,7 +12,19 @@ import {
 export const getPoolGlowVariant = (
   poolKind: PoolKindCode,
 ): ContainerVariant => {
-  return poolKind === PoolKindCodeEnum.Burn ? "burn" : "swap";
+  switch (poolKind) {
+    case PoolKindCodeEnum.Burn:
+      return "burn";
+    case PoolKindCodeEnum.Swap:
+      return "swap";
+    case PoolKindCodeEnum.Stake:
+      return "stake";
+    case PoolKindCodeEnum.Launchpad:
+      return "pair"; // TODO: change to launchpad
+    default:
+      void (poolKind satisfies never);
+      return "pair";
+  }
 };
 
 export const renderBurnPoolTime = (pool: PoolItemType): string => {

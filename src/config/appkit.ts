@@ -44,7 +44,11 @@ export const appKitConfig = {
   networks,
   metadata,
   projectId: APPKIT_PROJECT_ID ?? "",
+  allowUnsupportedChain: true,
   features: {
     analytics: true,
+    email: false,
+    socials: [],
+    emailShowWallets: false,
   },
 };

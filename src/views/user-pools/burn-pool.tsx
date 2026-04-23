@@ -120,7 +120,7 @@ function UserBurnPools({ mode = "participated", title }: Props) {
   const participatedQueryParams: GetParticipatedPoolsByUserParams = {
     page,
     limit: LIMIT,
-    kind: "0",
+    kinds: "0",
     includeStatuses: convertArrayToStringParam({ array: selectedStatuses }),
     chainIds: convertArrayToStringParam({
       array: selectedNetworks.map(networkIdToChainId),

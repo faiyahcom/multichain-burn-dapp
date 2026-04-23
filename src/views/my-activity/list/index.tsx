@@ -183,8 +183,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Deposit reward token, Deposit burn token
-  if ([10, 30].includes(kind)) {
+  // Deposit reward token, Deposit burn token, Stake
+  if ([10, 30, 33].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountIn}
@@ -197,8 +197,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Claim reward
-  if (kind === 31) {
+  // Claim reward (burn & stake), Unstake
+  if ([31, 35, 34].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountOut}

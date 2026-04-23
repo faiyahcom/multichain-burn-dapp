@@ -1,7 +1,7 @@
 import { cn } from "@/lib/utils";
 import { useId } from "react";
 
-const ContainerVariants = ["pair", "burn", "swap", "green"] as const;
+const ContainerVariants = ["pair", "burn", "swap", "green", "stake"] as const;
 
 export type ContainerVariant = (typeof ContainerVariants)[number];
 
@@ -27,6 +27,9 @@ export const getVariantBorderClassName = ({
       break;
     case "green":
       variantClassName = "border-green-border";
+      break;
+    case "stake":
+      variantClassName = "border-stake-border";
       break;
     default:
       const _exhaustiveCheck: never = variant;
@@ -58,6 +61,9 @@ export const getVariantShadowClassName = ({
     case "green":
       variantClassName = "shadow-green-glow";
       break;
+    case "stake":
+      variantClassName = "shadow-stake-glow";
+      break;
     default:
       const _exhaustiveCheck: never = variant;
       variantClassName = _exhaustiveCheck;
@@ -87,6 +93,9 @@ export const getVariantBgClassName = ({
       break;
     case "green":
       variantClassName = "card-green-bg";
+      break;
+    case "stake":
+      variantClassName = "card-stake-bg";
       break;
     default:
       const _exhaustiveCheck: never = variant;
@@ -136,6 +145,13 @@ export const getVariantBtnBg50ClassName = ({
         { "bg-mb-btn-green/50": !isHover && !isGroupHover },
         { "hover:bg-mb-btn-green/50": isHover },
         { "group-hover:bg-mb-btn-green/50": isGroupHover },
+      );
+      break;
+    case "stake":
+      variantClassName = cn(
+        { "bg-mb-btn-stake/50": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-stake/50": isHover },
+        { "group-hover:bg-mb-btn-stake/50": isGroupHover },
       );
       break;
     default:
@@ -188,6 +204,13 @@ export const getVariantBtnBg30ClassName = ({
         { "group-hover:bg-mb-btn-green/30": isGroupHover },
       );
       break;
+    case "stake":
+      variantClassName = cn(
+        { "bg-mb-btn-stake/30": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-stake/30": isHover },
+        { "group-hover:bg-mb-btn-stake/30": isGroupHover },
+      );
+      break;
     default:
       const _exhaustiveCheck: never = variant;
       variantClassName = _exhaustiveCheck;
@@ -237,7 +260,14 @@ export const getVariantBtnBgClassName = ({
         { "hover:bg-mb-btn-green": isHover },
         { "group-hover:bg-mb-btn-green": isGroupHover },
       );
-      break;  
+      break;
+    case "stake":
+      variantClassName = cn(
+        { "bg-mb-btn-stake": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-stake": isHover },
+        { "group-hover:bg-mb-btn-stake": isGroupHover },
+      );
+      break;
     default:
       const _exhaustiveCheck: never = variant;
       variantClassName = _exhaustiveCheck;
