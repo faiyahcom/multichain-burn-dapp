@@ -149,7 +149,7 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
             },
 
             {
-                label: "Total Deposited Rewards",
+                label: "Total Deposited Rewards By Admin",
                 value: `${formattedDepositedRewards} ${rewardSymbol}`,
             },
         ],
