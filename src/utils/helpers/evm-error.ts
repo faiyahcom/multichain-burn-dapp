@@ -2,14 +2,19 @@ import { ethers } from "ethers";
 
 const ONCHAIN_ERROR_MESSAGES = {
   MultisigWalletRequired: "Action must be executed by the multisig wallet.",
+  AddressEmptyCode: "Target address does not contain contract code.",
+  ERC1967InvalidImplementation: "Implementation address is invalid.",
+  ERC1967NonPayable: "This operation does not accept ETH value.",
+  FailedCall: "Contract call failed.",
   InvalidAddress: "Provided address is invalid.",
   InvalidCreationFee: "Creation fee is invalid.",
+  InvalidInitialization: "Contract initialization is invalid.",
   NotAuthorized: "Current wallet is not authorized to perform this action.",
   InvalidValue: "Transaction value is invalid.",
   InvalidTimeRange: "Start time and end time are invalid.",
   InvalidPoolStatus: "Pool status does not allow this action.",
   InvalidAmount: "Amount is invalid.",
-  StakingLimitExceeded: "Staking amount exceeds the allowed limit.",
+  StakingLimitExceeded: "The pool has reached its maximum capacity.",
   NotInWhitelist: "Address is not in the whitelist.",
   PoolEnded: "Pool has already ended.",
   ArrayLengthMismatch: "Input arrays must have the same length.",
@@ -20,6 +25,7 @@ const ONCHAIN_ERROR_MESSAGES = {
   InvalidDecimals: "Token decimals are invalid.",
   InvalidSettlementFee: "Settlement fee is invalid.",
   LengthMismatch: "Input lengths do not match.",
+  NotInitializing: "Contract is not in initialization mode.",
   PoolAlreadyClose: "Pool is already closed.",
   PoolClosed: "Pool is closed.",
   PoolNotClosed: "Pool is not closed yet.",
@@ -30,6 +36,10 @@ const ONCHAIN_ERROR_MESSAGES = {
   NotProjectOwner: "Current wallet is not the project owner.",
   NotOwner: "Current wallet is not the owner.",
   AlreadyInitialized: "Contract is already initialized.",
+  FailedDeployment: "Contract deployment failed.",
+  InsufficientBalance: "Insufficient balance for this transaction.",
+  OwnableInvalidOwner: "Owner address is invalid.",
+  OwnableUnauthorizedAccount: "Current wallet is not the contract owner.",
   RewardTooSmall: "Reward amount is too small.",
   InsufficientReward: "Insufficient reward balance.",
   PoolAlreadyClosed: "Pool is already closed.",
@@ -39,7 +49,9 @@ const ONCHAIN_ERROR_MESSAGES = {
   NoStateChange: "No state change to apply.",
   InvalidAssetPair: "Asset pair is invalid.",
   TransferFromFailed: "Something when wrong.",
-  MustKeepAtLeastOneSuperAdmin:"Must Keep At Least One Super Admin."
+  MustKeepAtLeastOneSuperAdmin: "Must keep at least one Super Admin.",
+  UUPSUnauthorizedCallContext: "Upgrade must be called through an active proxy.",
+  UUPSUnsupportedProxiableUUID: "Implementation is not UUPS compatible.",
 } as const;
 
 type OnchainErrorName = keyof typeof ONCHAIN_ERROR_MESSAGES;
@@ -81,11 +93,47 @@ const getValueAtPath = (value: unknown, path: readonly string[]) =>
     value,
   );
 
-const getErrorTexts = (error: unknown) =>
-  ERROR_TEXT_PATHS.flatMap((path) => {
+const collectNestedStrings = (
+  value: unknown,
+  visited = new WeakSet<object>(),
+  depth = 0,
+): string[] => {
+  if (typeof value === "string") {
+    const text = value.trim();
+    return text ? [text] : [];
+  }
+
+  if (value === null || value === undefined || depth >= 5) {
+    return [];
+  }
+
+  if (typeof value !== "object") {
+    return [];
+  }
+
+  if (visited.has(value)) {
+    return [];
+  }
+  visited.add(value);
+
+  if (Array.isArray(value)) {
+    return value.flatMap((item) => collectNestedStrings(item, visited, depth + 1));
+  }
+
+  return Object.values(value).flatMap((item) =>
+    collectNestedStrings(item, visited, depth + 1),
+  );
+};
+
+const getErrorTexts = (error: unknown) => {
+  const prioritizedTexts = ERROR_TEXT_PATHS.flatMap((path) => {
     const value = getValueAtPath(error, path);
     return typeof value === "string" && value.trim() ? [value.trim()] : [];
   });
+
+  const nestedTexts = collectNestedStrings(error);
+  return [...new Set([...prioritizedTexts, ...nestedTexts])];
+};
 
 const getMappedMessage = (text: string) => {
   const selector = text.match(SELECTOR_REGEX)?.[0]?.slice(0, 10).toLowerCase();

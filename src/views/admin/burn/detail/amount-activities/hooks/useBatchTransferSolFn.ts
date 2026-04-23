@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { BorshAccountsCoder, type Idl } from "@coral-xyz/anchor";
 import idl from "@/web3/contracts/multichain_burn_sc_sol.json";
 import { PublicKey, Transaction, SystemProgram } from "@solana/web3.js";
@@ -315,7 +316,7 @@ export const useBatchTransferSolFn = () => {
 
                 const signedTx = await provider.signTransaction(tx);
                 const signature = await connection.sendRawTransaction(signedTx.serialize());
-                await connection.confirmTransaction({ signature, blockhash, lastValidBlockHeight });
+                await confirmTransactionSafe(connection, { signature, blockhash, lastValidBlockHeight });
 
                 toast.success(
                     `${mode === "reward" ? "Reward" : "Deposit"} tokens sent to ${recipients.length} recipient${recipients.length > 1 ? "s" : ""}!`,
