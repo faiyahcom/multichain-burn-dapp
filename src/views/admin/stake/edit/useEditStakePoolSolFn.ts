@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey } from "@solana/web3.js";
 import BN from "bn.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
@@ -94,8 +94,11 @@ export const useEditStakePoolSolFn = () => {
                 tx.feePayer = walletPublicKey;
 
                 const signedTx = await provider.signTransaction(tx);
-                const signature = await connection.sendRawTransaction(signedTx.serialize());
-                await confirmTransactionSafe(connection, { signature, blockhash, lastValidBlockHeight });
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
+                    signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
+                );
 
                 toast.success("Pool updated successfully!", { description: `Tx: ${signature}` });
                 return signature;

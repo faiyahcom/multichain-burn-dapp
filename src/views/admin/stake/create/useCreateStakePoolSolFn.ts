@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
     PublicKey,
     SystemProgram,
@@ -234,16 +234,15 @@ export const useCreateStakePoolSolFn = () => {
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPublicKey;
 
-                // Use provider.sendTransaction to avoid double-broadcast:
-                // some wallets auto-submit on signTransaction, so calling
-                // sendRawTransaction afterwards results in "already processed".
-                const signature = await provider.sendTransaction(tx, connection);
-
-                await confirmTransactionSafe(connection, {
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
+                // Note: We use sendAndConfirmTransactionSafe which gracefully handles 
+                // the "already processed" error that can occur if the wallet 
+                // auto-submits on signTransaction.
+                const signedTx = await provider.signTransaction(tx);
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
+                    signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight }
+                );
 
                 toast.success("Staking pool created!", {
                     description: signature,
@@ -299,13 +298,12 @@ export const useCreateStakePoolSolFn = () => {
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPublicKey;
 
-                const signature = await provider.sendTransaction(tx, connection);
-
-                await confirmTransactionSafe(connection, {
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
+                const signedTx = await provider.signTransaction(tx);
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
+                    signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight }
+                );
 
                 toast.success("Staking pool submitted for review!", {
                     description: signature,
