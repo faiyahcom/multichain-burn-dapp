@@ -1,7 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -54,8 +54,12 @@ export const useEmergencyCloseSolFn = () => {
                 tx.recentBlockhash = blockhash;
                 tx.feePayer = walletPublicKey;
 
-                const signature = await provider.sendTransaction(tx, connection);
-                await confirmTransactionSafe(connection, { signature, blockhash, lastValidBlockHeight });
+                const signedTx = await provider.signTransaction(tx);
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
+                    signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
+                );
 
                 toast.success("Pool emergency closed!", { description: signature });
                 return signature;
