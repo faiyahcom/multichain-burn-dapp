@@ -14,7 +14,7 @@ import type { ActivityItem } from "@/services/dashboardService";
 import type { StakingActivityItem } from "@/services/dashboardService";
 import { POOL_KIND, PoolKindCodeEnum } from "@/types/pool";
 import { getExplorerUrl } from "@/utils/helpers/networks";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, safeBigInt } from "@/utils/helpers/numbers";
 import {
   formatRelativeTime,
   formatTimestampSecondsToDate,
@@ -395,7 +395,7 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
   const amount = formatAmount(
     item.amountIn,
     item.tokenInDecimals,
-    Number(formatUnits(item.amountIn, item.tokenInDecimals)) >= 10 ? 6 : 3,
+    Number(formatUnits(safeBigInt(item.amountIn), item.tokenInDecimals)) >= 10 ? 6 : 3,
   );
   const poolName = item.pool?.name ?? "";
 
