@@ -1,10 +1,11 @@
 # Branches
-- main: for development, all logic and sc changes should be made here
+- main: for development, all logic and sc changes should be made here (this is mostly untrue since phase 2 since most of the common components are unchanged, no new ones are added and checking out from main-admin and CR/convert-design makes it easier for other developers to work with without having to worry about the complication of having to merge changes from main)
 - main-admin: for admin development
 - CR/convert-design: for user development (since user version uses the new design)
 - beta-admin: for admin beta (with mapped domain)
 - staging/new-design: for user beta (with mapped domain)
-- there are no production branches yet, they are expected to be called prod-user, prod-admin
+- prod-user: for production user (with mapped domain, deployed by the client)
+- prod-admin: for production admin (with mapped domain, deployed by the client)
 
 ## Workflow
 - if there are any changes related to common, global Ui, logic, SC, please checkout from main branch and make PR to main branch
@@ -17,13 +18,15 @@
 ## The PR flow:
 ```mermaid
 graph LR;
-  checkout["&lt;checkout branch&gt;"] -->|common, global Ui, logic, SC| main;
+  checkout["&lt;checkout branch&gt;"] -->|common, global Ui, logic, SC (deprecated)| main;
   checkout["&lt;checkout branch&gt;"] -->|user only UI| CR/convert-design;
   checkout["&lt;checkout branch&gt;"] -->|admin only UI| main-admin;
   main --> CR/convert-design;
   main --> main-admin;
   CR/convert-design --> staging/new-design;
   main-admin --> beta-admin;
+  staging/new-design --> prod-user;
+  beta-admin --> prod-admin;
 ```
 
 # React + TypeScript + Vite
