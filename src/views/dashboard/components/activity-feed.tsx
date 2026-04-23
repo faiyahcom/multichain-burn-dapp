@@ -22,6 +22,7 @@ import {
 } from "@/utils/helpers/string";
 import { Link, useNavigate } from "@tanstack/react-router";
 import SwapActivityImage from "/images/dashboard/swap-activity.png";
+import { formatUnits } from "ethers";
 
 // ── Grid Constants (Responsive & Synced) ──────────────────────────────────────
 
@@ -394,7 +395,7 @@ const StakingRow = ({ item }: { item: StakingActivityItem }) => {
   const amount = formatAmount(
     item.amountIn,
     item.tokenInDecimals,
-    Number(item.amountIn) >= 10 ? 3 : 6,
+    Number(formatUnits(item.amountIn, item.tokenInDecimals)) >= 10 ? 6 : 3,
   );
   const poolName = item.pool?.name ?? "";
 

@@ -172,8 +172,21 @@ export const shortenNumberOld = ({
 };
 
 const formatDecimalDisplay = (val: Decimal, decimalPlaces: number): string => {
-  const truncated = val.toDecimalPlaces(decimalPlaces, Decimal.ROUND_DOWN);
-  const [intPart, fracPart = ""] = truncated.toFixed(decimalPlaces).split(".");
+  let places = decimalPlaces;
+  let truncated = val.toDecimalPlaces(places, Decimal.ROUND_DOWN);
+
+  // If truncation zeroes out a non-zero value, extend precision to the first
+  // significant digit so we never display "0" for something like 0.00001.
+  if (truncated.isZero() && !val.isZero()) {
+    const afterDot = val.abs().toFixed(20).split(".")[1] ?? "";
+    const firstSigIdx = afterDot.search(/[1-9]/);
+    if (firstSigIdx >= 0) {
+      places = firstSigIdx + 1;
+      truncated = val.toDecimalPlaces(places, Decimal.ROUND_DOWN);
+    }
+  }
+
+  const [intPart, fracPart = ""] = truncated.toFixed(places).split(".");
   const intFormatted = BigInt(intPart).toLocaleString("en-US");
   const trimmedFrac = fracPart.replace(/0+$/, "");
   return trimmedFrac ? `${intFormatted}.${trimmedFrac}` : intFormatted;
