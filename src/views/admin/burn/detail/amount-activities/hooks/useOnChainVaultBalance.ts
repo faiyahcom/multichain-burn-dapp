@@ -144,7 +144,7 @@ export function useOnChainVaultBalance(params: {
                         // rewardBalance and totalDeposited are BN instances (u64)
                         // BorshAccountsCoder returns snake_case field names matching the IDL
                         rewardRaw = poolAccount.reward_balance.toString();
-                        depositRaw = poolAccount.total_deposited.toString();
+                        depositRaw = poolAccount.deposit_balance.toString();
 
                         let isCollected = poolAccount.is_collected;
                         if (isCollected == true) {
