@@ -9,7 +9,11 @@ import CopyableText from "@/components/common/copyable-text";
 import { truncateString } from "@/utils/helpers/string";
 import { formatDuration } from "@/utils/helpers/timer";
 import Decimal from "decimal.js";
-import { formatAmount, safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
+import {
+    formatAmount,
+    safeDecimal,
+    shortenNumber,
+} from "@/utils/helpers/numbers";
 import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 import { cn } from "@/lib/utils";
 
@@ -49,7 +53,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
     });
 
     const pool = poolDetail?.pool;
-    const stakePool = pool as any;
+    const stakePool = pool;
 
     const isSameToken = !!(
         pool?.rewardToken &&
@@ -121,11 +125,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 {
                     label: "Interest Start Delay",
                     value:
-                        (stakePool?.interestStartDelay ??
-                            stakePool?.interestStrartDelay) !== undefined
-                            ? formatDuration(
-                                stakePool.interestStartDelay ?? stakePool.interestStrartDelay,
-                            )
+                        stakePool?.interestStartDelay !== undefined
+                            ? formatDuration(stakePool?.interestStartDelay)
                             : "—",
                 },
             ],

@@ -75,30 +75,54 @@ const createStakeFormSchema = ({
             .refine(
                 (v) => {
                     if (rawBalance === undefined) return true;
-                    try { return parseUnits(v, decimals) <= rawBalance; } catch { return false; }
+                    try {
+                        return parseUnits(v, decimals) <= rawBalance;
+                    } catch {
+                        return false;
+                    }
                 },
-                { error: `Amount exceeds wallet balance (${balanceFormatted} ${symbol})` },
+                {
+                    error: `Amount exceeds wallet balance (${balanceFormatted} ${symbol})`,
+                },
             )
             .refine(
                 (v) => {
                     if (minRaw === null) return true;
-                    try { return parseUnits(v, decimals) >= minRaw; } catch { return false; }
+                    try {
+                        return parseUnits(v, decimals) >= minRaw;
+                    } catch {
+                        return false;
+                    }
                 },
-                { error: `Amount is below minimum staking amount (${minFormatted} ${symbol})` },
+                {
+                    error: `Amount is below minimum staking amount (${minFormatted} ${symbol})`,
+                },
             )
             .refine(
                 (v) => {
                     if (maxRaw === null) return true;
-                    try { return parseUnits(v, decimals) <= maxRaw; } catch { return false; }
+                    try {
+                        return parseUnits(v, decimals) <= maxRaw;
+                    } catch {
+                        return false;
+                    }
                 },
-                { error: `Amount exceeds maximum staking amount (${maxFormatted} ${symbol})` },
+                {
+                    error: `Amount exceeds maximum staking amount (${maxFormatted} ${symbol})`,
+                },
             )
             .refine(
                 (v) => {
                     if (remainingRaw === null) return true;
-                    try { return parseUnits(v, decimals) <= remainingRaw; } catch { return false; }
+                    try {
+                        return parseUnits(v, decimals) <= remainingRaw;
+                    } catch {
+                        return false;
+                    }
                 },
-                { error: `Amount exceeds remaining pool capacity (${remainingFormatted} ${symbol})` },
+                {
+                    error: `Amount exceeds remaining pool capacity (${remainingFormatted} ${symbol})`,
+                },
             ),
     });
 
@@ -141,7 +165,11 @@ const SummaryRow = ({
 
 const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
     const pool = poolDetail?.pool;
-
+    const isSameToken = !!(
+        pool?.rewardToken &&
+        pool?.tokenIn &&
+        pool.rewardToken.toLowerCase() === pool.tokenIn.toLowerCase()
+    );
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail.pool.chainId)
         : undefined;
@@ -154,6 +182,15 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
         customName: poolDetail?.tokenIn?.customName,
         customSymbol: poolDetail?.tokenIn?.customSymbol,
         imageUri: poolDetail?.tokenIn?.imageUri,
+    });
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
     });
 
     const {
@@ -169,40 +206,79 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
 
     const stakingLimits = useMemo(() => {
         const decimals = pool?.tokenInDecimals;
-        const empty = { min: null, max: null, remaining: null, minFormatted: undefined, maxFormatted: undefined, remainingFormatted: undefined } as const;
+        const empty = {
+            min: null,
+            max: null,
+            remaining: null,
+            minFormatted: undefined,
+            maxFormatted: undefined,
+            remainingFormatted: undefined,
+        } as const;
         if (decimals == null) return empty;
         let min: bigint | null = null;
         let max: bigint | null = null;
         let remaining: bigint | null = null;
-        try { if (pool?.minStakingAmount) min = safeBigInt(pool.minStakingAmount); } catch { /* ignore */ }
-        try { if (pool?.maxStakingAmount) max = safeBigInt(pool.maxStakingAmount); } catch { /* ignore */ }
+        try {
+            if (pool?.minStakingAmount && pool.minStakingAmount !== "0")
+                min = safeBigInt(pool.minStakingAmount);
+        } catch {
+            /* ignore */
+        }
+        try {
+            if (pool?.maxStakingAmount && pool.maxStakingAmount !== "0")
+                max = safeBigInt(pool.maxStakingAmount);
+        } catch {
+            /* ignore */
+        }
         if (pool?.stakingLimit && pool.stakingLimit !== "0") {
             try {
                 const limit = safeBigInt(pool.stakingLimit);
                 const staked = safeBigInt(poolDetail?.staking?.totalStaked);
                 const r = limit - staked;
                 remaining = r >= 0n ? r : 0n;
-            } catch { /* ignore */ }
+            } catch {
+                /* ignore */
+            }
         }
         const fmt = (raw: bigint | null) =>
             raw !== null ? formatAmount(raw.toString(), decimals) : undefined;
-        return { min, max, remaining, minFormatted: fmt(min), maxFormatted: fmt(max), remainingFormatted: fmt(remaining) };
-    }, [pool?.minStakingAmount, pool?.maxStakingAmount, pool?.stakingLimit, poolDetail?.staking?.totalStaked, pool?.tokenInDecimals]);
+        return {
+            min,
+            max,
+            remaining,
+            minFormatted: fmt(min),
+            maxFormatted: fmt(max),
+            remainingFormatted: fmt(remaining),
+        };
+    }, [
+        pool?.minStakingAmount,
+        pool?.maxStakingAmount,
+        pool?.stakingLimit,
+        poolDetail?.staking?.totalStaked,
+        pool?.tokenInDecimals,
+    ]);
 
     const stakeFormSchema = useMemo(
-        () => createStakeFormSchema({
-            decimals: pool?.tokenInDecimals ?? 0,
-            rawBalance: stakingBalanceRaw,
-            minRaw: stakingLimits.min,
-            maxRaw: stakingLimits.max,
-            remainingRaw: stakingLimits.remaining,
-            minFormatted: stakingLimits.minFormatted,
-            maxFormatted: stakingLimits.maxFormatted,
-            remainingFormatted: stakingLimits.remainingFormatted,
-            balanceFormatted: stakingBalanceFormatted,
-            symbol: stakingTokenDisplay.symbol,
-        }),
-        [stakingBalanceRaw, stakingBalanceFormatted, stakingLimits, stakingTokenDisplay.symbol, pool?.tokenInDecimals],
+        () =>
+            createStakeFormSchema({
+                decimals: pool?.tokenInDecimals ?? 0,
+                rawBalance: stakingBalanceRaw,
+                minRaw: stakingLimits.min,
+                maxRaw: stakingLimits.max,
+                remainingRaw: stakingLimits.remaining,
+                minFormatted: stakingLimits.minFormatted,
+                maxFormatted: stakingLimits.maxFormatted,
+                remainingFormatted: stakingLimits.remainingFormatted,
+                balanceFormatted: stakingBalanceFormatted,
+                symbol: stakingTokenDisplay.symbol,
+            }),
+        [
+            stakingBalanceRaw,
+            stakingBalanceFormatted,
+            stakingLimits,
+            stakingTokenDisplay.symbol,
+            pool?.tokenInDecimals,
+        ],
     );
 
     const {
@@ -224,14 +300,18 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
         : "0";
 
     const fmtStakingAmt = (raw: string | null | undefined) => {
-        if (!raw || pool?.tokenInDecimals == null) return "Unlimited";
+        if (!raw || raw === "0" || pool?.tokenInDecimals == null)
+            return "Unlimited";
         return `${formatAmount(raw, pool.tokenInDecimals)} ${stakingTokenDisplay.symbol}`;
     };
 
     const handleSelectPercent = (percent: number) => {
         if (!stakingBalanceFormatted || pool?.tokenInDecimals == null) return;
         try {
-            const balanceBase = parseUnits(stakingBalanceFormatted, pool.tokenInDecimals);
+            const balanceBase = parseUnits(
+                stakingBalanceFormatted,
+                pool.tokenInDecimals,
+            );
             if (balanceBase === 0n) return;
             let amountBase =
                 percent === 100 ? balanceBase : (balanceBase * BigInt(percent)) / 100n;
@@ -240,7 +320,10 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                 amountBase = stakingLimits.max;
             }
             // Cap at remaining pool capacity
-            if (stakingLimits.remaining !== null && amountBase > stakingLimits.remaining) {
+            if (
+                stakingLimits.remaining !== null &&
+                amountBase > stakingLimits.remaining
+            ) {
                 amountBase = stakingLimits.remaining;
             }
             const formatted = formatUnits(amountBase, pool.tokenInDecimals);
@@ -280,13 +363,16 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                         <div
                             className={cn(
                                 "h-fit w-full bg-background sm:max-w-2xl lg:max-w-3xl xl:max-w-4xl 2xl:max-w-6xl",
-                                getVariantBorderClassName({ variant: "stake", custom: "rounded-xl" }),
+                                getVariantBorderClassName({
+                                    variant: "stake",
+                                    custom: "rounded-xl",
+                                }),
                                 getVariantShadowClassName({ variant: "stake" }),
                             )}
                         >
                             <div
                                 className={cn(
-                                    "h-fit w-full rounded-xl px-3 sm:px-6 py-4 2xl:py-8",
+                                    "h-fit w-full rounded-xl px-3 py-4 sm:px-6 2xl:py-8",
                                     getVariantBgClassName({ variant: "stake" }),
                                 )}
                             >
@@ -322,7 +408,9 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                         <div className="grid grid-cols-2 [&>*:nth-child(even)]:border-l [&>*:nth-child(even)]:border-stake-border [&>*:nth-child(n+3)]:border-t [&>*:nth-child(n+3)]:border-stake-border">
                                             <SummaryRow
                                                 label="Pool Name"
-                                                value={!pool ? <Skeleton className="h-5 w-28" /> : pool.name}
+                                                value={
+                                                    !pool ? <Skeleton className="h-5 w-28" /> : pool.name
+                                                }
                                             />
                                             <SummaryRow
                                                 label="Lock-up Duration"
@@ -334,17 +422,14 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                     )
                                                 }
                                             />
-                                            <SummaryRow
-                                                label="Pool Type"
-                                                value="Staking Pool"
-                                            />
+                                            <SummaryRow label="Pool Type" value="Staking Pool" />
                                             <SummaryRow
                                                 label="Interest Start Delay"
                                                 value={
                                                     !pool ? (
                                                         <Skeleton className="h-5 w-20" />
                                                     ) : (
-                                                        formatDuration(pool.interestStartDelay ?? pool.interestStrartDelay)
+                                                        formatDuration(pool?.interestStartDelay)
                                                     )
                                                 }
                                             />
@@ -363,6 +448,9 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 value={
                                                     !pool ? (
                                                         <Skeleton className="h-5 w-20" />
+                                                    ) : !pool.interestAccrualDuration ||
+                                                        pool.interestAccrualDuration === "0" ? (
+                                                        "Unlimited"
                                                     ) : (
                                                         formatDuration(pool.interestAccrualDuration)
                                                     )
@@ -420,7 +508,8 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 value={
                                                     !pool ? (
                                                         <Skeleton className="h-5 w-24" />
-                                                    ) : !pool.stakingLimit || pool.stakingLimit === "0" ? (
+                                                    ) : !pool.stakingLimit ||
+                                                        pool.stakingLimit === "0" ? (
                                                         "Unlimited"
                                                     ) : stakingLimits.remainingFormatted != null ? (
                                                         `${stakingLimits.remainingFormatted} ${stakingTokenDisplay.symbol}`
@@ -458,14 +547,34 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                     )
                                                 }
                                             />
-                                            <SummaryRow
-                                                label="Interest generated by the APR"
-                                                value={
-                                                    <span className="text-mb-gray-b8">
-                                                        {/* Interest generated by the APR */}
-                                                    </span>
-                                                }
-                                            />
+                                            {isSameToken ? (
+                                                <SummaryRow
+                                                    label="Interest generated by the APR"
+                                                    value={
+                                                        <span className="text-mb-gray-b8">
+                                                            Interest generated by the APR
+                                                        </span>
+                                                    }
+                                                />
+                                            ) : (
+                                                <SummaryRow
+                                                    label="Reward Token"
+                                                    value={
+                                                        !pool ? (
+                                                            <Skeleton className="h-5 w-28" />
+                                                        ) : (
+                                                            <span className="flex items-center gap-2 font-semibold">
+                                                                <TokenImage
+                                                                    src={rewardTokenDisplay.imageUri}
+                                                                    alt={rewardTokenDisplay.symbol}
+                                                                    classNames={{ common: "size-4 sm:size-5" }}
+                                                                />
+                                                                {rewardTokenDisplay.symbol}
+                                                            </span>
+                                                        )
+                                                    }
+                                                />
+                                            )}
                                         </div>
                                     </div>
 
@@ -475,7 +584,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                             <span className="font-inter text-base font-medium sm:text-xl 2xl:text-2xl">
                                                 Your Total Staked
                                             </span>
-                                            <span className="font-inter text-base text-nowrap font-bold sm:text-xl 2xl:text-2xl">
+                                            <span className="font-inter text-base font-bold text-nowrap sm:text-xl 2xl:text-2xl">
                                                 {yourTotalStaked} {stakingTokenDisplay.symbol}
                                             </span>
                                         </div>
@@ -486,7 +595,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 <label className="font-inter text-sm font-medium sm:text-base 2xl:text-xl">
                                                     Stake Amount
                                                 </label>
-                                                <span className="flex items-center gap-2 font-inter text-nowrap text-sm sm:text-base 2xl:text-xl">
+                                                <span className="flex items-center gap-2 font-inter text-sm text-nowrap sm:text-base 2xl:text-xl">
                                                     <IconWallet className="text-mb-gray-b8" />
                                                     {isLoadingBalance ? (
                                                         <Skeleton className="h-4 w-20" />
@@ -507,14 +616,18 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 />
                                                 <div
                                                     className={cn(
-                                                        "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 sm:px-4 text-mb-btn-stake",
+                                                        "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 text-mb-btn-stake sm:px-4",
                                                         getVariantBorderClassName({ variant: "stake" }),
                                                     )}
                                                 >
                                                     <TokenImage
                                                         src={stakingTokenDisplay.imageUri}
                                                         alt={stakingTokenDisplay.symbol}
-                                                        classNames={{ common: "size-5", img: "size-5", placeholder: "size-5" }}
+                                                        classNames={{
+                                                            common: "size-5",
+                                                            img: "size-5",
+                                                            placeholder: "size-5",
+                                                        }}
                                                     />
                                                     <span className="font-inter text-sm font-medium sm:text-base">
                                                         {stakingTokenDisplay.symbol}

@@ -102,7 +102,6 @@ export interface PoolDetailResponse {
     // Staking pool fields
     apr?: string;
     lockUpDuration?: string;
-    interestStrartDelay?: string; // API typo (double 'r')
     interestStartDelay?: string; // correct spelling
     interestAccrualDuration?: string;
     claimStartDelay?: string;
@@ -258,7 +257,7 @@ export interface MyStakeSnapshot {
     poolCreationFee: string;
     apr: string; // divide by 10000 to get display percentage
     lockUpDuration: string;
-    interestStrartDelay: string;
+    interestStartDelay: string;
     interestAccrualDuration: string;
     claimStartDelay: string;
     minStakingAmount: string | null;
