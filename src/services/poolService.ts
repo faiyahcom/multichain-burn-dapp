@@ -17,9 +17,10 @@ import type {
 const POOLS_API_ROUTES = API_ROUTES.POOLS;
 
 export const poolService = {
-  getPoolDetail: async (address: string) => {
+  getPoolDetail: async (address: string, current?: number) => {
     const response = await apiClient.get<PoolDetailResponse>(
       `${POOLS_API_ROUTES.GET_POOL_DETAIL(address)}`,
+      { params: current != null ? { current } : undefined },
     );
     return response;
   },
@@ -112,6 +113,7 @@ export const poolService = {
     poolAddress: string | undefined,
     page: number,
     limit: number,
+    current?: number,
   ) => {
     const response = await apiClient.get<MyStakesResponse>(
       `${POOLS_API_ROUTES.MY_STAKES}`,
@@ -120,6 +122,7 @@ export const poolService = {
           page: String(page),
           limit: String(limit),
           poolAddress: poolAddress,
+          ...(current != null ? { current } : {}),
         },
       },
     );

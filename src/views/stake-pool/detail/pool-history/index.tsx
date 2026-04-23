@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    getTimestamp: () => number;
 };
 
 type TabType = "my-stakes" | "transactions" | "activity";
@@ -17,7 +18,7 @@ const TABS: { id: TabType; label: string }[] = [
     { id: "activity", label: "Pool Activity" },
 ];
 
-const PoolHistory = ({ poolDetail }: Props) => {
+const PoolHistory = ({ poolDetail, getTimestamp }: Props) => {
     const [activeTab, setActiveTab] = useState<TabType>("my-stakes");
 
     return (
@@ -48,7 +49,7 @@ const PoolHistory = ({ poolDetail }: Props) => {
             </div>
 
             {/* Content */}
-            {activeTab === "my-stakes" && <MyStakesTable poolDetail={poolDetail} />}
+            {activeTab === "my-stakes" && <MyStakesTable poolDetail={poolDetail} getTimestamp={getTimestamp} />}
             {activeTab === "transactions" && (
                 <TransactionHistoryTable poolDetail={poolDetail} />
             )}

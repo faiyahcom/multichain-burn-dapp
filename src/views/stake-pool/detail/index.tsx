@@ -9,6 +9,7 @@ import { StakePoolStatusDisplay } from "@/components/shared/glow/pool/pool-statu
 import type { StakePoolStatus } from "@/types/pool";
 import PoolHistory from "./pool-history";
 import { useState, useEffect, useRef } from "react";
+import { usePoolSync } from "./hooks/usePoolSyncTimestamp";
 import ScanLink from "@/components/common/scan-link";
 import { Skeleton } from "@/components/ui/skeleton";
 import InfoTooltip from "@/components/common/glow/info-tooltip";
@@ -128,10 +129,16 @@ const EndingCountdown = ({
 // ─────────────────────────────────────────────────────────────
 
 const StakePoolDetail = ({ address }: Props) => {
+    const queryClient = useQueryClient();
+
+    const getTimestamp = usePoolSync(() => {
+        queryClient.refetchQueries({ queryKey: poolQueryKeys.detail(address) });
+        queryClient.refetchQueries({ queryKey: ["pools", "myStakes", address] });
+    });
+
     const { data: poolDetail, isLoading: isLoadingPoolDetail } = useQuery({
         queryKey: poolQueryKeys.detail(address),
-        queryFn: () => poolService.getPoolDetail(address),
-        refetchInterval: 2_500,
+        queryFn: () => poolService.getPoolDetail(address, Math.floor(getTimestamp() / 1000)),
     });
 
     const status = poolDetail?.pool?.status;
@@ -222,7 +229,7 @@ const StakePoolDetail = ({ address }: Props) => {
                     <RewardAmount poolDetail={poolDetail} />
                 </div>
                 <div className="order-4 lg:col-span-2">
-                    <PoolHistory poolDetail={poolDetail} />
+                    <PoolHistory poolDetail={poolDetail} getTimestamp={getTimestamp} />
                 </div>
             </div>
         </div>

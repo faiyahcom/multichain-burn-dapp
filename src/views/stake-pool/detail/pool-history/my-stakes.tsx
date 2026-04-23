@@ -23,6 +23,7 @@ import { useUnstakeEvmFn } from "../hooks/byStakeId/useUnstakeEvmFn";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
+  getTimestamp: () => number;
 };
 
 const DEFAULT_PAGE_SIZE = 5;
@@ -30,7 +31,7 @@ const DEFAULT_PAGE_SIZE = 5;
 const formatUnixDateTime = (
   timestamp?: number,
 ): { time: string; date: string } | null => {
-  if (timestamp == null) return null;
+  if (timestamp == null || timestamp === 0) return null;
   const d = new Date(timestamp * 1000);
   const time = d.toLocaleTimeString("en-GB", {
     hour: "2-digit",
@@ -55,7 +56,7 @@ const DateTimeCell = ({ timestamp }: { timestamp?: number }) => {
   );
 };
 
-const MyStakesTable = ({ poolDetail }: Props) => {
+const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
   const [page, setPage] = useState(1);
   const queryClient = useQueryClient();
   const { unstakeEvm } = useUnstakeEvmFn();
@@ -73,9 +74,8 @@ const MyStakesTable = ({ poolDetail }: Props) => {
       DEFAULT_PAGE_SIZE,
     ),
     queryFn: () =>
-      poolService.getMyStakes(poolAddress || "", page, DEFAULT_PAGE_SIZE),
+      poolService.getMyStakes(poolAddress || "", page, DEFAULT_PAGE_SIZE, Math.floor(getTimestamp() / 1000)),
     enabled: !!poolAddress,
-    refetchInterval: 2_500,
   });
 
   const invalidatePool = () => {
@@ -115,9 +115,9 @@ const MyStakesTable = ({ poolDetail }: Props) => {
   const isClosed = poolDetail?.pool?.status === "closed";
 
   const stakingSymbol =
-    snapshots[0]?.tokenStake ?? poolDetail?.tokenIn?.symbol ?? "";
+    snapshots[0]?.customSymbolStake ?? poolDetail?.tokenIn?.symbol ?? "";
   const rewardSymbol =
-    snapshots[0]?.tokenReward ?? poolDetail?.tokenOut?.symbol ?? "";
+    snapshots[0]?.customSymbolReward ?? poolDetail?.tokenOut?.symbol ?? "";
 
   const columns = [
     "Time",
