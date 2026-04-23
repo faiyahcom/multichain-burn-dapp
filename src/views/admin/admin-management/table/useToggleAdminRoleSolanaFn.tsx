@@ -1,6 +1,7 @@
 import { toast } from "@/components/common/custom-toast";
 import type { AdminManagementRole } from "@/types/admin/admin-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
   getMultichainBurnProgram,
   type BrowserWallet,
@@ -98,7 +99,7 @@ export const useToggleAdminRoleSolanaFn = () => {
           signedTx.serialize(),
         );
 
-        await programContext.connection.confirmTransaction({
+        await confirmTransactionSafe(programContext.connection, {
           signature,
           blockhash,
           lastValidBlockHeight,
@@ -147,7 +148,7 @@ export const useToggleAdminRoleSolanaFn = () => {
           signedTx.serialize(),
         );
 
-        await programContext.connection.confirmTransaction({
+        await confirmTransactionSafe(programContext.connection, {
           signature,
           blockhash,
           lastValidBlockHeight,
