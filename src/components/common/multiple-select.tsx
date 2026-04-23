@@ -24,6 +24,7 @@ interface Props {
   placeholder?: string; // Usually the label of the category filtering, like "Network", "Status", etc.
   placeholderMultiple?: string; // This is for when the placeholder has a special plural form. This is used when all is selected. If not provided, it will be "All {placeholder}s"
   showIconsInTriggerIfAny?: boolean;
+  showSelectedCount?: boolean; // When true, shows "N selected" instead of listing labels when partially selected
   classNames?: {
     btn?: string;
     content?: string;
@@ -38,6 +39,7 @@ const MultipleSelect: React.FC<Props> = ({
   placeholder = "Select",
   placeholderMultiple = "",
   showIconsInTriggerIfAny = true,
+  showSelectedCount = false,
   classNames,
   defaultValuesWhenUncheckAll,
 }) => {
@@ -112,6 +114,8 @@ const MultipleSelect: React.FC<Props> = ({
               )}
               {isAllSelected ? (
                 <span>{allLabel}</span>
+              ) : showSelectedCount ? (
+                <span>{selected?.length} selected</span>
               ) : (
                 <span className="min-w-0 truncate">
                   {options

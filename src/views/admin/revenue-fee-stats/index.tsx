@@ -6,7 +6,6 @@ import {
   chainIdToNetworkConfig,
   NETWORK_CONFIGS,
   networkIdToChainId,
-  type nativeCurrency,
 } from "@/config/networks";
 import { useNativePrices } from "@/hooks/useNativePrices";
 import { feeService, feeTxnKind } from "@/services/feeService";
@@ -54,7 +53,11 @@ const AdminRevenueFeeStats = () => {
   const kindsParam =
     activeTab === "creation"
       ? [feeTxnKind.createBurnPool, feeTxnKind.createSwapPool].join(",")
-      : [feeTxnKind.claimBurnReward, feeTxnKind.swap].join(",");
+      : [
+          feeTxnKind.claimBurnReward,
+          feeTxnKind.swap,
+          feeTxnKind.claimStakeReward,
+        ].join(",");
 
   const statsParams = { chainId, from: fromParam, to: toParam };
   const listParams = {
@@ -276,6 +279,7 @@ const AdminRevenueFeeStats = () => {
         listRows={feeRows}
         chainId={chainId}
         onClose={() => setDialogType(null)}
+        networkId={networkId}
       />
     </div>
   );

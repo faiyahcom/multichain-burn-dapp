@@ -6,12 +6,14 @@ import type {
   SortOrder,
 } from "@/types/common";
 
-// 0 - burn pool | 1 - swap pool
-export const poolTypes = [0, 1] as const;
+// 0 - burn pool | 1 - swap pool | 2 - stake pool | 3 - launchpad
+export const poolTypes = [0, 1, 2, 3] as const;
 export type PoolType = (typeof poolTypes)[number];
 export const poolTypeLabels: Record<PoolType, string> = {
   0: "Burn pool",
   1: "Swap pool",
+  2: "Stake pool",
+  3: "Launchpad",
 };
 
 export const poolTypeOptionValues = [
@@ -75,6 +77,23 @@ export const burnPoolStatusColors: Record<BurnPoolStatus, string> = {
   upcoming: "#FFE798",
 };
 
+export const stakePoolStatuses = [
+  "holding",
+  "upcoming",
+  ...swapPoolStatuses,
+] as const;
+export type StakePoolStatus = (typeof stakePoolStatuses)[number];
+export const stakePoolStatusLabels: Record<StakePoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  holding: "Holding",
+  upcoming: "Upcoming",
+};
+export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
+  ...swapPoolStatusColors,
+  holding: "#FFB08E",
+  upcoming: "#FFE798",
+};
+
 export const getPoolStatusColor = (status: AllPoolStatus) => {
   return burnPoolStatusColors[status as BurnPoolStatus] ?? "#7989ba";
 };
@@ -83,7 +102,11 @@ export const getPoolStatusLabel = (status: AllPoolStatus) => {
   return burnPoolStatusLabels[status as BurnPoolStatus] ?? "N/A";
 };
 
-export type AllPoolStatus = BurnPoolStatus | SwapPoolStatus | "draft";
+export type AllPoolStatus =
+  | BurnPoolStatus
+  | SwapPoolStatus
+  | StakePoolStatus
+  | "draft";
 
 export type PoolItemType = {
   address: string;
@@ -111,6 +134,7 @@ export type PoolItemType = {
   rewardNumerator: string;
   rewardDenominator: string;
   isPartner: boolean;
+  lowRewardNotiEnabled: boolean;
 };
 
 export type PoolListRequest = PaginationRequest & {

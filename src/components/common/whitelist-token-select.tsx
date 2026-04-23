@@ -22,6 +22,8 @@ type Props = {
   value?: string;
   onChange: (address: string) => void;
   disabledAddress?: string;
+  poolKind?: number;
+  btnProps?: React.ComponentProps<typeof Button>;
 };
 
 const resolveSymbol = (token: { symbol: string; customSymbol?: string }) =>
@@ -30,7 +32,13 @@ const resolveSymbol = (token: { symbol: string; customSymbol?: string }) =>
 const resolveName = (token: { name: string; customName?: string }) =>
   token.customName?.trim() || token.name;
 
-const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
+const WhitelistTokenSelect = ({
+  value,
+  onChange,
+  disabledAddress,
+  poolKind,
+  btnProps,
+}: Props) => {
   const [open, setOpen] = useState(false);
   const [textSearch, setTextSearch] = useState("");
   const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
@@ -50,6 +58,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
     chainIds: networkConfig?.backendChainId,
     active: "1",
     isDropped: "0",
+    kinds: poolKind !== undefined ? String(poolKind) : undefined,
   });
 
   const isLoading = isPending || (open && isFetching);
@@ -99,6 +108,7 @@ const WhitelistTokenSelect = ({ value, onChange, disabledAddress }: Props) => {
         <Button
           variant="outline"
           className="flex items-center justify-between gap-2 rounded-lg bg-inactive text-sm font-normal text-foreground hover:bg-inactive/80"
+          {...btnProps}
         >
           {value && selectedDetail ? (
             <div className="flex items-center gap-4">

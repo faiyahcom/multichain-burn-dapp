@@ -12,6 +12,7 @@ import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 
 export const useCreateWhitelistUserSolanaFn = () => {
     const { isConnected, address } = useAppKitAccount({ namespace: "solana" });
@@ -60,15 +61,11 @@ export const useCreateWhitelistUserSolanaFn = () => {
                 const signedTx = await provider.signTransaction(tx);
 
                 // Send
-                const signature = await connection.sendRawTransaction(
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
                     signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
                 );
-
-                await connection.confirmTransaction({
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
 
                 toast.success("User whitelisted on-chain successfully!", {
                     description: `Tx: ${signature}`,

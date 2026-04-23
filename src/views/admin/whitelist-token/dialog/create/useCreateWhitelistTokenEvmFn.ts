@@ -1,26 +1,32 @@
 import {
-  EVM_POOL_TYPES,
   getContractAccessManager,
   getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
+import type { PoolType } from "@/types/admin/master-pool-management";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 
-const PHASE1_POOL_TYPES = [EVM_POOL_TYPES.BURN, EVM_POOL_TYPES.SWAP];
-
 export const useCreateWhitelistTokenEvmFn = () => {
   const { isConnected } = useAppKitAccount();
   const { walletProvider } = useAppKitProvider("eip155");
 
-  // Phase 1 keeps burn and swap whitelist status in sync.
   const createWhitelistToken = useCallback(
-    async ({ tokenAddress }: { tokenAddress: string }) => {
+    async ({
+      tokenAddress,
+      poolTypes,
+    }: {
+      tokenAddress: string;
+      poolTypes: PoolType[];
+    }) => {
       try {
         if (!isConnected || !walletProvider) {
           throw new Error("Wallet not connected");
+        }
+        if (poolTypes.length === 0) {
+          throw new Error("At least one pool type is required");
         }
 
         const normalizedTokenAddress = ethers.getAddress(tokenAddress.trim());
@@ -37,22 +43,27 @@ export const useCreateWhitelistTokenEvmFn = () => {
           throw new Error("Token address is not a valid ERC20 contract");
         }
 
-        const [isBurnWhitelisted, isSwapWhitelisted] = await Promise.all(
-          PHASE1_POOL_TYPES.map((poolType) =>
+        const whitelistStatuses = await Promise.all(
+          poolTypes.map((poolType) =>
             accessManagerContract.isTokenWhitelisted(
               poolType,
               normalizedTokenAddress,
             ),
           ),
         );
+        const poolTypesToEnable = poolTypes.filter(
+          (_poolType, index) => !whitelistStatuses[index],
+        );
 
-        if (isBurnWhitelisted && isSwapWhitelisted) {
-          throw new Error("Token is already whitelisted on-chain");
+        if (poolTypesToEnable.length === 0) {
+          throw new Error(
+            "Selected pool types are already whitelisted on-chain",
+          );
         }
 
         const tx =
           await accessManagerContract.setTokenWhitelistForPoolTypes(
-            PHASE1_POOL_TYPES,
+            poolTypesToEnable,
             normalizedTokenAddress,
             true,
           );

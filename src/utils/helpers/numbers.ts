@@ -23,6 +23,52 @@ export function parseToBN(value: string | number | null | undefined): BN {
   }
 }
 
+/**
+ * Safely convert any numeric value — including scientific notation like
+ * "2.499999999745038091672e+23" that BigInt() cannot parse natively — to a
+ * bigint integer.  Fractional parts are truncated (floor toward zero, no rounding).
+ * Returns `fallback` (default `0n`) for null / undefined / empty / non-numeric input.
+ *
+ * Usage: replace `BigInt(apiString)` with `safeBigInt(apiString)` everywhere
+ * an API-sourced string is converted to bigint.
+ */
+export function safeBigInt(
+  value: string | number | bigint | null | undefined,
+  fallback: bigint = 0n,
+): bigint {
+  if (value == null || value === "") return fallback;
+  if (typeof value === "bigint") return value;
+  try {
+    return BigInt(new Decimal(String(value)).toFixed(0, Decimal.ROUND_DOWN));
+  } catch {
+    return fallback;
+  }
+}
+
+/**
+ * Safely parse any value — including scientific notation like "2.499e+23"
+ * and decimals like "1.5" — into a Decimal for lossless arithmetic.
+ * Returns `fallback` (default Decimal(0)) for null / undefined / empty / non-numeric input.
+ *
+ * Use this for calculations that must not round at any intermediate step.
+ * Convert to display string only at the final step via formatAmount / formatUnits.
+ *
+ * @example
+ *   const remaining = safeDecimal(stakingLimit).sub(safeDecimal(totalStaked));
+ *   const display = formatAmount(remaining.toFixed(), decimals);
+ */
+export function safeDecimal(
+  value: string | number | bigint | null | undefined,
+  fallback: Decimal = new Decimal(0),
+): Decimal {
+  if (value == null || value === "") return fallback;
+  try {
+    return new Decimal(typeof value === "bigint" ? value.toString() : String(value));
+  } catch {
+    return fallback;
+  }
+}
+
 export function formatAmountOld(
   amount: string,
   decimals: number,

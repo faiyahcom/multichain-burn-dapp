@@ -3,6 +3,7 @@ import {
     getMultichainBurnProgram,
 } from "@/web3/contracts/multichainBurnProgramSol";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
     getFactoryPDA,
     getRewardVaultPDA,
@@ -245,15 +246,11 @@ export const useSwapPoolSOL = () => {
 
                 const signedTx = await provider.signTransaction(tx);
 
-                const signature = await connection.sendRawTransaction(
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
                     signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
                 );
-
-                await connection.confirmTransaction({
-                    signature,
-                    blockhash,
-                    lastValidBlockHeight,
-                });
 
                 toast.success("Deposit successful", {
                     description: signature,

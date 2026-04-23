@@ -4,7 +4,7 @@ import {
   IconSquareArrowTopRightOut,
   IconTrashCan,
 } from "@/assets/react";
-import AnimateIconButton from "@/components/common/animate-icon-button";
+import { PencilIcon } from "lucide-react";
 import ConfirmDialog from "@/components/common/confirm-dialog";
 import CopyableText from "@/components/common/copyable-text";
 import NetworkDisplay from "@/components/common/network-display";
@@ -28,12 +28,7 @@ import {
   type WhitelistToken,
 } from "@/services/whitelistService";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
-import {
-  booleanToTokenStatus,
-  tokenStatusColors,
-  tokenStatusLabels,
-  tokenStatusLetters,
-} from "@/types/admin/whitelist-token";
+import { poolTypeLabels } from "@/types/admin/master-pool-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useAppKitAccount } from "@reown/appkit/react";
@@ -41,19 +36,25 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "@/components/common/custom-toast";
 import AdminWhitelistTokenDialogDetail from "../dialog/detail";
+import AdminWhitelistTokenDialogEdit from "../dialog/edit";
 import StatusSwitch from "./status-switch";
 import { useDisableWhitelistTokenEvmFn } from "./useDisableWhitelistTokenEvmFn";
 import { useDisableWhitelistTokenSolanaFn } from "./useDisableWhitelistTokenSolanaFn";
 import TokenImage from "@/components/common/token-image";
 import TableNoData from "@/components/common/table-no-data";
+import type { PoolType } from "@/types/admin/master-pool-management";
 
 type DeleteWhitelistTokenRequestWithStatus = DeleteWhitelistTokenRequest & {
   enabled: boolean;
+  poolTypes: PoolType[];
 };
 
 const AdminWhitelistTokenTable = () => {
   const { filter, setFilter } = useAdminWhitelistTokenSearchFilterStore();
   const [detailToken, setDetailToken] = useState<WhitelistToken | undefined>(
+    undefined,
+  );
+  const [editToken, setEditToken] = useState<WhitelistToken | undefined>(
     undefined,
   );
   const [isScDeleting, setIsScDeleting] = useState<boolean>(false);
@@ -84,15 +85,20 @@ const AdminWhitelistTokenTable = () => {
         chainIds:
           filter.network.length > 0
             ? filter.network
-                .map((network) => networkIdToChainId(network))
-                .filter((chainId) => chainId)
-                .join(",")
+              .map((network) => networkIdToChainId(network))
+              .filter((chainId) => chainId)
+              .join(",")
             : undefined,
         active: filter.status === "all" ? undefined : filter.status,
         search: filter.text ? filter.text : undefined,
+        kinds: filter.types.length > 0 ? filter.types.join(",") : undefined,
+        minDecimals: filter.decimalMin ? Number(filter.decimalMin) : undefined,
+        maxDecimals: filter.decimalMax ? Number(filter.decimalMax) : undefined,
         isDropped: "false", // only show tokens that are not soft-deleted
       }),
   });
+
+
 
   const { mutate: deleteTokenMutation, isPending: isDeleteTokenPending } =
     useMutation({
@@ -101,7 +107,7 @@ const AdminWhitelistTokenTable = () => {
       },
       onSuccess: () => {
         queryClient.invalidateQueries({
-         queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
+          queryKey: whitelistQueryKeys.listTokens().filter(Boolean),
         });
         toast.success("Token deleted successfully!");
       },
@@ -119,7 +125,7 @@ const AdminWhitelistTokenTable = () => {
   ) => {
     if (request.enabled) {
       const tokenNetworkId = chainIdToNetworkConfig(request.chainId)?.id;
-      
+
       if (tokenNetworkId && currentNetworkId !== tokenNetworkId) {
         openSwitchNetworkModal(currentNetworkId, tokenNetworkId);
         return;
@@ -139,12 +145,14 @@ const AdminWhitelistTokenTable = () => {
       if (isSolana) {
         isDisabled = await disableWhitelistTokenSolana({
           tokenAddress: request.address,
+          poolTypes: request.poolTypes,
         });
       }
 
       if (isEvm) {
         isDisabled = await disableWhitelistTokenEvm({
           tokenAddress: request.address,
+          poolTypes: request.poolTypes,
         });
       }
 
@@ -163,12 +171,14 @@ const AdminWhitelistTokenTable = () => {
     "Token",
     "Address",
     "Network",
+    "Decimal",
+    "Pool type",
     "Description",
     "Links",
     "Status",
-    "Toggle",
     "Action",
   ];
+
 
   const isTokenDeleting = isScDeleting || isDeleteTokenPending;
 
@@ -194,10 +204,22 @@ const AdminWhitelistTokenTable = () => {
               isLoading={isListTokensPending}
             />
             {listTokensData?.whitelistTokens?.map((item, index) => {
-              const status = booleanToTokenStatus(item.enable);
+              const activePoolTypes =
+                (item.kind?.filter((k) => k.enable).map((k) => k.kind) as PoolType[]) ??
+                [];
+              const availablePoolTypes =
+                (item.kind?.map((k) => k.kind) as PoolType[]) ?? [];
+              const displayKinds =
+                item.kind?.length
+                  ? activePoolTypes.length > 0
+                    ? item.kind.filter((kObj) => kObj.enable)
+                    : item.kind
+                  : [];
+              const isItemEnabled =
+                item.kind?.length > 0 ? activePoolTypes.length > 0 : item.enable;
 
               return (
-                <TableRow key={index}>
+                <TableRow key={index} className="group">
                   <TableCell>
                     <div className="flex items-center gap-1.75 pl-[15%]">
                       <TokenImage
@@ -226,6 +248,21 @@ const AdminWhitelistTokenTable = () => {
                     <NetworkDisplay chainId={item.chainId} />
                   </TableCell>
                   <TableCell>
+                    {item.decimals}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex flex-col gap-0.5">
+                      {displayKinds.map((kObj) => (
+                        <span
+                          key={kObj.kind}
+                          className="text-xs font-medium transition-all group-hover:font-bold"
+                        >
+                          {poolTypeLabels[kObj.kind as keyof typeof poolTypeLabels] ?? `Kind ${kObj.kind}`}
+                        </span>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell>
                     <p
                       className="mx-auto max-w-55.25 truncate"
                       title={item.description}
@@ -234,14 +271,16 @@ const AdminWhitelistTokenTable = () => {
                     </p>
                   </TableCell>
                   <TableCell>
-                    <div className="flex items-center justify-center gap-6">
+                    <div className="flex items-center justify-center gap-4">
                       {item.homepage && (
                         <a
                           href={item.homepage}
                           target="_blank"
                           rel="noopener noreferrer"
+                          title="Homepage"
+                          className="text-foreground transition-colors hover:text-active"
                         >
-                          <IconSquareArrowTopRightOut className="[&>path]:group-hover:stroke-[1.5px]" />
+                          <IconSquareArrowTopRightOut className="size-4" />
                         </a>
                       )}
                       {item.whitepaper && (
@@ -249,38 +288,42 @@ const AdminWhitelistTokenTable = () => {
                           href={item.whitepaper}
                           target="_blank"
                           rel="noopener noreferrer"
+                          title="Whitepaper"
+                          className="text-foreground transition-colors hover:text-active"
                         >
-                          <IconFileDoc className="[&>path]:group-hover:stroke-[1.5px]" />
+                          <IconFileDoc className="size-4" />
                         </a>
                       )}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <AnimateIconButton
-                      iconLetter={tokenStatusLetters[status]}
-                      textVariant="text-self-center"
-                      text={tokenStatusLabels[status]}
-                      color={tokenStatusColors[status]}
-                      hasGroupHover
-                      classNames={{
-                        btn: "min-w-27 mx-auto",
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell>
                     <StatusSwitch
                       switchProps={{
-                        active: item.enable,
+                        active: isItemEnabled,
                         classNames: {
                           btn: "mx-auto",
                         },
                       }}
                       chainId={item.chainId}
                       address={item.address}
+                      poolTypes={activePoolTypes}
+                      availablePoolTypes={availablePoolTypes}
                     />
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-4.5">
+                      <button onClick={() => {
+                        if (currentNetworkId) {
+                          const tokenNetworkId = chainIdToNetworkConfig(item.chainId)?.id;
+                          if (networkIdToChainId(currentNetworkId) == item.chainId) {
+                            setEditToken(item)
+                          } else if (tokenNetworkId) {
+                            openSwitchNetworkModal(currentNetworkId, tokenNetworkId)
+                          }
+                        }
+                      }}>
+                        <PencilIcon className="size-4" />
+                      </button>
                       <button onClick={() => setDetailToken(item)}>
                         <IconEye className="[&>path]:group-hover:stroke-[1.5px]" />
                       </button>
@@ -289,7 +332,8 @@ const AdminWhitelistTokenTable = () => {
                           handleDeleteToken({
                             chainId: item.chainId,
                             address: item.address,
-                            enabled: item.enable,
+                            enabled: isItemEnabled,
+                            poolTypes: activePoolTypes,
                           })
                         }
                       >
@@ -303,18 +347,34 @@ const AdminWhitelistTokenTable = () => {
           </TableBody>
         </Table>
 
-        <CustomPagination
-          currentPage={filter.page}
-          totalCount={listTokensData?.total || 0}
-          pageSize={limit}
-          onPageChange={(page) => setFilter({ page })}
-        />
+        {
+          listTokensData && listTokensData?.total > 0 && (
+            <CustomPagination
+              currentPage={filter.page}
+              totalCount={listTokensData?.total || 0}
+              pageSize={limit}
+              onPageChange={(page) => setFilter({ page })}
+            />
+          )
+        }
       </div>
 
       <AdminWhitelistTokenDialogDetail
         data={detailToken}
         setData={setDetailToken}
       />
+
+      {editToken && (
+        <AdminWhitelistTokenDialogEdit
+          token={editToken}
+          open={!!editToken}
+          onOpenChange={(open) => {
+            if (!open) {
+              setEditToken(undefined);
+            }
+          }}
+        />
+      )}
 
       <ConfirmDialog
         open={!!deleteRequest}

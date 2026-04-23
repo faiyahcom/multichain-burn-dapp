@@ -249,6 +249,7 @@ const AdminManagementDialogEdit: React.FC<Props> = ({
       }}
       lockWalletAddress
       lockNetworkId
+      activeNetworkIds={adminNetworkIds}
       lockRole={isSoleSuperAdmin}
       isLoading={isPending || isCallingSc}
       onSubmit={handleSubmit}
