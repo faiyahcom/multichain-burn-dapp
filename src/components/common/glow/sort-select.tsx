@@ -22,8 +22,12 @@ import {
 } from "./container";
 import { DownTriangleIcon } from "./down-triangle-icon";
 
+export type SortByOption =
+  | SortBy
+  | { label: string; value: SortBy; shortLabel?: string };
+
 interface Props {
-  options?: SortBy[];
+  options?: SortByOption[];
   sortBy?: SortBy;
   sortOrder?: SortOrder;
   setSortBy?: (sortBy: SortBy | undefined) => void;
@@ -37,6 +41,29 @@ interface Props {
     content?: string;
   };
 }
+
+const getShortlabel = ({
+  options,
+  sortBy,
+  placeholder,
+}: {
+  options?: SortByOption[];
+  sortBy?: SortBy;
+  placeholder: string;
+}) => {
+  const option = options?.find(
+    (option) =>
+      (typeof option === "object" && option.value === sortBy) ||
+      option === sortBy,
+  );
+  if (option) {
+    if (typeof option === "object") {
+      return option.shortLabel ?? sortBysShortLabels[option.value];
+    }
+    return sortBysShortLabels[option];
+  }
+  return sortBy ? sortBysShortLabels[sortBy] : placeholder;
+};
 
 const SortSelect: React.FC<Props> = ({
   options,
@@ -80,7 +107,7 @@ const SortSelect: React.FC<Props> = ({
             {isActive && <div className={cn("size-4")} />}
             {!isActive
               ? placeholder
-              : (sortBysShortLabels[sortBy ?? "none"] ?? sortBy)}{" "}
+              : getShortlabel({ options, sortBy, placeholder })}{" "}
             {isActive && (
               <DownTriangleIcon
                 direction={sortOrder === "asc" ? "up" : "down"}
@@ -108,15 +135,20 @@ const SortSelect: React.FC<Props> = ({
             <PopoverDescription>Sort by</PopoverDescription>
           </PopoverHeader>
           {options?.map((sortByItem) => {
-            const isActive = sortByItem === sortBy;
+            const hasCustomLabel = typeof sortByItem === "object";
+            const isActive = hasCustomLabel
+              ? sortByItem.value === sortBy
+              : sortByItem === sortBy;
             return (
               <OptionItem
-                key={sortByItem}
-                sortBy={sortByItem}
+                key={hasCustomLabel ? sortByItem.value : sortByItem}
+                sortBy={hasCustomLabel ? sortByItem.value : sortByItem}
                 sortOrder={sortOrder}
                 isActive={isActive}
                 toggleSort={handleToggleSort}
-                label={sortBysLabels[sortByItem]}
+                label={
+                  hasCustomLabel ? sortByItem.label : sortBysLabels[sortByItem]
+                }
                 variant={variant}
               />
             );

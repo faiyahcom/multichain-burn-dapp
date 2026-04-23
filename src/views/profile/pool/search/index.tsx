@@ -3,7 +3,9 @@ import type { MultipleSelectOption } from "@/components/common/glow/multiple-sel
 import MultipleSelect from "@/components/common/glow/multiple-select";
 import NetworkMultipleSelect from "@/components/common/glow/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
-import SortSelect from "@/components/common/glow/sort-select";
+import SortSelect, {
+  type SortByOption,
+} from "@/components/common/glow/sort-select";
 import { cn } from "@/lib/utils";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
 import {
@@ -12,9 +14,8 @@ import {
   poolTypeLabels,
   swapPoolStatuses,
   type AllPoolStatus,
-  type PoolType
+  type PoolType,
 } from "@/types/admin/master-pool-management";
-import type { SortBy } from "@/types/common";
 import { PoolKindCodeEnum } from "@/types/pool";
 import { useMemo } from "react";
 
@@ -70,9 +71,21 @@ const ProfilePoolSearch: React.FC<Props> = ({
     }));
   }, [poolType, profileType]);
 
-  const sortOptions = useMemo<SortBy[]>(() => {
+  const sortOptions = useMemo<SortByOption[]>(() => {
     if (poolType === "claimable")
-      return ["claimableReward", "amountBurned", "timestamp"];
+      return [
+        "claimableReward",
+        {
+          value: "amountBurned",
+          label: "Amount Deposited",
+          shortLabel: "Deposited",
+        },
+        {
+          value: "timestamp",
+          label: "Newest Joined",
+          shortLabel: "Newest",
+        },
+      ];
 
     if (poolType === PoolKindCodeEnum.Stake) return ["stakedAmount", "apr"];
 
@@ -148,10 +161,13 @@ const ProfilePoolSearch: React.FC<Props> = ({
         variant="pair"
         classNames={{
           container: cn("w-full 2xl:max-w-65", {
-            "2xl:max-w-79": poolType === PoolKindCodeEnum.Stake,
+            "2xl:w-79": poolType === PoolKindCodeEnum.Stake,
           }),
           btn: cn("w-full", {
             "2xl:min-w-79": poolType === PoolKindCodeEnum.Stake,
+          }),
+          content: cn({
+            "sm:w-76": poolType === "claimable",
           }),
         }}
       />
