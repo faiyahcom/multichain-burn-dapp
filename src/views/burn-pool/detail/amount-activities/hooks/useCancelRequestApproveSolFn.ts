@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { confirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -70,7 +71,7 @@ export const useCancelRequestApproveSolFn = () => {
                     signedTx.serialize(),
                 );
 
-                await connection.confirmTransaction({
+                await confirmTransactionSafe(connection, {
                     signature,
                     blockhash,
                     lastValidBlockHeight,
