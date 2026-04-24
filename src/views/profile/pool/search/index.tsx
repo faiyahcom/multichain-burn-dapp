@@ -161,7 +161,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
         variant="pair"
         classNames={{
           container: cn("w-full 2xl:max-w-65", {
-            "2xl:w-79": poolType === PoolKindCodeEnum.Stake,
+            "2xl:max-w-79": poolType === PoolKindCodeEnum.Stake,
           }),
           btn: cn("w-full", {
             "2xl:min-w-79": poolType === PoolKindCodeEnum.Stake,
