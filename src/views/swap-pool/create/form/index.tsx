@@ -1,29 +1,36 @@
-import { useAppKitAccount } from "@reown/appkit/react";
-import { PublicKey } from "@solana/web3.js";
-import { useEffect, useRef } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { useNavigate } from "@tanstack/react-router";
-import { useCreateSwapPoolSolanaFn } from "@/views/swap-pool/create/useCreateSwapPoolSolanaFn";
-import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
-import { useSystemStore } from "@/stores/systemStore";
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import { toast } from "@/components/common/custom-toast";
-import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
-import NetworkIcon from "@/components/layout/header/network-icon";
-import { safeDecimalParse } from "@/utils/helpers/numbers";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
-import { cn } from "@/lib/utils";
+import { Button } from "@/components/common/glow/button";
 import {
   getVariantBgClassName,
   getVariantBorderClassName,
 } from "@/components/common/glow/container";
 import InfoTooltip from "@/components/common/glow/info-tooltip";
-import { Button } from "@/components/common/glow/button";
 import { Input } from "@/components/common/glow/input";
 import {
   RadioGroup,
   RadioGroupItem,
 } from "@/components/common/glow/radio-group";
+import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
+import NetworkIcon from "@/components/layout/header/network-icon";
+import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
+import {
+  NETWORK_CONFIGS,
+  networkIdToChainId,
+  type NetworkId,
+} from "@/config/networks";
+import { cn } from "@/lib/utils";
+import { pairConfigsService } from "@/services/pairConfigsService";
+import { pairConfigsQueryKeys } from "@/services/queries/queryKey";
+import { useSystemStore } from "@/stores/systemStore";
+import { safeDecimalParse, shortenNumber } from "@/utils/helpers/numbers";
+import { useCreateSwapPoolSolanaFn } from "@/views/swap-pool/create/useCreateSwapPoolSolanaFn";
+import { useAppKitAccount } from "@reown/appkit/react";
+import { PublicKey } from "@solana/web3.js";
+import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useEffect, useRef } from "react";
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
@@ -67,6 +74,8 @@ const CreateSwapPoolForm = ({
     setValue,
     watch,
     formState: { errors, isSubmitting },
+    getFieldState,
+    trigger,
   } = useForm<CreateSwapPoolFormValues>({
     defaultValues: {
       poolName: "",
@@ -76,12 +85,75 @@ const CreateSwapPoolForm = ({
       budget: undefined,
       amountPay: undefined,
     },
+    reValidateMode: "onChange",
   });
 
   const selectedTokenBurn = watch("tokenBurn");
   const selectedTokenReward = watch("tokenReward");
   const budget = watch("budget");
   const ratio = watch("ratio");
+
+  const chainId = networkIdToChainId(selectedNetworkId);
+  const shouldCheckMinRatio =
+    !!chainId && !!selectedTokenBurn && !!selectedTokenReward;
+  const {
+    data: pairConfigData,
+    isPending: isDetailPairConfigPending,
+    isEnabled: isDetailPairConfigEnabled,
+  } = useQuery({
+    queryKey: pairConfigsQueryKeys.detail({
+      chainId: chainId,
+      tokenIn: selectedTokenBurn,
+      tokenOut: selectedTokenReward,
+    }),
+    queryFn: async () => {
+      return pairConfigsService.detailPairConfig({
+        chainId: chainId!,
+        tokenIn: selectedTokenBurn,
+        tokenOut: selectedTokenReward,
+      });
+    },
+    enabled: shouldCheckMinRatio,
+    retry: false,
+  });
+
+  useEffect(() => {
+    const ratioFieldState = getFieldState("ratio");
+    const isRatioDirty = ratioFieldState?.isDirty;
+    if (isRatioDirty) {
+      trigger("ratio");
+    }
+  }, [pairConfigData, isDetailPairConfigEnabled, isDetailPairConfigPending]);
+
+  const isRatioBiggerOrEqualToMinRatio = ({
+    ratioNumerator,
+    ratioDenominator,
+    minRatioNumerator,
+    minRatioDenominator,
+  }: {
+    ratioNumerator: string;
+    ratioDenominator: string;
+    minRatioNumerator: string;
+    minRatioDenominator: string;
+  }) => {
+    const numberRatioNumerator = Number(ratioNumerator);
+    const numberRatioDenominator = Number(ratioDenominator);
+    const numberMinRatioNumerator = Number(minRatioNumerator);
+    const numberMinRatioDenominator = Number(minRatioDenominator);
+
+    if (
+      !numberRatioNumerator ||
+      !numberRatioDenominator ||
+      !numberMinRatioNumerator ||
+      !numberMinRatioDenominator
+    ) {
+      return true; // clear if a number is invalid
+    }
+
+    const ratio = numberRatioNumerator / numberRatioDenominator;
+    const minRatio = numberMinRatioNumerator / numberMinRatioDenominator;
+    return ratio >= minRatio;
+  };
 
   // Reset form on network change
   useEffect(() => {
@@ -112,6 +184,37 @@ const CreateSwapPoolForm = ({
     if (!ratioNumerator || !ratioDenominator) {
       toast.error("Invalid ratio format. Please use `X:Y`.");
       return;
+    }
+    if (!chainId) {
+      toast.error("Invalid network configuration");
+      return;
+    }
+
+    // Check min ratio again
+    try {
+      const pairConfigDetailData = await pairConfigsService.detailPairConfig({
+        chainId: chainId!,
+        tokenIn: values.tokenBurn,
+        tokenOut: values.tokenReward,
+      });
+      if (pairConfigDetailData) {
+        const isValidMinRatio = isRatioBiggerOrEqualToMinRatio({
+          ratioNumerator: ratioNumerator.toString(),
+          ratioDenominator: ratioDenominator.toString(),
+          minRatioNumerator: pairConfigDetailData.pairConfig.ratioNumerator,
+          minRatioDenominator: pairConfigDetailData.pairConfig.ratioDenominator,
+        });
+        if (!isValidMinRatio) {
+          toast.error(
+            `Ratio must be greater than or equal to min ratio (${pairConfigDetailData.pairConfig.ratioNumerator}:${pairConfigDetailData.pairConfig.ratioDenominator}, ${shortenNumber({ number: Number(pairConfigDetailData.pairConfig.ratio) })})`,
+          );
+          return;
+        }
+      }
+    } catch (error) {
+      // Error is most likely 404 due to min ratio config doesn't exist
+      // In any case, ignore and let user proceed
+      console.error(error);
     }
 
     if (isSolana && !onSubmitForm) {
@@ -341,6 +444,24 @@ const CreateSwapPoolForm = ({
                     return "Both numbers must be integers";
                   if (left <= 0 || right <= 0)
                     return "Both numbers must be greater than zero";
+
+                  if (
+                    isDetailPairConfigEnabled &&
+                    !isDetailPairConfigPending &&
+                    pairConfigData
+                  ) {
+                    const isValidMinRatio = isRatioBiggerOrEqualToMinRatio({
+                      ratioNumerator: match[1],
+                      ratioDenominator: match[2],
+                      minRatioNumerator:
+                        pairConfigData.pairConfig.ratioNumerator,
+                      minRatioDenominator:
+                        pairConfigData.pairConfig.ratioDenominator,
+                    });
+                    if (!isValidMinRatio) {
+                      return `Ratio must be greater than or equal to min ratio (${pairConfigData.pairConfig.ratioNumerator}:${pairConfigData.pairConfig.ratioDenominator}, ${shortenNumber({ number: Number(pairConfigData.pairConfig.ratio) })})`;
+                    }
+                  }
 
                   return true;
                 },

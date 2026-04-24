@@ -174,10 +174,12 @@
   --color-burn-border: var(--burn-border);
   --color-swap-border: var(--swap-border);
   --color-green-border: var(--green-border);
+  --color-stake-border: var(--stake-border);
   --shadow-pair-glow: 0 0 20px 5px var(--pair-shadow);
   --shadow-burn-glow: 0 0 10px 5px var(--burn-shadow);
   --shadow-swap-glow: 0 0 20px 5px var(--swap-shadow);
   --shadow-green-glow: 0 0 10px 5px var(--green-shadow);
+  --shadow-stake-glow: 0 0 20px 5px var(--stake-shadow);
 
   --tracking-2-percent: -0.02em;
 
@@ -188,6 +190,7 @@
   --color-mb-btn-swap: var(--mb-btn-swap);
   --color-mb-btn-burn: var(--mb-btn-burn);
   --color-mb-btn-pair: var(--mb-btn-pair);
+  --color-mb-btn-stake: var(--mb-btn-stake);
   --color-banner-text: var(--banner-text);
   --color-mb-dark-popover-item: var(--mb-dark-popover-item);
   --color-mb-dark-popover-item-border: var(--mb-dark-popover-item-border);
@@ -208,6 +211,8 @@
   --color-mb-glow-input-bg: var(--mb-glow-input-bg);
   --color-mb-glow-input-secondary: var(--mb-glow-input-secondary);
   --color-mb-glow-green: var(--mb-glow-green);
+
+  --breakpoint-1440px: 90rem;
   /* END */
 }
 
@@ -230,6 +235,9 @@
 
   --green-border: #06c081;
   --green-shadow: rgba(6, 192, 129, 0.25);
+
+  --stake-border: rgba(20, 184, 166, 0.85);
+  --stake-shadow: rgba(20, 184, 166, 0.25);
   /* END */
 
   --sub-bg: #ffffff;
@@ -322,6 +330,7 @@
   --mb-btn-swap: #0285ff;
   --mb-btn-burn: #f26100;
   --mb-btn-pair: #8970ff;
+  --mb-btn-stake: #06b6d4;
 
   --banner-text: #d41317;
   --mb-dark-popover-item: #10121f;
@@ -361,6 +370,12 @@
 
   --swap-border: #0285ff;
   --swap-shadow: rgba(2, 133, 255, 0.25);
+
+  --green-border: #06c081;
+  --green-shadow: rgba(6, 192, 129, 0.25);
+
+  --stake-border: rgba(20, 184, 166, 0.85);
+  --stake-shadow: rgba(20, 184, 166, 0.878431);
   /* END */
 
   --sub-bg: #ffffff;
@@ -453,6 +468,7 @@
   --mb-btn-swap: #0779e9;
   --mb-btn-burn: #f26100;
   --mb-btn-pair: #7407e9;
+  --mb-btn-stake: #06b6d4;
 
   --banner-text: #d41317;
   --mb-dark-popover-item: #10121f;
@@ -595,6 +611,18 @@
   );
 }
 
+@utility card-stake-bg {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(20, 184, 166, 0.33) 0%,
+      rgba(20, 184, 166, 0) 31.25%,
+      rgba(20, 184, 166, 0) 65.38%,
+      rgba(20, 184, 166, 0.33) 100%
+    ),
+    rgba(0, 0, 0, 0.8);
+}
+
 @utility card-pair-bold-bottom-bg {
   background: linear-gradient(
     168.92deg,
@@ -622,6 +650,16 @@
     rgba(0, 93, 180, 0) 21.08%,
     rgba(0, 93, 180, 0.3) 61.5%,
     #0285ff 91.81%
+  );
+}
+
+@utility card-stake-bold-bottom-bg {
+  background: linear-gradient(
+    168.92deg,
+    rgba(20, 184, 166, 0) -0.14%,
+    rgba(20, 184, 166, 0) 21.08%,
+    rgba(20, 184, 166, 0.3) 61.5%,
+    #14b8a6 91.81%
   );
 }
 
@@ -673,6 +711,19 @@
   background-repeat: no-repeat;
 }
 
+@utility grid-stake-bg {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(52, 211, 211, 0) 0%,
+      rgba(52, 211, 211, 0.5) 100%
+    ),
+    url("/images/grid/stake-card-bg.png"), #000000;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 @utility grid-pair-btn-bg {
   background: linear-gradient(
     0deg,
@@ -698,6 +749,16 @@
     #003f79 7.41%,
     #0173de 46.5%,
     #0285ff 99.2%
+  );
+}
+
+@utility grid-stake-btn-bg {
+  background: linear-gradient(
+    182.73deg,
+    #75ebff 2.27%,
+    #06b6d4 21.55%,
+    #04889f 84.42%,
+    #035e6e 97.73%
   );
 }
 

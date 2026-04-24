@@ -29,6 +29,14 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
         totalVolume = overallStats?.totalSwapVolume ?? "0";
         break;
 
+      case PoolKindCodeEnum.Stake:
+        totalVolume = overallStats?.totalStaked?.toString() ?? "0";
+        break;
+
+      case PoolKindCodeEnum.Launchpad:
+        totalVolume = "123456789"; // TODO: implement API for launchpad pool
+        break;
+
       default:
         void (poolKind satisfies never);
         break;
@@ -39,10 +47,21 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
 
   const cards: { title: string; value: string; valueTitle?: string }[] = [
     {
-      title:
-        poolKind === PoolKindCodeEnum.Burn
-          ? "Total Burned"
-          : "Total Swap Volume",
+      title: (() => {
+        switch (poolKind) {
+          case PoolKindCodeEnum.Burn:
+            return "Total Burned";
+          case PoolKindCodeEnum.Swap:
+            return "Total Swap Volume";
+          case PoolKindCodeEnum.Stake:
+            return "Total Staked";
+          case PoolKindCodeEnum.Launchpad:
+            return "Total Launchpad Volume";
+          default:
+            void (poolKind satisfies never);
+            return "Total Volume";
+        }
+      })(),
       value: formatAmount(totalVolume, 0, 2),
       valueTitle: Number(totalVolume).toLocaleString("en-US"),
     },

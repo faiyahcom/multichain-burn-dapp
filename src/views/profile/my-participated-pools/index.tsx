@@ -17,6 +17,8 @@ import { useMediaQuery } from "usehooks-ts";
 import ProfilePoolListBurn from "../pool/list/burn";
 import ProfilePoolListSwap from "../pool/list/swap";
 import CustomPagination from "@/components/common/glow/glow-pagination";
+import { useMyParticipatedPoolsStakeSearchFilterStore } from "@/stores/my-participated-pools/stake";
+import ProfilePoolListStake from "../pool/list/stake";
 
 interface Props {
   poolType: PoolType;
@@ -27,6 +29,8 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
     useMyParticipatedPoolsBurnSearchFilterStore();
   const { filter: filterSwap, setFilter: setFilterSwap } =
     useMyParticipatedPoolsSwapSearchFilterStore();
+  const { filter: filterStake, setFilter: setFilterStake } =
+    useMyParticipatedPoolsStakeSearchFilterStore();
   const { user } = useAuthStore();
   const limit = 10;
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -37,11 +41,15 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
         return filterBurn;
       case PoolKindCodeEnum.Swap:
         return filterSwap;
+      case PoolKindCodeEnum.Stake:
+        return filterStake;
+      case PoolKindCodeEnum.Launchpad:
+        return undefined;
       default:
         void (poolType satisfies never); // exhaustive check
         return undefined;
     }
-  }, [poolType, filterBurn, filterSwap]);
+  }, [poolType, filterBurn, filterSwap, filterStake]);
 
   const setFilter = useMemo(() => {
     switch (poolType) {
@@ -49,16 +57,20 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
         return setFilterBurn;
       case PoolKindCodeEnum.Swap:
         return setFilterSwap;
+      case PoolKindCodeEnum.Stake:
+        return setFilterStake;
+      case PoolKindCodeEnum.Launchpad:
+        return undefined;
       default:
         void (poolType satisfies never); // exhaustive check
         return undefined;
     }
-  }, [poolType, setFilterBurn, setFilterSwap]);
+  }, [poolType, setFilterBurn, setFilterSwap, setFilterStake]);
 
   const participatedQueryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
     limit: limit,
-    kind: poolType.toString(),
+    kinds: poolType.toString(),
     includeStatuses: convertArrayToStringParam({ array: filter?.status }),
     chainIds: convertArrayToStringParam({
       array: filter?.network?.map(networkIdToChainId)?.filter(Boolean) ?? [],
@@ -91,6 +103,13 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
       )}
       {poolType === PoolKindCodeEnum.Swap && (
         <ProfilePoolListSwap
+          data={participatedData?.pools}
+          isLoading={isParticipatedPending}
+          limit={limit}
+        />
+      )}
+      {poolType === PoolKindCodeEnum.Stake && (
+        <ProfilePoolListStake
           data={participatedData?.pools}
           isLoading={isParticipatedPending}
           limit={limit}

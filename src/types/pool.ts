@@ -16,12 +16,24 @@ export type BurnPoolStatus =
 export enum PoolKindCodeEnum {
   Burn = 0,
   Swap = 1,
+  Stake = 2,
+  Launchpad = 3,
 }
-export type PoolKindCode = PoolKindCodeEnum.Burn | PoolKindCodeEnum.Swap;
-export type PoolKind = "burn_pool" | "swap_pool";
+export type PoolKindCode =
+  | PoolKindCodeEnum.Burn
+  | PoolKindCodeEnum.Swap
+  | PoolKindCodeEnum.Stake
+  | PoolKindCodeEnum.Launchpad;
+export type PoolKind =
+  | "burn_pool"
+  | "swap_pool"
+  | "stake_pool"
+  | "launchpad_pool";
 export const POOL_KIND: Record<PoolKindCode, PoolKind> = {
   [PoolKindCodeEnum.Burn]: "burn_pool",
   [PoolKindCodeEnum.Swap]: "swap_pool",
+  [PoolKindCodeEnum.Stake]: "stake_pool",
+  [PoolKindCodeEnum.Launchpad]: "launchpad_pool",
 };
 interface TokenInfo {
   address: string;
@@ -38,6 +50,8 @@ interface TokenInfo {
   description: string;
   homepage: string;
   whitepaper: string;
+  price: string | null;
+  kind: number;
 }
 
 export interface PoolDetailResponse {
@@ -66,7 +80,7 @@ export interface PoolDetailResponse {
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
-    adminCloseReason: string;
+    adminCloseReason: string | null;
     rewardTokenSymbol: string;
     rewardTokenDecimals: number;
     tokenInSymbol: string;
@@ -84,6 +98,31 @@ export interface PoolDetailResponse {
     settlementFee: string;
     poolCreationFee: string;
     isPartner?: boolean;
+    settlementRetryCount?: number;
+    // Staking pool fields
+    apr?: string;
+    lockUpDuration?: string;
+    interestStartDelay?: string; // correct spelling
+    interestAccrualDuration?: string;
+    claimStartDelay?: string;
+    minStakingAmount?: string | null;
+    maxStakingAmount?: string | null;
+    stakingLimit?: string | null;
+  };
+  // Staking pool aggregate data
+  staking?: {
+    totalStaked: string;
+    totalRewardAccrued?: string;
+    user?: {
+      address?: string;
+      totalStaked: string;
+      availableUnstake: string;
+      totalUnstaked: string;
+      rewardAccrued: string;
+      availableClaim: string;
+      totalClaimed: string;
+      totalSettlementFee: string;
+    };
   };
   returningAmountOnCanceling?: {
     amount: string;
@@ -110,6 +149,14 @@ export interface PoolTxnsResponse {
     amountOut: string;
     chainId: string;
     poolAddress: string;
+    // Staking-specific (optional, populated only for staking txns)
+    stakeId?: number;
+    unlockDate?: string;
+    interestStartDate?: string;
+    interestEndDate?: string;
+    claimableDate?: string;
+    rewardAmountStr?: string;
+    lockDuration?: string;
   }[];
 }
 
@@ -120,6 +167,10 @@ export const txnKind = {
   4: "Taker Claim Reward",
   5: "Refund to Maker",
   6: "Burn Success",
+  7: "Stake",
+  8: "Claim",
+  9: "Unstake & Claim",
+  10: "Emergency Withdraw",
 } as const;
 
 export const activityKind = {
@@ -133,21 +184,104 @@ export const activityKind = {
   6: "Pool Closed",
   7: "Pool Updated",
   8: "Pool Ended",
+  9: "Create stake pool",
+  69: "Submit stake pool",
 
   // Maker action
   10: "Deposit reward token",
   11: "Maker Cancel Approve Request",
+  12: "Maker Withdraw Reward",
 
   // Admin action
   20: "Admin Refund",
+  21: "Admin Deposit Reward",
 
   // User actions
   30: "Deposit burn token",
-  31: "Claim reward",
+  31: "Claim Burn reward",
   32: "Swap",
+  33: "Stake",
+  34: "Unstake",
+  35: "Claim Stake reward",
 
   40: "Pool End",
 } as const;
+
+export interface MyStakeSnapshot {
+  time: number;
+  stakingAmount: string;
+  unlockDate: number;
+  interestStartDate: number;
+  durationInSecs: number;
+  interestEndDate: number;
+  claimableDate: number;
+  rewardAmount: string;
+  isUnstaked: boolean;
+  tokenReward: string;
+  tokenStake: string;
+  stakeId: number;
+  poolAdress: string;
+  customSymbolStake: string;
+  customSymbolReward: string;
+  imageUriStake: string;
+  imageUriReward: string;
+  pool: {
+    address: string;
+    name: string;
+    owner: string;
+    rewardToken: string;
+    tokenIn: string;
+    pool_id: string;
+    kind: PoolKindCode;
+    chainId: string;
+    timestamp: string; // timestamp seconds
+    status: StakePoolStatus;
+    currentRewardAmount: string;
+    merkleRootStatus: string;
+    merkleRoot: string | null;
+    adminCloseReason: string | null;
+    settlementRetryCount: number;
+    rewardTokenSymbol: string;
+    rewardTokenDecimals: number;
+    tokenInSymbol: string;
+    tokenInDecimals: number;
+    timeStart: string;
+    timeEnd: string;
+    targetAddress: string;
+    assetTypeReward: number;
+    assetTypeIn: number;
+    rewardNumerator: string;
+    rewardDenominator: string;
+    rewardAmount: string;
+    settlementFee: string;
+    poolCreationFee: string;
+    apr: string; // divide by 10000 to get display percentage
+    lockUpDuration: string;
+    interestStartDelay: string;
+    interestAccrualDuration: string;
+    claimStartDelay: string;
+    minStakingAmount: string | null;
+    maxStakingAmount: string | null;
+    stakingLimit: string | null;
+    isPartner: boolean;
+  };
+}
+
+export interface MyStakesResponse {
+  total: number;
+  page: number;
+  snapshots: MyStakeSnapshot[];
+}
+
+export type StakePoolStatus =
+  | "on_going"
+  | "canceled"
+  | "closed"
+  | "draft"
+  | "pending"
+  | "upcoming"
+  | "holding"
+  | "ended";
 
 export type ActivityKindKey = keyof typeof activityKind;
 
@@ -155,18 +289,38 @@ export const getActivityKindLabel = (kind: ActivityKindKey) => {
   return activityKind[kind];
 };
 
-type ActivityKind = typeof activityKind;
+type ActivityKindKeyStr = `${ActivityKindKey}`;
 
-export function pickActivityKind<K extends keyof ActivityKind>(
-  keys: K[],
-): Pick<ActivityKind, K> {
-  return Object.fromEntries(keys.map((k) => [k, activityKind[k]])) as Pick<
-    ActivityKind,
-    K
-  >;
-}
+export type ActivityKeyList =
+  | ActivityKindKeyStr
+  | `${ActivityKindKeyStr},${ActivityKindKeyStr}`;
 
-export const myActivityActions = pickActivityKind([1, 0, 10, 32, 30, 31, 5]);
+export const myActivityActions = [
+  "1",
+  "0",
+  "10",
+  "32",
+  "30",
+  "31,35", // both claim burn and claim stake
+  "5",
+  "33",
+  "34",
+] as const satisfies ReadonlyArray<ActivityKeyList>;
+export type MyActivityAction = (typeof myActivityActions)[number];
+export const myActivityActionLabels: Record<MyActivityAction, string> = {
+  "1": "Create swap pool",
+  "0": "Create burn pool",
+  "10": "Deposit reward token",
+  "32": "Swap",
+  "30": "Deposit burn token",
+  "31,35": "Claim reward",
+  "5": "Cancel pool",
+  "33": "Stake",
+  "34": "Unstake",
+};
+export const getMyActivityActionLabel = (kind: MyActivityAction) => {
+  return myActivityActionLabels[kind];
+};
 
 export interface PoolActivitiesResponse {
   page: number;

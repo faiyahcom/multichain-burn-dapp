@@ -32,6 +32,8 @@ const AdminWhitelistTokenDialogDetail: React.FC<Props> = ({
     ? chainIdToNetworkConfig(data.chainId)
     : undefined;
 
+  const isEnabled = data?.kind?.length ? data.kind.some(k => k.enable) : data?.enable;
+
   const handleCopy = () => {
     if (data?.address) {
       navigator.clipboard
@@ -86,9 +88,9 @@ const AdminWhitelistTokenDialogDetail: React.FC<Props> = ({
                     />
                   )}
                   <ColorTag
-                    color={data?.enable ? "#7af4cb" : "#ff8e97"}
+                    color={isEnabled ? "#7af4cb" : "#ff8e97"}
                     text={
-                      tokenStatusLabels[booleanToTokenStatus(!!data?.enable)]
+                      tokenStatusLabels[booleanToTokenStatus(!!isEnabled)]
                     }
                   />
                 </div>

@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
 import { getErrorMessage } from "@/utils/helpers/error-message";
+import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { PublicKey, SystemProgram } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
@@ -108,14 +109,11 @@ export const useDepositBurnSolFn = () => {
                     tx.feePayer = walletPublicKey;
 
                     const signedTx = await provider.signTransaction(tx);
-                    signature = await connection.sendRawTransaction(
+                    signature = await sendAndConfirmTransactionSafe(
+                        connection,
                         signedTx.serialize(),
+                        { blockhash, lastValidBlockHeight },
                     );
-                    await connection.confirmTransaction({
-                        signature,
-                        blockhash,
-                        lastValidBlockHeight,
-                    });
                 } else {
                     const depositMint = new PublicKey(tokenIn);
                     const rewardMint = new PublicKey(rewardToken);
@@ -246,14 +244,11 @@ export const useDepositBurnSolFn = () => {
                     tx.feePayer = walletPublicKey;
 
                     const signedTx = await provider.signTransaction(tx);
-                    signature = await connection.sendRawTransaction(
+                    signature = await sendAndConfirmTransactionSafe(
+                        connection,
                         signedTx.serialize(),
+                        { blockhash, lastValidBlockHeight },
                     );
-                    await connection.confirmTransaction({
-                        signature,
-                        blockhash,
-                        lastValidBlockHeight,
-                    });
                 }
 
                 toast.success("Deposit successful!", {

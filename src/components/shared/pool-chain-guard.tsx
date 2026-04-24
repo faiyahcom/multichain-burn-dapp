@@ -7,7 +7,7 @@ import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
 import { Button } from "@/components/common/glow/button";
 import { cn } from "@/lib/utils";
 
-type PoolChainGuardVariant = "pair" | "burn" | "swap";
+type PoolChainGuardVariant = "pair" | "burn" | "swap" | "stake";
 
 type Props = {
   /** Backend chainId of the pool (e.g. "11155111"). */

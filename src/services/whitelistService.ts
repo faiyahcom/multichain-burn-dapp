@@ -17,6 +17,7 @@ export interface WhitelistToken {
   homepage: string;
   whitepaper: string;
   createdAt: string;
+  kind: { enable: boolean; kind: number }[];
 }
 
 export interface ListTokensRequest {
@@ -26,6 +27,9 @@ export interface ListTokensRequest {
   isDropped?: BooleanString; // soft delete
   chainIds?: string; // comma separated
   search?: string;
+  kinds?: string; // comma separated pool type numbers
+  minDecimals?: number;
+  maxDecimals?: number;
 }
 
 export interface ListTokensResponse extends PaginationResponse {
@@ -42,6 +46,7 @@ export interface ForceUpdateWhitelistTokenStatusRequest {
   chainId: string;
   address: string;
   active: boolean;
+  kind: number;
 }
 
 export interface ForceUpdateWhitelistTokenStatusResponse {
@@ -51,6 +56,12 @@ export interface ForceUpdateWhitelistTokenStatusResponse {
 export interface DeleteWhitelistTokenRequest {
   chainId: string;
   address: string;
+}
+
+export interface UpdateWhitelistTokenRequest {
+  chainId: string;
+  address: string;
+  data: FormData;
 }
 
 export const whitelistService = {
@@ -96,6 +107,7 @@ export const whitelistService = {
         )}`,
         {
           active: request.active,
+          kind: request.kind,
         },
       );
 
@@ -109,6 +121,23 @@ export const whitelistService = {
         request.chainId,
         request.address,
       )}`,
+    );
+
+    return response;
+  },
+
+  updateWhitelistToken: async (request: UpdateWhitelistTokenRequest) => {
+    const response = await apiClient.patch<WhitelistToken>(
+      `${WHITELIST_API_ROUTES.UPDATE_WHITELIST_TOKEN(
+        request.chainId,
+        request.address,
+      )}`,
+      request.data,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      },
     );
 
     return response;

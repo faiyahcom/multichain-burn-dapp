@@ -65,7 +65,7 @@ function UserClaimablePool() {
   const queryParams: GetParticipatedPoolsByUserParams = {
     page,
     limit: LIMIT,
-    kind: "0",
+    kinds: "0",
     includeStatuses: "ended",
     chainIds: convertArrayToStringParam({
       array: selectedNetworks.map(networkIdToChainId),

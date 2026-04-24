@@ -3,16 +3,19 @@ import type { MultipleSelectOption } from "@/components/common/glow/multiple-sel
 import MultipleSelect from "@/components/common/glow/multiple-select";
 import NetworkMultipleSelect from "@/components/common/glow/network-multiple-select";
 import SearchTextDebouncedInput from "@/components/common/glow/search-text-debounced-input";
-import SortSelect from "@/components/common/glow/sort-select";
+import SortSelect, {
+  type SortByOption,
+} from "@/components/common/glow/sort-select";
+import { cn } from "@/lib/utils";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
 import {
   burnPoolStatuses,
   getPoolStatusLabel,
+  poolTypeLabels,
   swapPoolStatuses,
   type AllPoolStatus,
   type PoolType,
 } from "@/types/admin/master-pool-management";
-import type { SortBy } from "@/types/common";
 import { PoolKindCodeEnum } from "@/types/pool";
 import { useMemo } from "react";
 
@@ -45,6 +48,14 @@ const ProfilePoolSearch: React.FC<Props> = ({
         if (profileType === "my-participated-pools")
           statuses = [...swapPoolStatuses];
         break;
+      case PoolKindCodeEnum.Stake:
+        if (profileType === "my-create-pools") statuses = []; // user cannot create stake pool
+        if (profileType === "my-participated-pools")
+          statuses = [...swapPoolStatuses]; // For participated pools, user cannot join "holding" and "upcoming" status, so basically it is the same as swap pool
+        break;
+      case PoolKindCodeEnum.Launchpad:
+        statuses = []; // TODO: implement launchpad pool search
+        break;
       case "claimable":
         statuses = [];
         break;
@@ -60,12 +71,34 @@ const ProfilePoolSearch: React.FC<Props> = ({
     }));
   }, [poolType, profileType]);
 
-  const sortOptions = useMemo<SortBy[]>(() => {
+  const sortOptions = useMemo<SortByOption[]>(() => {
     if (poolType === "claimable")
-      return ["claimableReward", "amountBurned", "timestamp"];
+      return [
+        "claimableReward",
+        {
+          value: "amountBurned",
+          label: "Amount Deposited",
+          shortLabel: "Deposited",
+        },
+        {
+          value: "timestamp",
+          label: "Newest Joined",
+          shortLabel: "Newest",
+        },
+      ];
+
+    if (poolType === PoolKindCodeEnum.Stake) return ["stakedAmount", "apr"];
 
     return ["volume", "liquidity"];
   }, [poolType]);
+
+  const poolTypeOptions: MultipleSelectOption[] = [
+    PoolKindCodeEnum.Burn,
+    PoolKindCodeEnum.Stake,
+  ].map((type) => ({
+    label: poolTypeLabels[type],
+    value: type.toString(),
+  }));
 
   return (
     <GlowContainer
@@ -105,6 +138,20 @@ const ProfilePoolSearch: React.FC<Props> = ({
           },
         }}
       />
+      {poolType === "claimable" && (
+        <MultipleSelect
+          variant="pair"
+          options={poolTypeOptions}
+          onChange={(value) =>
+            setFilter?.({ poolType: value?.map((v) => Number(v)) })
+          }
+          selected={filter?.poolType?.map((v) => v.toString())}
+          placeholder="Type"
+          classNames={{
+            btn: "w-full 2xl:max-w-65",
+          }}
+        />
+      )}
       <SortSelect
         options={sortOptions}
         sortBy={filter?.sortBy ?? "none"}
@@ -113,8 +160,15 @@ const ProfilePoolSearch: React.FC<Props> = ({
         setSortOrder={(sortOrder) => setFilter?.({ sortOrder })}
         variant="pair"
         classNames={{
-          container: "w-full 2xl:max-w-65",
-          btn: "w-full",
+          container: cn("w-full 2xl:max-w-65", {
+            "2xl:w-79": poolType === PoolKindCodeEnum.Stake,
+          }),
+          btn: cn("w-full", {
+            "2xl:min-w-79": poolType === PoolKindCodeEnum.Stake,
+          }),
+          content: cn({
+            "sm:w-76": poolType === "claimable",
+          }),
         }}
       />
     </GlowContainer>

@@ -11,6 +11,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { PLACEHOLDER_AVATAR_URL } from "@/config/constant";
 import { authService } from "@/services/authService";
 import { authQueryKeys } from "@/services/queries/queryKey";
 import { useAuthStore } from "@/stores/authStore";
@@ -21,7 +22,6 @@ import { useLocation, useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
 import { useMediaQuery } from "usehooks-ts";
 import { PROFILE_NAV_ITEMS } from "./glow/header-nav/const";
-import { PLACEHOLDER_AVATAR_URL } from "@/config/constant";
 
 type Props = {};
 

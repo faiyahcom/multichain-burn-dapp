@@ -12,13 +12,15 @@ import type {
   PoolDetailResponse,
   PoolKindCode,
   PoolTxnsResponse,
+  MyStakesResponse,
 } from "@/types/pool";
 const POOLS_API_ROUTES = API_ROUTES.POOLS;
 
 export const poolService = {
-  getPoolDetail: async (address: string) => {
+  getPoolDetail: async (address: string, current?: number) => {
     const response = await apiClient.get<PoolDetailResponse>(
       `${POOLS_API_ROUTES.GET_POOL_DETAIL(address)}`,
+      { params: current != null ? { current } : undefined },
     );
     return response;
   },
@@ -27,12 +29,14 @@ export const poolService = {
     limit: number,
     address: string,
     excludeKinds?: string,
+    includeKinds?: string,
   ) => {
     const params = new URLSearchParams({
       page: String(page),
       limit: String(limit),
     });
     if (excludeKinds) params.set("excludeKinds", excludeKinds);
+    if (includeKinds) params.set("includeKinds", includeKinds);
     const response = await apiClient.get<PoolTxnsResponse>(
       `${POOLS_API_ROUTES.GET_POOL_TXNS(address)}?${params.toString()}`,
     );
@@ -101,6 +105,25 @@ export const poolService = {
       `${POOLS_API_ROUTES.TOGGLE_PARTNER_POOL(address)}`,
       {
         isPartner,
+      },
+    );
+    return response;
+  },
+  getMyStakes: async (
+    poolAddress: string | undefined,
+    page: number,
+    limit: number,
+    current?: number,
+  ) => {
+    const response = await apiClient.get<MyStakesResponse>(
+      `${POOLS_API_ROUTES.MY_STAKES}`,
+      {
+        params: {
+          page: String(page),
+          limit: String(limit),
+          poolAddress: poolAddress,
+          ...(current != null ? { current } : {}),
+        },
       },
     );
     return response;

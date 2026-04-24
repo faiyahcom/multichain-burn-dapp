@@ -87,7 +87,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         {
           label: "Network",
           value: (
-            <div className="flex items-center gap-2">
+            <div className="flex h-fit items-center gap-2">
               <NetworkIcon
                 networkId={network?.id || ("" as NetworkId)}
                 className="size-4 md:size-5 2xl:size-6"
@@ -103,7 +103,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
           label: "Burn Token",
           // value: `${poolDetail.pool.tokenInSymbol}`,
           value: (
-            <div className="flex items-center gap-2">
+            <div className="flex h-fit items-center gap-2">
               <TokenImage
                 src={burnTokenDisplay.imageUri}
                 alt={burnTokenDisplay.name}
@@ -123,7 +123,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         {
           label: "Reward Token",
           value: (
-            <div className="flex items-center gap-2">
+            <div className="flex h-fit items-center gap-2">
               <TokenImage
                 src={rewardTokenDisplay.imageUri}
                 alt={rewardTokenDisplay.name}
@@ -162,14 +162,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
       <div className="space-y-2">
         {rows.map((row, rowIndex) => (
           <div
-            className="grid grid-cols-1 gap-y-1 md:grid-cols-2 md:space-x-2"
+            className="grid grid-cols-1 gap-y-1 md:grid-cols-2 space-x-2 md:space-x-6 2xl:space-x-8"
             key={rowIndex}
           >
             <div className="grid grid-cols-2">
               <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                 {row[0]?.label}:
               </span>
-              <span className="text-sm break-all md:text-base lg:text-xl 2xl:text-2xl">
+              <span className="text-sm flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
                 {row[0].value}
               </span>
             </div>
@@ -178,7 +178,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                   {row[1]?.label}:
                 </span>
-                <span className="text-sm font-medium break-all md:text-base lg:text-xl 2xl:text-2xl">
+                <span className="text-sm font-medium flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
                   {row[1]?.value}
                 </span>
               </div>

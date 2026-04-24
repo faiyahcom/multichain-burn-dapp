@@ -23,7 +23,7 @@ import {
 import { useAuthStore } from "@/stores/authStore";
 import { useMyParticipatedPoolsClaimableSearchFilterStore } from "@/stores/my-participated-pools/claimable";
 import {
-  swapPoolStatuses,
+  poolTypeLabels,
   type PoolType,
 } from "@/types/admin/master-pool-management";
 import { PoolKindCodeEnum } from "@/types/pool";
@@ -45,10 +45,10 @@ const ProfileMyParticipatedPoolsClaimable = () => {
 
   const columns = [
     "Pool",
+    "Pool Type",
     "Pair",
-    "Amount Burned",
-    "Claimable Reward",
-    "Ratio",
+    "Amount \nDeposited",
+    "Claimable \nReward",
     "Action",
   ];
 
@@ -57,8 +57,10 @@ const ProfileMyParticipatedPoolsClaimable = () => {
   const queryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
     limit: limit,
-    kind: PoolKindCodeEnum.Burn.toString(),
-    includeStatuses: swapPoolStatuses[3], // only ended pools are claimable
+    kinds: convertArrayToStringParam({
+      array: filter.poolType,
+    }),
+    includeStatuses: undefined,
     chainIds: convertArrayToStringParam({
       array: filter?.network?.map(networkIdToChainId)?.filter(Boolean) ?? [],
     }),
@@ -86,6 +88,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
               <TableHead
                 key={column}
                 variant="pair"
+                className="whitespace-pre-line"
                 style={{
                   width: cellWidth,
                 }}
@@ -140,6 +143,12 @@ const ProfileMyParticipatedPoolsClaimable = () => {
               case PoolKindCodeEnum.Swap:
                 href = `/swap/detail/${pool.address}`;
                 break;
+              case PoolKindCodeEnum.Stake:
+                href = `/staking/detail/${pool.address}`;
+                break;
+              case PoolKindCodeEnum.Launchpad:
+                href = `#`;
+                break;
               default:
                 void (poolType satisfies never); // exhaustive check
                 break;
@@ -169,6 +178,11 @@ const ProfileMyParticipatedPoolsClaimable = () => {
                       container: "justify-start",
                     }}
                   />
+                </TableCell>
+                <TableCell>
+                  <p className="capitalize">
+                    {poolTypeLabels[pool.kind as PoolType]}
+                  </p>
                 </TableCell>
                 <TableCell>
                   <TokenOutInInterceptDisplay
@@ -208,9 +222,6 @@ const ProfileMyParticipatedPoolsClaimable = () => {
                     unit={tokenOutDisplay.symbol}
                     isShorten
                   />
-                </TableCell>
-                <TableCell>
-                  <p>Dynamic</p>
                 </TableCell>
                 <TableCell>
                   <Button

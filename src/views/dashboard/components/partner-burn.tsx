@@ -19,7 +19,7 @@ const POOL_LIMIT = 4;
 
 // ── Pool Card ──────────────────────────────────────────────────────────────────
 
-const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
+export const LiveStatus = ({ timeEnd }: { timeEnd: string }) => {
     const remaining = useCountdown(Number(timeEnd));
     return (
         <div className="flex flex-col items-center gap-1px sm:gap-0.5 2xl:gap-1">

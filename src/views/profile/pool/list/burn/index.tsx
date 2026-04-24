@@ -15,16 +15,16 @@ import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import type { ParticipatedUserPool } from "@/services/userService";
 import {
-  getPoolStatusLabel,
-  type PoolItemType,
+  getPoolStatusLabel
 } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
-  data?: PoolItemType[];
+  data?: ParticipatedUserPool[];
   isLoading?: boolean;
   limit?: number;
 }

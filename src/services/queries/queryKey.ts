@@ -3,13 +3,19 @@ import type { PoolKindCode } from "@/types/pool";
 export const poolQueryKeys = {
   all: ["pools"] as const,
   detail: (address: string) => ["pools", "detail", address] as const,
-  txns: (address: string, page?: number, excludeKinds?: string) =>
-    ["pools", "txns", address, page, excludeKinds] as const,
+  txns: (
+    address: string,
+    page?: number,
+    excludeKinds?: string,
+    includeKinds?: string,
+  ) => ["pools", "txns", address, page, excludeKinds, includeKinds] as const,
   activities: (address: string, page?: number, excludeKinds?: string) =>
     ["pools", "activities", address, page, excludeKinds] as const,
   list: (params?: Record<string, unknown>) =>
     ["pools", "list", params] as const,
   stats: (poolKind: PoolKindCode) => ["pools", "stats", poolKind] as const,
+  myStakes: (address: string, page?: number, limit?: number) =>
+    ["pools", "myStakes", address, page, limit] as const,
   recents: (params?: Record<string, unknown>) =>
     ["pools", "recents", params] as const,
 };
@@ -93,4 +99,13 @@ export const dashboardQueryKeys = {
     ["dashboard", "top-pair", params] as const,
   topSwapper: (params?: Record<string, unknown>) =>
     ["dashboard", "top-swapper", params] as const,
+  topStakingPools: (params?: Record<string, unknown>) =>
+    ["dashboard", "top-staking-pools", params] as const,
+};
+
+export const pairConfigsQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["pair-configs", "list", params] as const,
+  detail: (params?: Record<string, unknown>) =>
+    ["pair-configs", "detail", params] as const,
 };

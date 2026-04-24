@@ -10,8 +10,6 @@ import {
 import type { PoolDetailResponse } from "@/types/pool";
 import type { BatchRecipient, TokenMode } from "./useBatchTransferSolFn";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { BN } from "bn.js";
-import { bigint } from "zod";
 
 export interface BatchTransferEvmParams {
     poolAddress: string;

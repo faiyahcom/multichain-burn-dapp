@@ -95,6 +95,31 @@ const buttonVariants = ({
             },
           ),
           green: "", // left for type safety
+          stake: cn(
+            "bg-mb-btn-stake text-foreground",
+            { "hover:bg-foreground hover:text-mb-btn-stake": hasHover },
+            {
+              "group-hover:bg-foreground group-hover:text-mb-btn-stake":
+                hasGroupHover,
+            },
+            getVariantShadowClassName({ variant: "stake" }),
+          ),
+          "stake-active": cn(
+            "bg-foreground text-mb-btn-stake",
+            getVariantShadowClassName({ variant: "stake" }),
+          ),
+          "stake-grid": cn(
+            "bg-mb-btn-stake text-foreground grid-stake-btn-bg",
+            getVariantShadowClassName({ variant: "stake" }),
+            {
+              "hover:bg-foreground hover:bg-none hover:text-mb-btn-stake":
+                hasHover,
+            },
+            {
+              "group-hover:bg-foreground group-hover:bg-none group-hover:text-mb-btn-stake":
+                hasGroupHover,
+            },
+          ),
         },
         size: {
           default: "py-3 px-6 text-base md:text-2xl",
@@ -131,6 +156,9 @@ const BUTTON_VARIANT_CONTAINER_VARIANT_MAP: Record<
   "burn-grid": "burn",
   "swap-grid": "swap",
   green: "green",
+  stake: "stake",
+  "stake-active": "stake",
+  "stake-grid": "stake",
 };
 
 // Mutually exclusive: can pass isActive OR isGrid, but not both

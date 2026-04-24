@@ -14,16 +14,14 @@ import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import RatioDisplay from "@/components/common/ratio-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
-import {
-  getPoolStatusLabel,
-  type PoolItemType,
-} from "@/types/admin/master-pool-management";
+import type { ParticipatedUserPool } from "@/services/userService";
+import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
 
 interface Props {
-  data?: PoolItemType[];
+  data?: ParticipatedUserPool[];
   isLoading?: boolean;
   limit?: number;
 }
@@ -100,7 +98,7 @@ const ProfilePoolListSwap: React.FC<Props> = ({
               variant="pair"
             >
               <TableCell className="min-w-0 space-y-1 text-left">
-                <p className="min-w-0 truncate max-w-38.75" title={pool.name}>
+                <p className="max-w-38.75 min-w-0 truncate" title={pool.name}>
                   {pool.name}
                 </p>
                 <CopyableText
