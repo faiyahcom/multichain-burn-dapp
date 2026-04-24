@@ -25,23 +25,29 @@ export const API_ROUTES = {
       `/whitelist-tokens/${chainId}/${address}`,
     DELETE_WHITELIST_TOKEN: (chainId: string, address: string) =>
       `/whitelist-tokens/${chainId}/${address}`,
+    UPDATE_WHITELIST_TOKEN: (chainId: string, address: string) =>
+      `/whitelist-tokens/${chainId}/${address}`,
   },
   WHITELIST_USERS: {
     GET_LIST_USERS: "/whitelist-users/users",
     CHECK_USER: "/whitelist-users/check-user",
-    UPDATE_USER_INFO: (address: string, chainId: string) => `/whitelist-users/${chainId}/${address}/info`,
+    UPDATE_USER_INFO: (address: string, chainId: string) =>
+      `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
   },
   ADMINS: {
     LIST: "/admins",
     UPSERT_USER: "/admins/user",
-    DELETE: (chainId: string, address: string) => `/admins/${chainId}/${address}`,
+    DELETE: (chainId: string, address: string) =>
+      `/admins/${chainId}/${address}`,
     NOTIFICATIONS: {
       LIST: "/admins/notifications",
       MARK_READ: "/admins/notifications/mark-read",
       STREAM: "/admins/notifications-stream",
     },
+    TOGGLE_LOW_REWARD_NOTI: (poolAddress: string) =>
+      `/admins/pools/${poolAddress}/low-reward-noti`,
   },
   PAIRS: {
     LIST: "/pairs",
@@ -57,5 +63,15 @@ export const API_ROUTES = {
   },
   GENERAL: {
     NATIVE_PRICES: "/general/native-prices",
+  },
+  PAIR_CONFIGS: {
+    CREATE: "/pair-configs",
+    DETAIL: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+    LIST: "/pair-configs",
+    UPDATE: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
+    DELETE: (tokenIn: string, tokenOut: string) =>
+      `/pair-configs/${tokenIn}/${tokenOut}`,
   },
 } as const;

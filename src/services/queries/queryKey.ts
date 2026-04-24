@@ -58,8 +58,7 @@ export const transferHistoryQueryKeys = {
 };
 
 export const feeQueryKeys = {
-  list: (params?: Record<string, unknown>) =>
-    ["fee", "list", params] as const,
+  list: (params?: Record<string, unknown>) => ["fee", "list", params] as const,
   stats: (params?: Record<string, unknown>) =>
     ["fee", "stats", params] as const,
 };
@@ -75,4 +74,11 @@ export const adminNotificationQueryKeys = {
 
 export const generalQueryKeys = {
   nativePrices: () => ["general", "native-prices"] as const,
+};
+
+export const pairConfigsQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["pair-configs", "list", params] as const,
+  detail: (params?: Record<string, unknown>) =>
+    ["pair-configs", "detail", params] as const,
 };

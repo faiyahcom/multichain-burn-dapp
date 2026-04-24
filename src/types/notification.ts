@@ -18,7 +18,7 @@ export interface NotiMeta {
   poolAddress?: string;
   user?: string;
   txHash?: string;
-  poolKind?: 0 | 1;
+  poolKind?: 0 | 1 | 2 | 3;
   redirect?: (typeof RedirectEnum)[keyof typeof RedirectEnum];
   [key: string]: unknown;
 }
@@ -38,4 +38,14 @@ export interface MarkReadRequest {
 
 export interface MarkReadResponse {
   updated: number;
+}
+
+export interface ToggleLowRewardNotiRequest {
+  poolAddress: string;
+  enabled: boolean;
+}
+
+export interface ToggleLowRewardNotiResponse {
+  poolAddress: string;
+  enabled: boolean;
 }

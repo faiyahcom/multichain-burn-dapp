@@ -1,4 +1,4 @@
-import { useAppKitAccount } from "@reown/appkit/react";
+import { AppKitNetworkButton, useAppKitAccount } from "@reown/appkit/react";
 import NetworkSelect from "./network-select";
 import ProfileMenu from "./profile-menu";
 import ConnectButton from "./connect-button";
@@ -31,7 +31,10 @@ export function MainHeader() {
       </div>
 
       {!isConnected ? (
-        <ConnectButton />
+        <div className="flex items-center gap-3 sm:gap-8">
+          <AppKitNetworkButton />
+          <ConnectButton />
+        </div>
       ) : (
         <div className="flex items-center gap-3 sm:gap-8">
           <AdminNotificationBell />

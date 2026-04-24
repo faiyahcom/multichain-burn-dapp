@@ -61,6 +61,8 @@ interface Props {
   lockWalletAddress?: boolean;
   lockNetworkId?: boolean;
   lockRole?: boolean;
+  /** When provided with lockNetworkId, highlights all networks the admin belongs to (read-only) */
+  activeNetworkIds?: string[];
   onSubmit: (values: AdminManagementFormValues) => Promise<void> | void;
 }
 
@@ -86,6 +88,7 @@ const AdminManagementDialogForm: React.FC<Props> = ({
   lockWalletAddress,
   lockNetworkId,
   lockRole,
+  activeNetworkIds,
   onSubmit,
 }) => {
   const currentNetworkId = useSystemStore((state) => state.selectedNetworkId);
@@ -231,41 +234,47 @@ const AdminManagementDialogForm: React.FC<Props> = ({
                     Network<span className="text-md-required-red">*</span>
                   </FieldLabel>
                   <div className="flex flex-wrap items-center gap-2.25">
-                    {NETWORK_CONFIGS.map((network, index) => (
-                      <AnimateIconButton
-                        key={index}
-                        variant="external-icon"
-                        icon={({ className }) => (
-                          <NetworkImgIcon
-                            src={network.iconSrc}
-                            alt={network.label}
-                            className={className}
-                          />
-                        )}
-                        isActive={field.value === network.id}
-                        btnProps={{
-                          disabled: lockNetworkId || isLoading,
-                          onClick: () => {
-                            field.onChange(network.id);
+                    {NETWORK_CONFIGS.map((network, index) => {
+                      const isLockedDisplay = lockNetworkId && activeNetworkIds;
+                      return (
+                        <AnimateIconButton
+                          key={index}
+                          variant="external-icon"
+                          icon={({ className }) => (
+                            <NetworkImgIcon
+                              src={network.iconSrc}
+                              alt={network.label}
+                              className={className}
+                            />
+                          )}
+                          isActive={
+                            isLockedDisplay
+                              ? activeNetworkIds.includes(network.id)
+                              : field.value === network.id
+                          }
+                          {...(!isLockedDisplay && {
+                            btnProps: {
+                              disabled: lockNetworkId || isLoading,
+                              onClick: () => {
+                                field.onChange(network.id);
 
-                            if (
-                              !lockNetworkId &&
-                              currentNetworkId !== network.id
-                            ) {
-                              openSwitchNetworkModal(
-                                currentNetworkId,
-                                network.id,
-                              );
-                            }
-                          },
-                        }}
-                        text={network.label}
-                        color={network.color}
-                        classNames={{
-                          btn: "after:text-primary-foreground",
-                        }}
-                      />
-                    ))}
+                                if (currentNetworkId !== network.id) {
+                                  openSwitchNetworkModal(
+                                    currentNetworkId,
+                                    network.id,
+                                  );
+                                }
+                              },
+                            },
+                          })}
+                          text={network.label}
+                          color={network.color}
+                          classNames={{
+                            btn: "after:text-primary-foreground",
+                          }}
+                        />
+                      );
+                    })}
                   </div>
                   {fieldState.invalid ? (
                     <FieldError errors={[fieldState.error]} />

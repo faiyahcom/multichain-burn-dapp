@@ -198,6 +198,18 @@ export const adminNavItems: NavItem[] = [
     allowedRoles: ["admin", "super_admin"],
   },
   {
+    label: "Draft Pools",
+    section: navSection.admin,
+    to: "/admin/draft-pools",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "Min Ratio",
+    section: navSection.admin,
+    to: "/admin/min-ratio",
+    allowedRoles: ["super_admin"],
+  },
+  {
     label: "Revenue & Fee Stats",
     icon: IconRevenueFeeStats,
     section: navSection.admin,

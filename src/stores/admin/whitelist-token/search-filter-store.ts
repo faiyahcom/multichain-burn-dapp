@@ -7,6 +7,9 @@ type AdminWhitelistTokenSearchFilterType = {
   network: string[];
   text: string;
   page: number;
+  decimalMin: string;
+  decimalMax: string;
+  types: string[]; // pool type values as strings, e.g. ["0", "1", "2", "3"]
 };
 
 type AdminWhitelistTokenSearchFilterState = {
@@ -21,6 +24,9 @@ export const useAdminWhitelistTokenSearchFilterStore =
       network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
       page: 1,
+      decimalMin: "",
+      decimalMax: "",
+      types: [],
     },
     setFilter: (filter) =>
       set((state) => ({

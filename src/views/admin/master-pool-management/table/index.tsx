@@ -27,7 +27,8 @@ import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { truncateString } from "@/utils/helpers/string";
 import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, type LinkOptions } from "@tanstack/react-router";
+import LowRewardNotiSwitch from "../low-reward-noti-switch";
 
 const AdminMasterPoolManagementTable = () => {
   const { filter, setFilter } = useMasterPoolManagementSearchFilterStore();
@@ -41,7 +42,7 @@ const AdminMasterPoolManagementTable = () => {
       return poolService.getPoolList({
         page: filter.page,
         limit: limit,
-        excludeStatuses: "draft", // admin does not want to see draft pools
+        excludeStatuses: "draft", // admin does not need to see users' draft pools
         includeStatuses: convertArrayToStringParam({ array: filter.status }),
         chainIds: convertArrayToStringParam({
           array: filter.network?.map((network) => networkIdToChainId(network)),
@@ -64,6 +65,7 @@ const AdminMasterPoolManagementTable = () => {
     "Creator",
     "Time",
     "Network",
+    "Low Reward \nNotification",
     "Partner Burn",
     "Status",
   ];
@@ -73,7 +75,9 @@ const AdminMasterPoolManagementTable = () => {
         <TableHeader>
           <TableRow>
             {columns.map((column, index) => (
-              <TableHead key={index}>{column}</TableHead>
+              <TableHead key={index} className="whitespace-pre-line">
+                {column}
+              </TableHead>
             ))}
           </TableRow>
         </TableHeader>
@@ -86,6 +90,29 @@ const AdminMasterPoolManagementTable = () => {
           />
           {pools?.pools?.map((item) => {
             const isBurnPool = item.kind === 0;
+            const isStakePool = item.kind === 2;
+
+            const href: LinkOptions["to"] = (() => {
+              const poolType = item.kind;
+
+              switch (poolType) {
+                case 0:
+                  return "/admin/burn/detail/$address";
+
+                case 1:
+                  return "/admin/swap/detail/$address";
+
+                case 2:
+                  return "/admin/stake/detail/$address";
+
+                case 3:
+                  return "/"; // TODO: launchpad
+
+                default:
+                  void (poolType satisfies never); // exhaustive check
+                  return "/";
+              }
+            })();
 
             return (
               <TableRow
@@ -93,9 +120,7 @@ const AdminMasterPoolManagementTable = () => {
                 className="cursor-pointer"
                 onClick={() => {
                   navigate({
-                    to: isBurnPool
-                      ? "/admin/burn/detail/$address"
-                      : "/admin/swap/detail/$address",
+                    to: href,
                     params: { address: item.address },
                   });
                 }}
@@ -126,7 +151,7 @@ const AdminMasterPoolManagementTable = () => {
                   />
                 </TableCell>
                 <TableCell>
-                  {isBurnPool && (
+                  {(isBurnPool || isStakePool) && (
                     <StartEndDateDisplay
                       startDate={item.timeStart}
                       endDate={item.timeEnd}
@@ -139,6 +164,16 @@ const AdminMasterPoolManagementTable = () => {
                 </TableCell>
                 <TableCell>
                   <NetworkDisplay chainId={item.chainId} />
+                </TableCell>
+                <TableCell className="text-center">
+                  {isStakePool && (
+                    <LowRewardNotiSwitch
+                      address={item.address}
+                      chainId={item.chainId}
+                      isLowRewardNotiEnabled={item.lowRewardNotiEnabled}
+                      classNames={{ btn: "mx-auto" }}
+                    />
+                  )}
                 </TableCell>
                 <TableCell className="text-center">
                   {isBurnPool && (

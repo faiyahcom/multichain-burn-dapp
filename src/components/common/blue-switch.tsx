@@ -20,6 +20,7 @@ const BlueSwitch: React.FC<Props> = ({
 }) => {
   return (
     <button
+      type="button"
       className={cn(
         "flex h-8.25 w-15 items-center justify-start rounded-full border border-mb-switch-blue bg-primary-foreground p-0.5 transition-all duration-300",
         "relative overflow-hidden after:pointer-events-none after:absolute after:inset-0 after:bg-transparent after:transition-colors after:duration-300",
