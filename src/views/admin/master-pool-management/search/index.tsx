@@ -11,6 +11,7 @@ import { authQueryKeys } from "@/services/queries/queryKey";
 import { useMasterPoolManagementSearchFilterStore } from "@/stores/admin/master-pool-management/search-filter-store";
 import { useAuthStore } from "@/stores/authStore";
 import {
+  allPoolStatuses,
   burnPoolStatuses,
   getPoolStatusColor,
   getPoolStatusLabel,
@@ -48,6 +49,7 @@ const AdminMasterPoolManagementSearch = () => {
   ): AllPoolStatus[] => {
     switch (poolType) {
       case "all":
+        return [...allPoolStatuses];
       case "partner":
       case "0": // burn pool
         return [...burnPoolStatuses];
