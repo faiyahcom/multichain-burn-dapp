@@ -82,19 +82,19 @@ const AdminTransferHistoryTable = () => {
             colSpan={columns.length}
           />
           {transfers?.txns?.map((item, index) => (
-            <TableRow key={index} className="group">
+            <TableRow key={index}>
               {/* Recipient — name + email subtitle */}
               <TableCell className="pl-8">
                 <div className="flex max-w-full flex-col items-start text-left">
                   <span
-                    className="block max-w-full truncate font-medium text-mb-table-text group-hover:font-bold group-hover:text-active"
+                    className="block max-w-full truncate font-medium"
                     title={item.whitelistName ?? "-"}
                   >
                     {item.whitelistName ?? "-"}
                   </span>
                   {item.whitelistEmail && (
                     <span
-                      className="block max-w-full truncate text-xs font-normal! text-foreground! group-hover:font-normal! group-hover:text-foreground!"
+                      className="block max-w-full truncate text-xs"
                       title={item.whitelistEmail}
                     >
                       {item.whitelistEmail}
