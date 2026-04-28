@@ -10,8 +10,8 @@ import {
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import {
   poolTypes,
-  poolTypeLabels,
   type PoolType,
+  adminPoolTypeLabels,
 } from "@/types/admin/master-pool-management";
 import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
@@ -345,7 +345,7 @@ const AdminWhitelistTokenDialogCreate = () => {
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-3.25">
                   <FieldLabel htmlFor={field.name}>
-                    Pool<span className="text-md-required-red">*</span>
+                    Pool type<span className="text-md-required-red">*</span>
                   </FieldLabel>
                   <div className="flex items-center gap-2.25">
                     {poolTypes.map((type) => {
@@ -354,7 +354,7 @@ const AdminWhitelistTokenDialogCreate = () => {
                         <AnimateIconButton
                           key={type}
                           variant="letter-icon"
-                          iconLetter={poolTypeLabels[type][0]}
+                          iconLetter={adminPoolTypeLabels[type][0]}
                           isActive={selected}
                           btnProps={{
                             type: "button",
@@ -367,7 +367,7 @@ const AdminWhitelistTokenDialogCreate = () => {
                               );
                             },
                           }}
-                          text={poolTypeLabels[type]}
+                          text={adminPoolTypeLabels[type]}
                           color="#9072f9"
                           classNames={{
                             btn: "after:text-primary-foreground",
