@@ -66,7 +66,7 @@ export const useStakePoolListSearchFilterStore =
       text: "",
       network: NETWORK_CONFIGS.map((network) => network.id),
       status: [...userViewStakePoolStatuses],
-      sortBy: "stakedAmount",
+      sortBy: "timestamp",
       sortOrder: "desc",
       listLayout: "card",
     },
