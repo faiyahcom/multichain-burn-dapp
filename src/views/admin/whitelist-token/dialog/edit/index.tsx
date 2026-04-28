@@ -401,7 +401,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-3.25">
                   <FieldLabel htmlFor={field.name}>
-                    Pool type<span className="text-md-required-red">*</span>
+                    Pool<span className="text-md-required-red">*</span>
                   </FieldLabel>
                   <div className="flex items-center gap-2.25">
                     {poolTypes.map((type) => {
