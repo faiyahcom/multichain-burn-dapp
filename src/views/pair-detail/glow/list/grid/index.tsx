@@ -13,7 +13,7 @@ import {
 } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
-import { renderBurnPoolTime } from "@/views/pool/glow/shared/helpers";
+import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -104,7 +104,7 @@ const PairDetailGlowListGrid: React.FC<Props> = ({ data, isLoading }) => {
                     />
                     <MetricNumber number={pool.volume} isShorten />
                     {isBurnPool ? (
-                      <p key={tick}>{renderBurnPoolTime(pool)}</p>
+                      <p key={tick}>{renderPoolTime(pool)}</p>
                     ) : (
                       <RatioDisplay
                         inValue={pool.rewardDenominator}

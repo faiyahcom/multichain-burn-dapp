@@ -13,7 +13,7 @@ export const useMyParticipatedPoolsStakeSearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      status: [...swapPoolStatuses],
+      status: [...swapPoolStatuses, "full"],
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "stakedAmount",
       sortOrder: "desc",

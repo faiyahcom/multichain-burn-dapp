@@ -3,9 +3,8 @@ import {
   userViewBurnPoolStatuses,
   userViewStakePoolStatuses,
   userViewSwapPoolStatuses,
-  type BurnPoolStatus,
+  type AllPoolStatus,
   type PoolType,
-  type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
 import type { ListLayout, SortBy, SortOrder } from "@/types/common";
 import { create } from "zustand";
@@ -14,7 +13,7 @@ type PoolListSearchFilterType = {
   page: number;
   text?: string;
   network?: string[];
-  status?: (BurnPoolStatus | SwapPoolStatus)[];
+  status?: AllPoolStatus[];
   sortBy?: SortBy;
   sortOrder?: SortOrder;
   listLayout?: ListLayout;
