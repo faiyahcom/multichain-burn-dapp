@@ -49,7 +49,7 @@ const AdminMasterPoolManagementSearch = () => {
   ): AllPoolStatus[] => {
     switch (poolType) {
       case "all":
-        return allPoolStatuses;
+        return [...allPoolStatuses];
       case "partner":
       case "0": // burn pool
         return [...burnPoolStatuses];
