@@ -61,7 +61,7 @@ const AdminMasterPoolManagementTable = () => {
 
   const columns = [
     "Pool",
-    "Pool Type",
+    "Pool",
     "Creator",
     "Time",
     "Network",

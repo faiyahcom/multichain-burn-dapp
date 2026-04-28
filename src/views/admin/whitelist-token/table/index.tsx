@@ -172,7 +172,7 @@ const AdminWhitelistTokenTable = () => {
     "Address",
     "Network",
     "Decimal",
-    "Pool type",
+    "Pool",
     "Description",
     "Links",
     "Status",

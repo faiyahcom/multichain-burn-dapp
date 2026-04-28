@@ -10,9 +10,9 @@ import type {
 export const poolTypes = [0, 1, 2, 3] as const;
 export type PoolType = (typeof poolTypes)[number];
 export const poolTypeLabels: Record<PoolType, string> = {
-  0: "Burn pool",
-  1: "Swap pool",
-  2: "Stake pool",
+  0: "Burn",
+  1: "Swap",
+  2: "Stake",
   3: "Launchpad",
 };
 
