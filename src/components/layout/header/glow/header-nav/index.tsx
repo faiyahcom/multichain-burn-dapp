@@ -16,7 +16,7 @@ export const HeaderNav = () => {
   const location = useLocation();
   const currentPath = location.pathname;
   return (
-    <nav className="hidden items-center gap-6 1440px:flex">
+    <nav className="hidden items-center gap-7 xl:flex">
       {NAV_ITEMS.map((item, index) => {
         const isActive =
           item.activeRegexMatch && currentPath.match(item.activeRegexMatch);
@@ -31,7 +31,7 @@ export const HeaderNav = () => {
               { "border-b-foreground font-bold text-foreground": isActive },
             )}
           >
-            <p className="text-3xl">{item.title}</p>
+            <p className="text-xl">{item.title}</p>
           </Link>
         );
       })}
@@ -45,10 +45,10 @@ export const HeaderNavMobile = () => {
 
   return (
     <Sheet>
-      <SheetTrigger className="1440px:hidden">
+      <SheetTrigger className="xl:hidden">
         <MenuIcon />
       </SheetTrigger>
-      <SheetContent className="1440px:hidden" side="left" showCloseButton={false}>
+      <SheetContent className="xl:hidden" side="left" showCloseButton={false}>
         <SheetHeader>
           <SheetTitle className="sr-only">Navigation</SheetTitle>
           <SheetDescription className="sr-only">Navigation</SheetDescription>

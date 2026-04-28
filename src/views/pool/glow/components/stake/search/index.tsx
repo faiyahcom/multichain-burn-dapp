@@ -56,7 +56,7 @@ const StakeSearch = () => {
         }}
       />
       <SortSelect
-        options={["stakedAmount", "apr"]}
+        options={["timestamp", "stakedAmount", "apr"]}
         sortBy={filter.sortBy ?? "none"}
         sortOrder={filter.sortOrder}
         setSortBy={(sortBy) => setFilter({ sortBy })}
