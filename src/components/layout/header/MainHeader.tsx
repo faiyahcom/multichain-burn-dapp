@@ -17,12 +17,12 @@ export function MainHeader() {
           <img
             src="/logo-with-text.png"
             alt="Logo"
-            className="hidden h-25.25 w-49.25 object-contain xl:block"
+            className="hidden h-18.75 w-37.5 object-contain xl:block"
           />
           <img
             src="/logo.png"
             alt="Logo"
-            className="block h-25.25 w-11 object-contain xl:hidden"
+            className="block h-18.75 w-8.75 object-contain xl:hidden"
           />
           <h1 className="sr-only">FAIYAH.COM</h1>
         </Link>
