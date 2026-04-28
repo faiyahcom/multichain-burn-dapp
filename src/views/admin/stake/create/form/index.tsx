@@ -33,8 +33,7 @@ type CreateStakePoolFormValues = {
   budget: string;
 };
 
-// TODO: revert MIN_DAYS back to 1 once testing is done
-const MIN_DAYS = 0;
+export const MIN_DAYS = 1;
 
 const CreateStakePoolForm = () => {
   const navigate = useNavigate();
@@ -533,7 +532,7 @@ const CreateStakePoolForm = () => {
             <InputGroup className="h-fit">
               <Input
                 type="number"
-                min="0"
+                min={MIN_DAYS}
                 step="any"
                 placeholder="0"
                 aria-invalid={!!errors.interestStartDelay}
@@ -544,7 +543,9 @@ const CreateStakePoolForm = () => {
                         ? true
                         : "Interest start delay is required",
                     gte0: (v) =>
-                      v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
+                      v === "" || Number(v) >= MIN_DAYS
+                        ? true
+                        : `Must be ≥ ${MIN_DAYS}`,
                     // decimals: (v) =>
                     //   !v || !v.includes(".") || v.split(".")[1].length <= 6
                     //     ? true

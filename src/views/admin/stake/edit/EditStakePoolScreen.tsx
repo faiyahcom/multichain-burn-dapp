@@ -14,6 +14,7 @@ import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { useEditStakePoolEvmFn } from "./useEditStakePoolEvmFn";
+import { MIN_DAYS } from "../create/form";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
 import PoolOverview from "../detail/pool-overview";
 import type { BurnPoolStatus } from "@/types/pool";
@@ -524,7 +525,7 @@ export default function EditStakePoolScreen({
                                     </span>
                                     <Input
                                         type="number"
-                                        min="0"
+                                        min={MIN_DAYS}
                                         step="any"
                                         placeholder="0"
                                         aria-invalid={!!errors.lockDuration}
@@ -535,9 +536,9 @@ export default function EditStakePoolScreen({
                                                         ? true
                                                         : "Lock-up duration is required",
                                                 gte0: (v) =>
-                                                    v === "" || Number(v) >= 0
+                                                    v === "" || Number(v) >= MIN_DAYS
                                                         ? true
-                                                        : "Must be \u2265 0",
+                                                        : `Must be ≥ ${MIN_DAYS}`,
                                                 // decimals: (v) =>
                                                 //     !v || !v.includes(".") || v.split(".")[1].length <= 6
                                                 //         ? true
@@ -558,7 +559,7 @@ export default function EditStakePoolScreen({
                                     </span>
                                     <Input
                                         type="number"
-                                        min="0"
+                                        min={MIN_DAYS}
                                         step="any"
                                         placeholder="0"
                                         aria-invalid={!!errors.claimStartDelay}
@@ -569,9 +570,9 @@ export default function EditStakePoolScreen({
                                                         ? true
                                                         : "Claim start delay is required",
                                                 gte0: (v) =>
-                                                    v === "" || Number(v) >= 0
+                                                    v === "" || Number(v) >= MIN_DAYS
                                                         ? true
-                                                        : "Must be \u2265 0",
+                                                        : `Must be ≥ ${MIN_DAYS}`,
                                                 // decimals: (v) =>
                                                 //     !v || !v.includes(".") || v.split(".")[1].length <= 6
                                                 //         ? true
@@ -595,7 +596,7 @@ export default function EditStakePoolScreen({
                                     </span>
                                     <Input
                                         type="number"
-                                        min="0"
+                                        min={MIN_DAYS}
                                         step="any"
                                         placeholder="0"
                                         aria-invalid={!!errors.interestStartDelay}
@@ -606,9 +607,9 @@ export default function EditStakePoolScreen({
                                                         ? true
                                                         : "Interest start delay is required",
                                                 gte0: (v) =>
-                                                    v === "" || Number(v) >= 0
+                                                    v === "" || Number(v) >= MIN_DAYS
                                                         ? true
-                                                        : "Must be \u2265 0",
+                                                        : `Must be ≥ ${MIN_DAYS}`,
                                                 // decimals: (v) =>
                                                 //     !v || !v.includes(".") || v.split(".")[1].length <= 6
                                                 //         ? true
@@ -629,12 +630,14 @@ export default function EditStakePoolScreen({
                                         </span>
                                         <Input
                                             type="number"
-                                            min="0"
+                                            min={MIN_DAYS}
                                             step="any"
                                             placeholder="0"
                                             {...register("interestAccrualDuration", {
                                                 validate: (v) =>
-                                                    v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
+                                                    !v || v === "" || Number(v) >= MIN_DAYS
+                                                        ? true
+                                                        : `Must be ≥ ${MIN_DAYS}`,
                                             })}
                                         />
                                         {errors.interestAccrualDuration && (
