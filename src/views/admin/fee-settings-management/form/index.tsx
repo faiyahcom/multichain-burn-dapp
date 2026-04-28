@@ -268,7 +268,7 @@ const FeeSettingsForm = () => {
                     key={network.id}
                     onClick={() => handleNetworkChange(network)}
                     className={cn(
-                      "my-2 flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive",
+                      "my-2 flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5",
                       isSelected && "bg-inactive font-semibold text-active",
                     )}
                   >

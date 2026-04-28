@@ -81,7 +81,7 @@ export default function NetworkSelect() {
               >
                 <NetworkIcon networkId={network.id} />
                 <div className="flex flex-1 justify-center">
-                  <span className="text-center group-hover:font-bold group-hover:text-active">
+                  <span className="text-center">
                     {network.label}
                   </span>
                 </div>
