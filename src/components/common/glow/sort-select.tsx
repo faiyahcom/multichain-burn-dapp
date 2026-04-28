@@ -93,7 +93,7 @@ const SortSelect: React.FC<Props> = ({
   };
 
   return (
-    <div className={classNames?.container}>
+    <div className={cn("self-stretch", classNames?.container)}>
       <Popover>
         <PopoverTrigger asChild>
           <Button
@@ -102,7 +102,7 @@ const SortSelect: React.FC<Props> = ({
               isActive: false,
             })}
             size={"default"}
-            className={classNames?.btn}
+            className={cn("h-full", classNames?.btn)}
           >
             {isActive && <div className={cn("size-4")} />}
             {!isActive
