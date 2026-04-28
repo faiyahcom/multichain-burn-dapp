@@ -76,7 +76,7 @@ export interface PoolDetailResponse {
     kind: PoolKindCode;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus;
+    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -281,6 +281,7 @@ export type StakePoolStatus =
   | "pending"
   | "upcoming"
   | "holding"
+  | "full"
   | "ended";
 
 export type ActivityKindKey = keyof typeof activityKind;

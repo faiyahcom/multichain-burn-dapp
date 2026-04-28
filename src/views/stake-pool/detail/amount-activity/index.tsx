@@ -25,6 +25,8 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
             case "on_going":
                 return <OnGoingStatus poolDetail={poolDetail} />;
 
+            case "full":
+                return <OnGoingStatus poolDetail={poolDetail} stakeDisabled />;
             case "ended":
                 return <EndStatus poolDetail={poolDetail} />;
 
