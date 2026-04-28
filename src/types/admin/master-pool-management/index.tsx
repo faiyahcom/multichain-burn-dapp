@@ -10,6 +10,13 @@ import type {
 export const poolTypes = [0, 1, 2, 3] as const;
 export type PoolType = (typeof poolTypes)[number];
 export const poolTypeLabels: Record<PoolType, string> = {
+  0: "Burn pool",
+  1: "Swap pool",
+  2: "Stake pool",
+  3: "Launchpad",
+};
+
+export const adminPoolTypeLabels: Record<PoolType, string> = {
   0: "Burn",
   1: "Swap",
   2: "Stake",
@@ -33,6 +40,13 @@ export const poolTypeOptions = poolTypeOptionValues.map((value) => {
 export const poolTypeShortenOptions = poolTypes.map((type) => {
   return {
     label: poolTypeLabels[type],
+    value: type.toString(),
+  };
+});
+
+export const adminPoolTypeShortenOptions = poolTypes.map((type) => {
+  return {
+    label: adminPoolTypeLabels[type],
     value: type.toString(),
   };
 });

@@ -9,7 +9,7 @@ import {
   tokenStatusLabels,
   type TokenStatus,
 } from "@/types/admin/whitelist-token";
-import { poolTypeShortenOptions } from "@/types/admin/master-pool-management";
+import { adminPoolTypeShortenOptions } from "@/types/admin/master-pool-management";
 import { useQuery } from "@tanstack/react-query";
 import AdminWhitelistTokenDialogCreate from "../dialog/create";
 import { networkIdToChainId } from "@/config/networks";
@@ -102,7 +102,7 @@ const AdminWhitelistTokenSearch = () => {
 
           {/* Types multi-select with "N selected" display */}
           <MultipleSelect
-            options={poolTypeShortenOptions}
+            options={adminPoolTypeShortenOptions}
             placeholder="All types"
             placeholderMultiple="All types"
             selected={filter.types}
