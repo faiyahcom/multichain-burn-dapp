@@ -109,7 +109,7 @@ const OptionItem: React.FC<SingleSelectOption & OptionItemProps> = ({
 
   return (
     <div
-      className="group cursor-pointer rounded-5px bg-primary-foreground py-0.5 pr-0.75"
+      className="cursor-pointer rounded-5px bg-primary-foreground py-0.5 pr-0.75"
       onClick={() => toggleCheck?.(value)}
     >
       <div className="relative pl-1">
@@ -117,14 +117,12 @@ const OptionItem: React.FC<SingleSelectOption & OptionItemProps> = ({
           className={cn(
             "absolute top-0 left-0 h-full w-1.75 rounded-full bg-transparent transition-colors",
             { "bg-active": checked },
-            "group-hover:bg-active",
           )}
         />
         <div
           className={cn(
             "flex items-center rounded-5px bg-transparent pt-2.5 pb-2.25 pl-11.25 transition-colors",
             { "bg-inactive": checked },
-            "group-hover:bg-inactive",
             { "pt-2 pb-1.75 pl-6.25": !!Icon },
           )}
         >

@@ -31,7 +31,7 @@ function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
     <tbody
       data-slot="table-body"
       className={cn(
-        "[&>tr]:hover:bg-inactive [&>tr]:hover:font-bold [&>tr]:hover:text-active",
+        "[&>tr]:hover:bg-inactive [&>tr]:hover:text-active",
         className,
       )}
       {...props}
@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-22.5 px-2 text-center align-middle font-bold whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "h-22.5 px-2 text-center align-middle font-bold whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
         className,
       )}
       {...props}
@@ -83,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "p-2 pt-4 pb-3.25 text-center align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+        "p-2 pt-4 pb-3.25 text-center align-middle whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
         "relative first:before:absolute first:before:top-1/2 first:before:left-0 first:before:h-full first:before:w-1.75 first:before:-translate-y-1/2 first:before:rounded-full first:before:bg-transparent first:before:transition-colors group-hover:first:before:bg-active",
         className,
       )}

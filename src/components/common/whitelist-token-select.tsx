@@ -17,6 +17,7 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
+import { cn } from "@/lib/utils";
 
 type Props = {
   value?: string;
@@ -151,7 +152,17 @@ const WhitelistTokenSelect = ({
             {showNativeToken && (
               <DropdownMenuItem
                 key={nativeAddress}
-                className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${value === nativeAddress ? "bg-inactive font-semibold text-active" : ""} ${disabledAddress === nativeAddress ? "cursor-not-allowed opacity-40" : ""}`}
+                className={cn(
+                  "flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5",
+                  {
+                    "bg-inactive font-semibold text-active":
+                      value === nativeAddress,
+                  },
+                  {
+                    "cursor-not-allowed opacity-40":
+                      disabledAddress === nativeAddress,
+                  },
+                )}
                 leftSelectedPanelClassName="w-1.5"
                 isSelected={value === nativeAddress}
                 disabled={disabledAddress === nativeAddress}
@@ -185,7 +196,15 @@ const WhitelistTokenSelect = ({
               return (
                 <DropdownMenuItem
                   key={token.address}
-                  className={`flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5 hover:bg-inactive ${isSelected ? "bg-inactive font-semibold text-active" : ""} ${isDisabled ? "cursor-not-allowed opacity-40" : ""}`}
+                  className={cn(
+                    "flex cursor-pointer items-center gap-3 rounded-5px py-1.75 pr-3.5 pl-5",
+                    {
+                      "bg-inactive font-semibold text-active": isSelected,
+                    },
+                    {
+                      "cursor-not-allowed opacity-40": isDisabled,
+                    },
+                  )}
                   leftSelectedPanelClassName="w-1.5"
                   isSelected={isSelected}
                   disabled={isDisabled}
