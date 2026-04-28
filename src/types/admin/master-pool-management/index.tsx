@@ -89,25 +89,27 @@ export const stakePoolStatuses = [
   "holding",
   "upcoming",
   ...swapPoolStatuses,
+  "full",
 ] as const;
 export type StakePoolStatus = (typeof stakePoolStatuses)[number];
 export const stakePoolStatusLabels: Record<StakePoolStatus, string> = {
   ...swapPoolStatusLabels,
   holding: "Holding",
   upcoming: "Upcoming",
+  full: "Full",
 };
 export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
   ...swapPoolStatusColors,
   holding: "#FFB08E",
   upcoming: "#FFE798",
+  full: "#FFB08E",
 };
 
 export const getPoolStatusColor = (status: AllPoolStatus) => {
-  return burnPoolStatusColors[status as BurnPoolStatus] ?? "#7989ba";
+  return allPoolStatusColors[status as AllPoolStatus] ?? "#7989ba";
 };
 export const getPoolStatusLabel = (status: AllPoolStatus) => {
-  if (status === "draft") return "Draft";
-  return burnPoolStatusLabels[status as BurnPoolStatus] ?? "N/A";
+  return allPoolStatusLabels[status as AllPoolStatus] ?? "N/A";
 };
 
 export type AllPoolStatus =
@@ -115,6 +117,23 @@ export type AllPoolStatus =
   | SwapPoolStatus
   | StakePoolStatus
   | "draft";
+
+// draft is not included in this list because when it is used is situational
+export const allPoolStatuses: AllPoolStatus[] = Array.from(
+  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses]),
+);
+export const allPoolStatusLabels: Record<AllPoolStatus, string> = {
+  ...burnPoolStatusLabels,
+  ...swapPoolStatusLabels,
+  ...stakePoolStatusLabels,
+  draft: "Draft",
+};
+export const allPoolStatusColors: Record<AllPoolStatus, string> = {
+  ...burnPoolStatusColors,
+  ...swapPoolStatusColors,
+  ...stakePoolStatusColors,
+  draft: "#7989ba",
+};
 
 export type PoolItemType = {
   address: string;
@@ -220,6 +239,7 @@ export const userViewStakePoolStatuses = [
   "on_going",
   "upcoming",
   "ended",
+  "full",
 ] as const;
 export const userHiddenStakePoolStatuses = [
   ...stakePoolStatuses.filter(
