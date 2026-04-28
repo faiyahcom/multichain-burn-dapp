@@ -67,7 +67,7 @@ const GridCard: React.FC<Props> = ({
         hasShadow={false}
       >
         {variant === "stake" && (
-          <div className="absolute! inset-0 z-0! h-full w-full rounded-24px bg-black opacity-20" />
+          <div className="absolute! inset-0 z-0! h-full w-full rounded-24px bg-black opacity-40" />
         )}
         <div className={cn("space-y-2.25 sm:space-y-4.5", classNames?.content)}>
           {topSection}
