@@ -9,7 +9,7 @@ interface BaseProps {
     text?: string;
     icon?: string;
   };
-  hasGroupHover?: boolean;
+  hasGroupHover?: boolean; // deprecated, client wants to remove hover effect
   text?: string;
   afterText?: string; // Only use if the after text is different from the text
   color?: string;
@@ -35,7 +35,6 @@ const AnimateIconButton: React.FC<Props> = (props) => {
   const {
     textVariant,
     classNames,
-    hasGroupHover,
     text,
     afterText,
     color,
@@ -92,12 +91,7 @@ const AnimateIconButton: React.FC<Props> = (props) => {
         "relative overflow-hidden after:absolute after:top-0 after:left-full after:flex after:h-full after:w-full after:items-center after:justify-center after:rounded-sm",
         "after:bg-(--btn-bg) after:text-base after:font-medium after:text-foreground after:content-(--btn-text)",
         "after:transition-all after:duration-300",
-        { "hover:border-(--btn-bg) hover:after:left-0": !isDisabled },
         { "justify-center": textVariant === "text-container-center" },
-        {
-          "group-hover:border-(--btn-bg) group-hover:after:left-0":
-            hasGroupHover && !isDisabled,
-        },
         {
           "border-(--btn-bg) after:left-0": isActive && !isDisabled,
         },
@@ -123,7 +117,7 @@ const AnimateIconButton: React.FC<Props> = (props) => {
               textVariant === "text-self-center",
           },
           {
-            "flex-1": !isDisabled
+            "flex-1": !isDisabled,
           },
           {
             "font-medium text-primary-foreground": isDisabled,
