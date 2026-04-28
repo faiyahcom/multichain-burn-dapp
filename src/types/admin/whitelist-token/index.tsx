@@ -68,3 +68,12 @@ export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
     letter: "H",
   },
 };
+
+export const STAKE_POOL_STATUS: Record<string, any> = {
+    ...BURN_POOL_STATUS,
+    full: {
+        label: "Full",
+        color: "#FF8E97",
+        letter: "F",
+    },
+};

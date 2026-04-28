@@ -41,6 +41,11 @@ const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
                     <LiveStatus poolDetail={poolDetail} />
                 );
 
+            case "full":
+                return (
+                    <LiveStatus poolDetail={poolDetail} />
+                );
+
             case "ended":
                 return (
                     <EndStatus poolDetail={poolDetail} vaultBalance={vaultBalance} />
