@@ -28,6 +28,8 @@ export interface EditStakePoolSolParams {
     lockDuration: number;
     /** Interest start delay (delay_accumulate) in days */
     interestStartDelay: number;
+    /** Interest accrual duration (interest_duration) in days; null / 0 = infinite (uses 0 on-chain) */
+    interestAccrualDuration: number | null;
     /** Claim start delay in days */
     claimStartDelay: number;
     /** APR as plain percentage, e.g. 12 for 12% */
@@ -67,6 +69,10 @@ export const useEditStakePoolSolFn = () => {
                 const lockDurationSec = new BN(Math.round(params.lockDuration * 86400));
                 const delayAccumulate = new BN(Math.round(params.interestStartDelay * 86400));
                 const delayClaim = new BN(Math.round(params.claimStartDelay * 86400));
+                const interestDuration =
+                    params.interestAccrualDuration === null || params.interestAccrualDuration <= 0
+                        ? new BN(0)
+                        : new BN(Math.round(params.interestAccrualDuration * 86400));
 
                 const tx = await program.methods
                     .updatePool({
@@ -79,6 +85,7 @@ export const useEditStakePoolSolFn = () => {
                         lockDuration: lockDurationSec,
                         delayAccumulate,
                         delayClaim,
+                        interestDuration,
                     })
                     .accounts({
                         admin: walletPublicKey,

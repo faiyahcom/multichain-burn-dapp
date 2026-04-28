@@ -176,6 +176,7 @@ export default function EditStakePoolScreen({
                     maxStakingAmount: values.maxStakingAmount || "0",
                     lockDuration,
                     interestStartDelay,
+                    interestAccrualDuration,
                     claimStartDelay,
                     apr,
                     tokenInDecimals: pool.tokenInDecimals,
