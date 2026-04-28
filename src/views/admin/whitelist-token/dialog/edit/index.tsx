@@ -13,8 +13,8 @@ import {
 } from "@/config/networks";
 import {
   poolTypes,
-  poolTypeLabels,
   type PoolType,
+  adminPoolTypeLabels,
 } from "@/types/admin/master-pool-management";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -401,7 +401,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid} className="gap-3.25">
                   <FieldLabel htmlFor={field.name}>
-                    Pool<span className="text-md-required-red">*</span>
+                    Pool type<span className="text-md-required-red">*</span>
                   </FieldLabel>
                   <div className="flex items-center gap-2.25">
                     {poolTypes.map((type) => {
@@ -412,7 +412,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                         <AnimateIconButton
                           key={type}
                           variant="letter-icon"
-                          iconLetter={poolTypeLabels[type][0]}
+                          iconLetter={adminPoolTypeLabels[type][0]}
                           isActive={selected || highlighted}
                           btnProps={{
                             type: "button",
@@ -427,7 +427,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                               );
                             },
                           }}
-                          text={poolTypeLabels[type]}
+                          text={adminPoolTypeLabels[type]}
                           color="#9072f9"
                           classNames={{
                             btn: "after:text-primary-foreground",
