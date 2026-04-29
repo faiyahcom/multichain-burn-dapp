@@ -596,7 +596,7 @@ export default function EditStakePoolScreen({
                                     </span>
                                     <Input
                                         type="number"
-                                        min={MIN_DAYS}
+                                        min="0"
                                         step="any"
                                         placeholder="0"
                                         aria-invalid={!!errors.interestStartDelay}
@@ -607,13 +607,9 @@ export default function EditStakePoolScreen({
                                                         ? true
                                                         : "Interest start delay is required",
                                                 gte0: (v) =>
-                                                    v === "" || Number(v) >= MIN_DAYS
+                                                    v === "" || Number(v) >= 0
                                                         ? true
-                                                        : `Must be ≥ ${MIN_DAYS}`,
-                                                // decimals: (v) =>
-                                                //     !v || !v.includes(".") || v.split(".")[1].length <= 6
-                                                //         ? true
-                                                //         : "Max 6 decimal places allowed",
+                                                        : "Must be \u2265 0",
                                             },
                                         })}
                                     />
