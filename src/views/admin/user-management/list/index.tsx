@@ -44,7 +44,12 @@ const AdminUserManagementList: React.FC<Props> = ({ data, isLoading }) => {
           isLoading={isLoading}
         />
         {data?.map((item, index) => {
-          const formatDate = format(parseISO(item.joinedDate), "MMM dd, yyyy");
+          let formattedDate = "-";
+          try {
+            formattedDate = format(parseISO(item.joinedDate), "MMM dd, yyyy");
+          } catch (error) {
+            console.log(error);
+          }
 
           return (
             <TableRow key={index} className="text-mb-gray-71a">
@@ -74,8 +79,8 @@ const AdminUserManagementList: React.FC<Props> = ({ data, isLoading }) => {
                 />
               </TableCell>
               <TableCell className="px-3 text-left sm:px-6">
-                <p className="min-w-0 truncate" title={formatDate}>
-                  {formatDate}
+                <p className="min-w-0 truncate" title={formattedDate}>
+                  {formattedDate}
                 </p>
               </TableCell>
             </TableRow>

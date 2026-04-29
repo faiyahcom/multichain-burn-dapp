@@ -54,7 +54,7 @@ function RouteComponent() {
             isLoading={isUsersPending}
           />
           <FSummarySection
-            currentNumber={Math.min(filter.limit, usersData?.total || 0)}
+            currentNumber={usersData?.users?.length || 0}
             totalNumber={usersData?.total}
             unit="user"
           />
