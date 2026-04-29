@@ -1,5 +1,5 @@
 {
-  "address": "2cK9SR3UD93uoX49pHxpxpmirBZTmCawUnMfxUp5Wkyu",
+  "address": "9hyDsXfdfFpVYzSRyDzwYMgT1T4q2ZiUk6UaDao9M9S",
   "metadata": {
     "name": "staking",
     "version": "0.1.0",
@@ -184,7 +184,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": []
@@ -221,7 +221,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "treasury",
@@ -452,7 +452,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "treasury",
@@ -593,7 +593,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "project_owner",
@@ -942,7 +942,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1023,7 +1023,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1081,7 +1081,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "pool",
@@ -1535,7 +1535,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1695,7 +1695,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1770,7 +1770,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "system_program",
@@ -2137,7 +2137,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -2307,7 +2307,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -2381,7 +2381,7 @@
         },
         {
           "name": "burn_program",
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -2421,7 +2421,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "factory",
@@ -3324,6 +3324,10 @@
           {
             "name": "interest_duration",
             "type": "i64"
+          },
+          {
+            "name": "staking_limit",
+            "type": "u64"
           }
         ]
       }

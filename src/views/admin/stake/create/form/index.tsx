@@ -33,7 +33,7 @@ type CreateStakePoolFormValues = {
   budget: string;
 };
 
-export const MIN_DAYS = 1;
+export const MIN_DAYS = 0;
 
 const CreateStakePoolForm = () => {
   const navigate = useNavigate();
