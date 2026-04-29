@@ -146,6 +146,7 @@
   --color-mb-gray-b5b7ca: var(--mb-gray-b5b7ca);
   --color-mb-gray-69: var(--mb-gray-69);
   --color-mb-btn-loading: var(--mb-btn-loading);
+  --color-mb-gray-e5: var(--mb-gray-e5);
 }
 
 /* Light mode design tokens (default) */
@@ -235,6 +236,7 @@
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
   --mb-btn-loading: #c2cdf5;
+  --mb-gray-e5: #e5e5e5;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -311,6 +313,7 @@
   --mb-gray-b5b7ca: #b5b7ca;
   --mb-gray-69: #696969;
   --mb-btn-loading: #c2cdf5;
+  --mb-gray-e5: #e5e5e5;
 }
 
 @layer base {

@@ -2,6 +2,7 @@ import {
   IconActivityHistory,
   IconBurnPool,
   IconFeeSettingsGear,
+  IconGridOutline,
   IconMyCreatedPools,
   IconMyDashboard,
   IconMyParticipatedPools,
@@ -167,6 +168,13 @@ export const navItems: NavItem[] = [
 ];
 
 export const adminNavItems: NavItem[] = [
+  {
+    label: "Dashboard",
+    icon: IconGridOutline,
+    section: navSection.admin,
+    to: "/",
+    allowedRoles: ["admin", "super_admin"],
+  },
   {
     label: "Admin Management",
     section: navSection.admin,

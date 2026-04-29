@@ -48,6 +48,7 @@ export const API_ROUTES = {
     },
     TOGGLE_LOW_REWARD_NOTI: (poolAddress: string) =>
       `/admins/pools/${poolAddress}/low-reward-noti`,
+    STATS: "/admins/stats",
   },
   PAIRS: {
     LIST: "/pairs",
