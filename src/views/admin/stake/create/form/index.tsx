@@ -83,6 +83,18 @@ const CreateStakePoolForm = () => {
   const rewardToken = watch("rewardToken");
   const startTime = watch("startTime");
   const endTime = watch("endTime");
+  const stakingLimitVal = watch("stakingLimit");
+  const aprVal = watch("apr");
+  const interestDurationVal = watch("interestAccrualDuration");
+
+  const maxRewardEnabled =
+    Number(stakingLimitVal) > 0 &&
+    Number(aprVal) > 0 &&
+    Number(interestDurationVal) > 0;
+  const maxRewardDisplay = maxRewardEnabled
+    ? (Number(stakingLimitVal) * Number(aprVal) * Number(interestDurationVal)).toLocaleString("en-US")
+    : "--";
+
   const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
 
   const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
@@ -707,6 +719,16 @@ const CreateStakePoolForm = () => {
           {errors.budget && (
             <p className="text-xs text-destructive">{errors.budget.message}</p>
           )}
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px]">Max Reward Amount</span>
+          <Input
+            type="text"
+            readOnly
+            disabled={!maxRewardEnabled}
+            value={maxRewardDisplay}
+            className="max-w-xs"
+          />
         </div>
       </div>
 
