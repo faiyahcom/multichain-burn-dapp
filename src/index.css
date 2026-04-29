@@ -151,6 +151,7 @@
   --color-mb-gray-fa: var(--mb-gray-fa);
   --color-mb-gray-f45: var(--mb-gray-f45);
   --color-mb-gray-71a: var(--mb-gray-71a);
+  --color-mb-black-18b: var(--mb-black-18b);
 }
 
 /* Light mode design tokens (default) */
@@ -245,6 +246,7 @@
   --mb-gray-fa: #fafafa;
   --mb-gray-f45: #f4f4f5;
   --mb-gray-71a: #71717a;
+  --mb-black-18b: #18181b;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -326,6 +328,7 @@
   --mb-gray-fa: #fafafa;
   --mb-gray-f45: #f4f4f5;
   --mb-gray-71a: #71717a;
+  --mb-black-18b: #18181b;
 }
 
 @layer base {

@@ -3,8 +3,8 @@ import type { DateRange } from "react-day-picker";
 import { create } from "zustand";
 
 type AdminUserManagementSearchFilterType = {
-  page?: number;
-  limit?: number;
+  page: number;
+  limit: number;
   text?: string;
   network?: string[];
   dateRange?: DateRange;

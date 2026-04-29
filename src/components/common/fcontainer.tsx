@@ -41,7 +41,7 @@ export const FSummarySection: React.FC<FSummarySectionProps> = ({
 
   return (
     <div className="bg-mb-gray-fa px-3 py-2 sm:px-6 sm:py-4">
-      <p>
+      <p className="text-xs font-medium text-mb-gray-71a">
         Showing {currentNumber} of {totalNumber} {displayUnit}
       </p>
     </div>

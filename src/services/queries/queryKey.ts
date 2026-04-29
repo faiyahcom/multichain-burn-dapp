@@ -86,3 +86,8 @@ export const pairConfigsQueryKeys = {
 export const adminStatsQueryKeys = {
   stats: ["admin-stats", "stats"] as const,
 };
+
+export const adminUserManagementQueryKeys = {
+  list: (params?: Record<string, unknown>) =>
+    ["admin-user-management", "list", params] as const,
+};
