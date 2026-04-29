@@ -174,6 +174,7 @@ export default function EditStakePoolScreen({
                     timeEnd: endUnix,
                     minStakingAmount: values.minStakingAmount || "0",
                     maxStakingAmount: values.maxStakingAmount || "0",
+                    stakingLimit: values.stakingLimit || "0",
                     lockDuration,
                     interestStartDelay,
                     interestAccrualDuration,
@@ -663,11 +664,6 @@ export default function EditStakePoolScreen({
                         </div>
                         <p className="text-base text-greyed">
                             Enter amounts in token units (human-readable).
-                            {isSolana && (
-                                <span className="mt-1 block">
-                                    Note: Staking Limit is not updatable on Solana.
-                                </span>
-                            )}
                         </p>
                     </div>
 
@@ -742,8 +738,8 @@ export default function EditStakePoolScreen({
                                 </div>
                             </div>
 
-                            {!isSolana && (
-                                <div className="space-y-1">
+                            {/* Staking Limit */}
+                            <div className="space-y-1">
                                     <span className="text-base text-greyed">Staking Limit:</span>
                                     <Input
                                         type="number"
@@ -770,7 +766,6 @@ export default function EditStakePoolScreen({
                                         </p>
                                     )}
                                 </div>
-                            )}
                         </div>
                     </div>
                 </div>

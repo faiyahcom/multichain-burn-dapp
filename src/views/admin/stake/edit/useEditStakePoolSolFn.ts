@@ -24,6 +24,8 @@ export interface EditStakePoolSolParams {
     minStakingAmount: string;
     /** Human-readable max staking amount per tx (0 = unlimited) */
     maxStakingAmount: string;
+    /** Human-readable total staking cap (0 = unlimited) */
+    stakingLimit: string;
     /** Lock-up duration in days */
     lockDuration: number;
     /** Interest start delay (delay_accumulate) in days */
@@ -65,6 +67,7 @@ export const useEditStakePoolSolFn = () => {
                 const dec = params.tokenInDecimals;
                 const minStakingBN = toBaseUnits(params.minStakingAmount || "0", dec);
                 const maxStakingBN = toBaseUnits(params.maxStakingAmount || "0", dec);
+                const stakingLimitBN = toBaseUnits(params.stakingLimit || "0", dec);
                 const aprBps = new BN(Math.round(params.apr * DECIMAL_FEE_PERCENT));
                 const lockDurationSec = new BN(Math.round(params.lockDuration * 86400));
                 const delayAccumulate = new BN(Math.round(params.interestStartDelay * 86400));
@@ -81,6 +84,7 @@ export const useEditStakePoolSolFn = () => {
                         name: params.name,
                         maxStakingAmount: maxStakingBN,
                         minStakingAmount: minStakingBN,
+                        stakingLimit: stakingLimitBN,
                         apr: aprBps,
                         lockDuration: lockDurationSec,
                         delayAccumulate,
