@@ -82,3 +82,7 @@ export const pairConfigsQueryKeys = {
   detail: (params?: Record<string, unknown>) =>
     ["pair-configs", "detail", params] as const,
 };
+
+export const adminStatsQueryKeys = {
+  stats: ["admin-stats", "stats"] as const,
+};
