@@ -21,7 +21,7 @@ import {
     getStakingProgram,
     type BrowserWallet,
 } from "@/web3/contracts/stakingProgramSol";
-import { MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
+import { getMultichainBurnProgram, MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
 import {
     getFactoryPDA,
     getRewardVaultPDA,
@@ -74,6 +74,7 @@ export const useUnstakeSolFn = () => {
                     signAllTransactions: provider.signAllTransactions?.bind(provider),
                 };
                 const program = getStakingProgram(connection, anchorWallet);
+                const programBurn = getMultichainBurnProgram(connection, anchorWallet);
 
                 const poolPDA = new PublicKey(poolAddress);
                 const depositMintPK = new PublicKey(depositMint);
@@ -100,7 +101,7 @@ export const useUnstakeSolFn = () => {
 
                 // Fetch factory to get treasury address
                 // @ts-ignore
-                const factoryState = await program.account.factoryAccount.fetch(factoryPDA);
+                const factoryState = await programBurn.account.factoryAccount.fetch(burnFactoryPDA);
                 const treasury = factoryState.treasury as PublicKey;
 
                 // Fetch stake entry to get the staked amount (required by the instruction)
