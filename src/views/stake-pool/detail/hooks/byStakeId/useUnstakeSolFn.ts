@@ -187,6 +187,14 @@ export const useUnstakeSolFn = () => {
                         );
                     }
 
+                    const treasuryTokenAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        treasury,
+                        true,
+                        depositTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+
                     const tx = await program.methods
                         .unstake(amount)
                         .accounts({
@@ -196,6 +204,7 @@ export const useUnstakeSolFn = () => {
                             depositMint: depositMintPK,
                             rewardMint: rewardMintPK,
                             treasury,
+                            treasuryTokenAta,
                             rewardVault: rewardVaultPDA,
                             depositVault: depositVaultPDA,
                             userTokenAta,

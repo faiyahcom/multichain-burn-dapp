@@ -22,7 +22,7 @@ import {
     getStakingProgram,
     type BrowserWallet,
 } from "@/web3/contracts/stakingProgramSol";
-import { MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
+import { getMultichainBurnProgram, MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
 import {
     getFactoryPDA,
     getRewardVaultPDA,
@@ -68,6 +68,7 @@ export const useClaimAllSolFn = () => {
                     signAllTransactions: provider.signAllTransactions?.bind(provider),
                 };
                 const program = getStakingProgram(connection, anchorWallet);
+                const programBurn = getMultichainBurnProgram(connection, anchorWallet);
 
                 const poolPDA = new PublicKey(poolAddress);
                 const rewardMintPK = new PublicKey(rewardMint);
@@ -78,13 +79,14 @@ export const useClaimAllSolFn = () => {
                 const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);
 
                 // @ts-ignore
-                const factoryState = await program.account.factoryAccount.fetch(factoryPDA);
+                const factoryState = await programBurn.account.factoryAccount.fetch(burnFactoryPDA);
                 const treasury = factoryState.treasury as PublicKey;
 
                 // For SPL reward: ensure the user reward ATA exists.
                 // If it doesn't, prepend the creation instruction to the first claim tx.
                 let userTokenAta: PublicKey | undefined;
                 let rewardVaultPDA: PublicKey | undefined;
+                let treasuryTokenAta: PublicKey | undefined;
                 let ataCreateIx: TransactionInstruction | undefined;
                 if (!isNativeReward) {
                     rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
@@ -92,6 +94,13 @@ export const useClaimAllSolFn = () => {
                         rewardMintPK,
                         walletPublicKey,
                         false,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                    treasuryTokenAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        treasury,
+                        true,
                         rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
@@ -145,6 +154,7 @@ export const useClaimAllSolFn = () => {
                                 burnFactory: burnFactoryPDA,
                                 burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                                 treasury,
+                                treasuryTokenAta: treasuryTokenAta!,
                                 pool: poolPDA,
                                 factory: factoryPDA,
                                 rewardMint: rewardMintPK,

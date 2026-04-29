@@ -22,7 +22,7 @@ import {
     getStakingProgram,
     type BrowserWallet,
 } from "@/web3/contracts/stakingProgramSol";
-import { MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
+import { getMultichainBurnProgram, MULTICHAIN_BURN_PROGRAM_ID } from "@/web3/contracts/multichainBurnProgramSol";
 import {
     getFactoryPDA,
     getRewardVaultPDA,
@@ -77,6 +77,7 @@ export const useUnstakeAllSolFn = () => {
                     signAllTransactions: provider.signAllTransactions?.bind(provider),
                 };
                 const program = getStakingProgram(connection, anchorWallet);
+                const programBurn = getMultichainBurnProgram(connection, anchorWallet);
 
                 const poolPDA = new PublicKey(poolAddress);
                 const depositMintPK = new PublicKey(depositMint);
@@ -95,7 +96,7 @@ export const useUnstakeAllSolFn = () => {
                 );
 
                 // @ts-ignore
-                const factoryState = await program.account.factoryAccount.fetch(factoryPDA);
+                const factoryState = await programBurn.account.factoryAccount.fetch(burnFactoryPDA);
                 const treasury = factoryState.treasury as PublicKey;
 
                 // For SPL: pre-derive ATAs and collect any missing-ATA creation ixs.
@@ -103,6 +104,7 @@ export const useUnstakeAllSolFn = () => {
                 let userRewardAta: PublicKey | undefined;
                 let rewardVaultPDA: PublicKey | undefined;
                 let depositVaultPDA: PublicKey | undefined;
+                let treasuryTokenAta: PublicKey | undefined;
                 const prependFirstIxs: TransactionInstruction[] = [];
 
                 if (!isNativeDeposit) {
@@ -121,6 +123,13 @@ export const useUnstakeAllSolFn = () => {
                         walletPublicKey,
                         false,
                         rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                    treasuryTokenAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        treasury,
+                        true,
+                        depositTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
 
@@ -201,6 +210,7 @@ export const useUnstakeAllSolFn = () => {
                                 depositMint: depositMintPK,
                                 rewardMint: rewardMintPK,
                                 treasury,
+                                treasuryTokenAta: treasuryTokenAta!,
                                 rewardVault: rewardVaultPDA!,
                                 depositVault: depositVaultPDA!,
                                 userTokenAta: userTokenAta!,

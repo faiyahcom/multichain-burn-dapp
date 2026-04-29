@@ -141,6 +141,14 @@ export const useClaimRewardSolFn = () => {
                         );
                     }
 
+                    const treasuryTokenAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        treasury,
+                        true,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+
                     const tx = await program.methods
                         .claimReward()
                         .accounts({
@@ -148,6 +156,7 @@ export const useClaimRewardSolFn = () => {
                             burnFactory: burnFactoryPDA,
                             burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                             treasury,
+                            treasuryTokenAta,
                             pool: poolPDA,
                             factory: factoryPDA,
                             rewardMint: rewardMintPK,
