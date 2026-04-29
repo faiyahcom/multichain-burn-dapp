@@ -13,6 +13,7 @@ import {
   IconSupport,
   IconSwap,
   IconSwapHistory,
+  IconUserTag,
 } from "@/assets/react";
 import type { UserRole } from "@/services/authService";
 
@@ -173,6 +174,13 @@ export const adminNavItems: NavItem[] = [
     icon: IconGridOutline,
     section: navSection.admin,
     to: "/",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "User Management",
+    icon: IconUserTag,
+    section: navSection.admin,
+    to: "/admin/user-management",
     allowedRoles: ["admin", "super_admin"],
   },
   {
