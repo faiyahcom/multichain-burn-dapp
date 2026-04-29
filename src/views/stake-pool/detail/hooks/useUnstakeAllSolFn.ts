@@ -29,9 +29,9 @@ import {
     getDepositVaultPDA,
     getUserStakeTrackerPDA,
     getStakeEntryPDA,
-    detectAssetType,
     getTokenProgramFromAssetType,
     AssetTypeEnum,
+    type AssetType,
 } from "@/web3/helpers";
 import BN from "bn.js";
 
@@ -42,8 +42,12 @@ export interface UnstakeAllSolParams {
     stakeIds: number[];
     /** Staking (deposit) token mint address */
     depositMint: string;
+    /** Asset type of the deposit token (from poolDetail.pool.assetTypeIn) */
+    assetTypeIn: number;
     /** Reward token mint address */
     rewardMint: string;
+    /** Asset type of the reward token (from poolDetail.pool.assetTypeReward) */
+    assetTypeReward: number;
 }
 
 // Iterates over all provided stakeIds and unstakes each in sequence.
@@ -57,7 +61,9 @@ export const useUnstakeAllSolFn = () => {
             poolAddress,
             stakeIds,
             depositMint,
+            assetTypeIn,
             rewardMint,
+            assetTypeReward,
         }: UnstakeAllSolParams): Promise<string | undefined> => {
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
@@ -76,13 +82,9 @@ export const useUnstakeAllSolFn = () => {
                 const depositMintPK = new PublicKey(depositMint);
                 const rewardMintPK = new PublicKey(rewardMint);
 
-                const [assetType, rewardAssetType] = await Promise.all([
-                    detectAssetType(connection, depositMintPK),
-                    detectAssetType(connection, rewardMintPK),
-                ]);
-                const isNativeDeposit = assetType === AssetTypeEnum.NATIVE;
-                const depositTokenProgram = getTokenProgramFromAssetType(assetType)!;
-                const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
+                const isNativeDeposit = (assetTypeIn as AssetType) === AssetTypeEnum.NATIVE;
+                const depositTokenProgram = getTokenProgramFromAssetType(assetTypeIn as AssetType)!;
+                const rewardTokenProgram = getTokenProgramFromAssetType(assetTypeReward as AssetType)!;
 
                 const factoryPDA = getFactoryPDA(program.programId);
                 const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);

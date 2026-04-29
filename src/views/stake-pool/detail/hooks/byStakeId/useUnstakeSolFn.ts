@@ -28,9 +28,9 @@ import {
     getDepositVaultPDA,
     getUserStakeTrackerPDA,
     getStakeEntryPDA,
-    detectAssetType,
     getTokenProgramFromAssetType,
     AssetTypeEnum,
+    type AssetType,
 } from "@/web3/helpers";
 import BN from "bn.js";
 
@@ -41,8 +41,12 @@ export interface UnstakeSolParams {
     stakeId: number;
     /** Staking (deposit) token mint address */
     depositMint: string;
+    /** Asset type of the deposit token (from poolDetail.pool.assetTypeIn) */
+    assetTypeIn: number;
     /** Reward token mint address */
     rewardMint: string;
+    /** Asset type of the reward token (from poolDetail.pool.assetTypeReward) */
+    assetTypeReward: number;
 }
 
 export const useUnstakeSolFn = () => {
@@ -55,7 +59,9 @@ export const useUnstakeSolFn = () => {
             poolAddress,
             stakeId,
             depositMint,
+            assetTypeIn,
             rewardMint,
+            assetTypeReward,
         }: UnstakeSolParams): Promise<string | undefined> => {
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
@@ -73,11 +79,10 @@ export const useUnstakeSolFn = () => {
                 const depositMintPK = new PublicKey(depositMint);
                 const rewardMintPK = new PublicKey(rewardMint);
 
-                const assetType = await detectAssetType(connection, depositMintPK);
+                const assetType = assetTypeIn as AssetType;
                 const isNativeDeposit = assetType === AssetTypeEnum.NATIVE;
                 const depositTokenProgram = getTokenProgramFromAssetType(assetType)!;
-                const rewardAssetType = await detectAssetType(connection, rewardMintPK);
-                const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
+                const rewardTokenProgram = getTokenProgramFromAssetType(assetTypeReward as AssetType)!;
 
                 const factoryPDA = getFactoryPDA(program.programId);
                 const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);

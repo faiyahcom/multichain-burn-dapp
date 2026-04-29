@@ -27,9 +27,9 @@ import {
     getFactoryPDA,
     getRewardVaultPDA,
     getStakeEntryPDA,
-    detectAssetType,
     getTokenProgramFromAssetType,
     AssetTypeEnum,
+    type AssetType,
 } from "@/web3/helpers";
 
 export interface ClaimAllSolParams {
@@ -39,6 +39,8 @@ export interface ClaimAllSolParams {
     stakeIds: number[];
     /** Reward token mint address */
     rewardMint: string;
+    /** Asset type of the reward token (from poolDetail.pool.assetTypeReward) */
+    assetTypeReward: number;
 }
 
 // Iterates over all provided stakeIds and claims each reward in sequence.
@@ -52,6 +54,7 @@ export const useClaimAllSolFn = () => {
             poolAddress,
             stakeIds,
             rewardMint,
+            assetTypeReward,
         }: ClaimAllSolParams): Promise<string | undefined> => {
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
@@ -68,9 +71,8 @@ export const useClaimAllSolFn = () => {
 
                 const poolPDA = new PublicKey(poolAddress);
                 const rewardMintPK = new PublicKey(rewardMint);
-                const rewardAssetType = await detectAssetType(connection, rewardMintPK);
-                const isNativeReward = rewardAssetType === AssetTypeEnum.NATIVE;
-                const rewardTokenProgram = getTokenProgramFromAssetType(rewardAssetType)!;
+                const isNativeReward = (assetTypeReward as AssetType) === AssetTypeEnum.NATIVE;
+                const rewardTokenProgram = getTokenProgramFromAssetType(assetTypeReward as AssetType)!;
 
                 const factoryPDA = getFactoryPDA(program.programId);
                 const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);

@@ -20,6 +20,9 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { useClaimRewardEvmFn } from "../hooks/byStakeId/useClaimRewardEvmFn";
 import { useUnstakeEvmFn } from "../hooks/byStakeId/useUnstakeEvmFn";
+import { useClaimRewardSolFn } from "../hooks/byStakeId/useClaimRewardSolFn";
+import { useUnstakeSolFn } from "../hooks/byStakeId/useUnstakeSolFn";
+import { useAppKitAccount } from "@reown/appkit/react";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -61,6 +64,10 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
   const queryClient = useQueryClient();
   const { unstakeEvm } = useUnstakeEvmFn();
   const { claimRewardEvm } = useClaimRewardEvmFn();
+  const { unstakeSol } = useUnstakeSolFn();
+  const { claimRewardSol } = useClaimRewardSolFn();
+  const { caipAddress } = useAppKitAccount();
+  const isSolana = caipAddress?.split(":")[0] === "solana";
   const [loadingRows, setLoadingRows] = useState<
     Record<number, "unstake" | "claim" | null>
   >({});
@@ -93,7 +100,18 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
     if (!poolAddress) return;
     setLoadingRows((prev) => ({ ...prev, [stakeId]: "unstake" }));
     try {
-      await unstakeEvm({ poolAddress, stakeId });
+      if (isSolana) {
+        await unstakeSol({
+          poolAddress,
+          stakeId,
+          depositMint: poolDetail?.pool?.tokenIn ?? "",
+          assetTypeIn: poolDetail?.pool?.assetTypeIn ?? 0,
+          rewardMint: poolDetail?.pool?.rewardToken ?? "",
+          assetTypeReward: poolDetail?.pool?.assetTypeReward ?? 0,
+        });
+      } else {
+        await unstakeEvm({ poolAddress, stakeId });
+      }
       invalidatePool();
     } finally {
       setLoadingRows((prev) => ({ ...prev, [stakeId]: null }));
@@ -104,7 +122,16 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
     if (!poolAddress) return;
     setLoadingRows((prev) => ({ ...prev, [stakeId]: "claim" }));
     try {
-      await claimRewardEvm({ poolAddress, stakeId });
+      if (isSolana) {
+        await claimRewardSol({
+          poolAddress,
+          stakeId,
+          rewardMint: poolDetail?.pool?.rewardToken ?? "",
+          assetTypeReward: poolDetail?.pool?.assetTypeReward ?? 0,
+        });
+      } else {
+        await claimRewardEvm({ poolAddress, stakeId });
+      }
       invalidatePool();
     } finally {
       setLoadingRows((prev) => ({ ...prev, [stakeId]: null }));

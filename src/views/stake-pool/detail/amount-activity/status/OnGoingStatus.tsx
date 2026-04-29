@@ -9,10 +9,10 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenDisplay from "@/components/common/token-display";
 import StakeDialog from "../../stake-dialog";
 import { useStakeEvmFn } from "../../hooks/useStakeEvmFn";
-// import { useUnstakeAllEvmFn } from "../../hooks/useUnstakeAllEvmFn";
-// import { useClaimAllEvmFn } from "../../hooks/useClaimAllEvmFn";
+import { useStakeSolFn } from "../../hooks/useStakeSolFn";
 import { useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { StatRow } from "@/views/burn-pool/detail/amount-activities/components";
 import { IconExclaimation } from "@/assets/react";
 
@@ -236,9 +236,11 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
         }
     }, [poolDetail?.pool, poolDetail?.staking?.totalStaked]);
 
+    const { caipAddress } = useAppKitAccount();
+    const isSolana = caipAddress?.split(":")[0] === "solana";
+
     const { stakeEvm } = useStakeEvmFn();
-    // const { unstakeAllEvm } = useUnstakeAllEvmFn();
-    // const { claimAllEvm } = useClaimAllEvmFn();
+    const { stakeSol } = useStakeSolFn();
     const queryClient = useQueryClient();
 
     const poolAddress = poolDetail?.pool?.address;
@@ -253,12 +255,22 @@ const OnGoingStatus = ({ poolDetail, stakeDisabled = false }: Props) => {
 
     const handleStakeConfirm = async (amountStr: string) => {
         if (!poolDetail) return;
-        await stakeEvm({
-            poolAddress: poolDetail.pool.address,
-            stakingToken: poolDetail.pool.tokenIn,
-            amountStr,
-            decimals: poolDetail.pool.tokenInDecimals,
-        });
+        if (isSolana) {
+            await stakeSol({
+                poolAddress: poolDetail.pool.address,
+                depositMint: poolDetail.pool.tokenIn,
+                assetTypeIn: poolDetail.pool.assetTypeIn,
+                amountStr,
+                decimals: poolDetail.pool.tokenInDecimals,
+            });
+        } else {
+            await stakeEvm({
+                poolAddress: poolDetail.pool.address,
+                stakingToken: poolDetail.pool.tokenIn,
+                amountStr,
+                decimals: poolDetail.pool.tokenInDecimals,
+            });
+        }
         setStakeDialogOpen(false);
         invalidatePool();
     };

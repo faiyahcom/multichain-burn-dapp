@@ -28,9 +28,9 @@ import {
     getDepositVaultPDA,
     getUserStakeTrackerPDA,
     getStakeEntryPDA,
-    detectAssetType,
     getTokenProgramFromAssetType,
     AssetTypeEnum,
+    type AssetType,
 } from "@/web3/helpers";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 import BN from "bn.js";
@@ -40,6 +40,8 @@ export interface StakeSolParams {
     poolAddress: string;
     /** Staking (deposit) token mint address */
     depositMint: string;
+    /** Asset type of the deposit token (from poolDetail.pool.assetTypeIn) */
+    assetTypeIn: number;
     /** Human-readable amount to stake */
     amountStr: string;
     /** Deposit token decimals */
@@ -55,6 +57,7 @@ export const useStakeSolFn = () => {
         async ({
             poolAddress,
             depositMint,
+            assetTypeIn,
             amountStr,
             decimals,
         }: StakeSolParams): Promise<string | undefined> => {
@@ -72,7 +75,7 @@ export const useStakeSolFn = () => {
 
                 const poolPDA = new PublicKey(poolAddress);
                 const depositMintPK = new PublicKey(depositMint);
-                const assetType = await detectAssetType(connection, depositMintPK);
+                const assetType = assetTypeIn as AssetType;
                 const isNative = assetType === AssetTypeEnum.NATIVE;
                 const depositTokenProgram = getTokenProgramFromAssetType(assetType)!;
 
