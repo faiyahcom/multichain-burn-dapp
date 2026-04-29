@@ -58,3 +58,4 @@ export { default as IconAdminHomeSingleUser } from "./icons/admin/home/single-us
 export { default as IconAdminHomeStackLayers } from "./icons/admin/home/stack-layers.svg?react";
 
 export { default as IconGridOutline } from "./icons/grid-outline.svg?react";
+export { default as IconUserTag } from "./icons/user-tag.svg?react";

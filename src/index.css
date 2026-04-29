@@ -147,6 +147,10 @@
   --color-mb-gray-69: var(--mb-gray-69);
   --color-mb-btn-loading: var(--mb-btn-loading);
   --color-mb-gray-e5: var(--mb-gray-e5);
+  --color-mb-gray-e47: var(--mb-gray-e47);
+  --color-mb-gray-fa: var(--mb-gray-fa);
+  --color-mb-gray-f45: var(--mb-gray-f45);
+  --color-mb-gray-71a: var(--mb-gray-71a);
 }
 
 /* Light mode design tokens (default) */
@@ -237,6 +241,10 @@
   --mb-gray-69: #696969;
   --mb-btn-loading: #c2cdf5;
   --mb-gray-e5: #e5e5e5;
+  --mb-gray-e47: #e4e4e7;
+  --mb-gray-fa: #fafafa;
+  --mb-gray-f45: #f4f4f5;
+  --mb-gray-71a: #71717a;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -314,6 +322,10 @@
   --mb-gray-69: #696969;
   --mb-btn-loading: #c2cdf5;
   --mb-gray-e5: #e5e5e5;
+  --mb-gray-e47: #e4e4e7;
+  --mb-gray-fa: #fafafa;
+  --mb-gray-f45: #f4f4f5;
+  --mb-gray-71a: #71717a;
 }
 
 @layer base {
