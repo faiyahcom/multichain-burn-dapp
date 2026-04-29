@@ -15,15 +15,18 @@ type AdminUserManagementSearchFilterState = {
   setFilter: (filter: Partial<AdminUserManagementSearchFilterType>) => void;
 };
 
+export const initialAdminUserManagementSearchFilter: AdminUserManagementSearchFilterType =
+  {
+    page: 1,
+    limit: 10,
+    text: "",
+    network: NETWORK_CONFIGS.map((network) => network.id),
+    dateRange: undefined,
+  };
+
 export const useAdminUserManagementSearchFilterStore =
   create<AdminUserManagementSearchFilterState>((set) => ({
-    filter: {
-      page: 1,
-      limit: 10,
-      text: "",
-      network: NETWORK_CONFIGS.map((network) => network.id),
-      dateRange: undefined,
-    },
+    filter: initialAdminUserManagementSearchFilter,
     setFilter: (filter) =>
       set((state) => ({
         filter: {

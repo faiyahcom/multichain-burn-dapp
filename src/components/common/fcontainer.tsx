@@ -12,7 +12,7 @@ export const FContainer: React.FC<FContainerProps> = ({
   return (
     <div
       className={cn(
-        "rounded-sm border border-mb-gray-e47 bg-primary-foreground",
+        "overflow-hidden rounded-sm border border-mb-gray-e47 bg-primary-foreground",
         className,
       )}
       style={{
