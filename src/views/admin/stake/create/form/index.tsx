@@ -33,8 +33,7 @@ type CreateStakePoolFormValues = {
   budget: string;
 };
 
-// TODO: revert MIN_DAYS back to 1 once testing is done
-const MIN_DAYS = 0;
+export const MIN_DAYS = 1;
 
 const CreateStakePoolForm = () => {
   const navigate = useNavigate();
@@ -544,11 +543,9 @@ const CreateStakePoolForm = () => {
                         ? true
                         : "Interest start delay is required",
                     gte0: (v) =>
-                      v === "" || Number(v) >= 0 ? true : "Must be ≥ 0",
-                    // decimals: (v) =>
-                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
-                    //     ? true
-                    //     : "Max 6 decimal places allowed",
+                      v === "" || Number(v) >= 0
+                        ? true
+                        : "Must be \u2265 0",
                   },
                 })}
               />
