@@ -316,16 +316,16 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
             let amountBase =
                 percent === 100 ? balanceBase : (balanceBase * BigInt(percent)) / 100n;
             // Cap at pool's max staking amount
-            if (stakingLimits.max !== null && amountBase > stakingLimits.max) {
-                amountBase = stakingLimits.max;
-            }
-            // Cap at remaining pool capacity
-            if (
-                stakingLimits.remaining !== null &&
-                amountBase > stakingLimits.remaining
-            ) {
-                amountBase = stakingLimits.remaining;
-            }
+            // if (stakingLimits.max !== null && amountBase > stakingLimits.max) {
+            //     amountBase = stakingLimits.max;
+            // }
+            // // Cap at remaining pool capacity
+            // if (
+            //     stakingLimits.remaining !== null &&
+            //     amountBase > stakingLimits.remaining
+            // ) {
+            //     amountBase = stakingLimits.remaining;
+            // }
             const formatted = formatUnits(amountBase, pool.tokenInDecimals);
             const [integer, decimal] = formatted.split(".");
             const trimmed = decimal ? `${integer}.${decimal.slice(0, 6)}` : integer;
