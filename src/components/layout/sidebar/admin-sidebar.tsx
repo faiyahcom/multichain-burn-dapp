@@ -18,6 +18,7 @@ import {
   type NavItem,
 } from "./const";
 import { useSidebarOpenedChildStore } from "@/stores/sideStore";
+import { useEffect } from "react";
 
 interface AdminNavItemProps {
   navItem: NavItem;
@@ -33,6 +34,14 @@ const AdminNavItem: React.FC<AdminNavItemProps> = ({
   const { tab } = useSearch({ strict: false });
   const Icon = navItem.icon;
   const { openedChild, setOpenedChild } = useSidebarOpenedChildStore();
+  const location = useLocation();
+  const pathname = location.pathname;
+
+  useEffect(() => {
+    if (pathname === navItem.to && !openedChild.includes(navItem.label)) {
+      setOpenedChild(navItem.label);
+    }
+  }, [pathname]);
 
   return (
     <li
