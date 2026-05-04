@@ -92,7 +92,12 @@ const CreateStakePoolForm = () => {
     Number(aprVal) > 0 &&
     Number(interestDurationVal) > 0;
   const maxRewardDisplay = maxRewardEnabled
-    ? (Number(stakingLimitVal) * Number(aprVal) * Number(interestDurationVal)).toLocaleString("en-US")
+    ? (
+      Number(stakingLimitVal) *
+      (Number(aprVal) / (100 * 31536000)) *
+      (Number(interestDurationVal) * 24 * 3600)
+    ) // convert from days to seconds
+      .toLocaleString("en-US")
     : "--";
 
   const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
