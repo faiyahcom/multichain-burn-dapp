@@ -36,7 +36,7 @@ type CreateStakePoolFormValues = {
   budget: string;
 };
 
-export const MIN_DAYS = 1;
+export const MIN_DAYS = import.meta.env.VITE_ENV === "development" ? 0 : 1;
 
 const CreateStakePoolForm = () => {
   const navigate = useNavigate();
