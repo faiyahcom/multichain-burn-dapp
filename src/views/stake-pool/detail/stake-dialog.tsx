@@ -290,6 +290,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
     } = useForm<StakeFormValues>({
         defaultValues: { amount: "" },
         resolver: zodResolver(stakeFormSchema),
+        reValidateMode: "onChange",
     });
 
     const yourTotalStaked = poolDetail?.staking?.user?.totalStaked
