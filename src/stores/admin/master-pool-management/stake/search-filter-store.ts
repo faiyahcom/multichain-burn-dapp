@@ -1,3 +1,4 @@
+import { NETWORK_CONFIGS } from "@/config/networks";
 import {
   stakePoolStatuses,
   type StakePoolStatus,
@@ -44,7 +45,7 @@ export const initialMasterPoolManagementStakeSearchFilter: MasterPoolManagementS
     type: "all",
     tokens: [],
     status: ["draft", ...stakePoolStatuses],
-    network: [],
+    network: NETWORK_CONFIGS.map((network) => network.id),
     poolStartRange: undefined,
     poolEndRange: undefined,
     dateRange: undefined,
