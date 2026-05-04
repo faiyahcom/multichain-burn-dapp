@@ -50,6 +50,7 @@ export const API_ROUTES = {
       `/admins/pools/${poolAddress}/low-reward-noti`,
     STATS: "/admins/stats",
     USER_LIST: "/admins/users",
+    POOL_LIST: "/admins/pools",
   },
   PAIRS: {
     LIST: "/pairs",

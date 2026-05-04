@@ -26,6 +26,7 @@ const buttonVariants = cva(
           "bg-inactive text-15px font-normal text-foreground",
         "mb-pagination-active":
           "text-primary-foreground bg-active font-bold text-15px",
+        "mb-clear-all": "bg-inactive text-sm font-bold text-active",
       },
       size: {
         default: "h-9 px-4 py-2 has-[>svg]:px-3",

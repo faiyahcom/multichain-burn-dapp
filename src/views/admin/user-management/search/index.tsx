@@ -11,7 +11,7 @@ const AdminUserManagementSearch = () => {
   const { filter, setFilter } = useAdminUserManagementSearchFilterStore();
 
   return (
-    <div className="flex flex-col gap-1 bg-mb-gray-fa p-3 sm:gap-2 sm:p-6 md:items-center lg:flex-row">
+    <div className="flex flex-col gap-1 bg-mb-gray-fa p-3 sm:gap-2 sm:p-6 lg:flex-row lg:items-center">
       <SearchTextDebouncedInput
         value={filter.text}
         onValueChange={(value) => setFilter({ text: value })}
@@ -22,24 +22,15 @@ const AdminUserManagementSearch = () => {
       <RangeDatePicker
         value={filter.dateRange}
         onChange={(value) => setFilter({ dateRange: value })}
-        filterByText="Joined Date"
-        classNames={{
-          btn: "max-lg:w-full",
-        }}
+        filterByText="Filter by Joined Date"
       />
       <NetworkMultipleSelect
         selected={filter.network}
         onChange={(value) => setFilter({ network: value })}
-        otherProps={{
-          classNames: {
-            btn: "max-lg:w-full",
-          },
-        }}
       />
       <Button
-        variant={"mb-inactive"}
+        variant={"mb-clear-all"}
         size={"mb-btn"}
-        className="text-sm font-bold text-active max-lg:w-full"
         onClick={() => {
           setFilter(initialAdminUserManagementSearchFilter);
         }}

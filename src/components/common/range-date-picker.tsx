@@ -28,7 +28,7 @@ interface Props {
 const RangeDatePicker: React.FC<Props> = ({
   value,
   onChange,
-  filterByText = "Date",
+  filterByText = "Filter by Date",
   calendarProps,
   classNames,
 }) => {
@@ -46,7 +46,7 @@ const RangeDatePicker: React.FC<Props> = ({
           <span>
             {value && value.from
               ? `${format(value.from, "yyyy.MM.dd")} ~ ${value.to ? format(value.to, "yyyy.MM.dd") : ""}`
-              : `Filter by ${filterByText}`}
+              : filterByText}
           </span>
         </Button>
       </PopoverTrigger>
