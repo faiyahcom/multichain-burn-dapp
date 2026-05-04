@@ -148,46 +148,53 @@ function RouteComponent() {
           array: filter?.status?.map((status) => status.toString()),
         }),
         timeEndFrom: isBurnOrStakePool
-          ? dateToUnixSeconds(
-              (
+          ? dateToUnixSeconds({
+              date: (
                 filter as
                   | MasterPoolManagementBurnSearchFilterType
                   | MasterPoolManagementStakeSearchFilterType
               )?.poolEndRange?.from,
-            )
+              mod: "startOfDay",
+            })
           : undefined,
         timeEndTo: isBurnOrStakePool
-          ? dateToUnixSeconds(
-              (
+          ? dateToUnixSeconds({
+              date: (
                 filter as
                   | MasterPoolManagementBurnSearchFilterType
                   | MasterPoolManagementStakeSearchFilterType
               )?.poolEndRange?.to,
-            )
+              mod: "endOfDay",
+            })
           : undefined,
         timeStartFrom: isBurnOrStakePool
-          ? dateToUnixSeconds(
-              (
+          ? dateToUnixSeconds({
+              date: (
                 filter as
                   | MasterPoolManagementBurnSearchFilterType
                   | MasterPoolManagementStakeSearchFilterType
               )?.poolStartRange?.from,
-            )
+              mod: "startOfDay",
+            })
           : undefined,
         timeStartTo: isBurnOrStakePool
-          ? dateToUnixSeconds(
-              (
+          ? dateToUnixSeconds({
+              date: (
                 filter as
                   | MasterPoolManagementBurnSearchFilterType
                   | MasterPoolManagementStakeSearchFilterType
               )?.poolStartRange?.to,
-            )
+              mod: "endOfDay",
+            })
           : undefined,
         timestampFrom: isBurnOrStakePool
-          ? dateToUnixSeconds(filter?.dateRange?.from)
+          ? dateToUnixSeconds({
+              date: filter?.dateRange?.from,
+              mod: "startOfDay",
+            })
           : undefined,
         timestampTo: isBurnOrStakePool
-          ? dateToUnixSeconds(filter?.dateRange?.to)
+          ? dateToUnixSeconds({ date: filter?.dateRange?.to, mod: "endOfDay" })
           : undefined,
         tokens: convertArrayToStringParam({
           array: filter?.tokens,

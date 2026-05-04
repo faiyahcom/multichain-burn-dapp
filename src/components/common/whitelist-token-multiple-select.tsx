@@ -192,11 +192,11 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
           isLoading={isPendingTokens}
           text="No tokens found"
         />
-        {nativeTokens.map((token) => {
+        {nativeTokens.map((token, index) => {
           const isSelected = value?.includes(token.address);
           return (
             <OptionItem
-              key={token.address}
+              key={`native-${token.address}-${index}`}
               label={token.name}
               value={token.address}
               checked={isSelected}
@@ -205,11 +205,11 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
             />
           );
         })}
-        {whitelistTokens?.map((token) => {
+        {whitelistTokens?.map((token, index) => {
           const isSelected = value?.includes(token.address);
           return (
             <OptionItem
-              key={token.address}
+              key={`${token.address}-${index}`}
               label={token.customName ?? token.name}
               value={token.address}
               checked={isSelected}

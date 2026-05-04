@@ -1,8 +1,9 @@
-import { type PoolType } from "@/types/admin/master-pool-management";
-import AdminMasterPoolManagementTableBurn from "./burn";
-import AdminMasterPoolManagementTableStake from "./stake";
-import AdminMasterPoolManagementTableSwap from "./swap";
 import type { AdminPoolItemType } from "@/services/adminPoolManagementService";
+import { useMasterPoolManagementBurnSearchFilterStore } from "@/stores/admin/master-pool-management/burn/search-filter-store";
+import { useMasterPoolManagementStakeSearchFilterStore } from "@/stores/admin/master-pool-management/stake/search-filter-store";
+import { useMasterPoolManagementSwapSearchFilterStore } from "@/stores/admin/master-pool-management/swap/search-filter-store";
+import { type PoolType } from "@/types/admin/master-pool-management";
+import AdminMasterPoolManagementTableTemplate from "./template";
 
 interface Props {
   poolType: PoolType;
@@ -15,22 +16,52 @@ const AdminMasterPoolManagementTable: React.FC<Props> = ({
   data,
   isLoading,
 }) => {
+  const { filter: burnFilter, setFilter: setBurnFilter } =
+    useMasterPoolManagementBurnSearchFilterStore();
+  const { filter: swapFilter, setFilter: setSwapFilter } =
+    useMasterPoolManagementSwapSearchFilterStore();
+  const { filter: stakeFilter, setFilter: setStakeFilter } =
+    useMasterPoolManagementStakeSearchFilterStore();
   switch (poolType) {
     case 0:
       return (
-        <AdminMasterPoolManagementTableBurn data={data} isLoading={isLoading} />
+        <AdminMasterPoolManagementTableTemplate
+          poolType={0}
+          data={data}
+          isLoading={isLoading}
+          sortBy={burnFilter.sortBy}
+          sortOrder={burnFilter.sortOrder}
+          onToggleSort={({ sortBy, sortOrder }) => {
+            setBurnFilter({ sortBy, sortOrder });
+          }}
+        />
       );
 
     case 1:
       return (
-        <AdminMasterPoolManagementTableSwap data={data} isLoading={isLoading} />
+        <AdminMasterPoolManagementTableTemplate
+          poolType={1}
+          data={data}
+          isLoading={isLoading}
+          sortBy={swapFilter.sortBy}
+          sortOrder={swapFilter.sortOrder}
+          onToggleSort={({ sortBy, sortOrder }) => {
+            setSwapFilter({ sortBy, sortOrder });
+          }}
+        />
       );
 
     case 2:
       return (
-        <AdminMasterPoolManagementTableStake
+        <AdminMasterPoolManagementTableTemplate
+          poolType={2}
           data={data}
           isLoading={isLoading}
+          sortBy={stakeFilter.sortBy}
+          sortOrder={stakeFilter.sortOrder}
+          onToggleSort={({ sortBy, sortOrder }) => {
+            setStakeFilter({ sortBy, sortOrder });
+          }}
         />
       );
 
