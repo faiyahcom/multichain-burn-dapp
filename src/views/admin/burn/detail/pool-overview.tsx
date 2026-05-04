@@ -144,9 +144,9 @@ const PoolOverview = ({ poolDetail, onPartnerToggleSuccess }: Props) => {
         </div>
         <p className="text-[13px] text-greyed">
           {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
-            ? `${new Date(Number(poolDetail?.pool?.timeStart) * 1000).toLocaleDateString()} - ${new Date(
+            ? `${new Date(Number(poolDetail?.pool?.timeStart) * 1000).toLocaleString(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })} - ${new Date(
                 Number(poolDetail?.pool?.timeEnd) * 1000,
-              ).toLocaleDateString()}`
+              ).toLocaleString(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}`
             : "No time limit"}
         </p>
       </div>
