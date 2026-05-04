@@ -10,13 +10,14 @@ import { authQueryKeys } from "@/services/queries/queryKey";
 import { useSidebarStateStore } from "@/stores/admin/sidebar/sidebar-store";
 import { useAuthStore } from "@/stores/authStore";
 import { useQuery } from "@tanstack/react-query";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useSearch } from "@tanstack/react-router";
 import {
   adminNavItems,
   navSection,
   NavSectionLabel,
   type NavItem,
 } from "./const";
+import { useSidebarOpenedChildStore } from "@/stores/sideStore";
 
 interface AdminNavItemProps {
   navItem: NavItem;
@@ -29,9 +30,19 @@ const AdminNavItem: React.FC<AdminNavItemProps> = ({
   isActive,
   onClick,
 }) => {
+  const { tab } = useSearch({ strict: false });
   const Icon = navItem.icon;
+  const { openedChild, setOpenedChild } = useSidebarOpenedChildStore();
+
   return (
-    <li onClick={onClick}>
+    <li
+      onClick={() => {
+        onClick?.();
+        if (!openedChild.includes(navItem.label)) {
+          setOpenedChild(navItem.label);
+        }
+      }}
+    >
       <div className="group flex items-center gap-4.25" data-active={isActive}>
         <div className="w-1.75 self-stretch rounded-full bg-transparent transition-colors group-data-[active='true']:bg-active" />
         <div className="flex flex-1 items-center gap-2.75 pt-1.25 pb-2.5">
@@ -53,6 +64,48 @@ const AdminNavItem: React.FC<AdminNavItemProps> = ({
           </span>
         </div>
       </div>
+      {navItem.children &&
+        navItem.children.length > 0 &&
+        openedChild.includes(navItem.label) && (
+          <ul>
+            {navItem.children.map((child, index) => {
+              const ChildIcon = child.icon;
+              const isChildActive = isActive && tab === child.tab;
+              return (
+                <li
+                  key={`${child.tab}-${index}`}
+                  className="group flex items-center gap-3 py-2.25 pl-10.75"
+                  data-child-active={isChildActive}
+                  onClick={() => {
+                    onClick?.();
+                  }}
+                >
+                  {ChildIcon && (
+                    <ChildIcon className="w-4 shrink-0 transition-colors group-data-[child-active='true']:text-active" />
+                  )}
+                  <span className="flex-1 text-sm font-normal tracking-2-percent transition-colors group-data-[child-active='true']:font-bold group-data-[child-active='true']:text-active">
+                    {child.tab ? (
+                      <Link
+                        to={navItem.to}
+                        search={
+                          {
+                            tab: child.tab,
+                          } as any // This is the only way to make TS happy without adding tab to root route
+                        }
+                      >
+                        <span>{child.label}</span>
+                      </Link>
+                    ) : (
+                      <div>
+                        <span>{child.label}</span>
+                      </div>
+                    )}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
     </li>
   );
 };
