@@ -21,11 +21,14 @@ import { useState } from "react";
 
 export function formatTimestamp(timestamp: string): string {
     const date = new Date(Number(timestamp) * 1000);
-    // DD/MM/YYYY
-    return date.toLocaleDateString("en-GB", {
+    // DD/MM/YYYY HH:mm
+    return date.toLocaleString("en-GB", {
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        hour12: false,
     });
 }
 
