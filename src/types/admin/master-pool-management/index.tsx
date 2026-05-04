@@ -218,7 +218,6 @@ export const userHiddenSwapPoolStatuses = [
 
 export const userViewStakePoolStatuses = [
   "on_going",
-  "closed",
   "upcoming",
   "ended",
 ] as const;
