@@ -182,8 +182,8 @@ const StakeStats = ({
             {showInterestNote && (
                 <p className="text-center text-sm md:text-base lg:text-lg 2xl:text-xl">
                     {poolDetail?.pool?.stopInterestAtPoolEnd
-                        ? "Interest stops accruing upon unstaking"
-                        : "Interest stops accruing once you unstake your tokens or when the pool reaches its end time"}
+                        ? "Interest stops accruing once you unstake your tokens or when the pool reaches its end time"
+                        : "Interest stops accruing upon unstaking"}
                 </p>
             )}
             {hasReachedLimit && (
