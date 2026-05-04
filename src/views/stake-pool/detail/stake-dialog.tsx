@@ -29,7 +29,7 @@ import {
 } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
 import z from "zod";
@@ -290,6 +290,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
     } = useForm<StakeFormValues>({
         defaultValues: { amount: "" },
         resolver: zodResolver(stakeFormSchema),
+        mode: "onChange",
     });
 
     const yourTotalStaked = poolDetail?.staking?.user?.totalStaked
@@ -316,16 +317,16 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
             let amountBase =
                 percent === 100 ? balanceBase : (balanceBase * BigInt(percent)) / 100n;
             // Cap at pool's max staking amount
-            if (stakingLimits.max !== null && amountBase > stakingLimits.max) {
-                amountBase = stakingLimits.max;
-            }
-            // Cap at remaining pool capacity
-            if (
-                stakingLimits.remaining !== null &&
-                amountBase > stakingLimits.remaining
-            ) {
-                amountBase = stakingLimits.remaining;
-            }
+            // if (stakingLimits.max !== null && amountBase > stakingLimits.max) {
+            //     amountBase = stakingLimits.max;
+            // }
+            // // Cap at remaining pool capacity
+            // if (
+            //     stakingLimits.remaining !== null &&
+            //     amountBase > stakingLimits.remaining
+            // ) {
+            //     amountBase = stakingLimits.remaining;
+            // }
             const formatted = formatUnits(amountBase, pool.tokenInDecimals);
             const [integer, decimal] = formatted.split(".");
             const trimmed = decimal ? `${integer}.${decimal.slice(0, 6)}` : integer;

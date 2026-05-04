@@ -85,7 +85,7 @@ const CreateSwapPoolForm = ({
       budget: undefined,
       amountPay: undefined,
     },
-    reValidateMode: "onChange",
+    mode: "onChange",
   });
 
   const selectedTokenBurn = watch("tokenBurn");

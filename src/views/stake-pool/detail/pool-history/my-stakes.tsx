@@ -147,6 +147,7 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
     snapshots[0]?.customSymbolReward ?? poolDetail?.tokenOut?.symbol ?? "";
 
   const columns = [
+    "Action",
     "Time",
     `Staking Amount`,
     "Unlock Date",
@@ -155,7 +156,6 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
     "Interest End Date",
     "Claimable Date",
     `Claimable Amount`,
-    "Action",
   ];
 
   return (
@@ -193,30 +193,6 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
                   variant="stake"
                   className="text-xs md:text-sm lg:text-base 2xl:text-xl [&>td]:px-4 [&>td]:text-center [&>td]:md:px-6"
                 >
-                  <TableCell className="whitespace-nowrap">
-                    <DateTimeCell timestamp={row.time} />
-                  </TableCell>
-                  <TableCell>
-                    {`${shortenNumber({ number: Number(row.stakingAmount) })} ${stakingSymbol}`}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <DateTimeCell timestamp={row.unlockDate} />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <DateTimeCell timestamp={row.interestStartDate} />
-                  </TableCell>
-                  <TableCell>
-                    {row.durationInSecs === 0
-                      ? "Unlimited"
-                      : formatDuration(row.durationInSecs)}
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <DateTimeCell timestamp={row.interestEndDate} />
-                  </TableCell>
-                  <TableCell className="whitespace-nowrap">
-                    <DateTimeCell timestamp={row.claimableDate} />
-                  </TableCell>
-                  <TableCell>{`${shortenNumber({ number: Number(row.rewardAmount) })} ${rewardSymbol}`}</TableCell>
                   <TableCell>
                     <div className="flex gap-1.5 font-orbitron">
                       <Button
@@ -254,6 +230,30 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
                       </Button>
                     </div>
                   </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <DateTimeCell timestamp={row.time} />
+                  </TableCell>
+                  <TableCell>
+                    {`${shortenNumber({ number: Number(row.stakingAmount) })} ${stakingSymbol}`}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <DateTimeCell timestamp={row.unlockDate} />
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <DateTimeCell timestamp={row.interestStartDate} />
+                  </TableCell>
+                  <TableCell>
+                    {row.durationInSecs === 0
+                      ? "Unlimited"
+                      : formatDuration(row.durationInSecs)}
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <DateTimeCell timestamp={row.interestEndDate} />
+                  </TableCell>
+                  <TableCell className="whitespace-nowrap">
+                    <DateTimeCell timestamp={row.claimableDate} />
+                  </TableCell>
+                  <TableCell>{`${shortenNumber({ number: Number(row.rewardAmount) })} ${rewardSymbol}`}</TableCell>
                 </TableRow>
               );
             })}
