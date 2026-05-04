@@ -1,5 +1,5 @@
 {
-  "address": "6N5SNCMH7776W3uSuTT1Y8EJBxETHZWKRHynEkEQupVS",
+  "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz",
   "metadata": {
     "name": "multichain_burn_sc_sol",
     "version": "0.1.0",
@@ -1969,38 +1969,38 @@
             "program": {
               "kind": "const",
               "value": [
-                23,
-                231,
-                136,
-                76,
-                10,
-                77,
-                194,
-                28,
-                3,
-                170,
+                2,
+                58,
+                248,
+                124,
                 247,
-                1,
-                212,
-                34,
-                11,
-                112,
-                134,
-                191,
-                229,
-                164,
-                39,
-                71,
-                204,
-                122,
-                46,
-                113,
-                74,
-                1,
-                122,
-                175,
-                9,
-                88
+                215,
+                123,
+                155,
+                55,
+                98,
+                241,
+                85,
+                78,
+                222,
+                20,
+                172,
+                160,
+                126,
+                224,
+                60,
+                215,
+                207,
+                54,
+                220,
+                234,
+                15,
+                126,
+                228,
+                21,
+                139,
+                146,
+                249
               ]
             }
           }
@@ -4669,6 +4669,10 @@
               {
                 "name": "staking_limit",
                 "type": "u64"
+              },
+              {
+                "name": "stop_accrual_at_pool_end",
+                "type": "bool"
               }
             ]
           },
@@ -4961,6 +4965,14 @@
               {
                 "name": "interest_duration",
                 "type": "i64"
+              },
+              {
+                "name": "staking_limit",
+                "type": "u64"
+              },
+              {
+                "name": "stop_accrual_at_pool_end",
+                "type": "bool"
               }
             ]
           },
@@ -5128,6 +5140,10 @@
           {
             "name": "staking_limit",
             "type": "u64"
+          },
+          {
+            "name": "stop_accrual_at_pool_end",
+            "type": "bool"
           }
         ]
       }
@@ -5216,6 +5232,14 @@
           {
             "name": "interest_duration",
             "type": "i64"
+          },
+          {
+            "name": "staking_limit",
+            "type": "u64"
+          },
+          {
+            "name": "stop_accrual_at_pool_end",
+            "type": "bool"
           }
         ]
       }

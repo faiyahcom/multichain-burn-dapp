@@ -18,6 +18,8 @@ import { MIN_DAYS } from "../create/form";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
 import PoolOverview from "../detail/pool-overview";
 import type { BurnPoolStatus } from "@/types/pool";
+import BlueSwitch from "@/components/common/blue-switch";
+import InfoTooltip from "@/components/common/info-tooltip";
 
 type EditStakeFormValues = {
     poolName: string;
@@ -31,6 +33,7 @@ type EditStakeFormValues = {
     minStakingAmount: string;
     maxStakingAmount: string;
     stakingLimit: string;
+    stopAccrualAtPoolEnd: boolean;
 };
 
 const STAKE_POOL_STATUS = {
@@ -103,6 +106,7 @@ export default function EditStakePoolScreen({
             minStakingAmount: "",
             maxStakingAmount: "",
             stakingLimit: "",
+            stopAccrualAtPoolEnd: true,
         },
     });
 
@@ -144,11 +148,13 @@ export default function EditStakePoolScreen({
                     pool.tokenInDecimals != null
                     ? sciToFormatted(stakePool.stakingLimit, pool.tokenInDecimals)
                     : "",
+            stopAccrualAtPoolEnd: stakePool?.stopInterestAtPoolEnd ?? true,
         });
     }, [pool?.address]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const startTime = watch("startTime");
     const endTime = watch("endTime");
+    const stopAccrualAtPoolEnd = watch("stopAccrualAtPoolEnd");
 
     const onSubmit = async (values: EditStakeFormValues) => {
         if (!pool || inFlightRef.current) return;
@@ -181,6 +187,7 @@ export default function EditStakePoolScreen({
                     claimStartDelay,
                     apr,
                     tokenInDecimals: pool.tokenInDecimals,
+                    stopAccrualAtPoolEnd,
                 });
             } else {
                 await editPoolEvm({
@@ -197,6 +204,7 @@ export default function EditStakePoolScreen({
                     claimStartDelay,
                     apr,
                     tokenInDecimals: pool.tokenInDecimals,
+                    stopAccrualAtPoolEnd,
                 });
             }
 
@@ -342,7 +350,9 @@ export default function EditStakePoolScreen({
                                     disabled={(date) => {
                                         const today = new Date();
                                         today.setHours(0, 0, 0, 0);
-                                        return date < today || (startTime ? date < startTime : false);
+                                        return (
+                                            date < today || (startTime ? date < startTime : false)
+                                        );
                                     }}
                                 />
                                 <input
@@ -353,7 +363,8 @@ export default function EditStakePoolScreen({
                                                 return submitAttemptedRef.current
                                                     ? "End time is required"
                                                     : true;
-                                            if (v <= new Date()) return "End time must be in the future";
+                                            if (v <= new Date())
+                                                return "End time must be in the future";
                                             if (startTime && v <= startTime)
                                                 return "End time must be after start time";
                                             return true;
@@ -421,6 +432,23 @@ export default function EditStakePoolScreen({
                                 <span className="text-xl text-greyed">Claim Start Delay:</span>
                                 <span className="text-xl text-black max-sm:text-right">
                                     {fmtDisplayDays(stakePool?.claimStartDelay)} days
+                                </span>
+                            </div>
+                            <div className="grid grid-cols-2">
+                                <span className="text-xl text-greyed">
+                                    Stop at Pool End:{" "}
+                                    <InfoTooltip
+                                        classNames={{
+                                            icon: "size-3.5 text-xs",
+                                            contentContainer: "max-h-fit",
+                                            textContainer: "min-h-10",
+                                        }}
+                                        side="right"
+                                        content="If enabled, interest calculation will strictly stop at the pool's end time, even if the user's accrual duration has not finished."
+                                    />
+                                </span>
+                                <span className="text-xl text-black max-sm:text-right">
+                                    {stakePool?.stopInterestAtPoolEnd ? "True" : "False"}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
@@ -590,6 +618,30 @@ export default function EditStakePoolScreen({
                                 </div>
                             </div>
 
+                            <div className="flex items-center gap-2">
+                                <BlueSwitch
+                                    active={stopAccrualAtPoolEnd}
+                                    onClick={(e) => {
+                                        e?.stopPropagation();
+                                        setValue("stopAccrualAtPoolEnd", !stopAccrualAtPoolEnd);
+                                    }}
+                                />
+                                <div>
+                                    <span className="text-base text-greyed">
+                                        Stop at pool end{" "}
+                                        <InfoTooltip
+                                            classNames={{
+                                                icon: "size-3.5 text-xs",
+                                                contentContainer: "max-h-fit",
+                                                textContainer: "min-h-10",
+                                            }}
+                                            side="right"
+                                            content="If enabled, interest calculation will strictly stop at the pool's end time, even if the user's accrual duration has not finished."
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+
                             <div className="grid grid-cols-2 gap-x-3">
                                 <div className="space-y-1">
                                     <span className="text-base text-greyed">
@@ -736,32 +788,32 @@ export default function EditStakePoolScreen({
 
                             {/* Staking Limit */}
                             <div className="space-y-1">
-                                    <span className="text-base text-greyed">Staking Limit:</span>
-                                    <Input
-                                        type="number"
-                                        min="0"
-                                        step="any"
-                                        placeholder="0"
-                                        aria-invalid={!!errors.stakingLimit}
-                                        {...register("stakingLimit", {
-                                            validate: (v) => {
-                                                if (!v) return true;
-                                                if (Number(v) < 0) return "Must be \u2265 0";
-                                                const max = Number(getValues("maxStakingAmount"));
-                                                if (max > 0 && Number(v) < max)
-                                                    return "Staking limit must be \u2265 max staking amount";
-                                                if (v.includes(".") && v.split(".")[1].length > 6)
-                                                    return "Max 6 decimal places allowed";
-                                                return true;
-                                            },
-                                        })}
-                                    />
-                                    {errors.stakingLimit && (
-                                        <p className="text-xs text-destructive">
-                                            {errors.stakingLimit.message}
-                                        </p>
-                                    )}
-                                </div>
+                                <span className="text-base text-greyed">Staking Limit:</span>
+                                <Input
+                                    type="number"
+                                    min="0"
+                                    step="any"
+                                    placeholder="0"
+                                    aria-invalid={!!errors.stakingLimit}
+                                    {...register("stakingLimit", {
+                                        validate: (v) => {
+                                            if (!v) return true;
+                                            if (Number(v) < 0) return "Must be \u2265 0";
+                                            const max = Number(getValues("maxStakingAmount"));
+                                            if (max > 0 && Number(v) < max)
+                                                return "Staking limit must be \u2265 max staking amount";
+                                            if (v.includes(".") && v.split(".")[1].length > 6)
+                                                return "Max 6 decimal places allowed";
+                                            return true;
+                                        },
+                                    })}
+                                />
+                                {errors.stakingLimit && (
+                                    <p className="text-xs text-destructive">
+                                        {errors.stakingLimit.message}
+                                    </p>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

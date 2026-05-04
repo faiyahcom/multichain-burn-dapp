@@ -14,6 +14,8 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { useNavigate } from "@tanstack/react-router";
+import BlueSwitch from "@/components/common/blue-switch";
+import InfoTooltip from "@/components/common/info-tooltip";
 
 type CreateStakePoolFormValues = {
   poolName: string;
@@ -30,6 +32,7 @@ type CreateStakePoolFormValues = {
   claimStartDelay: string;
   apr: string;
   lowRewardNotification: boolean;
+  stopAccrualAtPoolEnd: boolean;
   budget: string;
 };
 
@@ -75,6 +78,7 @@ const CreateStakePoolForm = () => {
       claimStartDelay: "",
       apr: "",
       lowRewardNotification: true,
+      stopAccrualAtPoolEnd: true,
       budget: "",
     },
   });
@@ -86,6 +90,7 @@ const CreateStakePoolForm = () => {
   const stakingLimitVal = watch("stakingLimit");
   const aprVal = watch("apr");
   const interestDurationVal = watch("interestAccrualDuration");
+  const stopAccrualAtPoolEnd = watch("stopAccrualAtPoolEnd");
 
   const maxRewardEnabled =
     Number(stakingLimitVal) > 0 &&
@@ -146,6 +151,7 @@ const CreateStakePoolForm = () => {
           claimStartDelay: Number(values.claimStartDelay) || 0,
           apr: Number(values.apr) || 0,
           lowRewardNotification: values.lowRewardNotification,
+          stopAccrualAtPoolEnd: values.stopAccrualAtPoolEnd,
         });
         if (poolAddress) {
           if (!isDraft) await submitPoolSol(poolAddress);
@@ -180,6 +186,7 @@ const CreateStakePoolForm = () => {
         claimStartDelay: Number(values.claimStartDelay) || 0,
         apr: Number(values.apr) || 0,
         autoSubmit: !isDraft,
+        stopAccrualAtPoolEnd: values.stopAccrualAtPoolEnd,
       });
       if (poolAddress) {
         reset();
@@ -560,9 +567,7 @@ const CreateStakePoolForm = () => {
                         ? true
                         : "Interest start delay is required",
                     gte0: (v) =>
-                      v === "" || Number(v) >= 0
-                        ? true
-                        : "Must be \u2265 0",
+                      v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
                   },
                 })}
               />
@@ -643,6 +648,31 @@ const CreateStakePoolForm = () => {
                 {errors.claimStartDelay.message}
               </p>
             )}
+          </div>
+        </div>
+
+        <div className="flex items-center gap-1.5">
+          <BlueSwitch
+            active={stopAccrualAtPoolEnd}
+            onClick={(e) => {
+              e?.stopPropagation();
+              setValue("stopAccrualAtPoolEnd", !stopAccrualAtPoolEnd);
+            }}
+          />
+          <div className="flex-col">
+            <span className="text-[13px]">
+              Stop at pool end{" "}
+              <InfoTooltip
+                classNames={{
+                  icon: "size-3.5 text-xs",
+                  contentContainer: "max-h-fit",
+                  textContainer: "min-h-10",
+                }}
+                side="right"
+                content="If enabled, interest calculation will strictly stop at the pool's end time, even if the user's accrual duration has not finished."
+              />
+            </span>
+            <div className="text-tiny text-mb-gray-71a">(Recommended)</div>
           </div>
         </div>
 

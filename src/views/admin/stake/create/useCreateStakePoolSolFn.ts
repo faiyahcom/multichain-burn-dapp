@@ -63,6 +63,8 @@ export type CreateStakePoolSolParams = {
     apr: number;
     /** Whether to enable low reward notification */
     lowRewardNotification: boolean;
+    /** When true, reward accrual stops at pool end time */
+    stopAccrualAtPoolEnd: boolean;
 };
 
 export const useCreateStakePoolSolFn = () => {
@@ -204,6 +206,7 @@ export const useCreateStakePoolSolFn = () => {
                         interestDuration,
                         stakingLimit: stakingLimitBN,
                         lowRewardNoti: params.lowRewardNotification,
+                        stopAccrualAtPoolEnd: params.stopAccrualAtPoolEnd,
                     })
                     .accounts({
                         factory: stakingFactoryPDA,

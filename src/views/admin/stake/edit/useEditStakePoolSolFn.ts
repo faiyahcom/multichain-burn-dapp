@@ -38,6 +38,8 @@ export interface EditStakePoolSolParams {
     apr: number;
     /** Decimals of the staking (deposit) token */
     tokenInDecimals: number;
+    /** When true, reward accrual stops at pool end time */
+    stopAccrualAtPoolEnd: boolean;
 }
 
 export const useEditStakePoolSolFn = () => {
@@ -90,6 +92,7 @@ export const useEditStakePoolSolFn = () => {
                         delayAccumulate,
                         delayClaim,
                         interestDuration,
+                        stopAccrualAtPoolEnd: params.stopAccrualAtPoolEnd,
                     })
                     .accounts({
                         admin: walletPublicKey,

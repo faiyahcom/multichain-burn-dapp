@@ -145,6 +145,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "totalRefunded",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "time",
         "type": "uint256"
       }
@@ -711,6 +717,11 @@
             "internalType": "uint256",
             "name": "apr",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "stopInterestAtPoolEnd",
+            "type": "bool"
           }
         ],
         "internalType": "struct CreateStakingPoolParam",
@@ -810,6 +821,11 @@
             "internalType": "uint256",
             "name": "apr",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "stopInterestAtPoolEnd",
+            "type": "bool"
           }
         ],
         "internalType": "struct IStakingPool.EditPoolParam",

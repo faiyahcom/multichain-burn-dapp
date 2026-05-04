@@ -32,6 +32,8 @@ export interface EditStakePoolEvmParams {
     apr: number;
     /** Decimals of the staking (deposit) token */
     tokenInDecimals: number;
+    /** When true, interest calculation stops at the pool's end time */
+    stopAccrualAtPoolEnd: boolean;
 }
 
 const daysToSeconds = (days: number): bigint => BigInt(Math.round(days * 86400));
@@ -68,6 +70,7 @@ export const useEditStakePoolEvmFn = () => {
                             : daysToSeconds(params.interestAccrualDuration),
                     claimDelay: daysToSeconds(params.claimStartDelay),
                     apr: BigInt(Math.round(params.apr * DECIMAL_FEE_PERCENT)),
+                    stopInterestAtPoolEnd: params.stopAccrualAtPoolEnd,
                 };
 
                 const tx = await contract.editPool(params.poolAddress, payload);

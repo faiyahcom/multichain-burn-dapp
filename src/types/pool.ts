@@ -100,6 +100,7 @@ export interface PoolDetailResponse {
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
     settlementFeeTotal?: string;
+    stopInterestAtPoolEnd?: boolean;
   };
   // Staking pool aggregate data
   staking?: {

@@ -194,6 +194,12 @@ const PoolOverview = ({ poolDetail }: Props) => {
                     ),
                 },
             ],
+            [
+                {
+                    label: "Stop interest at Pool End",
+                    value: stakePool?.stopInterestAtPoolEnd === true ? "True" : "False",
+                },
+            ],
         ];
     }, [
         poolDetail,

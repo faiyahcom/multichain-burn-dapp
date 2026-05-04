@@ -40,6 +40,8 @@ export type CreateStakePoolEvmParams = {
   apr: number;
   /** Whether to submit the pool immediately after creation */
   autoSubmit: boolean;
+  /** When true, interest calculation stops at the pool's end time */
+  stopAccrualAtPoolEnd: boolean;
 };
 
 const normalizeAddress = (address: string) =>
@@ -132,6 +134,7 @@ export const useCreateStakePoolEvmFn = () => {
           initialReward,
           submitPool: params.autoSubmit,
           apr: aprBps,
+          stopInterestAtPoolEnd: params.stopAccrualAtPoolEnd,
         };
 
         console.log("Creating stake pool with payload:", payload);
