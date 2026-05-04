@@ -1,13 +1,15 @@
-import type { PoolType } from "@/types/admin/master-pool-management";
-import { Button } from "../ui/button";
-import { useEffect, useState } from "react";
-import { useIntersectionObserver } from "usehooks-ts";
-import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
+import { NETWORK_CONFIGS } from "@/config/networks";
+import { cn } from "@/lib/utils";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { whitelistService } from "@/services/whitelistService";
-import { useSystemStore } from "@/stores/systemStore";
-import { NETWORK_CONFIGS } from "@/config/networks";
-import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
+import type { PoolType } from "@/types/admin/master-pool-management";
+import { truncateString } from "@/utils/helpers/string";
+import { useInfiniteQuery, useQueryClient } from "@tanstack/react-query";
+import { CircleXIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useIntersectionObserver } from "usehooks-ts";
+import { Button } from "../ui/button";
 import {
   Popover,
   PopoverContent,
@@ -16,14 +18,12 @@ import {
   PopoverTitle,
   PopoverTrigger,
 } from "../ui/popover";
-import { ArrowIcon } from "./arrow-icon";
-import { cn } from "@/lib/utils";
 import { Spinner } from "../ui/spinner";
+import { ArrowIcon } from "./arrow-icon";
 import CenterSpinner from "./center-spinner";
+import NoData from "./no-data";
 import SearchTextDebouncedInput from "./search-text-debounced-input";
 import TokenImage from "./token-image";
-import { CircleXIcon } from "lucide-react";
-import { truncateString } from "@/utils/helpers/string";
 
 interface Props {
   value?: string[];
@@ -45,11 +45,6 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
   const [open, setOpen] = useState(false);
   const [tokenTextSearch, setTokenTextSearch] = useState("");
   const isAnySelected = (value?.length ?? 0) > 0;
-  const selectedNetworkId = useSystemStore((state) => state.selectedNetworkId);
-  const networkConfig = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
-  const nativeCurrency = networkConfig?.appKitNetwork.nativeCurrency;
-  const isSolana = selectedNetworkId === "solana";
-  const nativeAddress = isSolana ? WSOL_ADDRESS : ZERO_ADDRESS;
   const queryClient = useQueryClient();
   const { isIntersecting, ref } = useIntersectionObserver({
     threshold: 0.5,
@@ -74,7 +69,6 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
         active: "true",
         isDropped: "false",
         search: tokenTextSearch || undefined,
-        chainIds: networkConfig?.backendChainId,
         kinds: poolType !== undefined ? String(poolType) : undefined,
       });
     },
@@ -113,27 +107,21 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
     }
   };
 
-  // Native token entry shown at top of list
-  const nativeToken = nativeCurrency
-    ? {
-        address: nativeAddress,
-        name: nativeCurrency.name,
-        symbol: nativeCurrency.symbol,
-        imageUri: networkConfig?.iconSrc ?? "",
-      }
-    : null;
-
-  // Show native token if search text is empty or matches native token symbol or name
-  const showNativeToken =
-    !!nativeToken &&
-    (nativeToken.symbol
-      .toLocaleLowerCase()
-      .includes(tokenTextSearch.toLocaleLowerCase()) ||
-      nativeToken.name
+  const nativeTokens = NETWORK_CONFIGS.map((network) => ({
+    address: network.id === "solana" ? WSOL_ADDRESS : ZERO_ADDRESS,
+    name: network.appKitNetwork.nativeCurrency.name,
+    symbol: network.appKitNetwork.nativeCurrency.symbol,
+    imageUri: network.iconSrc ?? "",
+  })).filter(
+    (token) =>
+      tokenTextSearch.length === 0 ||
+      token.symbol
         .toLocaleLowerCase()
         .includes(tokenTextSearch.toLocaleLowerCase()) ||
-      tokenTextSearch.length === 0);
-
+      token.name
+        .toLocaleLowerCase()
+        .includes(tokenTextSearch.toLocaleLowerCase()),
+  );
   const whitelistTokens = tokenData?.pages?.flatMap(
     (page) => page.whitelistTokens,
   );
@@ -199,22 +187,24 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
           </div>
         )}
         <CenterSpinner isLoading={isPendingTokens} />
-        {whitelistTokens?.length === 0 &&
-          !showNativeToken &&
-          !isPendingTokens && (
-            <div className="flex items-center justify-center py-4">
-              No tokens found
-            </div>
-          )}
-        {showNativeToken && (
-          <OptionItem
-            label={nativeToken.name}
-            value={nativeToken.address}
-            checked={value?.includes(nativeToken.address)}
-            toggleCheck={handleToggleCheck}
-            imgSrc={nativeToken.imageUri}
-          />
-        )}
+        <NoData
+          data={[...nativeTokens, ...(whitelistTokens ?? [])]}
+          isLoading={isPendingTokens}
+          text="No tokens found"
+        />
+        {nativeTokens.map((token) => {
+          const isSelected = value?.includes(token.address);
+          return (
+            <OptionItem
+              key={token.address}
+              label={token.name}
+              value={token.address}
+              checked={isSelected}
+              toggleCheck={handleToggleCheck}
+              imgSrc={token.imageUri}
+            />
+          );
+        })}
         {whitelistTokens?.map((token) => {
           const isSelected = value?.includes(token.address);
           return (
