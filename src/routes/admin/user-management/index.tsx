@@ -38,7 +38,7 @@ function RouteComponent() {
   });
 
   return (
-    <div className="flex flex-col justify-between gap-2.5 pb-10 sm:gap-5">
+    <div className="flex flex-col justify-between gap-2.5 pb-10 sm:gap-5 min-h-full">
       <div className="space-y-2.5 sm:space-y-10">
         <div className="px-7 pt-5 sm:px-14 sm:pt-11">
           <h1 className="text-3xl font-semibold">User Management</h1>
