@@ -185,7 +185,7 @@ const StakeStats = ({
                 className="ml-4"
             />
 
-            <p className="text-right text-sm md:text-base lg:text-lg 2xl:text-xl">
+            <p className="text-center text-sm md:text-base lg:text-lg 2xl:text-xl">
                 Interest stops accruing upon unstaking.
             </p>
             {hasReachedLimit && (

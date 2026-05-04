@@ -156,6 +156,9 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 }
                 className="ml-4"
             />
+            <p className="text-center text-sm md:text-base lg:text-lg 2xl:text-xl">
+                Interest stops accruing upon unstaking.
+            </p>
             {/* Emergency closed warning */}
             <div className="inline-flex items-start gap-1">
                 <IconExclaimation className="inline size-5" />

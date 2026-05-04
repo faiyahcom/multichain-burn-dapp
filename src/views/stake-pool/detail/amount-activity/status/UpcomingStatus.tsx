@@ -28,6 +28,9 @@ const UpcomingStatus = ({ poolDetail: _poolDetail }: Props) => {
             <StatRow label="Reward Available to Claim" value="0" className="ml-4" />
             <StatRow label="Your Reward Claimed" value="0" className="ml-4" />
             <StatRow label="Total Fee" value="0" className="ml-4" />
+            <p className="text-center text-sm md:text-base lg:text-lg 2xl:text-xl">
+                Interest stops accruing upon unstaking.
+            </p>
             <Button
                 variant="stake"
                 className="my-1.5 w-full py-2 font-orbitron text-base md:my-3 md:py-3 md:text-lg lg:text-xl 2xl:text-2xl"
