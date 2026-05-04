@@ -29,7 +29,7 @@ import {
 } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
 import z from "zod";
@@ -290,7 +290,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
     } = useForm<StakeFormValues>({
         defaultValues: { amount: "" },
         resolver: zodResolver(stakeFormSchema),
-        reValidateMode: "onChange",
+        mode: "onChange",
     });
 
     const yourTotalStaked = poolDetail?.staking?.user?.totalStaked
