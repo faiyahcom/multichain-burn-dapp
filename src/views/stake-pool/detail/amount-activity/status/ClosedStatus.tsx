@@ -130,7 +130,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
             />
             <StatRow
-                label="Reward Available to Claim"
+                label="Claimable"
                 value={
                     <span className="inline-flex items-center gap-1">
                         {fmtReward(ua?.availableClaim)} {rewardToken}

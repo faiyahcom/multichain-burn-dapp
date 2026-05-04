@@ -25,7 +25,7 @@ const UpcomingStatus = ({ poolDetail: _poolDetail }: Props) => {
                 labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
                 valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
             />
-            <StatRow label="Reward Available to Claim" value="0" className="ml-4" />
+            <StatRow label="Claimable" value="0" className="ml-4" />
             <StatRow label="Your Reward Claimed" value="0" className="ml-4" />
             <StatRow label="Total Fee" value="0" className="ml-4" />
             <p className="text-center text-sm md:text-base lg:text-lg 2xl:text-xl">
