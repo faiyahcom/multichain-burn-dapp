@@ -253,6 +253,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
           })();
 
           const amount: string = (() => {
+            const poolType = item.kind;
             switch (poolType) {
               case 0:
                 return item.burnedAmount ?? "0";
