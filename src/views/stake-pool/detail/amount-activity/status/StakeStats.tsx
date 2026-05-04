@@ -152,7 +152,7 @@ const StakeStats = ({
                 valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
             />
             <StatRow
-                label="Reward Available to Claim"
+                label="Claimable"
                 value={
                     <span className="inline-flex items-center gap-1">
                         {fmtReward(ua?.availableClaim)} {rewardToken}
@@ -161,7 +161,7 @@ const StakeStats = ({
                 className="ml-4"
             />
             <StatRow
-                label="Your Reward Claimed"
+                label="Reward Claimed"
                 value={
                     <span className="inline-flex items-center gap-1">
                         {fmtReward(ua?.totalClaimed)} {rewardToken}
@@ -179,13 +179,17 @@ const StakeStats = ({
                 className="ml-4"
             />
 
-            {showInterestNote && (
-                <p className="text-center text-sm md:text-base lg:text-lg 2xl:text-xl">
-                    {poolDetail?.pool?.stopInterestAtPoolEnd
-                        ? "Interest stops accruing once you unstake your tokens or when the pool reaches its end time"
-                        : "Interest stops accruing upon unstaking"}
-                </p>
-            )}
+            {showInterestNote &&
+                (poolDetail?.pool?.stopInterestAtPoolEnd ? (
+                    <p className="text-center text-xs text-error md:text-sm lg:text-base 2xl:text-lg">
+                        Interest stops accruing once you unstake your tokens or when the
+                        pool reaches its end time
+                    </p>
+                ) : (
+                    <p className="text-center text-sm text-error md:text-base lg:text-lg 2xl:text-xl">
+                        Interest stops accruing upon unstaking
+                    </p>
+                ))}
             {hasReachedLimit && (
                 <div className="inline-flex items-start gap-1">
                     <IconExclaimation className="inline size-5" />
