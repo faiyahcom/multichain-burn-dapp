@@ -123,7 +123,7 @@ const StakeStats = ({
                 className="ml-4"
             />
             <StatRow
-                label="Your Total Unstaked"
+                label="Total Unstaked"
                 value={
                     <span className="inline-flex items-center gap-1">
                         {fmtStaking(ua?.totalUnstaked)} {stakingToken}
