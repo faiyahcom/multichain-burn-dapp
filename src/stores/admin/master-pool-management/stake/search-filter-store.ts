@@ -3,7 +3,7 @@ import {
   stakePoolStatuses,
   type StakePoolStatus,
 } from "@/types/admin/master-pool-management";
-import { booleanString } from "@/types/common";
+import { booleanString, type SortBy, type SortOrder } from "@/types/common";
 import type { DateRange } from "react-day-picker";
 import { create } from "zustand";
 
@@ -19,7 +19,7 @@ export const stakeNotiLabels: Record<StakeNotiOption, string> = {
   [booleanString[1]]: "Notification OFF",
 };
 
-type MasterPoolManagementStakeSearchFilterType = {
+export type MasterPoolManagementStakeSearchFilterType = {
   page: number;
   text?: string;
   type?: StakeNotiOption;
@@ -29,6 +29,8 @@ type MasterPoolManagementStakeSearchFilterType = {
   poolStartRange?: DateRange;
   poolEndRange?: DateRange;
   dateRange?: DateRange;
+  sortBy?: SortBy;
+  sortOrder?: SortOrder;
 };
 
 type MasterPoolManagementStakeSearchFilterState = {
@@ -49,6 +51,8 @@ export const initialMasterPoolManagementStakeSearchFilter: MasterPoolManagementS
     poolStartRange: undefined,
     poolEndRange: undefined,
     dateRange: undefined,
+    sortBy: "timestamp",
+    sortOrder: "desc",
   };
 
 export const useMasterPoolManagementStakeSearchFilterStore =

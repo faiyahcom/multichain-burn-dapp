@@ -3,16 +3,19 @@ import {
   swapPoolStatuses,
   type SwapPoolStatus,
 } from "@/types/admin/master-pool-management";
+import type { SortBy, SortOrder } from "@/types/common";
 import type { DateRange } from "react-day-picker";
 import { create } from "zustand";
 
-type MasterPoolManagementSwapSearchFilterType = {
+export type MasterPoolManagementSwapSearchFilterType = {
   page: number;
   text?: string;
   tokens?: string[];
   status?: SwapPoolStatus[];
   network?: string[];
   dateRange?: DateRange;
+  sortBy?: SortBy;
+  sortOrder?: SortOrder;
 };
 
 type MasterPoolManagementSwapSearchFilterState = {
@@ -30,6 +33,8 @@ export const initialMasterPoolManagementSwapSearchFilter: MasterPoolManagementSw
     status: [...swapPoolStatuses],
     network: NETWORK_CONFIGS.map((network) => network.id),
     dateRange: undefined,
+    sortBy: "timestamp",
+    sortOrder: "desc",
   };
 
 export const useMasterPoolManagementSwapSearchFilterStore =

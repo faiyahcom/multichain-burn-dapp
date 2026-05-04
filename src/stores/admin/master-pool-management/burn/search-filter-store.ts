@@ -3,6 +3,7 @@ import {
   burnPoolStatuses,
   type BurnPoolStatus,
 } from "@/types/admin/master-pool-management";
+import type { SortBy, SortOrder } from "@/types/common";
 import type { DateRange } from "react-day-picker";
 import { create } from "zustand";
 
@@ -13,7 +14,7 @@ export const burnPoolTypeLabels: Record<BurnPoolType, string> = {
   partner: "Partner Burn",
 };
 
-type MasterPoolManagementBurnSearchFilterType = {
+export type MasterPoolManagementBurnSearchFilterType = {
   page: number;
   text?: string;
   type?: BurnPoolType;
@@ -23,6 +24,8 @@ type MasterPoolManagementBurnSearchFilterType = {
   poolStartRange?: DateRange;
   poolEndRange?: DateRange;
   dateRange?: DateRange;
+  sortBy?: SortBy;
+  sortOrder?: SortOrder;
 };
 
 type MasterPoolManagementBurnSearchFilterState = {
@@ -43,6 +46,8 @@ export const initialMasterPoolManagementBurnSearchFilter: MasterPoolManagementBu
     poolStartRange: undefined,
     poolEndRange: undefined,
     dateRange: undefined,
+    sortBy: "timestamp",
+    sortOrder: "desc",
   };
 
 export const useMasterPoolManagementBurnSearchFilterStore =
