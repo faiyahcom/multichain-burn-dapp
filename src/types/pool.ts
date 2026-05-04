@@ -108,6 +108,7 @@ export interface PoolDetailResponse {
     minStakingAmount?: string | null;
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
+    stopInterestAtPoolEnd?: boolean;
   };
   // Staking pool aggregate data
   staking?: {
