@@ -181,7 +181,10 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
           <div className="flex flex-wrap items-center gap-0.5">
             <span>Selected:</span>
             {value?.map((token) => (
-              <div className="flex items-center gap-0.5 rounded-full bg-active/50 p-1 pl-2 text-active">
+              <div
+                className="flex items-center gap-0.5 rounded-full bg-active/50 p-1 pl-2 text-active"
+                key={token}
+              >
                 <span title={token} className="text-xs">
                   {truncateString({ str: token })}
                 </span>
