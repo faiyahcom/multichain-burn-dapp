@@ -1,4 +1,21 @@
+import bs58 from "bs58";
 import type { Connection, SendOptions } from "@solana/web3.js";
+
+/**
+ * Extracts the first transaction signature from serialized Solana transaction bytes.
+ * Wire format: compact-u16 sig count, then N × 64-byte signatures.
+ * For a single-signer tx the first byte is 0x01.
+ */
+const extractSignatureFromSerialized = (serialized: Buffer | Uint8Array): string | null => {
+    try {
+        const sigCount = serialized[0];
+        if (!sigCount) return null;
+        const sigBytes = serialized.slice(1, 65);
+        return bs58.encode(sigBytes);
+    } catch {
+        return null;
+    }
+};
 
 /**
  * Checks whether an error is the intermittent
@@ -67,6 +84,10 @@ export const sendAndConfirmTransactionSafe = async (
 ): Promise<string> => {
     let signature: string;
 
+    // Extract signature before sending so we can verify it if the RPC
+    // rejects with "already processed" (wallet may have auto-submitted).
+    const preExtractedSig = extractSignatureFromSerialized(signedTxSerialized);
+
     try {
         signature = await connection.sendRawTransaction(
             signedTxSerialized,
@@ -77,20 +98,16 @@ export const sendAndConfirmTransactionSafe = async (
             },
         );
     } catch (error: any) {
-        if (isAlreadyProcessedError(error)) {
-            // Extract signature from the error logs if available,
-            // otherwise fall back to computing it from the transaction.
-            const sigMatch = error?.message?.match(/signature[:\s]+([A-Za-z0-9]{87,88})/);
-            if (sigMatch?.[1]) {
-                const extractedSig = sigMatch[1];
-                const status = await connection.getSignatureStatus(extractedSig);
-                if (status?.value && !status.value.err) {
-                    return extractedSig;
-                }
-            }
-            // If we can't extract/verify, the tx likely succeeded but we
-            // can't confirm — re-throw so the caller can handle it
-            throw error;
+        if (isAlreadyProcessedError(error) && preExtractedSig) {
+            // Wallet auto-broadcast the tx — confirm it normally.
+            // confirmTransactionSafe handles the "already processed" case
+            // during polling, so this is safe even if the tx lands before
+            // confirmTransaction starts tracking it.
+            await confirmTransactionSafe(connection, {
+                signature: preExtractedSig,
+                ...blockhashInfo,
+            });
+            return preExtractedSig;
         }
         throw error;
     }

@@ -1,11 +1,10 @@
 import { PublicKey, Connection } from "@solana/web3.js";
-import { BN } from "bn.js";
+import BN from "bn.js";
 import { Buffer } from "buffer";
 import {
     NATIVE_MINT,
     TOKEN_PROGRAM_ID,
     TOKEN_2022_PROGRAM_ID,
-    NATIVE_MINT_2022,
 } from "@solana/spl-token";
 
 // ==============================
@@ -57,6 +56,37 @@ export const getUserDepositPDA = (
 ): PublicKey => {
     const [pda] = PublicKey.findProgramAddressSync(
         [Buffer.from("user-deposit"), poolPDA.toBuffer(), user.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+export const getUserStakeTrackerPDA = (
+    poolPDA: PublicKey,
+    user: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("user-stake-tracker"), poolPDA.toBuffer(), user.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+export const getStakeEntryPDA = (
+    poolPDA: PublicKey,
+    user: PublicKey,
+    stakeIndex: number | InstanceType<typeof BN>,
+    programId: PublicKey,
+): PublicKey => {
+    const indexBN = typeof stakeIndex === "number" ? new BN(stakeIndex) : stakeIndex;
+    const [pda] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from("stake-entry"),
+            poolPDA.toBuffer(),
+            user.toBuffer(),
+            indexBN.toArrayLike(Buffer, "le", 8),
+        ],
         programId,
     );
     return pda;
