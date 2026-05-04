@@ -31,6 +31,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { adminPoolManagementQueryKeys } from "@/services/queries/queryKey";
 import LowRewardNotiSwitch from "../../low-reward-noti-switch";
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import { cn } from "@/lib/utils";
 
 interface Props {
   poolType: PoolType;
@@ -191,7 +192,12 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
       <TableHeader>
         <TableRow>
           {columns.map((column, index) => (
-            <TableHead key={index} className="h-18 whitespace-pre-line">
+            <TableHead
+              key={index}
+              className={cn("h-18 whitespace-pre-line", {
+                "pl-7 text-left": index === 0,
+              })}
+            >
               {typeof column === "string" ? column : column.render}
             </TableHead>
           ))}
