@@ -8,7 +8,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import PoolHistory from "./pool-history";
 import ScanLink from "@/components/common/scan-link";
 import { useOnChainVaultBalance } from "./amount-activities/hooks/useOnChainVaultBalance";
-import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
+import { BURN_POOL_STATUS, STAKE_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { StartsInCountdown, EndsInCountdown } from "@/components/shared/countdown";
 import LowRewardNotiSwitch from "@/views/admin/master-pool-management/low-reward-noti-switch";
 
@@ -25,7 +25,7 @@ const AdminStakePoolDetail = ({ address }: Props) => {
 
     const pool = poolDetail?.pool;
     const status = pool?.status ?? "draft";
-    const statusDisplay = BURN_POOL_STATUS[status] ?? BURN_POOL_STATUS["draft"];
+    const statusDisplay = STAKE_POOL_STATUS[status] ?? BURN_POOL_STATUS["draft"];
 
     // Shared on-chain vault balance — used by both StakedRewardAmount and ClosedStatus
     const vaultBalance = useOnChainVaultBalance({
