@@ -494,7 +494,7 @@
 
 @layer base {
   html {
-    @apply md:zoom-75;
+    @apply md:zoom-70;
   }
   body {
     @apply text-foreground;
@@ -810,8 +810,8 @@
   scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
 }
 
-@utility zoom-75 {
-  font-size: 75%;
+@utility zoom-70 {
+  font-size: 70%;
 }
 
 @utility zoom-100 {
