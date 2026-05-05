@@ -76,7 +76,7 @@ export interface PoolDetailResponse {
     kind: PoolKindCode;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus;
+    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -108,6 +108,7 @@ export interface PoolDetailResponse {
     minStakingAmount?: string | null;
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
+    stopInterestAtPoolEnd?: boolean;
   };
   // Staking pool aggregate data
   staking?: {
@@ -281,6 +282,7 @@ export type StakePoolStatus =
   | "pending"
   | "upcoming"
   | "holding"
+  | "full"
   | "ended";
 
 export type ActivityKindKey = keyof typeof activityKind;

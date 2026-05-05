@@ -12,7 +12,7 @@ import {
 import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
-import { renderBurnPoolTime } from "@/views/pool/glow/shared/helpers";
+import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -110,7 +110,7 @@ const StakePoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       unit={tokenInDisplay.symbol}
                       isShorten
                     />
-                    <p key={tick}>{renderBurnPoolTime(pool)}</p>
+                    <p key={tick}>{renderPoolTime(pool)}</p>
                   </div>
                 }
                 btn={{

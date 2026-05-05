@@ -1,5 +1,5 @@
 {
-  "address": "DnzDrr6PAeEJym7zeteUyHAnAv4wxr8EXoud3UvV5AeA",
+  "address": "9hyDsXfdfFpVYzSRyDzwYMgT1T4q2ZiUk6UaDao9M9S",
   "metadata": {
     "name": "staking",
     "version": "0.1.0",
@@ -184,7 +184,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": []
@@ -221,11 +221,70 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
-          "name": "treasury",
-          "writable": true
+          "name": "treasury"
+        },
+        {
+          "name": "treasury_token_ata",
+          "docs": [
+            "Treasury's ATA for the reward token (fee destination)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           "name": "pool",
@@ -452,7 +511,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "treasury",
@@ -593,7 +652,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "project_owner",
@@ -942,7 +1001,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1023,7 +1082,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1081,7 +1140,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "pool",
@@ -1535,7 +1594,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1695,7 +1754,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -1770,7 +1829,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "system_program",
@@ -1851,8 +1910,67 @@
           "name": "reward_mint"
         },
         {
-          "name": "treasury",
-          "writable": true
+          "name": "treasury"
+        },
+        {
+          "name": "treasury_token_ata",
+          "docs": [
+            "Treasury's ATA for the reward token (fee destination)"
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "treasury"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
         },
         {
           "name": "reward_vault",
@@ -2137,7 +2255,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -2307,7 +2425,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -2381,7 +2499,7 @@
         },
         {
           "name": "burn_program",
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         }
       ],
       "args": [
@@ -2421,7 +2539,7 @@
           "docs": [
             "The burn program — for CPI proxy-emit."
           ],
-          "address": "2SViE6sDnMLNZcUULXD3xuc5ptA8xHyKtGhpkw5Teq1j"
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
         },
         {
           "name": "factory",
@@ -2672,6 +2790,10 @@
         {
           "name": "amount",
           "type": "u64"
+        },
+        {
+          "name": "is_reward",
+          "type": "bool"
         }
       ]
     }
@@ -3196,6 +3318,14 @@
           {
             "name": "staking_limit",
             "type": "u64"
+          },
+          {
+            "name": "staking_remaining",
+            "type": "u64"
+          },
+          {
+            "name": "reward_remaining",
+            "type": "u64"
           }
         ]
       }
@@ -3308,6 +3438,14 @@
           {
             "name": "delay_claim",
             "type": "i64"
+          },
+          {
+            "name": "interest_duration",
+            "type": "i64"
+          },
+          {
+            "name": "staking_limit",
+            "type": "u64"
           }
         ]
       }

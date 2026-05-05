@@ -11,7 +11,7 @@ import {
 } from "@/types/admin/master-pool-management";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
-import { renderBurnPoolTime } from "@/views/pool/glow/shared/helpers";
+import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
@@ -104,7 +104,7 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       unit={tokenOutDisplay.symbol}
                       isShorten
                     />
-                    <p key={tick}>{renderBurnPoolTime(pool)}</p>
+                    <p key={tick}>{renderPoolTime(pool)}</p>
                   </div>
                 }
                 btn={{

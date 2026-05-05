@@ -27,10 +27,14 @@ export const getPoolGlowVariant = (
   }
 };
 
-export const renderBurnPoolTime = (pool: PoolItemType): string => {
+export const renderPoolTime = (pool: PoolItemType): string => {
   const nowInSeconds = Math.floor(Date.now() / 1000);
   // all possible status is stored in userViewBurnPoolStatuses
-  if (pool.status !== "upcoming" && pool.status !== "on_going") {
+  if (
+    pool.status !== "upcoming" &&
+    pool.status !== "on_going" &&
+    pool.status !== "full"
+  ) {
     // return nothing for pending and holding
     if (pool.status === "pending" || pool.status === "holding") {
       return "\u00A0"; // non-breaking space
@@ -71,7 +75,7 @@ export const renderBurnPoolTime = (pool: PoolItemType): string => {
     }
   }
 
-  if (pool.status === "on_going") {
+  if (pool.status === "on_going" || pool.status === "full") {
     return renderTimeEnd();
   }
 

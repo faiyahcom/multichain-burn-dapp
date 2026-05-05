@@ -12,7 +12,7 @@ export const Container = ({ children }: { children?: React.ReactNode }) => (
         className="w-full space-y-3 px-3 py-4 font-inter md:px-5 md:py-6"
     >
         <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">
-            Amount & Activity
+            Your Position
         </p>
         {children}
     </GlowContainer>
