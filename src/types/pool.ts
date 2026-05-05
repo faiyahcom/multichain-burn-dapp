@@ -143,6 +143,15 @@ export interface PoolTxnsResponse {
     amountOut: string;
     chainId: string;
     poolAddress: string;
+    poolKind: number;
+    recipient: string;
+    executor: string;
+    fee: string;
+    stakeId: number | null;
+    stakeDate: string | null;
+    isUnstaked: boolean;
+    notiFlags: number;
+    executorName: string;
   }[];
 }
 

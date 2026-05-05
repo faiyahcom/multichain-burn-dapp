@@ -27,17 +27,24 @@ type Props = {
 
 const DEFAULT_PAGE_SIZE = 5;
 
+const burnActionLabel = (kind: keyof typeof txnKind): string => {
+    if (kind === 1) return "Burn";
+    if (kind === 4) return "Claim";
+    return txnKind[kind];
+};
+
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
+    const excludeKinds = [2].join(",");
 
     const { data: poolTxns, isLoading } = useQuery({
-        queryKey: poolQueryKeys.txns(poolDetail?.pool?.address || "", page, ""),
+        queryKey: poolQueryKeys.txns(poolDetail?.pool?.address || "", page, excludeKinds),
         queryFn: () =>
             poolService.getPoolTxns(
                 page,
                 DEFAULT_PAGE_SIZE,
                 poolDetail?.pool?.address || "",
-                // No excludeKinds — show all transaction types
+                excludeKinds,
             ),
         enabled: !!poolDetail?.pool?.address,
         refetchInterval: 2_500,
@@ -46,7 +53,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
-    const stakeTokenDisplay = resolvePoolTokenDisplay({
+    const burnTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool?.tokenIn,
         tokenSymbol: poolDetail?.tokenIn?.symbol,
@@ -67,7 +74,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
 
     const resolveTokenSymbol = (txTokenAddress: string, fallbackSymbol: string) => {
         if (txTokenAddress?.toLowerCase() === poolDetail?.pool?.tokenIn?.toLowerCase()) {
-            return stakeTokenDisplay.symbol;
+            return burnTokenDisplay.symbol;
         }
         if (txTokenAddress?.toLowerCase() === poolDetail?.pool?.rewardToken?.toLowerCase()) {
             return rewardTokenDisplay.symbol;
@@ -172,7 +179,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                     />
                                 </TableCell>
                                 <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
-                                <TableCell>{txnKind[tx.kind]}</TableCell>
+                                <TableCell>{burnActionLabel(tx.kind)}</TableCell>
                                 <TableCell>{amount}</TableCell>
                                 <TableCell>{fee}</TableCell>
                                 <TableCell>

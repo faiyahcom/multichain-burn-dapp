@@ -12,7 +12,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import { getExplorerTxUrl } from "@/utils/helpers/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
-import { txnKind, type PoolDetailResponse } from "@/types/pool";
+import { type PoolDetailResponse } from "@/types/pool";
 import { formatAmount, parseToBN } from "@/utils/helpers/numbers";
 import { IconGoTo } from "@/assets/react";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -29,15 +29,16 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
+    const excludeKinds = [2].join(",");
 
     const { data: poolTxns, isLoading } = useQuery({
-        queryKey: poolQueryKeys.txns(poolDetail?.pool?.address || "", page, ""),
+        queryKey: poolQueryKeys.txns(poolDetail?.pool?.address || "", page, excludeKinds),
         queryFn: () =>
             poolService.getPoolTxns(
                 page,
                 DEFAULT_PAGE_SIZE,
                 poolDetail?.pool?.address || "",
-                // No excludeKinds — show all transaction types
+                excludeKinds,
             ),
         enabled: !!poolDetail?.pool?.address,
         refetchInterval: 2_500,
@@ -46,7 +47,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
-    const stakeTokenDisplay = resolvePoolTokenDisplay({
+    const tokenInDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool?.tokenIn,
         tokenSymbol: poolDetail?.tokenIn?.symbol,
@@ -55,7 +56,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
         customSymbol: poolDetail?.tokenIn?.customSymbol,
         imageUri: poolDetail?.tokenIn?.imageUri,
     });
-    const rewardTokenDisplay = resolvePoolTokenDisplay({
+    const tokenOutDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: poolDetail?.pool?.rewardToken,
         tokenSymbol: poolDetail?.tokenOut?.symbol,
@@ -67,10 +68,10 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
 
     const resolveTokenSymbol = (txTokenAddress: string, fallbackSymbol: string) => {
         if (txTokenAddress?.toLowerCase() === poolDetail?.pool?.tokenIn?.toLowerCase()) {
-            return stakeTokenDisplay.symbol;
+            return tokenInDisplay.symbol;
         }
         if (txTokenAddress?.toLowerCase() === poolDetail?.pool?.rewardToken?.toLowerCase()) {
-            return rewardTokenDisplay.symbol;
+            return tokenOutDisplay.symbol;
         }
         return fallbackSymbol;
     };
@@ -105,16 +106,13 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                             Wallet Address
                         </TableHead>
                         <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Time
-                        </TableHead>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Action
-                        </TableHead>
-                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
-                            Amount
+                            Swapped
                         </TableHead>
                         <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
                             Fee
+                        </TableHead>
+                        <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
+                            Time
                         </TableHead>
                         <TableHead className="h-auto border-b border-progress-bg py-3 text-base font-medium">
                             Tx Hash
@@ -132,29 +130,25 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                             tx.amountOut.toString() !== "0" &&
                             tx.tokenOutDecimals != null;
 
+                        // Fee is always on the input side for swap
                         const feeRaw = parseToBN(tx.fee);
-                        const feeDecimals = hasAmountOut ? tx.tokenOutDecimals : tx.tokenInDecimals;
-                        const feeSymbol = hasAmountOut
-                            ? resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)
-                            : resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol);
+                        const feeDecimals = tx.tokenInDecimals;
+                        const feeSymbol = resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol);
                         const fee = feeDecimals != null
                             ? `${formatAmount(parseToBN(tx.fee || "0").toString(), feeDecimals)} ${feeSymbol}`
                             : `0 ${feeSymbol}`;
 
-                        const netRaw = hasAmountIn
+                        // User's net received on input side = amountIn - fee
+                        const inNetRaw = hasAmountIn
                             ? parseToBN(tx.amountIn).sub(feeRaw).toString()
-                            : hasAmountOut
-                                ? parseToBN(tx.amountOut).sub(feeRaw).toString()
-                                : null;
-                        const amountDecimals = hasAmountIn ? tx.tokenInDecimals : tx.tokenOutDecimals;
-                        const amountSymbol = hasAmountIn
-                            ? resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)
-                            : hasAmountOut
-                                ? resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)
-                                : "";
-                        const amount = netRaw != null && amountDecimals != null
-                            ? `${formatAmount(netRaw, amountDecimals)} ${amountSymbol}`
-                            : `0 ${amountSymbol}`;
+                            : null;
+                        const inPart = inNetRaw != null
+                            ? `${formatAmount(inNetRaw, tx.tokenInDecimals)} ${resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)}`
+                            : `0 ${resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)}`;
+                        const outPart = hasAmountOut
+                            ? `${formatAmount(tx.amountOut, tx.tokenOutDecimals)} ${resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)}`
+                            : `0 ${resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)}`;
+                        const swapped = `${inPart} → ${outPart}`;
 
                         const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
@@ -171,10 +165,9 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                         displayText={truncateString({ str: tx.executor, left: 4, right: 4 }) || "—"}
                                     />
                                 </TableCell>
-                                <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
-                                <TableCell>{txnKind[tx.kind]}</TableCell>
-                                <TableCell>{amount}</TableCell>
+                                <TableCell>{swapped}</TableCell>
                                 <TableCell>{fee}</TableCell>
+                                <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
                                 <TableCell>
                                     <a
                                         href={explorerUrl}
