@@ -761,16 +761,6 @@ const CreateStakePoolForm = () => {
             className="max-w-xs"
           />
         </div>
-        <div className="flex flex-col gap-1.5">
-          <span className="text-[13px]">Max Reward Amount</span>
-          <Input
-            type="text"
-            readOnly
-            disabled={!maxRewardEnabled}
-            value={maxRewardDisplay}
-            className="max-w-xs"
-          />
-        </div>
       </div>
 
       {/* ── Actions ───────────────────────────────────────────── */}
