@@ -493,6 +493,11 @@
 }
 
 @layer base {
+  @media (min-width: 768px) {
+    html {
+      zoom: 0.7;
+    }
+  }
   body {
     @apply text-foreground;
     font-family: var(--font-orbitron);
