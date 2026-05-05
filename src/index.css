@@ -493,10 +493,8 @@
 }
 
 @layer base {
-  @media (min-width: 768px) {
-    html {
-      zoom: 0.7;
-    }
+  html {
+    @apply md:zoom-70;
   }
   body {
     @apply text-foreground;
@@ -810,6 +808,14 @@
 @utility thin-transparent-scrollbar {
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+}
+
+@utility zoom-70 {
+  font-size: 70%;
+}
+
+@utility zoom-100 {
+  font-size: 100%;
 }
 
 /* END */
