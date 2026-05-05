@@ -153,28 +153,28 @@ const MAINNET_CONFIGS: readonly NetworkConfig[] = [
     shortLabel: "BNB",
     scanUrl: "https://bscscan.com",
   },
-  {
-    id: "ethereum",
-    label: "Ethereum",
-    iconBg: "bg-[#627EEA]",
-    appKitNetwork: mainnet,
-    backendChainId: String(mainnet.id),
-    iconSrc: "/network/ethereum.png",
-    color: "#5779FE",
-    shortLabel: "ETH",
-    scanUrl: "https://etherscan.io",
-  },
-  {
-    id: "solana",
-    label: "Solana",
-    iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
-    appKitNetwork: solana,
-    backendChainId: SOLANA_BACKEND_CHAIN_ID,
-    iconSrc: "/network/solana.png",
-    color: "#b07be0",
-    shortLabel: "SOL",
-    scanUrl: "https://explorer.solana.com",
-  },
+  // {
+  //   id: "ethereum",
+  //   label: "Ethereum",
+  //   iconBg: "bg-[#627EEA]",
+  //   appKitNetwork: mainnet,
+  //   backendChainId: String(mainnet.id),
+  //   iconSrc: "/network/ethereum.png",
+  //   color: "#5779FE",
+  //   shortLabel: "ETH",
+  //   scanUrl: "https://etherscan.io",
+  // },
+  // {
+  //   id: "solana",
+  //   label: "Solana",
+  //   iconBg: "bg-gradient-to-br from-[#00FFA3] to-[#9945FF]",
+  //   appKitNetwork: solana,
+  //   backendChainId: SOLANA_BACKEND_CHAIN_ID,
+  //   iconSrc: "/network/solana.png",
+  //   color: "#b07be0",
+  //   shortLabel: "SOL",
+  //   scanUrl: "https://explorer.solana.com",
+  // },
 ];
 
 export const NETWORK_CONFIGS: readonly NetworkConfig[] = IS_MAINNET
@@ -200,7 +200,7 @@ export const getDecimalsTokenNativeByChainId = (
 };
 
 export const evmAppkitNetworks = IS_MAINNET
-  ? [mainnet, bsc, xphereMainnet]
+  ? [bsc, xphereMainnet]
   : [sepolia, bscTestnet, xphereTestnet];
 
 /**
