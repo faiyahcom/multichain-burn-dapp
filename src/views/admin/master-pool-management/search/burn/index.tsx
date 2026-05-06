@@ -10,6 +10,7 @@ import {
   burnPoolTypeLabels,
   burnPoolTypes,
   initialMasterPoolManagementBurnSearchFilter,
+  isFilterChanged,
   useMasterPoolManagementBurnSearchFilterStore,
   type BurnPoolType,
 } from "@/stores/admin/master-pool-management/burn/search-filter-store";
@@ -94,6 +95,7 @@ const AdminMasterPoolManagementBurnSearch = () => {
             onClick={() => {
               setFilter(initialMasterPoolManagementBurnSearchFilter);
             }}
+            disabled={!isFilterChanged(filter)}
           >
             Clear All
           </Button>

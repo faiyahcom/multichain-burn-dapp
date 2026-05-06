@@ -37,6 +37,41 @@ export const initialMasterPoolManagementSwapSearchFilter: MasterPoolManagementSw
     sortOrder: "desc",
   };
 
+export const isFilterChanged = (
+  currentFilter: MasterPoolManagementSwapSearchFilterType,
+): boolean => {
+  const checks: Record<
+    keyof MasterPoolManagementSwapSearchFilterType,
+    boolean
+  > = {
+    page:
+      currentFilter.page !== initialMasterPoolManagementSwapSearchFilter.page,
+    text:
+      currentFilter.text !== initialMasterPoolManagementSwapSearchFilter.text,
+    tokens:
+      currentFilter.tokens?.length !==
+      initialMasterPoolManagementSwapSearchFilter.tokens?.length,
+    status:
+      currentFilter.status?.length !==
+      initialMasterPoolManagementSwapSearchFilter.status?.length,
+    network:
+      currentFilter.network?.length !==
+      initialMasterPoolManagementSwapSearchFilter.network?.length,
+    dateRange:
+      currentFilter.dateRange?.from !==
+        initialMasterPoolManagementSwapSearchFilter.dateRange?.from ||
+      currentFilter.dateRange?.to !==
+        initialMasterPoolManagementSwapSearchFilter.dateRange?.to,
+    sortBy:
+      currentFilter.sortBy !==
+      initialMasterPoolManagementSwapSearchFilter.sortBy,
+    sortOrder:
+      currentFilter.sortOrder !==
+      initialMasterPoolManagementSwapSearchFilter.sortOrder,
+  };
+  return Object.values(checks).some(Boolean);
+};
+
 export const useMasterPoolManagementSwapSearchFilterStore =
   create<MasterPoolManagementSwapSearchFilterState>((set) => ({
     filter: initialMasterPoolManagementSwapSearchFilter,

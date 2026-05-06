@@ -55,6 +55,53 @@ export const initialMasterPoolManagementStakeSearchFilter: MasterPoolManagementS
     sortOrder: "desc",
   };
 
+export const isFilterChanged = (
+  currentFilter: MasterPoolManagementStakeSearchFilterType,
+): boolean => {
+  const checks: Record<
+    keyof MasterPoolManagementStakeSearchFilterType,
+    boolean
+  > = {
+    page:
+      currentFilter.page !== initialMasterPoolManagementStakeSearchFilter.page,
+    text:
+      currentFilter.text !== initialMasterPoolManagementStakeSearchFilter.text,
+    type:
+      currentFilter.type !== initialMasterPoolManagementStakeSearchFilter.type,
+    tokens:
+      currentFilter.tokens?.length !==
+      initialMasterPoolManagementStakeSearchFilter.tokens?.length,
+    status:
+      currentFilter.status?.length !==
+      initialMasterPoolManagementStakeSearchFilter.status?.length,
+    network:
+      currentFilter.network?.length !==
+      initialMasterPoolManagementStakeSearchFilter.network?.length,
+    poolStartRange:
+      currentFilter.poolStartRange?.from !==
+        initialMasterPoolManagementStakeSearchFilter.poolStartRange?.from ||
+      currentFilter.poolStartRange?.to !==
+        initialMasterPoolManagementStakeSearchFilter.poolStartRange?.to,
+    poolEndRange:
+      currentFilter.poolEndRange?.from !==
+        initialMasterPoolManagementStakeSearchFilter.poolEndRange?.from ||
+      currentFilter.poolEndRange?.to !==
+        initialMasterPoolManagementStakeSearchFilter.poolEndRange?.to,
+    dateRange:
+      currentFilter.dateRange?.from !==
+        initialMasterPoolManagementStakeSearchFilter.dateRange?.from ||
+      currentFilter.dateRange?.to !==
+        initialMasterPoolManagementStakeSearchFilter.dateRange?.to,
+    sortBy:
+      currentFilter.sortBy !==
+      initialMasterPoolManagementStakeSearchFilter.sortBy,
+    sortOrder:
+      currentFilter.sortOrder !==
+      initialMasterPoolManagementStakeSearchFilter.sortOrder,
+  };
+  return Object.values(checks).some(Boolean);
+};
+
 export const useMasterPoolManagementStakeSearchFilterStore =
   create<MasterPoolManagementStakeSearchFilterState>((set) => ({
     filter: initialMasterPoolManagementStakeSearchFilter,

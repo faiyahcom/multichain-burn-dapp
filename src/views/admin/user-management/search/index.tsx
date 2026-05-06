@@ -4,6 +4,7 @@ import SearchTextDebouncedInput from "@/components/common/search-text-debounced-
 import { Button } from "@/components/ui/button";
 import {
   initialAdminUserManagementSearchFilter,
+  isFilterChanged,
   useAdminUserManagementSearchFilterStore,
 } from "@/stores/admin/user-management/search-filter-store";
 
@@ -34,6 +35,7 @@ const AdminUserManagementSearch = () => {
         onClick={() => {
           setFilter(initialAdminUserManagementSearchFilter);
         }}
+        disabled={!isFilterChanged(filter)}
       >
         Clear All
       </Button>
