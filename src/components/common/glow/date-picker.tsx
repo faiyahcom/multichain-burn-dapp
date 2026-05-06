@@ -24,6 +24,7 @@ const variantSelectedDayClass: Record<ContainerVariant, string> = {
   swap: "data-[selected-single=true]:!bg-mb-btn-swap",
   pair: "data-[selected-single=true]:!bg-mb-btn-pair",
   green: "data-[selected-single=true]:!bg-mb-btn-green",
+  stake: "data-[selected-single=true]:!bg-mb-btn-stake",
 };
 
 type DatePickerProps = {
