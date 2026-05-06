@@ -24,6 +24,7 @@ import CenterSpinner from "./center-spinner";
 import NoData from "./no-data";
 import SearchTextDebouncedInput from "./search-text-debounced-input";
 import TokenImage from "./token-image";
+import MultipleSplitTokenImage from "./multiple-split-token-image";
 
 interface Props {
   value?: string[];
@@ -192,16 +193,29 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
           isLoading={isPendingTokens}
           text="No tokens found"
         />
-        {nativeTokens.map((token, index) => {
-          const isSelected = value?.includes(token.address);
+        {/* Some native tokens have the same address, 
+          if we just display them like whitelist tokens,
+          when clicking any one if them, it will toggle all of them.
+          This is bad UX, so we need to group them by address.
+        */}
+        {Object.entries(
+          nativeTokens.reduce<
+            Record<string, { name: string[]; img: string[] }>
+          >((acc, { address, name, imageUri }) => {
+            (acc[address] ??= { name: [], img: [] }).name.push(name);
+            acc[address].img.push(imageUri);
+            return acc;
+          }, {}),
+        ).map(([address, { name, img }], index) => {
+          const isSelected = value?.includes(address);
           return (
             <OptionItem
-              key={`native-${token.address}-${index}`}
-              label={token.name}
-              value={token.address}
+              key={`native-${address}-${index}`}
+              label={name}
+              value={address}
               checked={isSelected}
               toggleCheck={handleToggleCheck}
-              imgSrc={token.imageUri}
+              imgSrc={img}
             />
           );
         })}
@@ -231,13 +245,23 @@ const WhitelistTokenMultipleSelect: React.FC<Props> = ({
   );
 };
 
-interface OptionItemProps {
+interface OptionItemCommonProps {
   checked?: boolean;
   toggleCheck?: (value?: string) => void;
-  label: string;
   value: string;
-  imgSrc?: string;
 }
+
+type OptionItemDiffProps =
+  | {
+      label: string;
+      imgSrc: string;
+    }
+  | {
+      label: string[];
+      imgSrc: string[];
+    };
+
+type OptionItemProps = OptionItemCommonProps & OptionItemDiffProps;
 
 const OptionItem: React.FC<OptionItemProps> = ({
   label,
@@ -246,6 +270,8 @@ const OptionItem: React.FC<OptionItemProps> = ({
   toggleCheck,
   imgSrc,
 }) => {
+  const displayLabel = Array.isArray(label) ? label.join(", ") : label;
+
   return (
     <div
       className="cursor-pointer rounded-5px bg-primary-foreground py-0.5 pr-0.75"
@@ -265,14 +291,30 @@ const OptionItem: React.FC<OptionItemProps> = ({
           )}
         >
           <div className="flex items-center gap-2.25">
-            <TokenImage
-              src={imgSrc}
-              alt={label}
-              classNames={{
-                common: "size-7.75",
-              }}
-            />
-            <p className="text-15px font-medium">{label}</p>
+            {typeof imgSrc === "string" && typeof label === "string" && (
+              <TokenImage
+                src={imgSrc}
+                alt={label}
+                classNames={{
+                  common: "size-7.75",
+                }}
+              />
+            )}
+            {Array.isArray(imgSrc) && Array.isArray(label) && (
+              <MultipleSplitTokenImage
+                imgs={imgSrc}
+                labels={label}
+                classNames={{
+                  common: "size-7.75",
+                }}
+              />
+            )}
+            <p
+              className="min-w-0 truncate text-15px font-medium"
+              title={displayLabel}
+            >
+              {displayLabel}
+            </p>
           </div>
         </div>
       </div>

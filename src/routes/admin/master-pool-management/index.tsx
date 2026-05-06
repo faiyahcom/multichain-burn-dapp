@@ -187,15 +187,14 @@ function RouteComponent() {
               mod: "endOfDay",
             })
           : undefined,
-        timestampFrom: isBurnOrStakePool
-          ? dateToUnixSeconds({
-              date: filter?.dateRange?.from,
-              mod: "startOfDay",
-            })
-          : undefined,
-        timestampTo: isBurnOrStakePool
-          ? dateToUnixSeconds({ date: filter?.dateRange?.to, mod: "endOfDay" })
-          : undefined,
+        timestampFrom: dateToUnixSeconds({
+          date: filter?.dateRange?.from,
+          mod: "startOfDay",
+        }),
+        timestampTo: dateToUnixSeconds({
+          date: filter?.dateRange?.to,
+          mod: "endOfDay",
+        }),
         tokens: convertArrayToStringParam({
           array: filter?.tokens,
         }),
