@@ -37,7 +37,7 @@ const MultipleSplitTokenImage: React.FC<Props> = ({
   labels,
   classNames,
 }) => {
-  const { common: _common, ...restClassNames } = classNames ?? {}; // ← add this
+  const { common: _common, ...restClassNames } = classNames ?? {};
   const imgLabelGroups = imgs.map((img, index) => ({
     img,
     label: labels?.[index] ?? `Token ${index + 1}`,
@@ -48,7 +48,7 @@ const MultipleSplitTokenImage: React.FC<Props> = ({
     <div
       className={cn(
         "relative size-8 shrink-0 overflow-hidden rounded-full",
-        classNames?.common,
+        _common,
       )}
     >
       {imgLabelGroups.map(({ img, label }, index) => (
@@ -57,10 +57,7 @@ const MultipleSplitTokenImage: React.FC<Props> = ({
           src={img}
           alt={label}
           classNames={{
-            common: cn(
-              "absolute top-0 left-0 h-full w-full",
-              classNames?.common,
-            ),
+            common: cn("absolute top-0 left-0 h-full w-full", _common),
             ...restClassNames,
           }}
           styles={{
