@@ -8,6 +8,7 @@ import WhitelistTokenMultipleSelect from "@/components/common/whitelist-token-mu
 import { Button } from "@/components/ui/button";
 import {
   initialMasterPoolManagementStakeSearchFilter,
+  isFilterChanged,
   stakeNotiLabels,
   stakeNotiOptions,
   useMasterPoolManagementStakeSearchFilterStore,
@@ -95,6 +96,7 @@ const AdminMasterPoolManagementStakeSearch = () => {
             onClick={() => {
               setFilter(initialMasterPoolManagementStakeSearchFilter);
             }}
+            disabled={!isFilterChanged(filter)}
           >
             Clear All
           </Button>

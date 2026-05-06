@@ -50,6 +50,53 @@ export const initialMasterPoolManagementBurnSearchFilter: MasterPoolManagementBu
     sortOrder: "desc",
   };
 
+export const isFilterChanged = (
+  currentFilter: MasterPoolManagementBurnSearchFilterType,
+): boolean => {
+  const checks: Record<
+    keyof MasterPoolManagementBurnSearchFilterType,
+    boolean
+  > = {
+    page:
+      currentFilter.page !== initialMasterPoolManagementBurnSearchFilter.page,
+    text:
+      currentFilter.text !== initialMasterPoolManagementBurnSearchFilter.text,
+    type:
+      currentFilter.type !== initialMasterPoolManagementBurnSearchFilter.type,
+    tokens:
+      currentFilter.tokens?.length !==
+      initialMasterPoolManagementBurnSearchFilter.tokens?.length,
+    status:
+      currentFilter.status?.length !==
+      initialMasterPoolManagementBurnSearchFilter.status?.length,
+    network:
+      currentFilter.network?.length !==
+      initialMasterPoolManagementBurnSearchFilter.network?.length,
+    poolStartRange:
+      currentFilter.poolStartRange?.from !==
+        initialMasterPoolManagementBurnSearchFilter.poolStartRange?.from ||
+      currentFilter.poolStartRange?.to !==
+        initialMasterPoolManagementBurnSearchFilter.poolStartRange?.to,
+    poolEndRange:
+      currentFilter.poolEndRange?.from !==
+        initialMasterPoolManagementBurnSearchFilter.poolEndRange?.from ||
+      currentFilter.poolEndRange?.to !==
+        initialMasterPoolManagementBurnSearchFilter.poolEndRange?.to,
+    dateRange:
+      currentFilter.dateRange?.from !==
+        initialMasterPoolManagementBurnSearchFilter.dateRange?.from ||
+      currentFilter.dateRange?.to !==
+        initialMasterPoolManagementBurnSearchFilter.dateRange?.to,
+    sortBy:
+      currentFilter.sortBy !==
+      initialMasterPoolManagementBurnSearchFilter.sortBy,
+    sortOrder:
+      currentFilter.sortOrder !==
+      initialMasterPoolManagementBurnSearchFilter.sortOrder,
+  };
+  return Object.values(checks).some(Boolean);
+};
+
 export const useMasterPoolManagementBurnSearchFilterStore =
   create<MasterPoolManagementBurnSearchFilterState>((set) => ({
     filter: initialMasterPoolManagementBurnSearchFilter,

@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import {
   useMasterPoolManagementSwapSearchFilterStore,
   initialMasterPoolManagementSwapSearchFilter,
+  isFilterChanged,
 } from "@/stores/admin/master-pool-management/swap/search-filter-store";
 import {
   getPoolStatusColor,
@@ -65,6 +66,7 @@ const AdminMasterPoolManagementSwapSearch = () => {
         onClick={() => {
           setFilter(initialMasterPoolManagementSwapSearchFilter);
         }}
+        disabled={!isFilterChanged(filter)}
       >
         Clear All
       </Button>

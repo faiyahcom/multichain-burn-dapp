@@ -24,6 +24,25 @@ export const initialAdminUserManagementSearchFilter: AdminUserManagementSearchFi
     dateRange: undefined,
   };
 
+export const isFilterChanged = (
+  currentFilter: AdminUserManagementSearchFilterType,
+): boolean => {
+  const checks: Record<keyof AdminUserManagementSearchFilterType, boolean> = {
+    page: currentFilter.page !== initialAdminUserManagementSearchFilter.page,
+    limit: currentFilter.limit !== initialAdminUserManagementSearchFilter.limit,
+    text: currentFilter.text !== initialAdminUserManagementSearchFilter.text,
+    network:
+      currentFilter.network?.length !==
+      initialAdminUserManagementSearchFilter.network?.length,
+    dateRange:
+      currentFilter.dateRange?.from !==
+        initialAdminUserManagementSearchFilter.dateRange?.from ||
+      currentFilter.dateRange?.to !==
+        initialAdminUserManagementSearchFilter.dateRange?.to,
+  };
+  return Object.values(checks).some(Boolean);
+};
+
 export const useAdminUserManagementSearchFilterStore =
   create<AdminUserManagementSearchFilterState>((set) => ({
     filter: initialAdminUserManagementSearchFilter,
