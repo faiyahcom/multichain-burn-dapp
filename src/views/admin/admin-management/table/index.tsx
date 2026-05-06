@@ -328,9 +328,9 @@ const AdminManagementTable = () => {
               const disabledActionTitle = isSelfAdmin
                 ? SELF_ADMIN_ACTION_ERROR
                 : undefined;
-              let formattedCreateAt = "N/A";
+              let formattedCreatedAt = "N/A";
               try {
-                formattedCreateAt = format(parseISO(admin.createdAt), "yyyy/MM/dd");
+                formattedCreatedAt = format(parseISO(admin.createdAt), "yyyy/MM/dd");
               } catch (error) {
                 console.log(error);
               }
@@ -399,7 +399,7 @@ const AdminManagementTable = () => {
                         "text-primary": isFeaturedRow,
                       })}
                     >
-                      {formattedCreateAt}
+                      {formattedCreatedAt}
                     </p>
                   </TableCell>
 
