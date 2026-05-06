@@ -38,7 +38,7 @@ const BurnSearch = () => {
         onChange={(value) => setFilter({ network: value })}
         otherProps={{
           classNames: {
-            btn: "xl:max-w-[400px]",
+            btn: "xl:max-w-100",
             content: "font-inter",
           },
         }}

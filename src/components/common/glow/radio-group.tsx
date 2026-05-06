@@ -83,7 +83,7 @@ function RadioGroupItem({
             value={value ?? ""}
             className={cn(
                 "group relative flex items-center gap-3 rounded-xl px-3 py-2",
-                "font-inter text-[23px] font-medium transition-all duration-200",
+                "font-inter text-23px font-medium transition-all duration-200",
                 "cursor-pointer outline-none focus-visible:outline-none",
                 // Inactive: transparent border, dimmed text
                 "border border-transparent text-foreground/50",

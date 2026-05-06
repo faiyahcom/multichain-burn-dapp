@@ -165,7 +165,7 @@ const EditPoolDialog = ({
                       today.setHours(0, 0, 0, 0);
                       return date < today;
                     }}
-                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px"
                   />
                   <input
                     type="hidden"
@@ -205,7 +205,7 @@ const EditPoolDialog = ({
                         date < today || (startTime ? date < startTime : false)
                       );
                     }}
-                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px"
                   />
                   <input
                     type="hidden"

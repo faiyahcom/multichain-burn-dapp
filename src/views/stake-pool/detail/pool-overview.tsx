@@ -243,7 +243,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 <p className="font-orbitron text-base font-semibold md:text-xl lg:text-2xl 2xl:text-28px">
                     Pool Overview
                 </p>
-                <p className="text-[13px] text-mb-gray-b8 md:text-md 2xl:text-xl">
+                <p className="text-13px text-mb-gray-b8 md:text-md 2xl:text-xl">
                     {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
                         ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} — ${new Date(
                             Number(poolDetail.pool.timeEnd) * 1000,

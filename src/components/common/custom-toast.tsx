@@ -79,12 +79,12 @@ const CustomToast: React.FC<CustomToastProps> = ({
         } as React.CSSProperties
       }
       className={cn(
-        "relative flex min-w-[296px] items-start gap-2.25 overflow-hidden rounded-md bg-mb-dark-popover px-2.5 py-3",
-        "border-l-[6px] border-(--color) font-inter",
+        "relative flex min-w-74 items-start gap-2.25 overflow-hidden rounded-md bg-mb-dark-popover px-2.5 py-3",
+        "border-l-[0.375rem] border-(--color) font-inter",
       )}
       id={id}
     >
-      <Icon className="mt-[1.5px] size-5 shrink-0 text-(--color)" />
+      <Icon className="mt-[0.094rem] size-5 shrink-0 text-(--color)" />
       <div>
         <p className="text-base font-semibold text-(--color)">
           {toastProps.message}

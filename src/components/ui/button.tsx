@@ -36,11 +36,11 @@ const buttonVariants = cva(
         "icon-xs": "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
         "icon-sm": "size-8",
         "icon-lg": "size-10",
-        "mb-btn": "rounded-md-plus h-[34px] px-4 py-2",
+        "mb-btn": "rounded-md-plus h-8.5 px-4 py-2",
         "mb-square-btn":
-          "rounded-sm h-[46px] py-[8px] pl-[34px] pr-[25px] gap-[25px]",
-        "mb-pagination-small": "h-[28px] py-[8px] px-[12px] rounded-5px",
-        "mb-pagination-normal": "h-[28px] py-[8px] px-[21px] rounded-5px",
+          "rounded-sm h-11.5 py-2 pl-8.5 pr-6.25 gap-6.25",
+        "mb-pagination-small": "h-7 py-2 px-3 rounded-5px",
+        "mb-pagination-normal": "h-7 py-2 px-5.25 rounded-5px",
       },
     },
     defaultVariants: {

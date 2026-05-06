@@ -1,6 +1,5 @@
 import type { FieldErrors, UseFormRegister } from "react-hook-form";
 import { shortenNumber } from "@/utils/helpers/numbers";
-import { IconArrowDownWithStem } from "@/assets/react";
 import TokenBadge from "./token-badge";
 import type { PoolDetailResponse } from "@/types/pool";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
@@ -37,7 +36,7 @@ const SellSection = ({
     chainId,
 }: Props) => {
     return (
-        <div className="relative mb-4 flex w-full flex-col rounded-24px border-[2.5px] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-4 py-3 xl:px-8.75 xl:py-3.75">
+        <div className="relative mb-4 flex w-full flex-col rounded-24px border-[0.156rem] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-4 py-3 xl:px-8.75 xl:py-3.75">
             <div className="flex items-center justify-between">
                 <div className="font-inter text-sm font-medium text-mb-gray-b8/60 xl:text-base">
                     From
@@ -48,7 +47,7 @@ const SellSection = ({
                             type="button"
                             key={percent}
                             onClick={() => onSelectPercent(percent)}
-                            className="rounded-full bg-primary-foreground px-2 py-0.5 font-orbitron text-[11px] font-semibold text-mb-btn-swap transition hover:bg-mb-btn-swap hover:text-white xl:px-[11.5px] xl:py-1 xl:text-13px"
+                            className="rounded-full bg-primary-foreground px-2 py-0.5 font-orbitron text-11px font-semibold text-mb-btn-swap transition hover:bg-mb-btn-swap hover:text-white xl:px-[0.719rem] xl:py-1 xl:text-13px"
                         >
                             {percent === 100 ? "Max" : `${percent}%`}
                         </button>
@@ -104,14 +103,6 @@ const SellSection = ({
                     {isLoadingBalance ? "Checking balance..." : balanceText}
                 </p>
             </div>
-
-            {/* <div className="absolute top-full left-1/2 flex size-15.5 -translate-x-1/2 -translate-y-2.5 items-center justify-center rounded-[10px] bg-active">
-                <IconArrowDownWithStem
-                    width={18.5}
-                    height={28.5}
-                    className="text-white opacity-100"
-                />
-            </div> */}
         </div>
     );
 };

@@ -113,7 +113,7 @@ const PairCard = ({ pair }: PairCardProps) => {
       {/* Button: Full width on mobile, original auto width on md: */}
       <Button
         variant="swap"
-        className="mx-auto w-2/3 shrink-0 rounded-13px py-3 text-[16px] text-nowrap md:mx-0 md:w-auto md:px-6 md:py-3 md:text-[15px]"
+        className="mx-auto w-2/3 shrink-0 rounded-13px py-3 text-base text-nowrap md:mx-0 md:w-auto md:px-6 md:py-3 md:text-15px"
         hasHover
       >
         <Link

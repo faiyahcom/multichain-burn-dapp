@@ -28,13 +28,13 @@ import { formatUnits } from "ethers";
 
 // Mobile: text-xs (12px) | Tablet: text-base (16px) | 2xl: 18px
 const ROW_BURN_GRID =
-  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.55fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.55fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-lg font-medium";
 
 const ROW_SWAP_GRID =
-  "grid grid-cols-[minmax(0,1fr)_90px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_110px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+  "grid grid-cols-[minmax(0,1fr)_90px_minmax(0,1fr)] md:grid-cols-[minmax(0,1fr)_110px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-lg font-medium";
 
 const ROW_STAKE_GRID =
-  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.55fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-[18px] font-medium";
+  "grid grid-cols-[minmax(0,1.5fr)_42px_minmax(0,1fr)] md:grid-cols-[minmax(0,1.55fr)_60px_minmax(0,1fr)] items-center gap-2 md:gap-4 font-inter text-xs md:text-base 2xl:text-lg font-medium";
 
 // ── Row components ────────────────────────────────────────────────────────────
 
@@ -272,7 +272,7 @@ export const ActivityFeed = ({
               <div
                 key={`ghost-${i}`}
                 className={cn(
-                  "pointer-events-none invisible py-1.5 2xl:py-[11.5px]",
+                  "pointer-events-none invisible py-1.5 2xl:py-[0.719rem]",
                   ghostRowClassName,
                 )}
               >
@@ -309,7 +309,7 @@ export const TransactionFeed = ({
         </p>
       </div>
 
-      <div className="txn-grid font-inter text-xs font-bold tracking-[0.24px] opacity-60 md:text-base 2xl:text-lg">
+      <div className="txn-grid font-inter text-xs font-bold tracking-[0.015rem] opacity-60 md:text-base 2xl:text-lg">
         <span />
         <span>Tx hash</span>
         <span className="hidden text-center md:block">Time</span>
@@ -321,7 +321,7 @@ export const TransactionFeed = ({
 
       <div
         key={animKey}
-        className="animate-feed-jump-in space-y-3 font-inter text-xs tracking-[0.24px] md:space-y-5 md:text-base 2xl:text-lg"
+        className="animate-feed-jump-in space-y-3 font-inter text-xs tracking-[0.015rem] md:space-y-5 md:text-base 2xl:text-lg"
       >
         {slots.map((item, i) =>
           item ? (

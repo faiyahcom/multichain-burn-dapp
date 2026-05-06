@@ -112,7 +112,7 @@ const CardItem: React.FC<PairItemType> = ({
               {tokenOutDisplay.symbol}/{tokenInDisplay.symbol}
             </p>
           </div>
-          <div className="absolute inset-0 z-0 h-full w-full bg-primary-foreground/50 backdrop-blur-[15px]" />
+          <div className="absolute inset-0 z-0 h-full w-full bg-primary-foreground/50 backdrop-blur-[0.938rem]" />
         </div>
       </div>
 
@@ -131,7 +131,14 @@ const CardItem: React.FC<PairItemType> = ({
         />
       </div>
 
-      <Link to={`/pair-detail/${chainId}/${tokenIn}/${tokenOut}`}>
+      <Link
+        to="/pair-detail/$chainId/$tokenIn/$tokenOut"
+        params={{
+          chainId: chainId,
+          tokenIn: tokenIn,
+          tokenOut: tokenOut,
+        }}
+      >
         <AnimateIconButton
           variant="letter-icon"
           iconLetter="V"
