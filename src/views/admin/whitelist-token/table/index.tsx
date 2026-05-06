@@ -301,7 +301,7 @@ const AdminWhitelistTokenTable = () => {
                         <PencilIcon className="size-4" />
                       </button>
                       <button onClick={() => setDetailToken(item)}>
-                        <IconEye className="[&>path]:group-hover:stroke-[1.5px]" />
+                        <IconEye className="[&>path]:group-hover:stroke-[0.094rem]" />
                       </button>
                       <button
                         onClick={() =>
@@ -313,7 +313,7 @@ const AdminWhitelistTokenTable = () => {
                           })
                         }
                       >
-                        <IconTrashCan className="[&>path]:group-hover:stroke-[1.5px]" />
+                        <IconTrashCan className="[&>path]:group-hover:stroke-[0.094rem]" />
                       </button>
                     </div>
                   </TableCell>

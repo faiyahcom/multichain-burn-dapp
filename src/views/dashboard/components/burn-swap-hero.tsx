@@ -42,7 +42,7 @@ export const HeroStatRow = ({
 }) => (
     <div className="flex items-center justify-between">
         <div className="flex items-center gap-2.5 lg:gap-5">
-            <div className={`flex size-10 items-center justify-center rounded-[6px] ${iconWrapperClassname ?? "bg-mb-btn-burn/10"}`}>
+            <div className={`flex size-10 items-center justify-center rounded-6px ${iconWrapperClassname ?? "bg-mb-btn-burn/10"}`}>
                 {icon}
             </div>
             <span className="text-sm font-medium text-mb-gray-b8 2xl:text-base">
@@ -77,7 +77,7 @@ const HeroSwapMiniForm = () => {
             </div>
 
             {/* Token Select */}
-            <div className="mb-1 flex items-center gap-2 rounded-[6px] border-2 border-mb-dark-popover-item-border px-3 2xl:mb-2">
+            <div className="mb-1 flex items-center gap-2 rounded-6px border-2 border-mb-dark-popover-item-border px-3 2xl:mb-2">
                 <div className="flex-1">
                     <WhitelistTokenSelect
                         value={tokenFrom}
@@ -110,7 +110,7 @@ const HeroSwapMiniForm = () => {
             {/* Amount */}
             <div className="flex flex-col gap-1 2xl:gap-2">
                 <span className="text-sm text-mb-gray-b8/60 2xl:text-base">Amount</span>
-                <div className="flex justify-between rounded-[6px] border-2 border-mb-dark-popover-item-border px-3">
+                <div className="flex justify-between rounded-6px border-2 border-mb-dark-popover-item-border px-3">
                     <Input
                         value={amount}
                         onChange={(e) => setAmount(e.target.value)}
@@ -199,7 +199,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                             BURN
                         </p>
                     </div>
-                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase sm:text-[32px]">
+                    <p className="font-orbitron text-2xl font-medium text-mb-burn-light uppercase sm:text-3xl">
                         {formatAmount(data?.burnSection?.volume || "0", 0, 2)}
                     </p>
                     <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
@@ -254,7 +254,7 @@ export const BurnSwapHero = ({ data }: Props) => {
                     </div>
                     <div className="flex items-center justify-between gap-2">
                         <div className="space-y-2.5">
-                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase sm:text-[32px]">
+                            <p className="font-orbitron text-2xl font-medium text-mb-swap-light uppercase sm:text-3xl">
                                 {formatAmount(data?.swapSection?.volume ?? "0", 0, 2)}
                             </p>
                             <p className="text-sm font-medium text-mb-gray-b8/60 lg:text-nowrap 2xl:text-base">

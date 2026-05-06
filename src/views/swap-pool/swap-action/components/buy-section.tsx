@@ -20,7 +20,7 @@ const BuySection = ({
     chainId,
 }: Props) => {
     return (
-        <div className="flex w-full flex-col rounded-24px border-[2.5px] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-4 py-3 xl:px-8.75 xl:py-3.75">
+        <div className="flex w-full flex-col rounded-24px border-[0.156rem] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-4 py-3 xl:px-8.75 xl:py-3.75">
             <div className="flex items-center justify-between">
                 <div className="font-inter text-sm font-medium text-mb-gray-b8/60 xl:text-base">
                     Buy

@@ -101,7 +101,7 @@ const ProfileMenu = ({}: Props) => {
           side="bottom"
           sideOffset={isMobile ? 20 : 40}
           // className="min-w-44 rounded-lg border-transparent bg-mb-dark-profile-btn p-3"
-          className={contentClassName("min-w-[320px]")}
+          className={contentClassName("min-w-[20rem]")}
         >
           <div className="px-2 py-1.5 sm:hidden">
             <p

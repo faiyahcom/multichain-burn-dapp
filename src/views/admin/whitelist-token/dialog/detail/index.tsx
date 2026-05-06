@@ -182,7 +182,7 @@ const Link = ({
       className="flex items-center justify-between gap-1 rounded-md-plus bg-inactive px-4.75 py-2"
     >
       <span className="flex items-center gap-6.25">
-        <Icon className="shrink-0 text-secondary-text [&>path]:stroke-[1.5px]" />
+        <Icon className="shrink-0 text-secondary-text [&>path]:stroke-[0.094rem]" />
         <p className="text-15px font-normal">{href}</p>
       </span>
       <p className="font-normal text-secondary-text">{title}</p>

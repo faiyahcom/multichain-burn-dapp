@@ -157,7 +157,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                 onTransfer={handleTransfer}
             />
             {poolDetail?.pool?.adminCloseReason && (
-                <div className="flex gap-1 text-[15px]">
+                <div className="flex gap-1 text-15px">
                     <span className="font-medium text-foreground">
                         Reason close pool:{" "}
                     </span>

@@ -48,7 +48,7 @@ const StakeHero = ({ stakingSection }: { stakingSection?: StakingSection }) => {
                         TOTAL STAKING
                     </p>
                 </div>
-                <p className="font-orbitron text-2xl font-medium text-mb-btn-stake uppercase sm:text-[32px]">
+                <p className="font-orbitron text-2xl font-medium text-mb-btn-stake uppercase sm:text-3xl">
                     {stakedVolume}
                 </p>
                 <p className="text-sm font-medium text-mb-gray-b8/60 2xl:text-base">
