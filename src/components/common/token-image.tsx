@@ -32,7 +32,10 @@ const TokenImage: React.FC<Props> = ({
           classNames?.common,
           classNames?.placeholder,
         )}
-        style={styles?.common}
+        style={{
+          ...styles?.common,
+          ...styles?.placeholder,
+        }}
       >
         <Spinner />
       </div>

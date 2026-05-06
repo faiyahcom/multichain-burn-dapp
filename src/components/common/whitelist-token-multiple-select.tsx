@@ -301,7 +301,13 @@ const OptionItem: React.FC<OptionItemProps> = ({
               />
             )}
             {Array.isArray(imgSrc) && Array.isArray(label) && (
-              <MultipleSplitTokenImage imgs={imgSrc} labels={label} />
+              <MultipleSplitTokenImage
+                imgs={imgSrc}
+                labels={label}
+                classNames={{
+                  common: "size-7.75",
+                }}
+              />
             )}
             <p
               className="min-w-0 truncate text-15px font-medium"

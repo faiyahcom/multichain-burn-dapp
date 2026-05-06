@@ -10,37 +10,24 @@ interface Props {
 interface WedgePolygonOptions {
   startDeg: number;
   endDeg: number;
-  size?: number;
 }
 
-function wedgePolygon({
-  startDeg,
-  endDeg,
-  size = 124,
-}: WedgePolygonOptions): string {
-  const cx = size / 2,
-    cy = size / 2,
-    r = size / 2;
+function wedgePolygon({ startDeg, endDeg }: WedgePolygonOptions): string {
   const toRad = (deg: number): number => ((deg - 90) * Math.PI) / 180;
   const pt = (deg: number): [number, number] => [
-    cx + r * Math.cos(toRad(deg)),
-    cy + r * Math.sin(toRad(deg)),
+    50 + 50 * Math.cos(toRad(deg)),
+    50 + 50 * Math.sin(toRad(deg)),
   ];
 
-  const points: [number, number][] = [[cx, cy]];
+  const points: [number, number][] = [[50, 50]];
   const steps = Math.ceil((endDeg - startDeg) / 10);
   for (let i = 0; i <= steps; i++)
     points.push(pt(startDeg + ((endDeg - startDeg) * i) / steps));
-  points.push([cx, cy]);
+  points.push([50, 50]);
 
   return (
     "polygon(" +
-    points
-      .map(
-        ([x, y]) =>
-          `${((x / size) * 100).toFixed(2)}% ${((y / size) * 100).toFixed(2)}%`,
-      )
-      .join(", ") +
+    points.map(([x, y]) => `${x.toFixed(2)}% ${y.toFixed(2)}%`).join(", ") +
     ")"
   );
 }
@@ -50,6 +37,7 @@ const MultipleSplitTokenImage: React.FC<Props> = ({
   labels,
   classNames,
 }) => {
+  const { common: _common, ...restClassNames } = classNames ?? {}; // ← add this
   const imgLabelGroups = imgs.map((img, index) => ({
     img,
     label: labels?.[index] ?? `Token ${index + 1}`,
@@ -73,12 +61,7 @@ const MultipleSplitTokenImage: React.FC<Props> = ({
               "absolute top-0 left-0 h-full w-full",
               classNames?.common,
             ),
-            ...(!!classNames
-              ? (() => {
-                  const { common, ...rest } = classNames;
-                  return rest;
-                })()
-              : {}),
+            ...restClassNames,
           }}
           styles={{
             common: {
