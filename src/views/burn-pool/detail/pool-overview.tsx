@@ -5,6 +5,7 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import GlowContainer from "@/components/common/glow/container";
+import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -152,9 +153,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
         </p>
         <p className="text-13px text-mb-gray-b8 md:text-md 2xl:text-xl">
           {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
-            ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
-              Number(poolDetail.pool.timeEnd) * 1000,
-            ).toLocaleDateString()}`
+            ? `${formatTimestampSecondsToDate({
+                timestamp: poolDetail.pool.timeStart,
+              })} - ${formatTimestampSecondsToDate({
+                timestamp: poolDetail.pool.timeEnd,
+              })}`
             : "No time limit"}
         </p>
       </div>
@@ -162,14 +165,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
       <div className="space-y-2">
         {rows.map((row, rowIndex) => (
           <div
-            className="grid grid-cols-1 gap-y-1 md:grid-cols-2 space-x-2 md:space-x-6 2xl:space-x-8"
+            className="grid grid-cols-1 space-x-2 gap-y-1 md:grid-cols-2 md:space-x-6 2xl:space-x-8"
             key={rowIndex}
           >
             <div className="grid grid-cols-2">
               <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                 {row[0]?.label}:
               </span>
-              <span className="text-sm flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
+              <span className="flex justify-end text-sm md:text-base lg:text-xl 2xl:text-2xl">
                 {row[0].value}
               </span>
             </div>
@@ -178,7 +181,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                   {row[1]?.label}:
                 </span>
-                <span className="text-sm font-medium flex justify-end md:text-base lg:text-xl 2xl:text-2xl">
+                <span className="flex justify-end text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                   {row[1]?.value}
                 </span>
               </div>
