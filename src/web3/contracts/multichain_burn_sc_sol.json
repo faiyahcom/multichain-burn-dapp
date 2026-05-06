@@ -1932,6 +1932,123 @@
       "args": []
     },
     {
+      "name": "emit_launchpad_event",
+      "discriminator": [
+        195,
+        69,
+        40,
+        133,
+        62,
+        42,
+        253,
+        173
+      ],
+      "accounts": [
+        {
+          "name": "launchpad_config",
+          "docs": [
+            "The launchpad program's config PDA — used as the CPI signer.",
+            "Validates that only the launchpad program can call this instruction."
+          ],
+          "signer": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                163,
+                130,
+                85,
+                208,
+                254,
+                162,
+                58,
+                114,
+                37,
+                193,
+                10,
+                107,
+                164,
+                126,
+                164,
+                160,
+                3,
+                6,
+                156,
+                44,
+                27,
+                28,
+                85,
+                172,
+                237,
+                210,
+                37,
+                183,
+                144,
+                111,
+                221,
+                109
+              ]
+            }
+          }
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn factory — ensures the instruction runs under burn's context."
+          ],
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  102,
+                  97,
+                  99,
+                  116,
+                  111,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "args": [
+        {
+          "name": "event",
+          "type": {
+            "defined": {
+              "name": "LaunchpadEvent"
+            }
+          }
+        }
+      ]
+    },
+    {
       "name": "emit_staking_event",
       "discriminator": [
         156,
@@ -3077,6 +3194,97 @@
       ]
     },
     {
+      "name": "LaunchpadClaimed",
+      "discriminator": [
+        6,
+        15,
+        234,
+        29,
+        205,
+        147,
+        236,
+        164
+      ]
+    },
+    {
+      "name": "LaunchpadCollected",
+      "discriminator": [
+        19,
+        66,
+        45,
+        30,
+        245,
+        189,
+        95,
+        3
+      ]
+    },
+    {
+      "name": "LaunchpadDeposited",
+      "discriminator": [
+        196,
+        137,
+        38,
+        48,
+        164,
+        41,
+        38,
+        218
+      ]
+    },
+    {
+      "name": "LaunchpadPoolClosed",
+      "discriminator": [
+        140,
+        116,
+        37,
+        92,
+        232,
+        60,
+        208,
+        150
+      ]
+    },
+    {
+      "name": "LaunchpadPoolDeployed",
+      "discriminator": [
+        56,
+        122,
+        235,
+        245,
+        207,
+        49,
+        206,
+        192
+      ]
+    },
+    {
+      "name": "LaunchpadPoolUpdated",
+      "discriminator": [
+        113,
+        247,
+        244,
+        223,
+        93,
+        175,
+        205,
+        255
+      ]
+    },
+    {
+      "name": "LaunchpadRewardRefund",
+      "discriminator": [
+        99,
+        126,
+        162,
+        171,
+        43,
+        87,
+        217,
+        142
+      ]
+    },
+    {
       "name": "MerkleRootSet",
       "discriminator": [
         71,
@@ -3911,6 +4119,569 @@
       }
     },
     {
+      "name": "LaunchpadClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadCollected",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadDeposited",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_in",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "reward",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadEvent",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PoolDeployed",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "reward_mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "deposit_mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "target",
+                "type": "pubkey"
+              },
+              {
+                "name": "asset_type",
+                "type": "u8"
+              },
+              {
+                "name": "asset_reward_type",
+                "type": "u8"
+              },
+              {
+                "name": "time_start",
+                "type": "i64"
+              },
+              {
+                "name": "time_end",
+                "type": "i64"
+              },
+              {
+                "name": "reward_deposited",
+                "type": "u64"
+              },
+              {
+                "name": "ratio",
+                "type": "u64"
+              },
+              {
+                "name": "ratio_denominator",
+                "type": "u64"
+              },
+              {
+                "name": "settlement_fee",
+                "type": "u64"
+              },
+              {
+                "name": "creation_fee_paid",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              }
+            ]
+          },
+          {
+            "name": "PoolUpdated",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "time_start",
+                "type": "i64"
+              },
+              {
+                "name": "time_end",
+                "type": "i64"
+              },
+              {
+                "name": "name",
+                "type": "string"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              }
+            ]
+          },
+          {
+            "name": "Deposited",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount_in",
+                "type": "u64"
+              },
+              {
+                "name": "fee",
+                "type": "u64"
+              },
+              {
+                "name": "reward",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "current_amount",
+                "type": "u64"
+              },
+              {
+                "name": "total_amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "Claimed",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "fee",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "current_amount",
+                "type": "u64"
+              },
+              {
+                "name": "total_amount",
+                "type": "u64"
+              }
+            ]
+          },
+          {
+            "name": "PoolClosed",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "Collected",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "target",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              }
+            ]
+          },
+          {
+            "name": "RewardRefund",
+            "fields": [
+              {
+                "name": "pool",
+                "type": "pubkey"
+              },
+              {
+                "name": "pool_id",
+                "type": "u64"
+              },
+              {
+                "name": "executor",
+                "type": "pubkey"
+              },
+              {
+                "name": "amount",
+                "type": "u64"
+              },
+              {
+                "name": "token_mint",
+                "type": "pubkey"
+              },
+              {
+                "name": "timestamp",
+                "type": "i64"
+              },
+              {
+                "name": "recipient",
+                "type": "pubkey"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadPoolClosed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadPoolDeployed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "reward_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_type",
+            "type": "u8"
+          },
+          {
+            "name": "asset_reward_type",
+            "type": "u8"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "reward_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "ratio",
+            "type": "u64"
+          },
+          {
+            "name": "ratio_denominator",
+            "type": "u64"
+          },
+          {
+            "name": "settlement_fee",
+            "type": "u64"
+          },
+          {
+            "name": "creation_fee_paid",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadPoolUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadRewardRefund",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
       "name": "MerkleRootSet",
       "type": {
         "kind": "struct",
@@ -4671,8 +5442,8 @@
                 "type": "u64"
               },
               {
-                "name": "stop_accrual_at_pool_end",
-                "type": "bool"
+                "name": "interest_stop_date",
+                "type": "i64"
               }
             ]
           },
@@ -4973,6 +5744,10 @@
               {
                 "name": "stop_accrual_at_pool_end",
                 "type": "bool"
+              },
+              {
+                "name": "interest_stop_date",
+                "type": "i64"
               }
             ]
           },
@@ -5142,8 +5917,8 @@
             "type": "u64"
           },
           {
-            "name": "stop_accrual_at_pool_end",
-            "type": "bool"
+            "name": "interest_stop_date",
+            "type": "i64"
           }
         ]
       }
@@ -5240,6 +6015,10 @@
           {
             "name": "stop_accrual_at_pool_end",
             "type": "bool"
+          },
+          {
+            "name": "interest_stop_date",
+            "type": "i64"
           }
         ]
       }

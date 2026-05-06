@@ -3170,8 +3170,10 @@
             "type": "bool"
           },
           {
-            "name": "stop_accrual_at_pool_end",
-            "type": "bool"
+            "name": "interest_stop_date",
+            "type": {
+              "option": "i64"
+            }
           }
         ]
       }
@@ -3334,9 +3336,20 @@
           {
             "name": "stop_accrual_at_pool_end",
             "docs": [
-              "When true, reward accrual stops at pool_end_ts (no interest after pool ends)."
+              "When true, reward accrual stops at pool_end_ts (no interest after pool ends).",
+              "DEPRECATED — superseded by interest_stop_date. Kept for on-chain storage layout."
             ],
             "type": "bool"
+          },
+          {
+            "name": "interest_stop_date",
+            "docs": [
+              "Global stop date for interest accrual.  0 = disabled (no global stop).",
+              "When set (> 0) and `now >= interest_stop_date`:",
+              "- No further reward accrual",
+              "- All users can unstake + claim immediately (bypasses lock/delay)"
+            ],
+            "type": "i64"
           }
         ]
       }
@@ -3461,6 +3474,12 @@
           {
             "name": "stop_accrual_at_pool_end",
             "type": "bool"
+          },
+          {
+            "name": "interest_stop_date",
+            "type": {
+              "option": "i64"
+            }
           }
         ]
       }

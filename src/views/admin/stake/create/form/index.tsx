@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
+import { format } from "date-fns";
 import { Input } from "@/components/ui/input";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useForm, type SubmitHandler } from "react-hook-form";
@@ -14,8 +15,7 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { useNavigate } from "@tanstack/react-router";
-import BlueSwitch from "@/components/common/blue-switch";
-import InfoTooltip from "@/components/common/info-tooltip";
+
 
 type CreateStakePoolFormValues = {
   poolName: string;
@@ -32,7 +32,7 @@ type CreateStakePoolFormValues = {
   claimStartDelay: string;
   apr: string;
   lowRewardNotification: boolean;
-  stopAccrualAtPoolEnd: boolean;
+  interestStopDate: Date | undefined;
   budget: string;
 };
 
@@ -78,7 +78,7 @@ const CreateStakePoolForm = () => {
       claimStartDelay: "",
       apr: "",
       lowRewardNotification: true,
-      stopAccrualAtPoolEnd: true,
+      interestStopDate: undefined,
       budget: "",
     },
   });
@@ -90,7 +90,41 @@ const CreateStakePoolForm = () => {
   const stakingLimitVal = watch("stakingLimit");
   const aprVal = watch("apr");
   const interestDurationVal = watch("interestAccrualDuration");
-  const stopAccrualAtPoolEnd = watch("stopAccrualAtPoolEnd");
+  const lockDurationVal = watch("lockDuration");
+  const interestStartDelayVal = watch("interestStartDelay");
+  const claimStartDelayVal = watch("claimStartDelay");
+  const interestStopDateVal = watch("interestStopDate");
+
+  // const validInterestStopRange = useMemo(() => {
+  //   const startSec = startTime ? startTime.getTime() / 1000 : null;
+  //   const endSec = endTime ? endTime.getTime() / 1000 : null;
+  //   if (!startSec || !endSec || endSec <= startSec) return null;
+  //   const lockDays = Number(lockDurationVal) || 0;
+  //   const interestDelayDays = Number(interestStartDelayVal) || 0;
+  //   const interestAccrualDays =
+  //     interestDurationVal && Number(interestDurationVal) > 0
+  //       ? Number(interestDurationVal)
+  //       : null;
+  //   const claimDelayDays = Number(claimStartDelayVal) || 0;
+  //   const D = endSec - startSec;
+  //   const lockSec = lockDays * 86400;
+  //   const interestDelaySec = interestDelayDays * 86400;
+  //   const claimDelaySec = claimDelayDays * 86400;
+  //   if (lockSec <= D + interestDelaySec) return null;
+  //   if (claimDelaySec <= D) return null;
+  //   if (interestAccrualDays !== null && interestAccrualDays * 86400 <= D) return null;
+  //   const lower = endSec + interestDelaySec;
+  //   const upperCandidates: number[] = [
+  //     startSec + lockSec,
+  //     startSec + interestDelaySec + claimDelaySec,
+  //   ];
+  //   if (interestAccrualDays !== null) {
+  //     upperCandidates.push(startSec + interestDelaySec + interestAccrualDays * 86400);
+  //   }
+  //   const upper = Math.min(...upperCandidates);
+  //   if (lower >= upper) return null;
+  //   return { lower, upper };
+  // }, [startTime, endTime, lockDurationVal, interestStartDelayVal, interestDurationVal, claimStartDelayVal]);
 
   const maxRewardEnabled =
     Number(stakingLimitVal) > 0 &&
@@ -151,7 +185,7 @@ const CreateStakePoolForm = () => {
           claimStartDelay: Number(values.claimStartDelay) || 0,
           apr: Number(values.apr) || 0,
           lowRewardNotification: values.lowRewardNotification,
-          stopAccrualAtPoolEnd: values.stopAccrualAtPoolEnd,
+          interestStopDate: values.interestStopDate,
         });
         if (poolAddress) {
           if (!isDraft) await submitPoolSol(poolAddress);
@@ -186,7 +220,7 @@ const CreateStakePoolForm = () => {
         claimStartDelay: Number(values.claimStartDelay) || 0,
         apr: Number(values.apr) || 0,
         autoSubmit: !isDraft,
-        stopAccrualAtPoolEnd: values.stopAccrualAtPoolEnd,
+        interestStopDate: values.interestStopDate,
       });
       if (poolAddress) {
         reset();
@@ -651,29 +685,94 @@ const CreateStakePoolForm = () => {
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5">
-          <BlueSwitch
-            active={stopAccrualAtPoolEnd}
-            onClick={(e) => {
-              e?.stopPropagation();
-              setValue("stopAccrualAtPoolEnd", !stopAccrualAtPoolEnd);
-            }}
-          />
-          <div className="flex-col">
-            <span className="text-[13px]">
-              Stop at pool end{" "}
-              <InfoTooltip
-                classNames={{
-                  icon: "size-3.5 text-xs",
-                  contentContainer: "max-h-fit",
-                  textContainer: "min-h-10",
-                }}
-                side="right"
-                content="If enabled, interest calculation will strictly stop at the pool's end time, even if the user's accrual duration has not finished."
-              />
-            </span>
-            <div className="text-tiny text-mb-gray-71a">(Recommended)</div>
+        {/* Interest Stop Date */}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px]">Interest Stop Date</span>
+          {/* {validInterestStopRange ? (
+            <p className="text-[11px] text-greyed">
+              Valid range:{" "}
+              {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
+              {" – "}
+              {format(new Date(validInterestStopRange.upper * 1000), "MMM dd, yyyy, HH:mm")}
+            </p>
+          ) : (
+            startTime && endTime && (
+              <p className="text-[11px] text-greyed">
+                Set Lock-up Duration, Claim Start Delay, and Interest Start Delay to see valid range.
+              </p>
+            )
+          )} */}
+          <div className="flex items-center gap-2">
+            <DatePicker
+              value={interestStopDateVal}
+              onChange={(date) =>
+                setValue("interestStopDate", date as Date | undefined, {
+                  shouldValidate: true,
+                })
+              }
+              // disabled={(date) => {
+              //   if (!validInterestStopRange) return false;
+              //   const ts = date.getTime() / 1000;
+              //   return ts <= validInterestStopRange.lower || ts >= validInterestStopRange.upper;
+              // }}
+            />
+            {interestStopDateVal && (
+              <button
+                type="button"
+                className="text-xs text-greyed hover:text-destructive"
+                onClick={() =>
+                  setValue("interestStopDate", undefined, { shouldValidate: true })
+                }
+              >
+                Clear
+              </button>
+            )}
           </div>
+          <input
+            type="hidden"
+            {...register("interestStopDate", {
+              // validate: (v) => {
+              //   if (!v) return true;
+              //   const start = getValues("startTime");
+              //   const end = getValues("endTime");
+              //   if (!start || !end) return true;
+              //   const startSec = start.getTime() / 1000;
+              //   const endSec = end.getTime() / 1000;
+              //   const interestDelayDays = Number(getValues("interestStartDelay")) || 0;
+              //   const lockDays = Number(getValues("lockDuration")) || 0;
+              //   const interestAccrualStr = getValues("interestAccrualDuration");
+              //   const claimDelayDays = Number(getValues("claimStartDelay")) || 0;
+              //   const D = endSec - startSec;
+              //   const interestDelaySec = interestDelayDays * 86400;
+              //   const lockSec = lockDays * 86400;
+              //   const claimDelaySec = claimDelayDays * 86400;
+              //   if (lockSec <= D + interestDelaySec) return "Lock-up Duration too short";
+              //   if (claimDelaySec <= D)
+              //     return "Claim Start Delay must be greater than pool duration";
+              //   const dateTs = v.getTime() / 1000;
+              //   const lower = endSec + interestDelaySec;
+              //   const upperCandidates: number[] = [
+              //     startSec + lockSec,
+              //     startSec + interestDelaySec + claimDelaySec,
+              //   ];
+              //   if (interestAccrualStr && Number(interestAccrualStr) > 0) {
+              //     const accrualSec = Number(interestAccrualStr) * 86400;
+              //     if (accrualSec <= D)
+              //       return "Interest Accrual Duration must be greater than pool duration";
+              //     upperCandidates.push(startSec + interestDelaySec + accrualSec);
+              //   }
+              //   const upper = Math.min(...upperCandidates);
+              //   if (dateTs <= lower || dateTs >= upper)
+              //     return "Interest Stop Date out of valid range";
+              //   return true;
+              // },
+            })}
+          />
+          {/* {errors.interestStopDate && (
+            <p className="text-xs text-destructive">
+              {errors.interestStopDate.message}
+            </p>
+          )} */}
         </div>
 
         {/* APR */}

@@ -705,6 +705,11 @@
           },
           {
             "internalType": "uint256",
+            "name": "interestStopDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "initialReward",
             "type": "uint256"
           },
@@ -717,11 +722,6 @@
             "internalType": "uint256",
             "name": "apr",
             "type": "uint256"
-          },
-          {
-            "internalType": "bool",
-            "name": "stopInterestAtPoolEnd",
-            "type": "bool"
           }
         ],
         "internalType": "struct CreateStakingPoolParam",
@@ -819,13 +819,13 @@
           },
           {
             "internalType": "uint256",
-            "name": "apr",
+            "name": "interestStopDate",
             "type": "uint256"
           },
           {
-            "internalType": "bool",
-            "name": "stopInterestAtPoolEnd",
-            "type": "bool"
+            "internalType": "uint256",
+            "name": "apr",
+            "type": "uint256"
           }
         ],
         "internalType": "struct IStakingPool.EditPoolParam",

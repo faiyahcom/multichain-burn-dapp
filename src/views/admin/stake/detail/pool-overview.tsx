@@ -196,8 +196,21 @@ const PoolOverview = ({ poolDetail }: Props) => {
             ],
             [
                 {
-                    label: "Stop interest at Pool End",
-                    value: stakePool?.stopInterestAtPoolEnd === true ? "True" : "False",
+                    label: "Interest Stop Date",
+                    value:
+                        stakePool?.interestStopDate && stakePool.interestStopDate !== "0"
+                            ? new Date(Number(stakePool.interestStopDate) * 1000).toLocaleString(
+                                  undefined,
+                                  {
+                                      year: "numeric",
+                                      month: "2-digit",
+                                      day: "2-digit",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                      hour12: false,
+                                  },
+                              )
+                            : "Not set",
                 },
             ],
         ];

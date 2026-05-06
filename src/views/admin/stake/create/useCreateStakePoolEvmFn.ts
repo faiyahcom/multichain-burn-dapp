@@ -40,8 +40,8 @@ export type CreateStakePoolEvmParams = {
   apr: number;
   /** Whether to submit the pool immediately after creation */
   autoSubmit: boolean;
-  /** When true, interest calculation stops at the pool's end time */
-  stopAccrualAtPoolEnd: boolean;
+  /** Optional date/time at which interest stops accruing; undefined = no explicit stop */
+  interestStopDate?: Date;
 };
 
 const normalizeAddress = (address: string) =>
@@ -80,12 +80,16 @@ export const useCreateStakePoolEvmFn = () => {
 
         let rewardDecimals = nativeDecimals;
         if (!rewardIsNative) {
+          const code = await provider.getCode(params.rewardToken);
+          if (code === "0x") throw new Error(`Reward token address has no contract on this network: ${params.rewardToken}`);
           const rewardToken = getERC20Contract(params.rewardToken, signer);
           rewardDecimals = Number(await rewardToken.decimals());
         }
 
         let stakingDecimals = nativeDecimals;
         if (!stakingIsNative) {
+          const code = await provider.getCode(params.stakingToken);
+          if (code === "0x") throw new Error(`Staking token address has no contract on this network: ${params.stakingToken}`);
           const stakingToken = getERC20Contract(params.stakingToken, signer);
           stakingDecimals = Number(await stakingToken.decimals());
         }
@@ -134,10 +138,12 @@ export const useCreateStakePoolEvmFn = () => {
           initialReward,
           submitPool: params.autoSubmit,
           apr: aprBps,
-          stopInterestAtPoolEnd: params.stopAccrualAtPoolEnd,
+          interestStopDate: params.interestStopDate
+            ? BigInt(Math.floor(params.interestStopDate.getTime() / 1000))
+            : 0n,
         };
 
-        console.log("Creating stake pool with payload:", payload);
+        console.log("Create Stake Pool Payload:", payload);
 
         // 5. ERC20 approve if initial reward is provided and reward is not native
         if (initialReward > 0n && !rewardIsNative) {
