@@ -23,6 +23,7 @@ import { useUnstakeEvmFn } from "../hooks/byStakeId/useUnstakeEvmFn";
 import { useClaimRewardSolFn } from "../hooks/byStakeId/useClaimRewardSolFn";
 import { useUnstakeSolFn } from "../hooks/byStakeId/useUnstakeSolFn";
 import { useAppKitAccount } from "@reown/appkit/react";
+import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -35,15 +36,12 @@ const formatUnixDateTime = (
   timestamp?: number,
 ): { time: string; date: string } | null => {
   if (timestamp == null || timestamp === 0) return null;
-  const d = new Date(timestamp * 1000);
-  const time = d.toLocaleTimeString("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
+  const time = formatTimestampSecondsToDate({
+    timestamp: timestamp.toString(),
+    formatStr: "HH:mm",
   });
-  const date = d.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
+  const date = formatTimestampSecondsToDate({
+    timestamp: timestamp.toString(),
   });
   return { time, date };
 };
@@ -81,7 +79,12 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
       DEFAULT_PAGE_SIZE,
     ),
     queryFn: () =>
-      poolService.getMyStakes(poolAddress || "", page, DEFAULT_PAGE_SIZE, Math.floor(getTimestamp() / 1000)),
+      poolService.getMyStakes(
+        poolAddress || "",
+        page,
+        DEFAULT_PAGE_SIZE,
+        Math.floor(getTimestamp() / 1000),
+      ),
     enabled: !!poolAddress,
   });
 

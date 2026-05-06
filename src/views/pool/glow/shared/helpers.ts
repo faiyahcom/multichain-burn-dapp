@@ -43,7 +43,6 @@ export const renderPoolTime = (pool: PoolItemType): string => {
     if (pool.status === "ended") {
       return formatTimestampSecondsToDate({
         timestamp: pool.timeEnd,
-        formatStr: "yyyy-MM-dd",
       });
     }
   }
