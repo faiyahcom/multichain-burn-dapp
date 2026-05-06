@@ -38,7 +38,7 @@ const StakeSearch = () => {
         onChange={(value) => setFilter({ network: value })}
         otherProps={{
           classNames: {
-            btn: "1440px:max-w-[400px]",
+            btn: "1440px:max-w-100",
           },
         }}
       />

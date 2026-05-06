@@ -151,7 +151,7 @@ const ProfilePoolListStake: React.FC<Props> = ({
                     src: tokenInDisplay.imageUri,
                     alt: tokenInDisplay.symbol,
                     classNames: {
-                      common: "sm:size-7 sm:-ml-[9px] z-10",
+                      common: "sm:size-7 sm:-ml-2.25 z-10",
                     },
                   }}
                   className="justify-center"

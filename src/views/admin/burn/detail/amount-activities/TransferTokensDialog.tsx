@@ -296,7 +296,7 @@ const TransferTokensDialog = ({
                     <div className="grid grid-cols-3 gap-2">
                         {/* TOKEN */}
                         <div className="flex flex-col gap-1 rounded-xl bg-muted/50 px-3 py-2.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-secondary-text">TOKEN</span>
+                            <span className="text-tiny font-semibold uppercase tracking-wider text-secondary-text">TOKEN</span>
                             <span className="flex items-center gap-1.5">
                                 {/* wallet icon */}
                                 <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-secondary-text" xmlns="http://www.w3.org/2000/svg">
@@ -321,7 +321,7 @@ const TransferTokensDialog = ({
 
                         {/* NETWORK */}
                         <div className="flex flex-col gap-1 rounded-xl bg-muted/50 px-3 py-2.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-secondary-text">NETWORK</span>
+                            <span className="text-tiny font-semibold uppercase tracking-wider text-secondary-text">NETWORK</span>
                             <span className="flex items-center gap-1.5">
                                 {/* globe icon or network icon */}
                                 {networkIconSrc
@@ -335,7 +335,7 @@ const TransferTokensDialog = ({
                                 }
                                 <span className="leading-tight">
                                     <p className="text-sm font-bold text-foreground">{networkLabel}</p>
-                                    <p className="text-[10px] text-secondary-text">
+                                    <p className="text-tiny text-secondary-text">
                                         {networkConfig?.appKitNetwork?.name ?? networkLabel}
                                     </p>
                                 </span>
@@ -344,7 +344,7 @@ const TransferTokensDialog = ({
 
                         {/* AVAILABLE */}
                         <div className="flex flex-col gap-1 rounded-xl bg-muted/50 px-3 py-2.5">
-                            <span className="text-[10px] font-semibold uppercase tracking-wider text-secondary-text">Available</span>
+                            <span className="text-tiny font-semibold uppercase tracking-wider text-secondary-text">Available</span>
                             <span className="flex items-center gap-1.5">
                                 {/* chain-link / coins icon */}
                                 <svg viewBox="0 0 16 16" fill="none" className="size-4 shrink-0 text-primary" xmlns="http://www.w3.org/2000/svg">
@@ -356,7 +356,7 @@ const TransferTokensDialog = ({
                                         {displayAvailableAmount}
                                     </span>
                                     {" "}
-                                    <span className="text-[10px] text-secondary-text">
+                                    <span className="text-tiny text-secondary-text">
                                         ({displayAvailableSymbol})
                                     </span>
                                 </span>

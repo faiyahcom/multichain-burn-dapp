@@ -38,12 +38,12 @@ export function TickerBanner({
           backfaceVisibility: "hidden",
         }}
       >
-        <span className="font-ds-digital font-bold text-[60px] leading-none text-banner-text tracking-[0.12em] px-8">
+        <span className="font-ds-digital font-bold text-60px leading-none text-banner-text tracking-[0.12em] px-8">
           {text}
         </span>
         <span
           aria-hidden
-          className="font-ds-digital font-bold text-[60px] leading-none text-banner-text tracking-[0.12em] px-8"
+          className="font-ds-digital font-bold text-60px leading-none text-banner-text tracking-[0.12em] px-8"
         >
           {text}
         </span>

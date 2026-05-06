@@ -123,11 +123,11 @@ const buttonVariants = ({
         },
         size: {
           default: "py-3 px-6 text-base md:text-2xl",
-          big: "py-[25px] px-[66px] text-22px",
+          big: "py-6.25 px-16.5 text-22px",
           pagination:
-            "py-[6px] px-8 rounded-13px text-base sm:text-2xl font-semibold",
+            "py-1.5 px-8 rounded-13px text-base sm:text-2xl font-semibold",
           "pagination-small":
-            "py-[6px] px-[19px] rounded-13px text-base sm:text-2xl font-semibold",
+            "py-1.5 px-4.75 rounded-13px text-base sm:text-2xl font-semibold",
         },
       },
       defaultVariants: {
