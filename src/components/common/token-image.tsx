@@ -10,9 +10,20 @@ interface Props {
     placeholder?: string;
   };
   isLoading?: boolean;
+  styles?: {
+    common?: React.CSSProperties;
+    img?: React.CSSProperties;
+    placeholder?: React.CSSProperties;
+  };
 }
 
-const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
+const TokenImage: React.FC<Props> = ({
+  src,
+  alt,
+  classNames,
+  isLoading,
+  styles,
+}) => {
   if (isLoading) {
     return (
       <div
@@ -21,6 +32,7 @@ const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
           classNames?.common,
           classNames?.placeholder,
         )}
+        style={styles?.common}
       >
         <Spinner />
       </div>
@@ -37,6 +49,10 @@ const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
           classNames?.common,
           classNames?.img,
         )}
+        style={{
+          ...styles?.common,
+          ...styles?.img,
+        }}
       />
     );
   }
@@ -48,6 +64,10 @@ const TokenImage: React.FC<Props> = ({ src, alt, classNames, isLoading }) => {
         classNames?.common,
         classNames?.placeholder,
       )}
+      style={{
+        ...styles?.common,
+        ...styles?.placeholder,
+      }}
     />
   );
 };
