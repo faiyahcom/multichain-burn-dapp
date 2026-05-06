@@ -42,6 +42,7 @@ import { useAppKitAccount } from "@reown/appkit/react";
 import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
+import { format, parseISO } from "date-fns";
 
 const MAX_VISIBLE_TOKENS = 3;
 
@@ -328,6 +329,12 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                             const rowKey = `${user.address}-${chainId}`;
                             const isDisabling = disablingKey === rowKey;
                             const networkCfg = chainId ? chainIdToNetworkConfig(chainId) : undefined;
+                            let formattedCreateAt = "N/A";
+                            try {
+                                formattedCreateAt = format(parseISO(user.createdAt), "yyyy/MM/dd");
+                            } catch (error) {
+                                console.log(error);
+                            }
 
                             return (
                                 <TableRow
@@ -401,11 +408,7 @@ const AdminWhitelistUserTable: React.FC<Props> = ({ data }) => {
                                     {/* Added date */}
                                     <TableCell>
                                         <p className="text-sm whitespace-nowrap">
-                                            {new Date(user.createdAt).toLocaleDateString("en-US", {
-                                                month: "short",
-                                                day: "numeric",
-                                                year: "numeric",
-                                            })}
+                                            {formattedCreateAt}
                                         </p>
                                     </TableCell>
 

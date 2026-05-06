@@ -22,7 +22,7 @@ type DatePickerProps = {
 export function DatePicker({
     value,
     onChange,
-    placeholder = "DD/MM/YY",
+    placeholder = "YYYY/MM/DD",
     disabled,
     className,
 }: DatePickerProps) {
@@ -74,7 +74,7 @@ export function DatePicker({
                 >
                     <CalendarIcon className="size-5 shrink-0 text-secondary-text" />
                     <span className="flex-1 text-left">
-                        {value ? format(value, "dd/MM/yy HH:mm") : placeholder}
+                        {value ? format(value, "yyyy/MM/dd HH:mm") : placeholder}
                     </span>
                     <svg
                         className="size-4 shrink-0 text-foreground"

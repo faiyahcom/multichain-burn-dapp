@@ -46,7 +46,7 @@ const AdminUserManagementList: React.FC<Props> = ({ data, isLoading }) => {
         {data?.map((item, index) => {
           let formattedDate = "-";
           try {
-            formattedDate = format(parseISO(item.joinedDate), "MMM dd, yyyy");
+            formattedDate = format(parseISO(item.joinedDate), "yyyy/MM/dd");
           } catch (error) {
             console.log(error);
           }

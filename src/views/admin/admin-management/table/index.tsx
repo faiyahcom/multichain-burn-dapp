@@ -39,6 +39,7 @@ import { toast } from "@/components/common/custom-toast";
 import AdminManagementDialogEdit from "../dialog/edit";
 import { useToggleAdminRoleEvmFn } from "./useToggleAdminRoleEvmFn";
 import { useToggleAdminRoleSolanaFn } from "./useToggleAdminRoleSolanaFn";
+import { format, parseISO } from "date-fns";
 
 const PAGE_SIZE = 10;
 const SELF_ADMIN_ACTION_ERROR =
@@ -327,6 +328,12 @@ const AdminManagementTable = () => {
               const disabledActionTitle = isSelfAdmin
                 ? SELF_ADMIN_ACTION_ERROR
                 : undefined;
+              let formattedCreateAt = "N/A";
+              try {
+                formattedCreateAt = format(parseISO(admin.createdAt), "yyyy/MM/dd");
+              } catch (error) {
+                console.log(error);
+              }
 
               return (
                 <TableRow
@@ -392,16 +399,7 @@ const AdminManagementTable = () => {
                         "text-primary": isFeaturedRow,
                       })}
                     >
-                      {admin.createdAt
-                        ? new Date(admin.createdAt).toLocaleDateString(
-                          "en-US",
-                          {
-                            month: "short",
-                            day: "numeric",
-                            year: "numeric",
-                          },
-                        )
-                        : "N/A"}
+                      {formattedCreateAt}
                     </p>
                   </TableCell>
 
