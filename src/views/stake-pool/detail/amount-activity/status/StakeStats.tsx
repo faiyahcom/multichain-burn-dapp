@@ -7,6 +7,7 @@ import TokenDisplay from "@/components/common/token-display";
 import { StatRow } from "@/views/burn-pool/detail/amount-activities/components";
 import { ActionBtn } from "../components";
 import { IconExclaimation } from "@/assets/react";
+import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 
 export type StakeStatsProps = {
     poolDetail?: PoolDetailResponse;
@@ -180,10 +181,14 @@ const StakeStats = ({
             />
 
             {showInterestNote &&
-                (poolDetail?.pool?.stopInterestAtPoolEnd ? (
+                (poolDetail?.pool?.interestStopDate &&
+                    poolDetail?.pool?.interestStopDate !== "0" ? (
                     <p className="text-center text-xs text-error md:text-sm lg:text-base 2xl:text-lg">
-                        Interest stops accruing once you unstake your tokens or when the
-                        pool reaches its end time
+                        Interest stops on{" "}
+                        {formatTimestampSecondsToDate({
+                            timestamp: poolDetail?.pool?.interestStopDate,
+                        })}
+                        . You can then unstake and claim your rewards
                     </p>
                 ) : (
                     <p className="text-center text-sm text-error md:text-base lg:text-lg 2xl:text-xl">
