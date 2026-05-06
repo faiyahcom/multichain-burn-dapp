@@ -98,11 +98,11 @@ const CreateStakePoolForm = () => {
     Number(interestDurationVal) > 0;
   const maxRewardDisplay = maxRewardEnabled
     ? (
-      Number(stakingLimitVal) *
-      (Number(aprVal) / (100 * 31536000)) *
-      (Number(interestDurationVal) * 24 * 3600)
-    ) // convert from days to seconds
-      .toLocaleString("en-US")
+        Number(stakingLimitVal) *
+        (Number(aprVal) / (100 * 31536000)) *
+        (Number(interestDurationVal) * 24 * 3600)
+      ) // convert from days to seconds
+        .toLocaleString("en-US")
     : "--";
 
   const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
@@ -117,12 +117,12 @@ const CreateStakePoolForm = () => {
   const selectedStakingToken = stakingToken
     ? stakingToken === nativeAddress
       ? {
-        imageUri: network?.iconSrc ?? "",
-        symbol: network?.appKitNetwork.nativeCurrency.symbol ?? "",
-      }
+          imageUri: network?.iconSrc ?? "",
+          symbol: network?.appKitNetwork.nativeCurrency.symbol ?? "",
+        }
       : whitelistTokensData?.whitelistTokens.find(
-        (t) => t.address === stakingToken,
-      )
+          (t) => t.address === stakingToken,
+        )
     : null;
 
   const onSubmit: SubmitHandler<CreateStakePoolFormValues> = async (values) => {
@@ -145,7 +145,7 @@ const CreateStakePoolForm = () => {
           interestStartDelay: Number(values.interestStartDelay) || 0,
           interestAccrualDuration:
             values.interestAccrualDuration === "" ||
-              values.interestAccrualDuration === undefined
+            values.interestAccrualDuration === undefined
               ? null
               : Number(values.interestAccrualDuration),
           claimStartDelay: Number(values.claimStartDelay) || 0,
@@ -180,7 +180,7 @@ const CreateStakePoolForm = () => {
         interestStartDelay: Number(values.interestStartDelay) || 0,
         interestAccrualDuration:
           values.interestAccrualDuration === "" ||
-            values.interestAccrualDuration === undefined
+          values.interestAccrualDuration === undefined
             ? null
             : Number(values.interestAccrualDuration),
         claimStartDelay: Number(values.claimStartDelay) || 0,
@@ -381,7 +381,7 @@ const CreateStakePoolForm = () => {
                   {selectedStakingToken
                     ? "customSymbol" in selectedStakingToken
                       ? selectedStakingToken.customSymbol?.trim() ||
-                      selectedStakingToken.symbol
+                        selectedStakingToken.symbol
                       : selectedStakingToken.symbol
                     : ""}
                 </span>
@@ -430,7 +430,7 @@ const CreateStakePoolForm = () => {
                   {selectedStakingToken
                     ? "customSymbol" in selectedStakingToken
                       ? selectedStakingToken.customSymbol?.trim() ||
-                      selectedStakingToken.symbol
+                        selectedStakingToken.symbol
                       : selectedStakingToken.symbol
                     : ""}
                 </span>
@@ -781,7 +781,10 @@ const CreateStakePoolForm = () => {
             disabled: isSubmitting,
             onClick: () => {
               reset();
-              navigate({ to: "/admin/master-pool-management" });
+              navigate({
+                to: "/admin/master-pool-management",
+                search: { tab: "stake-pool" },
+              });
             },
           }}
         />

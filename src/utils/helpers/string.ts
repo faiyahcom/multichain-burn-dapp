@@ -20,7 +20,7 @@ export const truncateString = ({
 
 export const formatTimestampSecondsToDate = ({
   timestamp,
-  formatStr = "dd/MM/yyyy",
+  formatStr = "yyyy/MM/dd",
   notFound = "N/A",
 }: {
   timestamp?: string; // timestamp seconds

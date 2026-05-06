@@ -45,7 +45,7 @@ const RangeDatePicker: React.FC<Props> = ({
           <CalendarIcon className="size-4 shrink-0" />
           <span>
             {value && value.from
-              ? `${format(value.from, "yyyy.MM.dd")} ~ ${value.to ? format(value.to, "yyyy.MM.dd") : ""}`
+              ? `${format(value.from, "yyyy/MM/dd")} ~ ${value.to ? format(value.to, "yyyy/MM/dd") : ""}`
               : filterByText}
           </span>
         </Button>
