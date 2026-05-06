@@ -96,7 +96,7 @@ const MyActivityList = () => {
             const hash = activity.hash;
             const date = formatTimestampSecondsToDate({
               timestamp: activity.timestamp,
-              formatStr: "MMMM d, yyyy. h:mm a",
+              formatStr: "yyyy/MM/dd. h:mm a",
             });
 
             const href = getPoolHref({

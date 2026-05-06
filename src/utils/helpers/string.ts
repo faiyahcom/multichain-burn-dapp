@@ -26,7 +26,7 @@ export const truncateString = ({
 
 export const formatTimestampSecondsToDate = ({
   timestamp,
-  formatStr = "dd/MM/yyyy",
+  formatStr = "yyyy/MM/dd",
   notFound = "N/A",
 }: {
   timestamp?: string; // timestamp seconds
@@ -76,6 +76,9 @@ export const getPoolHref = (
 
     case PoolKindCodeEnum.Stake:
       return `/staking/detail/${address}`;
+
+    case PoolKindCodeEnum.Launchpad:
+      return `/`; // TODO: change to launchpad
 
     default:
       void (kind satisfies never); // exhaustive check

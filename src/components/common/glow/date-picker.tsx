@@ -40,7 +40,7 @@ export function DatePicker({
   variant = "burn",
   value,
   onChange,
-  placeholder = "DD/MM/YY HH:mm",
+  placeholder = "YYYY/MM/DD HH:mm",
   disabled,
   className,
 }: DatePickerProps) {
@@ -109,7 +109,7 @@ export function DatePicker({
         >
           <CalendarIcon className="size-3.5 shrink-0 md:size-5" />
           <span className="flex-1 text-left">
-            {value ? format(value, "dd/MM/yy HH:mm") : placeholder}
+            {value ? format(value, "yyyy/MM/dd HH:mm") : placeholder}
           </span>
           <ChevronDownIcon className="size-4 shrink-0" />
         </Button>

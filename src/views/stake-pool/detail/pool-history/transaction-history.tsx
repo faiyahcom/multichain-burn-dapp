@@ -20,15 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import CustomPagination from "@/components/common/glow/glow-pagination";
 import GlowContainer from "@/components/common/glow/container";
-
-export function formatTimestamp(timestamp: string): string {
-    const date = new Date(Number(timestamp) * 1000);
-    return date.toLocaleDateString("en-GB", {
-        day: "2-digit",
-        month: "2-digit",
-        year: "numeric",
-    });
-}
+import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -137,7 +129,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                                     variant="stake"
                                     className="text-xs md:text-sm lg:text-base 2xl:text-xl"
                                 >
-                                    <TableCell>{formatTimestamp(tx.timestamp)}</TableCell>
+                                    <TableCell>{formatTimestampSecondsToDate({ timestamp: tx.timestamp })}</TableCell>
                                     <TableCell>{txnKind[tx.kind]}</TableCell>
                                     <TableCell>{amount}</TableCell>
                                     <TableCell>{token}</TableCell>
