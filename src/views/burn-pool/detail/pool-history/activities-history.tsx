@@ -12,9 +12,8 @@ import CopyableText from "@/components/common/copyable-text";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { activityKind, type PoolDetailResponse } from "@/types/pool";
-import { truncateString } from "@/utils/helpers/string";
+import { formatTimestampSecondsToDate, truncateString } from "@/utils/helpers/string";
 import { useQuery } from "@tanstack/react-query";
-import { formatTimestamp } from "./transaction-history";
 import { useState } from "react";
 import CustomPagination from "@/components/common/glow/glow-pagination";
 import GlowContainer from "@/components/common/glow/container";
@@ -76,7 +75,7 @@ const ActivitiesHistory = ({ poolDetail }: Props) => {
                                 variant="burn"
                                 className="text-xs md:text-sm lg:text-base 2xl:text-xl"
                             >
-                                <TableCell>{formatTimestamp(activity.timestamp)}</TableCell>
+                                <TableCell>{formatTimestampSecondsToDate({ timestamp: activity.timestamp })}</TableCell>
                                 <TableCell>
                                     <CopyableText
                                         content={activity.actor}
