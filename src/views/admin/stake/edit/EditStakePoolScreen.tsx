@@ -650,7 +650,7 @@ export default function EditStakePoolScreen({
                             {/* Interest Stop Date */}
                             <div className="flex flex-col gap-1">
                                 <span className="text-base text-greyed">Interest Stop Date:</span>
-                                {validInterestStopRange ? (
+                                {/* {validInterestStopRange ? (
                                     <p className="text-[11px] text-greyed">
                                         Valid range:{" "}
                                         {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
@@ -663,7 +663,7 @@ export default function EditStakePoolScreen({
                                             Set Lock-up Duration, Claim Start Delay, and Interest Start Delay to see valid range.
                                         </p>
                                     )
-                                )}
+                                )} */}
                                 <div className="flex items-center gap-2">
                                     <DatePicker
                                         value={interestStopDateVal}
@@ -672,11 +672,11 @@ export default function EditStakePoolScreen({
                                                 shouldValidate: true,
                                             })
                                         }
-                                        disabled={(date) => {
-                                            if (!validInterestStopRange) return false;
-                                            const ts = date.getTime() / 1000;
-                                            return ts <= validInterestStopRange.lower || ts >= validInterestStopRange.upper;
-                                        }}
+                                        // disabled={(date) => {
+                                        //     if (!validInterestStopRange) return false;
+                                        //     const ts = date.getTime() / 1000;
+                                        //     return ts <= validInterestStopRange.lower || ts >= validInterestStopRange.upper;
+                                        // }}
                                     />
                                     {interestStopDateVal && (
                                         <button
@@ -730,11 +730,11 @@ export default function EditStakePoolScreen({
                                         // },
                                     })}
                                 />
-                                {errors.interestStopDate && (
+                                {/* {errors.interestStopDate && (
                                     <p className="text-xs text-destructive">
                                         {errors.interestStopDate.message}
                                     </p>
-                                )}
+                                )} */}
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-3">
