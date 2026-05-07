@@ -115,6 +115,37 @@ export const useUnstakeSolFn = () => {
                 let signature: string;
 
                 if (isNativeDeposit) {
+                    const rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
+                    const userRewardAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        walletPublicKey,
+                        false,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                    const treasuryTokenAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        treasury,
+                        true,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+
+                    const prependNativeIxs: TransactionInstruction[] = [];
+                    const rewardAtaInfo = await connection.getAccountInfo(userRewardAta);
+                    if (!rewardAtaInfo) {
+                        prependNativeIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                userRewardAta,
+                                walletPublicKey,
+                                rewardMintPK,
+                                rewardTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+
                     const tx = await program.methods
                         .unstakeNative(amount)
                         .accounts({
@@ -125,11 +156,17 @@ export const useUnstakeSolFn = () => {
                             userStakeTracker: userStakeTrackerPDA,
                             stakeEntry: stakeEntryPDA,
                             systemProgram: SystemProgram.programId,
+                            rewardMint: rewardMintPK,
+                            rewardVault: rewardVaultPDA,
+                            userRewardAta,
+                            treasuryTokenAta,
+                            tokenProgram: rewardTokenProgram,
                             burnFactory: burnFactoryPDA,
                             burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                         })
                         .transaction();
 
+                    if (prependNativeIxs.length > 0) tx.instructions.unshift(...prependNativeIxs);
                     tx.recentBlockhash = blockhash;
                     tx.feePayer = walletPublicKey;
                     const signedTx = await provider.signTransaction(tx);
@@ -191,7 +228,7 @@ export const useUnstakeSolFn = () => {
                         rewardMintPK,
                         treasury,
                         true,
-                        depositTokenProgram,
+                        rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
 
@@ -212,6 +249,7 @@ export const useUnstakeSolFn = () => {
                             userStakeTracker: userStakeTrackerPDA,
                             stakeEntry: stakeEntryPDA,
                             tokenProgram: depositTokenProgram,
+                            rewardTokenProgram,
                             associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                             systemProgram: SystemProgram.programId,
                             burnFactory: burnFactoryPDA,

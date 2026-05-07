@@ -129,6 +129,7 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
         await claimRewardSol({
           poolAddress,
           stakeId,
+          depositMint: poolDetail?.pool?.tokenIn ?? "",
           rewardMint: poolDetail?.pool?.rewardToken ?? "",
           assetTypeReward: poolDetail?.pool?.assetTypeReward ?? 0,
         });
