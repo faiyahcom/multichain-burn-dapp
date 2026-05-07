@@ -137,6 +137,7 @@ export function useTokenBalance({
 
   const [solanaFormatted, setSolanaFormatted] = useState<string>("0");
   const [isLoadingSolana, setIsLoadingSolana] = useState<boolean>(false);
+  const [solanaRaw, setSolanaRaw] = useState<bigint | undefined>(undefined);
   const [solanaRefetchCounter, setSolanaRefetchCounter] = useState(0);
 
   const solanaRefetch = useCallback(() => {
@@ -166,6 +167,7 @@ export function useTokenBalance({
           const lamports = await connection.getBalance(owner);
           if (cancelled) return;
 
+          setSolanaRaw(BigInt(lamports));
           setSolanaFormatted(
             (lamports / LAMPORTS_PER_SOL).toString()
           );
@@ -185,17 +187,19 @@ export function useTokenBalance({
         if (cancelled) return;
 
         if (tokenAccounts.value.length === 0) {
+          setSolanaRaw(0n);
           setSolanaFormatted("0");
           return;
         }
 
-        const amount =
-          tokenAccounts.value[0].account.data.parsed.info.tokenAmount
-            .uiAmountString;
+        const tokenAmount =
+          tokenAccounts.value[0].account.data.parsed.info.tokenAmount;
 
-        setSolanaFormatted(amount ?? "0");
+        setSolanaRaw(BigInt(tokenAmount.amount));
+        setSolanaFormatted(tokenAmount.uiAmountString ?? "0");
       } catch {
         if (!cancelled) {
+          setSolanaRaw(undefined);
           setSolanaFormatted("0");
         }
       } finally {
@@ -226,7 +230,7 @@ export function useTokenBalance({
 
   if (isSolanaNetwork) {
     return {
-      balance: undefined,
+      balance: solanaRaw,
       formatted: solanaFormatted,
       symbol,
       isLoading: isLoadingSolana,
