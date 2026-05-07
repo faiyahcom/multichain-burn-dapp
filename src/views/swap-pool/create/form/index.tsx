@@ -6,6 +6,7 @@ import {
 } from "@/components/common/glow/container";
 import InfoTooltip from "@/components/common/glow/info-tooltip";
 import { Input } from "@/components/common/glow/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import {
   RadioGroup,
   RadioGroupItem,
@@ -29,7 +30,7 @@ import { PublicKey } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
 
 type CreateSwapPoolFormValues = {
@@ -73,6 +74,7 @@ const CreateSwapPoolForm = ({
     reset,
     setValue,
     watch,
+    control,
     formState: { errors, isSubmitting },
     getFieldState,
     trigger,
@@ -493,47 +495,57 @@ const CreateSwapPoolForm = ({
           <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
             You Pay
           </span>
-          <Input
-            variant="swap"
-            placeholder="0.0"
-            aria-invalid={!!errors.amountPay}
-            className={cn(
-              "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
-            )}
-            type="number"
-            step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-            {...register("amountPay", {
-              onChange: (e) => {
-                handleOnChangeAmountPay(e.target.value);
-              },
+          <Controller
+            control={control}
+            name="amountPay"
+            rules={{
               required: "Amount pay is required",
               validate: {
                 validNumber: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal?.isFinite()
                     ? true
                     : "Amount pay must be a valid number";
                 },
                 moreThanZero: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal?.isZero()
                     ? "Amount pay must be greater than zero"
                     : true;
                 },
                 notNegative: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal?.isNegative()
                     ? "Amount pay must be positive"
                     : true;
                 },
                 maxDecimals: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal && decimal.decimalPlaces() <= 6
                     ? true
                     : "Amount pay must have 6 decimals or less";
                 },
               },
-            })}
+            }}
+            render={({ field: { onChange, value, ref, name, onBlur } }) => (
+              <NumericInput
+                inputComponent={Input}
+                variant="swap"
+                placeholder="0.0"
+                aria-invalid={!!errors.amountPay}
+                className={cn(
+                  "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                )}
+                value={value ?? ""}
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(val) => {
+                  onChange(val);
+                  handleOnChangeAmountPay(val);
+                }}
+              />
+            )}
           />
           {errors.amountPay && (
             <p className="font-inter text-xs text-destructive">
@@ -611,47 +623,57 @@ const CreateSwapPoolForm = ({
             <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               You Receive
             </span>
-            <Input
-              variant="swap"
-              placeholder="0.0"
-              aria-invalid={!!errors.budget}
-              className={cn(
-                "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
-              )}
-              type="number"
-              step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-              {...register("budget", {
-                onChange: (e) => {
-                  handleOnChangeBudget(e.target.value);
-                },
+            <Controller
+              control={control}
+              name="budget"
+              rules={{
                 required: "Budget is required",
                 validate: {
                   validNumber: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal?.isFinite()
                       ? true
                       : "Budget must be a valid number";
                   },
                   moreThanZero: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal?.isZero()
                       ? "Budget must be greater than zero"
                       : true;
                   },
                   notNegative: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal?.isNegative()
                       ? "Budget must be positive"
                       : true;
                   },
                   maxDecimals: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal && decimal.decimalPlaces() <= 6
                       ? true
                       : "Budget must have 6 decimals or less";
                   },
                 },
-              })}
+              }}
+              render={({ field: { onChange, value, ref, name, onBlur } }) => (
+                <NumericInput
+                  inputComponent={Input}
+                  variant="swap"
+                  placeholder="0.0"
+                  aria-invalid={!!errors.budget}
+                  className={cn(
+                    "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                  )}
+                  value={value ?? ""}
+                  ref={ref}
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={(val) => {
+                    onChange(val);
+                    handleOnChangeBudget(val);
+                  }}
+                />
+              )}
             />
             {errors.budget && (
               <p className="font-inter text-xs text-destructive">

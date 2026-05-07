@@ -6,7 +6,7 @@ import {
     DialogPortal,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { PoolDetailResponse } from "@/types/pool";
@@ -106,6 +106,7 @@ const SwapDialog = ({
         watch,
         setValue,
         reset,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<SwapFormValues>({
         defaultValues: { burnAmount: "" },
@@ -361,19 +362,27 @@ const SwapDialog = ({
                             </DialogHeader>
 
                             <form className="w-full" onSubmit={handleSubmit(onSubmit)}>
-                                <SellSection
-                                    tokenDisplay={burnTokenDisplay}
-                                    isLoadingWhitelistTokens={!poolDetail}
-                                    register={register}
-                                    errors={errors}
-                                    onSelectPercent={handleSelectPercent}
-                                    isLoadingBalance={isLoadingBurnBalance}
-                                    balanceText={`${formatBalanceDisplay(burnBalanceFormatted.toUpperCase())} ${burnTokenDisplay?.symbol ?? ""}`}
-                                    poolDetail={poolDetail}
-                                    maxBurnLeft={maxBurnLeft}
-                                    isExceedingMax={isExceedingMax}
-                                    insufficientBalanceMessage={insufficientBalanceMessage}
-                                    chainId={poolDetail?.pool.chainId}
+                                <Controller
+                                    control={control}
+                                    name="burnAmount"
+                                    render={({ field }) => (
+                                        <SellSection
+                                            tokenDisplay={burnTokenDisplay}
+                                            isLoadingWhitelistTokens={!poolDetail}
+                                            errors={errors}
+                                            onSelectPercent={handleSelectPercent}
+                                            burnAmount={field.value}
+                                            onBurnAmountChange={field.onChange}
+                                            onBurnAmountBlur={field.onBlur}
+                                            isLoadingBalance={isLoadingBurnBalance}
+                                            balanceText={`${formatBalanceDisplay(burnBalanceFormatted.toUpperCase())} ${burnTokenDisplay?.symbol ?? ""}`}
+                                            poolDetail={poolDetail}
+                                            maxBurnLeft={maxBurnLeft}
+                                            isExceedingMax={isExceedingMax}
+                                            insufficientBalanceMessage={insufficientBalanceMessage}
+                                            chainId={poolDetail?.pool.chainId}
+                                        />
+                                    )}
                                 />
 
                                 <BuySection
