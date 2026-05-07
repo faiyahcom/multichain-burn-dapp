@@ -40,6 +40,7 @@ export type AdminPoolItemType = {
 export interface AdminPoolListRequest extends PaginationRequest {
   chainIds?: string; // comma separated
   statuses?: string; // comma separated
+  excludeStatuses?: string; // comma separated
   kind?: string;
   tokens?: string; // comma separated
   timeStartFrom?: number; // unix seconds
