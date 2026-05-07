@@ -11,6 +11,8 @@ export function formatDuration(seconds: number | bigint | string | undefined | n
     const parts: string[] = [];
     if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
     if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
-    if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    // if case minute and have odd seconds left, we round up
+    if (minutes || s % 60) parts.push(`${minutes + (s % 60 ? 1 : 0)} ${minutes + (s % 60 ? 1 : 0) === 1 ? "minute" : "minutes"}`);
+    // if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
     return parts.length ? parts.join(" ") : `${s} seconds`;
 }
