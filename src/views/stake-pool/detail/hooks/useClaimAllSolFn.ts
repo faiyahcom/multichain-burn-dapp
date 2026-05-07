@@ -37,6 +37,8 @@ export interface ClaimAllSolParams {
     poolAddress: string;
     /** Stake indices to claim rewards for */
     stakeIds: number[];
+    /** Deposit (staking) token mint address */
+    depositMint: string;
     /** Reward token mint address */
     rewardMint: string;
     /** Asset type of the reward token (from poolDetail.pool.assetTypeReward) */
@@ -53,6 +55,7 @@ export const useClaimAllSolFn = () => {
         async ({
             poolAddress,
             stakeIds,
+            depositMint,
             rewardMint,
             assetTypeReward,
         }: ClaimAllSolParams): Promise<string | undefined> => {
@@ -71,6 +74,7 @@ export const useClaimAllSolFn = () => {
                 const programBurn = getMultichainBurnProgram(connection, anchorWallet);
 
                 const poolPDA = new PublicKey(poolAddress);
+                const depositMintPK = new PublicKey(depositMint);
                 const rewardMintPK = new PublicKey(rewardMint);
                 const isNativeReward = (assetTypeReward as AssetType) === AssetTypeEnum.NATIVE;
                 const rewardTokenProgram = getTokenProgramFromAssetType(assetTypeReward as AssetType)!;
@@ -138,6 +142,7 @@ export const useClaimAllSolFn = () => {
                             .accounts({
                                 user: walletPublicKey,
                                 burnFactory: burnFactoryPDA,
+                                depositMint: depositMintPK,
                                 burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                                 treasury,
                                 pool: poolPDA,
@@ -158,6 +163,7 @@ export const useClaimAllSolFn = () => {
                                 pool: poolPDA,
                                 factory: factoryPDA,
                                 rewardMint: rewardMintPK,
+                                depositMint: depositMintPK,
                                 rewardVault: rewardVaultPDA!,
                                 userTokenAta: userTokenAta!,
                                 stakeEntry: stakeEntryPDA,

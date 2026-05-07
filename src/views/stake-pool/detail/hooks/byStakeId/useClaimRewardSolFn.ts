@@ -36,6 +36,8 @@ export interface ClaimRewardSolParams {
     poolAddress: string;
     /** Stake index / stakeId */
     stakeId: number;
+    /** Deposit (staking) token mint address */
+    depositMint: string;
     /** Reward token mint address */
     rewardMint: string;
     /** Asset type of the reward token (from poolDetail.pool.assetTypeReward) */
@@ -51,6 +53,7 @@ export const useClaimRewardSolFn = () => {
         async ({
             poolAddress,
             stakeId,
+            depositMint,
             rewardMint,
             assetTypeReward,
         }: ClaimRewardSolParams): Promise<string | undefined> => {
@@ -68,6 +71,7 @@ export const useClaimRewardSolFn = () => {
                 const programBurn = getMultichainBurnProgram(connection, anchorWallet);
 
                 const poolPDA = new PublicKey(poolAddress);
+                const depositMintPK = new PublicKey(depositMint);
                 const rewardMintPK = new PublicKey(rewardMint);
                 const isNativeReward = (assetTypeReward as AssetType) === AssetTypeEnum.NATIVE;
                 const rewardTokenProgram = getTokenProgramFromAssetType(assetTypeReward as AssetType)!;
@@ -99,6 +103,7 @@ export const useClaimRewardSolFn = () => {
                         .accounts({
                             user: walletPublicKey,
                             burnFactory: burnFactoryPDA,
+                            depositMint: depositMintPK,
                             burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                             treasury,
                             pool: poolPDA,
@@ -160,6 +165,7 @@ export const useClaimRewardSolFn = () => {
                             pool: poolPDA,
                             factory: factoryPDA,
                             rewardMint: rewardMintPK,
+                            depositMint: depositMintPK,
                             rewardVault: rewardVaultPDA,
                             userTokenAta,
                             stakeEntry: stakeEntryPDA,

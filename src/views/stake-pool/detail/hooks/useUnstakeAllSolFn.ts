@@ -129,7 +129,7 @@ export const useUnstakeAllSolFn = () => {
                         rewardMintPK,
                         treasury,
                         true,
-                        depositTokenProgram,
+                        rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
 
@@ -150,6 +150,36 @@ export const useUnstakeAllSolFn = () => {
                         );
                     }
                     if (!rewardAtaInfo) {
+                        prependFirstIxs.push(
+                            createAssociatedTokenAccountInstruction(
+                                walletPublicKey,
+                                userRewardAta,
+                                walletPublicKey,
+                                rewardMintPK,
+                                rewardTokenProgram,
+                                ASSOCIATED_TOKEN_PROGRAM_ID,
+                            ),
+                        );
+                    }
+                } else {
+                    // Native deposit: reward is SPL — derive reward accounts
+                    rewardVaultPDA = getRewardVaultPDA(poolPDA, program.programId);
+                    userRewardAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        walletPublicKey,
+                        false,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                    treasuryTokenAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        treasury,
+                        true,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                    const rewardAtaInfoNative = await connection.getAccountInfo(userRewardAta);
+                    if (!rewardAtaInfoNative) {
                         prependFirstIxs.push(
                             createAssociatedTokenAccountInstruction(
                                 walletPublicKey,
@@ -196,10 +226,18 @@ export const useUnstakeAllSolFn = () => {
                                 userStakeTracker: userStakeTrackerPDA,
                                 stakeEntry: stakeEntryPDA,
                                 systemProgram: SystemProgram.programId,
+                                rewardMint: rewardMintPK,
+                                rewardVault: rewardVaultPDA!,
+                                userRewardAta: userRewardAta!,
+                                treasuryTokenAta: treasuryTokenAta!,
+                                tokenProgram: rewardTokenProgram,
                                 burnFactory: burnFactoryPDA,
                                 burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                             })
                             .transaction();
+                        if (isFirstTx && prependFirstIxs.length > 0) {
+                            tx.instructions.unshift(...prependFirstIxs);
+                        }
                     } else {
                         tx = await program.methods
                             .unstake(amount)
@@ -218,6 +256,7 @@ export const useUnstakeAllSolFn = () => {
                                 userStakeTracker: userStakeTrackerPDA,
                                 stakeEntry: stakeEntryPDA,
                                 tokenProgram: depositTokenProgram,
+                                rewardTokenProgram,
                                 associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                                 systemProgram: SystemProgram.programId,
                                 burnFactory: burnFactoryPDA,
