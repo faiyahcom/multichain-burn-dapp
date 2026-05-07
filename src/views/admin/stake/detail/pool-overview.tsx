@@ -201,8 +201,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
       ],
       [
         {
-          label: "Stop interest at Pool End",
-          value: stakePool?.stopInterestAtPoolEnd === true ? "True" : "False",
+          label: "Interest Stop Date",
+          value:
+            stakePool?.interestStopDate && stakePool.interestStopDate !== "0"
+              ? formatTimestampSecondsToDate({
+                  timestamp: stakePool.interestStopDate,
+                  formatStr: "yyyy/MM/dd, HH:mm",
+                })
+              : "Not set",
         },
       ],
     ];

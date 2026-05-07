@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useMemo } from "react";
 import { format } from "date-fns";
 import { useForm } from "react-hook-form";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -18,8 +18,6 @@ import { MIN_DAYS } from "../create/form";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
 import PoolOverview from "../detail/pool-overview";
 import type { BurnPoolStatus } from "@/types/pool";
-import BlueSwitch from "@/components/common/blue-switch";
-import InfoTooltip from "@/components/common/info-tooltip";
 
 type EditStakeFormValues = {
     poolName: string;
@@ -33,7 +31,7 @@ type EditStakeFormValues = {
     minStakingAmount: string;
     maxStakingAmount: string;
     stakingLimit: string;
-    stopAccrualAtPoolEnd: boolean;
+    interestStopDate: Date | undefined;
 };
 
 const STAKE_POOL_STATUS = {
@@ -106,7 +104,7 @@ export default function EditStakePoolScreen({
             minStakingAmount: "",
             maxStakingAmount: "",
             stakingLimit: "",
-            stopAccrualAtPoolEnd: true,
+            interestStopDate: undefined,
         },
     });
 
@@ -148,13 +146,50 @@ export default function EditStakePoolScreen({
                     pool.tokenInDecimals != null
                     ? sciToFormatted(stakePool.stakingLimit, pool.tokenInDecimals)
                     : "",
-            stopAccrualAtPoolEnd: stakePool?.stopInterestAtPoolEnd ?? true,
+            interestStopDate: stakePool?.interestStopDate && stakePool.interestStopDate !== "0"
+                ? new Date(Number(stakePool.interestStopDate) * 1000)
+                : undefined,
         });
     }, [pool?.address]); // eslint-disable-line react-hooks/exhaustive-deps
 
     const startTime = watch("startTime");
     const endTime = watch("endTime");
-    const stopAccrualAtPoolEnd = watch("stopAccrualAtPoolEnd");
+    const lockDurationVal = watch("lockDuration");
+    const interestStartDelayVal = watch("interestStartDelay");
+    const interestAccrualDurationVal = watch("interestAccrualDuration");
+    const claimStartDelayVal = watch("claimStartDelay");
+    const interestStopDateVal = watch("interestStopDate");
+
+    const validInterestStopRange = useMemo(() => {
+        const startSec = startTime ? startTime.getTime() / 1000 : null;
+        const endSec = endTime ? endTime.getTime() / 1000 : null;
+        if (!startSec || !endSec || endSec <= startSec) return null;
+        const lockDays = Number(lockDurationVal) || 0;
+        const interestDelayDays = Number(interestStartDelayVal) || 0;
+        const interestAccrualDays =
+            interestAccrualDurationVal && Number(interestAccrualDurationVal) > 0
+                ? Number(interestAccrualDurationVal)
+                : null;
+        const claimDelayDays = Number(claimStartDelayVal) || 0;
+        const D = endSec - startSec;
+        const lockSec = lockDays * 86400;
+        const interestDelaySec = interestDelayDays * 86400;
+        const claimDelaySec = claimDelayDays * 86400;
+        if (lockSec <= D + interestDelaySec) return null;
+        if (claimDelaySec <= D) return null;
+        if (interestAccrualDays !== null && interestAccrualDays * 86400 <= D) return null;
+        const lower = endSec + interestDelaySec;
+        const upperCandidates: number[] = [
+            startSec + lockSec,
+            startSec + interestDelaySec + claimDelaySec,
+        ];
+        if (interestAccrualDays !== null) {
+            upperCandidates.push(startSec + interestDelaySec + interestAccrualDays * 86400);
+        }
+        const upper = Math.min(...upperCandidates);
+        if (lower >= upper) return null;
+        return { lower, upper };
+    }, [startTime, endTime, lockDurationVal, interestStartDelayVal, interestAccrualDurationVal, claimStartDelayVal]);
 
     const onSubmit = async (values: EditStakeFormValues) => {
         if (!pool || inFlightRef.current) return;
@@ -187,7 +222,7 @@ export default function EditStakePoolScreen({
                     claimStartDelay,
                     apr,
                     tokenInDecimals: pool.tokenInDecimals,
-                    stopAccrualAtPoolEnd,
+                    interestStopDate: values.interestStopDate,
                 });
             } else {
                 await editPoolEvm({
@@ -204,7 +239,7 @@ export default function EditStakePoolScreen({
                     claimStartDelay,
                     apr,
                     tokenInDecimals: pool.tokenInDecimals,
-                    stopAccrualAtPoolEnd,
+                    interestStopDate: values.interestStopDate,
                 });
             }
 
@@ -435,20 +470,14 @@ export default function EditStakePoolScreen({
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
-                                <span className="text-xl text-greyed">
-                                    Stop at Pool End:{" "}
-                                    <InfoTooltip
-                                        classNames={{
-                                            icon: "size-3.5 text-xs",
-                                            contentContainer: "max-h-fit",
-                                            textContainer: "min-h-10",
-                                        }}
-                                        side="right"
-                                        content="If enabled, interest calculation will strictly stop at the pool's end time, even if the user's accrual duration has not finished."
-                                    />
-                                </span>
+                                <span className="text-xl text-greyed">Interest Stop Date:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {stakePool?.stopInterestAtPoolEnd ? "True" : "False"}
+                                    {stakePool?.interestStopDate && stakePool.interestStopDate !== "0"
+                                        ? format(
+                                            new Date(Number(stakePool.interestStopDate) * 1000),
+                                            "MMM dd, yyyy, HH:mm",
+                                          )
+                                        : "Not set"}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
@@ -618,28 +647,94 @@ export default function EditStakePoolScreen({
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-2">
-                                <BlueSwitch
-                                    active={stopAccrualAtPoolEnd}
-                                    onClick={(e) => {
-                                        e?.stopPropagation();
-                                        setValue("stopAccrualAtPoolEnd", !stopAccrualAtPoolEnd);
-                                    }}
-                                />
-                                <div>
-                                    <span className="text-base text-greyed">
-                                        Stop at pool end{" "}
-                                        <InfoTooltip
-                                            classNames={{
-                                                icon: "size-3.5 text-xs",
-                                                contentContainer: "max-h-fit",
-                                                textContainer: "min-h-10",
-                                            }}
-                                            side="right"
-                                            content="If enabled, interest calculation will strictly stop at the pool's end time, even if the user's accrual duration has not finished."
-                                        />
-                                    </span>
+                            {/* Interest Stop Date */}
+                            <div className="flex flex-col gap-1">
+                                <span className="text-base text-greyed">Interest Stop Date:</span>
+                                {/* {validInterestStopRange ? (
+                                    <p className="text-[11px] text-greyed">
+                                        Valid range:{" "}
+                                        {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
+                                        {" – "}
+                                        {format(new Date(validInterestStopRange.upper * 1000), "MMM dd, yyyy, HH:mm")}
+                                    </p>
+                                ) : (
+                                    startTime && endTime && (
+                                        <p className="text-[11px] text-greyed">
+                                            Set Lock-up Duration, Claim Start Delay, and Interest Start Delay to see valid range.
+                                        </p>
+                                    )
+                                )} */}
+                                <div className="flex items-center gap-2">
+                                    <DatePicker
+                                        value={interestStopDateVal}
+                                        onChange={(date) =>
+                                            setValue("interestStopDate", date as Date | undefined, {
+                                                shouldValidate: true,
+                                            })
+                                        }
+                                        // disabled={(date) => {
+                                        //     if (!validInterestStopRange) return false;
+                                        //     const ts = date.getTime() / 1000;
+                                        //     return ts <= validInterestStopRange.lower || ts >= validInterestStopRange.upper;
+                                        // }}
+                                    />
+                                    {interestStopDateVal && (
+                                        <button
+                                            type="button"
+                                            className="text-xs text-greyed hover:text-destructive"
+                                            onClick={() =>
+                                                setValue("interestStopDate", undefined, { shouldValidate: true })
+                                            }
+                                        >
+                                            Clear
+                                        </button>
+                                    )}
                                 </div>
+                                <input
+                                    type="hidden"
+                                    {...register("interestStopDate", {
+                                        // validate: (v) => {
+                                        //     if (!v) return true;
+                                        //     const start = getValues("startTime");
+                                        //     const end = getValues("endTime");
+                                        //     if (!start || !end) return true;
+                                        //     const startSec = start.getTime() / 1000;
+                                        //     const endSec = end.getTime() / 1000;
+                                        //     const interestDelayDays = Number(getValues("interestStartDelay")) || 0;
+                                        //     const lockDays = Number(getValues("lockDuration")) || 0;
+                                        //     const interestAccrualStr = getValues("interestAccrualDuration");
+                                        //     const claimDelayDays = Number(getValues("claimStartDelay")) || 0;
+                                        //     const D = endSec - startSec;
+                                        //     const interestDelaySec = interestDelayDays * 86400;
+                                        //     const lockSec = lockDays * 86400;
+                                        //     const claimDelaySec = claimDelayDays * 86400;
+                                        //     if (lockSec <= D + interestDelaySec) return "Lock-up Duration too short";
+                                        //     if (claimDelaySec <= D)
+                                        //         return "Claim Start Delay must be greater than pool duration";
+                                        //     const dateTs = v.getTime() / 1000;
+                                        //     const lower = endSec + interestDelaySec;
+                                        //     const upperCandidates: number[] = [
+                                        //         startSec + lockSec,
+                                        //         startSec + interestDelaySec + claimDelaySec,
+                                        //     ];
+                                        //     if (interestAccrualStr && Number(interestAccrualStr) > 0) {
+                                        //         const accrualSec = Number(interestAccrualStr) * 86400;
+                                        //         if (accrualSec <= D)
+                                        //             return "Interest Accrual Duration must be greater than pool duration";
+                                        //         upperCandidates.push(startSec + interestDelaySec + accrualSec);
+                                        //     }
+                                        //     const upper = Math.min(...upperCandidates);
+                                        //     if (dateTs <= lower || dateTs >= upper)
+                                        //         return "Interest Stop Date out of valid range";
+                                        //     return true;
+                                        // },
+                                    })}
+                                />
+                                {/* {errors.interestStopDate && (
+                                    <p className="text-xs text-destructive">
+                                        {errors.interestStopDate.message}
+                                    </p>
+                                )} */}
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-3">
