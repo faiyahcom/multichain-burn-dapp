@@ -699,7 +699,7 @@ export default function EditStakePoolScreen({
                                 ) : interestStopWarnings ? (
                                     <div className="space-y-0.5">
                                         {interestStopWarnings.map((reason, i) => (
-                                            <p key={i} className="text-[11px] text-amber-500">{reason}</p>
+                                            <p key={i} className="text-[11px] text-greyed">{reason}</p>
                                         ))}
                                     </div>
                                 ) : (
