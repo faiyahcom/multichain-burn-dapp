@@ -223,7 +223,7 @@ export const useCreateStakePoolSolFn = () => {
                         lockDuration: lockDurationSec,
                         delayAccumulate,
                         delayClaim,
-                        interestDuration: null,
+                        interestDuration,
                         stakingLimit: stakingLimitBN,
                         lowRewardNoti: params.lowRewardNotification,
                         interestStopDate: params.interestStopDate

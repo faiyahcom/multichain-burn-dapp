@@ -453,16 +453,14 @@ export default function EditStakePoolScreen({
                                     {fmtDisplayDays(stakePool?.interestStartDelay)} days
                                 </span>
                             </div>
-                            {!isSolana && (
-                                <div className="grid grid-cols-2">
-                                    <span className="text-xl text-greyed">Interest Accrual:</span>
-                                    <span className="text-xl text-black max-sm:text-right">
-                                        {stakePool?.interestAccrualDuration === "0"
-                                            ? "Unlimited"
-                                            : `${fmtDisplayDays(stakePool?.interestAccrualDuration)} days`}
-                                    </span>
-                                </div>
-                            )}
+                            <div className="grid grid-cols-2">
+                                <span className="text-xl text-greyed">Interest Accrual:</span>
+                                <span className="text-xl text-black max-sm:text-right">
+                                    {stakePool?.interestAccrualDuration === "0"
+                                        ? "Unlimited"
+                                        : `${fmtDisplayDays(stakePool?.interestAccrualDuration)} days`}
+                                </span>
+                            </div>
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Claim Start Delay:</span>
                                 <span className="text-xl text-black max-sm:text-right">
@@ -492,14 +490,12 @@ export default function EditStakePoolScreen({
                                     {fmtCurrentAmt(stakePool?.maxStakingAmount)}
                                 </span>
                             </div>
-                            {!isSolana && (
-                                <div className="grid grid-cols-2">
-                                    <span className="text-xl text-greyed">Staking Limit:</span>
-                                    <span className="text-xl text-black max-sm:text-right">
-                                        {fmtCurrentAmt(stakePool?.stakingLimit)}
-                                    </span>
-                                </div>
-                            )}
+                            <div className="grid grid-cols-2">
+                                <span className="text-xl text-greyed">Staking Limit:</span>
+                                <span className="text-xl text-black max-sm:text-right">
+                                    {fmtCurrentAmt(stakePool?.stakingLimit)}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -768,30 +764,28 @@ export default function EditStakePoolScreen({
                                         </p>
                                     )}
                                 </div>
-                                {!isSolana && (
-                                    <div className="space-y-1">
-                                        <span className="text-base text-greyed">
-                                            Interest Accrual Duration (days):
-                                        </span>
-                                        <Input
-                                            type="number"
-                                            min={MIN_DAYS}
-                                            step="any"
-                                            placeholder="0"
-                                            {...register("interestAccrualDuration", {
-                                                validate: (v) =>
-                                                    !v || v === "" || Number(v) >= MIN_DAYS
-                                                        ? true
-                                                        : `Must be ≥ ${MIN_DAYS}`,
-                                            })}
-                                        />
-                                        {errors.interestAccrualDuration && (
-                                            <p className="text-xs text-destructive">
-                                                {errors.interestAccrualDuration.message}
-                                            </p>
-                                        )}
-                                    </div>
-                                )}
+                                <div className="space-y-1">
+                                    <span className="text-base text-greyed">
+                                        Interest Accrual Duration (days):
+                                    </span>
+                                    <Input
+                                        type="number"
+                                        min={MIN_DAYS}
+                                        step="any"
+                                        placeholder="0"
+                                        {...register("interestAccrualDuration", {
+                                            validate: (v) =>
+                                                !v || v === "" || Number(v) >= MIN_DAYS
+                                                    ? true
+                                                    : `Must be ≥ ${MIN_DAYS}`,
+                                        })}
+                                    />
+                                    {errors.interestAccrualDuration && (
+                                        <p className="text-xs text-destructive">
+                                            {errors.interestAccrualDuration.message}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

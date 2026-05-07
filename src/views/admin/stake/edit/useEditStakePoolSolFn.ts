@@ -92,6 +92,7 @@ export const useEditStakePoolSolFn = () => {
                         delayAccumulate,
                         delayClaim,
                         interestDuration,
+                        stopAccrualAtPoolEnd: false,
                         interestStopDate: params.interestStopDate
                             ? new BN(Math.floor(params.interestStopDate.getTime() / 1000))
                             : null,
