@@ -11,6 +11,7 @@ import {
 } from "@/types/admin/whitelist-token";
 import { adminPoolTypeShortenOptions } from "@/types/admin/master-pool-management";
 import { useQuery } from "@tanstack/react-query";
+import { NumericInput } from "@/components/ui/numeric-input";
 import AdminWhitelistTokenDialogCreate from "../dialog/create";
 import { networkIdToChainId } from "@/config/networks";
 
@@ -72,20 +73,20 @@ const AdminWhitelistTokenSearch = () => {
             <span className="whitespace-nowrap text-xs font-medium text-foreground">
               Decimal:
             </span>
-            <input
-              type="number"
+            <NumericInput
               placeholder="Min"
               value={filter.decimalMin}
-              onChange={(e) => setFilter({ decimalMin: e.target.value })}
-              className="h-[34px] w-16 rounded-md-plus bg-inactive px-2.5 text-xs font-normal text-foreground placeholder:text-foreground/50 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              onChange={(val) => setFilter({ decimalMin: val })}
+              decimalScale={0}
+              className="h-[34px] w-16 rounded-md-plus border-none bg-inactive px-2.5 text-xs font-normal text-foreground shadow-none placeholder:text-foreground/50 outline-none"
             />
             <span className="text-xs font-medium text-foreground">to</span>
-            <input
-              type="number"
+            <NumericInput
               placeholder="Max"
               value={filter.decimalMax}
-              onChange={(e) => setFilter({ decimalMax: e.target.value })}
-              className="h-[34px] w-16 rounded-md-plus bg-inactive px-2.5 text-xs font-normal text-foreground placeholder:text-foreground/50 outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+              onChange={(val) => setFilter({ decimalMax: val })}
+              decimalScale={0}
+              className="h-[34px] w-16 rounded-md-plus border-none bg-inactive px-2.5 text-xs font-normal text-foreground shadow-none placeholder:text-foreground/50 outline-none"
             />
           </div>
 

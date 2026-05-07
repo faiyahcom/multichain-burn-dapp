@@ -8,6 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import {
   chainIdToNetworkConfig,
   SOLANA_BACKEND_CHAIN_ID,
@@ -94,13 +95,12 @@ const UserRow = ({
         className="flex items-center gap-1.5"
         onClick={(e) => e.stopPropagation()}
       >
-        <Input
+        <NumericInput
           value={amount}
-          onChange={(e) => onAmountChange(e.target.value)}
+          onChange={(val) => onAmountChange(val)}
           placeholder="0.00"
-          className="h-8 w-36 [appearance:textfield] text-center text-sm [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
-          type="number"
-          min="0"
+          className="h-8 w-36 text-center text-sm"
+          min={0}
         />
         <span className="text-xs font-medium text-secondary-text">
           {tokenSymbol}

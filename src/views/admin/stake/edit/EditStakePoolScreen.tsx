@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useMemo } from "react";
 import { format } from "date-fns";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { DatePicker } from "@/components/ui/date-picker";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { poolService } from "@/services/poolService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -91,6 +92,7 @@ export default function EditStakePoolScreen({
         watch,
         reset,
         getValues,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<EditStakeFormValues>({
         mode: "onChange",
@@ -543,13 +545,10 @@ export default function EditStakePoolScreen({
                                 <span className="text-base text-greyed">
                                     APR (%): <span className="text-destructive">*</span>
                                 </span>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    step="any"
-                                    placeholder="0"
-                                    aria-invalid={!!errors.apr}
-                                    {...register("apr", {
+                                <Controller
+                                    control={control}
+                                    name="apr"
+                                    rules={{
                                         validate: {
                                             required: (v) =>
                                                 !submitAttemptedRef.current || v !== ""
@@ -562,7 +561,18 @@ export default function EditStakePoolScreen({
                                                     ? true
                                                     : "Max 6 decimal places allowed",
                                         },
-                                    })}
+                                    }}
+                                    render={({ field }) => (
+                                        <NumericInput
+                                            placeholder="0"
+                                            aria-invalid={!!errors.apr}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            ref={field.ref}
+                                            name={field.name}
+                                            onBlur={field.onBlur}
+                                        />
+                                    )}
                                 />
                                 {errors.apr && (
                                     <p className="text-xs text-destructive">
@@ -578,13 +588,10 @@ export default function EditStakePoolScreen({
                                         Lock-up Duration (days):{" "}
                                         <span className="text-destructive">*</span>
                                     </span>
-                                    <Input
-                                        type="number"
-                                        min={MIN_DAYS}
-                                        step="any"
-                                        placeholder="0"
-                                        aria-invalid={!!errors.lockDuration}
-                                        {...register("lockDuration", {
+                                    <Controller
+                                        control={control}
+                                        name="lockDuration"
+                                        rules={{
                                             validate: {
                                                 required: (v) =>
                                                     !submitAttemptedRef.current || v !== ""
@@ -594,12 +601,19 @@ export default function EditStakePoolScreen({
                                                     v === "" || Number(v) >= MIN_DAYS
                                                         ? true
                                                         : `Must be ≥ ${MIN_DAYS}`,
-                                                // decimals: (v) =>
-                                                //     !v || !v.includes(".") || v.split(".")[1].length <= 6
-                                                //         ? true
-                                                //         : "Max 6 decimal places allowed",
                                             },
-                                        })}
+                                        }}
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="0"
+                                                aria-invalid={!!errors.lockDuration}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     {errors.lockDuration && (
                                         <p className="text-xs text-destructive">
@@ -612,13 +626,10 @@ export default function EditStakePoolScreen({
                                         Claim Start Delay (days):{" "}
                                         <span className="text-destructive">*</span>
                                     </span>
-                                    <Input
-                                        type="number"
-                                        min={MIN_DAYS}
-                                        step="any"
-                                        placeholder="0"
-                                        aria-invalid={!!errors.claimStartDelay}
-                                        {...register("claimStartDelay", {
+                                    <Controller
+                                        control={control}
+                                        name="claimStartDelay"
+                                        rules={{
                                             validate: {
                                                 required: (v) =>
                                                     !submitAttemptedRef.current || v !== ""
@@ -628,12 +639,19 @@ export default function EditStakePoolScreen({
                                                     v === "" || Number(v) >= MIN_DAYS
                                                         ? true
                                                         : `Must be ≥ ${MIN_DAYS}`,
-                                                // decimals: (v) =>
-                                                //     !v || !v.includes(".") || v.split(".")[1].length <= 6
-                                                //         ? true
-                                                //         : "Max 6 decimal places allowed",
                                             },
-                                        })}
+                                        }}
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="0"
+                                                aria-invalid={!!errors.claimStartDelay}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     {errors.claimStartDelay && (
                                         <p className="text-xs text-destructive">
@@ -739,13 +757,10 @@ export default function EditStakePoolScreen({
                                         Interest Start Delay (days):{" "}
                                         <span className="text-destructive">*</span>
                                     </span>
-                                    <Input
-                                        type="number"
-                                        min={MIN_DAYS}
-                                        step="any"
-                                        placeholder="0"
-                                        aria-invalid={!!errors.interestStartDelay}
-                                        {...register("interestStartDelay", {
+                                    <Controller
+                                        control={control}
+                                        name="interestStartDelay"
+                                        rules={{
                                             validate: {
                                                 required: (v) =>
                                                     !submitAttemptedRef.current || v !== ""
@@ -756,7 +771,18 @@ export default function EditStakePoolScreen({
                                                         ? true
                                                         : "Must be \u2265 0",
                                             },
-                                        })}
+                                        }}
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="0"
+                                                aria-invalid={!!errors.interestStartDelay}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     {errors.interestStartDelay && (
                                         <p className="text-xs text-destructive">
@@ -768,17 +794,25 @@ export default function EditStakePoolScreen({
                                     <span className="text-base text-greyed">
                                         Interest Accrual Duration (days):
                                     </span>
-                                    <Input
-                                        type="number"
-                                        min={MIN_DAYS}
-                                        step="any"
-                                        placeholder="0"
-                                        {...register("interestAccrualDuration", {
+                                    <Controller
+                                        control={control}
+                                        name="interestAccrualDuration"
+                                        rules={{
                                             validate: (v) =>
                                                 !v || v === "" || Number(v) >= MIN_DAYS
                                                     ? true
                                                     : `Must be ≥ ${MIN_DAYS}`,
-                                        })}
+                                        }}
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="0"
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     {errors.interestAccrualDuration && (
                                         <p className="text-xs text-destructive">
@@ -816,13 +850,10 @@ export default function EditStakePoolScreen({
                                     <span className="text-base text-greyed">
                                         Min Staking Amount:
                                     </span>
-                                    <Input
-                                        type="number"
-                                        min="0"
-                                        step="any"
-                                        placeholder="0"
-                                        aria-invalid={!!errors.minStakingAmount}
-                                        {...register("minStakingAmount", {
+                                    <Controller
+                                        control={control}
+                                        name="minStakingAmount"
+                                        rules={{
                                             validate: (v) => {
                                                 if (!v) return true;
                                                 if (Number(v) < 0) return "Must be \u2265 0";
@@ -833,7 +864,18 @@ export default function EditStakePoolScreen({
                                                     return "Max 6 decimal places allowed";
                                                 return true;
                                             },
-                                        })}
+                                        }}
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="0"
+                                                aria-invalid={!!errors.minStakingAmount}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     {errors.minStakingAmount && (
                                         <p className="text-xs text-destructive">
@@ -845,13 +887,10 @@ export default function EditStakePoolScreen({
                                     <span className="text-base text-greyed">
                                         Max Staking Amount:
                                     </span>
-                                    <Input
-                                        type="number"
-                                        min="0"
-                                        step="any"
-                                        placeholder="0"
-                                        aria-invalid={!!errors.maxStakingAmount}
-                                        {...register("maxStakingAmount", {
+                                    <Controller
+                                        control={control}
+                                        name="maxStakingAmount"
+                                        rules={{
                                             validate: (v) => {
                                                 if (!v) return true;
                                                 if (Number(v) <= 0) return "Must be greater than 0";
@@ -865,7 +904,18 @@ export default function EditStakePoolScreen({
                                                     return "Max 6 decimal places allowed";
                                                 return true;
                                             },
-                                        })}
+                                        }}
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="0"
+                                                aria-invalid={!!errors.maxStakingAmount}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     {errors.maxStakingAmount && (
                                         <p className="text-xs text-destructive">
@@ -878,13 +928,10 @@ export default function EditStakePoolScreen({
                             {/* Staking Limit */}
                             <div className="space-y-1">
                                 <span className="text-base text-greyed">Staking Limit:</span>
-                                <Input
-                                    type="number"
-                                    min="0"
-                                    step="any"
-                                    placeholder="0"
-                                    aria-invalid={!!errors.stakingLimit}
-                                    {...register("stakingLimit", {
+                                <Controller
+                                    control={control}
+                                    name="stakingLimit"
+                                    rules={{
                                         validate: (v) => {
                                             if (!v) return true;
                                             if (Number(v) < 0) return "Must be \u2265 0";
@@ -895,7 +942,18 @@ export default function EditStakePoolScreen({
                                                 return "Max 6 decimal places allowed";
                                             return true;
                                         },
-                                    })}
+                                    }}
+                                    render={({ field }) => (
+                                        <NumericInput
+                                            placeholder="0"
+                                            aria-invalid={!!errors.stakingLimit}
+                                            value={field.value}
+                                            onChange={field.onChange}
+                                            ref={field.ref}
+                                            name={field.name}
+                                            onBlur={field.onBlur}
+                                        />
+                                    )}
                                 />
                                 {errors.stakingLimit && (
                                     <p className="text-xs text-destructive">
