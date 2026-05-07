@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef, useMemo } from "react";
 import { format } from "date-fns";
 import { useForm, Controller } from "react-hook-form";
 import { DatePicker } from "@/components/ui/date-picker";
@@ -8,7 +8,6 @@ import { poolService } from "@/services/poolService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useNavigate } from "@tanstack/react-router";
-import { toast } from "@/components/common/custom-toast";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
@@ -192,6 +191,32 @@ export default function EditStakePoolScreen({
         if (lower >= upper) return null;
         return { lower, upper };
     }, [startTime, endTime, lockDurationVal, interestStartDelayVal, interestAccrualDurationVal, claimStartDelayVal]);
+
+    const interestStopWarnings = useMemo((): string[] | null => {
+        if (validInterestStopRange) return null;
+        const startSec = startTime ? startTime.getTime() / 1000 : null;
+        const endSec = endTime ? endTime.getTime() / 1000 : null;
+        if (!startSec || !endSec || endSec <= startSec) return null;
+        // Only evaluate infeasibility once both required duration fields are filled
+        if (!lockDurationVal || !claimStartDelayVal) return null;
+        const D = endSec - startSec;
+        const D_days = D / 86400;
+        const lockDays = Number(lockDurationVal) || 0;
+        const interestDelayDays = Number(interestStartDelayVal) || 0;
+        const claimDelayDays = Number(claimStartDelayVal) || 0;
+        const interestAccrualDays =
+            interestAccrualDurationVal && Number(interestAccrualDurationVal) > 0
+                ? Number(interestAccrualDurationVal)
+                : null;
+        const reasons: string[] = [];
+        if (lockDays * 86400 <= D + interestDelayDays * 86400)
+            reasons.push(`Lock-up Duration must be > ${D_days + interestDelayDays} days (pool duration ${D_days} + interest start delay ${interestDelayDays})`);
+        if (claimDelayDays * 86400 <= D)
+            reasons.push(`Claim Start Delay must be > ${D_days} days (pool duration)`);
+        if (interestAccrualDays !== null && interestAccrualDays * 86400 <= D)
+            reasons.push(`Interest Accrual Duration must be > ${D_days} days (pool duration)`);
+        return reasons.length > 0 ? reasons : null;
+    }, [validInterestStopRange, startTime, endTime, lockDurationVal, interestStartDelayVal, interestAccrualDurationVal, claimStartDelayVal]);
 
     const onSubmit = async (values: EditStakeFormValues) => {
         if (!pool || inFlightRef.current) return;
@@ -476,7 +501,7 @@ export default function EditStakePoolScreen({
                                         ? format(
                                             new Date(Number(stakePool.interestStopDate) * 1000),
                                             "MMM dd, yyyy, HH:mm",
-                                          )
+                                        )
                                         : "Not set"}
                                 </span>
                             </div>
@@ -664,20 +689,26 @@ export default function EditStakePoolScreen({
                             {/* Interest Stop Date */}
                             <div className="flex flex-col gap-1">
                                 <span className="text-base text-greyed">Interest Stop Date:</span>
-                                {/* {validInterestStopRange ? (
+                                {validInterestStopRange ? (
                                     <p className="text-[11px] text-greyed">
                                         Valid range:{" "}
                                         {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
                                         {" – "}
                                         {format(new Date(validInterestStopRange.upper * 1000), "MMM dd, yyyy, HH:mm")}
                                     </p>
+                                ) : interestStopWarnings ? (
+                                    <div className="space-y-0.5">
+                                        {interestStopWarnings.map((reason, i) => (
+                                            <p key={i} className="text-[11px] text-amber-500">{reason}</p>
+                                        ))}
+                                    </div>
                                 ) : (
                                     startTime && endTime && (
                                         <p className="text-[11px] text-greyed">
                                             Set Lock-up Duration, Claim Start Delay, and Interest Start Delay to see valid range.
                                         </p>
                                     )
-                                )} */}
+                                )}
                                 <div className="flex items-center gap-2">
                                     <DatePicker
                                         value={interestStopDateVal}
@@ -686,11 +717,11 @@ export default function EditStakePoolScreen({
                                                 shouldValidate: true,
                                             })
                                         }
-                                        // disabled={(date) => {
-                                        //     if (!validInterestStopRange) return false;
-                                        //     const ts = date.getTime() / 1000;
-                                        //     return ts <= validInterestStopRange.lower || ts >= validInterestStopRange.upper;
-                                        // }}
+                                        disabled={(date) => {
+                                            if (!validInterestStopRange) return false;
+                                            const ts = date.getTime() / 1000;
+                                            return ts < validInterestStopRange.lower || ts > validInterestStopRange.upper;
+                                        }}
                                     />
                                     {interestStopDateVal && (
                                         <button
@@ -707,48 +738,48 @@ export default function EditStakePoolScreen({
                                 <input
                                     type="hidden"
                                     {...register("interestStopDate", {
-                                        // validate: (v) => {
-                                        //     if (!v) return true;
-                                        //     const start = getValues("startTime");
-                                        //     const end = getValues("endTime");
-                                        //     if (!start || !end) return true;
-                                        //     const startSec = start.getTime() / 1000;
-                                        //     const endSec = end.getTime() / 1000;
-                                        //     const interestDelayDays = Number(getValues("interestStartDelay")) || 0;
-                                        //     const lockDays = Number(getValues("lockDuration")) || 0;
-                                        //     const interestAccrualStr = getValues("interestAccrualDuration");
-                                        //     const claimDelayDays = Number(getValues("claimStartDelay")) || 0;
-                                        //     const D = endSec - startSec;
-                                        //     const interestDelaySec = interestDelayDays * 86400;
-                                        //     const lockSec = lockDays * 86400;
-                                        //     const claimDelaySec = claimDelayDays * 86400;
-                                        //     if (lockSec <= D + interestDelaySec) return "Lock-up Duration too short";
-                                        //     if (claimDelaySec <= D)
-                                        //         return "Claim Start Delay must be greater than pool duration";
-                                        //     const dateTs = v.getTime() / 1000;
-                                        //     const lower = endSec + interestDelaySec;
-                                        //     const upperCandidates: number[] = [
-                                        //         startSec + lockSec,
-                                        //         startSec + interestDelaySec + claimDelaySec,
-                                        //     ];
-                                        //     if (interestAccrualStr && Number(interestAccrualStr) > 0) {
-                                        //         const accrualSec = Number(interestAccrualStr) * 86400;
-                                        //         if (accrualSec <= D)
-                                        //             return "Interest Accrual Duration must be greater than pool duration";
-                                        //         upperCandidates.push(startSec + interestDelaySec + accrualSec);
-                                        //     }
-                                        //     const upper = Math.min(...upperCandidates);
-                                        //     if (dateTs <= lower || dateTs >= upper)
-                                        //         return "Interest Stop Date out of valid range";
-                                        //     return true;
-                                        // },
+                                        validate: (v) => {
+                                            if (!v) return true;
+                                            const start = getValues("startTime");
+                                            const end = getValues("endTime");
+                                            if (!start || !end) return true;
+                                            const startSec = start.getTime() / 1000;
+                                            const endSec = end.getTime() / 1000;
+                                            const interestDelayDays = Number(getValues("interestStartDelay")) || 0;
+                                            const lockDays = Number(getValues("lockDuration")) || 0;
+                                            const interestAccrualStr = getValues("interestAccrualDuration");
+                                            const claimDelayDays = Number(getValues("claimStartDelay")) || 0;
+                                            const D = endSec - startSec;
+                                            const interestDelaySec = interestDelayDays * 86400;
+                                            const lockSec = lockDays * 86400;
+                                            const claimDelaySec = claimDelayDays * 86400;
+                                            if (lockSec <= D + interestDelaySec) return "Lock-up Duration too short";
+                                            if (claimDelaySec <= D)
+                                                return "Claim Start Delay must be greater than pool duration";
+                                            const dateTs = v.getTime() / 1000;
+                                            const lower = endSec + interestDelaySec;
+                                            const upperCandidates: number[] = [
+                                                startSec + lockSec,
+                                                startSec + interestDelaySec + claimDelaySec,
+                                            ];
+                                            if (interestAccrualStr && Number(interestAccrualStr) > 0) {
+                                                const accrualSec = Number(interestAccrualStr) * 86400;
+                                                if (accrualSec <= D)
+                                                    return "Interest Accrual Duration must be greater than pool duration";
+                                                upperCandidates.push(startSec + interestDelaySec + accrualSec);
+                                            }
+                                            const upper = Math.min(...upperCandidates);
+                                            if (dateTs <= lower || dateTs >= upper)
+                                                return "Interest Stop Date out of valid range";
+                                            return true;
+                                        },
                                     })}
                                 />
-                                {/* {errors.interestStopDate && (
+                                {errors.interestStopDate && (
                                     <p className="text-xs text-destructive">
                                         {errors.interestStopDate.message}
                                     </p>
-                                )} */}
+                                )}
                             </div>
 
                             <div className="grid grid-cols-2 gap-x-3">
