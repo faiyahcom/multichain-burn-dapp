@@ -147,6 +147,7 @@ function RouteComponent() {
         statuses: convertArrayToStringParam({
           array: filter?.status?.map((status) => status.toString()),
         }),
+        excludeStatuses: isStakePool ? undefined : "draft", // admin does not need to see draft pools (except for stake pool)
         timeEndFrom: isBurnOrStakePool
           ? dateToUnixSeconds({
               date: (
