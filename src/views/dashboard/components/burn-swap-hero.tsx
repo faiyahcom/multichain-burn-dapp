@@ -18,6 +18,7 @@ import SwapChartStatsImage from "/images/dashboard/swap-stats.png";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import WhitelistTokenSelect, {
     type TokenOption,
 } from "@/components/common/glow/whitelist-token-select";
@@ -111,11 +112,9 @@ const HeroSwapMiniForm = () => {
             <div className="flex flex-col gap-1 2xl:gap-2">
                 <span className="text-sm text-mb-gray-b8/60 2xl:text-base">Amount</span>
                 <div className="flex justify-between rounded-6px border-2 border-mb-dark-popover-item-border px-3">
-                    <Input
+                    <NumericInput
                         value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        type="number"
-                        step={DEFAULT_INPUT_NUMBER_STEP}
+                        onChange={(val) => setAmount(val)}
                         placeholder="0.0"
                         className="bg-transparent px-0"
                     />

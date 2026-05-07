@@ -1,8 +1,8 @@
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import type { FieldErrors } from "react-hook-form";
+import { NumericFormat } from "react-number-format";
 import { shortenNumber } from "@/utils/helpers/numbers";
 import TokenBadge from "./token-badge";
 import type { PoolDetailResponse } from "@/types/pool";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 
 type SwapFormValues = { burnAmount: string };
 type TokenDisplay = { imageUri?: string; name?: string; symbol?: string };
@@ -10,7 +10,6 @@ type TokenDisplay = { imageUri?: string; name?: string; symbol?: string };
 type Props = {
     tokenDisplay: TokenDisplay;
     isLoadingWhitelistTokens: boolean;
-    register: UseFormRegister<SwapFormValues>;
     errors: FieldErrors<SwapFormValues>;
     onSelectPercent: (percent: number) => void;
     isLoadingBalance: boolean;
@@ -20,12 +19,14 @@ type Props = {
     isExceedingMax: boolean;
     insufficientBalanceMessage?: string;
     chainId?: string;
+    burnAmount: string;
+    onBurnAmountChange: (value: string) => void;
+    onBurnAmountBlur?: () => void;
 };
 
 const SellSection = ({
     tokenDisplay,
     isLoadingWhitelistTokens,
-    register,
     errors,
     onSelectPercent,
     isLoadingBalance,
@@ -34,6 +35,9 @@ const SellSection = ({
     isExceedingMax,
     insufficientBalanceMessage,
     chainId,
+    burnAmount,
+    onBurnAmountChange,
+    onBurnAmountBlur,
 }: Props) => {
     return (
         <div className="relative mb-4 flex w-full flex-col rounded-24px border-[0.156rem] border-mb-dark-popover-item-border bg-mb-dark-popover-item px-4 py-3 xl:px-8.75 xl:py-3.75">
@@ -56,16 +60,25 @@ const SellSection = ({
             </div>
 
             <div className="my-2 flex items-center justify-between xl:my-4">
-                <input
+                <NumericFormat
+                    value={burnAmount}
+                    onBlur={onBurnAmountBlur}
                     className="min-w-0 flex-1 bg-transparent px-0 font-inter text-2xl font-medium text-primary-foreground outline-none sm:text-3xl xl:text-40px"
                     aria-invalid={
                         !!errors.burnAmount ||
                         isExceedingMax ||
                         !!insufficientBalanceMessage
                     }
-                    {...register("burnAmount")}
-                    type="number"
-                    step={DEFAULT_INPUT_NUMBER_STEP}
+                    thousandSeparator=","
+                    decimalSeparator="."
+                    allowNegative={false}
+                    decimalScale={6}
+                    placeholder="0.0"
+                    onValueChange={(values, sourceInfo) => {
+                        if (sourceInfo.source === "event") {
+                            onBurnAmountChange(values.value);
+                        }
+                    }}
                 />
                 <TokenBadge
                     isLoading={isLoadingWhitelistTokens}

@@ -15,9 +15,9 @@ import {
     getVariantShadowClassName,
 } from "@/components/common/glow/container";
 import { Input } from "@/components/common/glow/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Button } from "@/components/common/glow/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import type { PoolDetailResponse } from "@/types/pool";
@@ -29,8 +29,8 @@ import {
 } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
 import z from "zod";
 import { formatDuration } from "@/utils/helpers/timer";
@@ -286,10 +286,10 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
     );
 
     const {
-        register,
         handleSubmit,
         setValue,
         reset,
+        control,
         formState: { errors, isSubmitting },
     } = useForm<StakeFormValues>({
         defaultValues: { amount: "" },
@@ -610,14 +610,23 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 </span>
                                             </div>
                                             <div className="flex gap-3">
-                                                <Input
-                                                    variant="stake"
-                                                    type="number"
-                                                    step={DEFAULT_INPUT_NUMBER_STEP}
-                                                    min={0}
-                                                    placeholder="0.0"
-                                                    className="w-full border-2 bg-transparent"
-                                                    {...register("amount")}
+                                                <Controller
+                                                    control={control}
+                                                    name="amount"
+                                                    render={({ field }) => (
+                                                        <NumericInput
+                                                            inputComponent={Input}
+                                                            variant="stake"
+                                                            min={0}
+                                                            placeholder="0.0"
+                                                            className="w-full border-2 bg-transparent"
+                                                            value={field.value}
+                                                            onChange={field.onChange}
+                                                            ref={field.ref}
+                                                            name={field.name}
+                                                            onBlur={field.onBlur}
+                                                        />
+                                                    )}
                                                 />
                                                 <div
                                                     className={cn(

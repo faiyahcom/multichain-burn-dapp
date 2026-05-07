@@ -15,6 +15,7 @@ import {
   getVariantShadowClassName,
 } from "@/components/common/glow/container";
 import { Input } from "@/components/common/glow/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Button } from "@/components/common/glow/button";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
@@ -34,7 +35,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import z from "zod";
 import type { PoolDetailResponse } from "@/types/pool";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 const createDepositFormSchema = ({
@@ -127,6 +128,7 @@ const DepositRewardDialog = ({
     setValue,
     reset,
     watch,
+    control,
     formState: { errors, isSubmitting, isValid },
   } = useForm<DepositFormValues>({
     defaultValues: { amount: "" },
@@ -444,15 +446,24 @@ const DepositRewardDialog = ({
                         </span>
                       </div>
                       <div className="flex gap-3">
-                        <Input
-                          {...register("amount")}
-                          variant="burn"
-                          type="number"
-                          step={DEFAULT_INPUT_NUMBER_STEP}
-                          placeholder="Enter amount"
-                          className="w-full border-2 bg-transparent"
-                          aria-invalid={!!errors.amount}
-                        />
+                          <Controller
+                            control={control}
+                            name="amount"
+                            render={({ field }) => (
+                              <NumericInput
+                                inputComponent={Input}
+                                variant="burn"
+                                placeholder="Enter amount"
+                                className="w-full border-2 bg-transparent"
+                                aria-invalid={!!errors.amount}
+                                value={field.value}
+                                onChange={field.onChange}
+                                ref={field.ref}
+                                name={field.name}
+                                onBlur={field.onBlur}
+                              />
+                            )}
+                          />
                         <div
                           className={cn(
                             "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 sm:px-4 text-mb-burn-light",
