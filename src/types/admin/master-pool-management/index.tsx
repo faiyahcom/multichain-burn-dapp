@@ -105,6 +105,26 @@ export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
   full: "#FFB08E",
 };
 
+export const launchpadPoolStatuses = [
+  "upcoming",
+  "completed",
+  "cancelled",
+  ...swapPoolStatuses,
+] as const;
+export type LaunchpadPoolStatus = (typeof launchpadPoolStatuses)[number];
+export const launchpadPoolStatusLabels: Record<LaunchpadPoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  upcoming: "Upcoming",
+  completed: "Completed",
+  cancelled: "Cancelled",
+};
+export const launchpadPoolStatusColors: Record<LaunchpadPoolStatus, string> = {
+  ...swapPoolStatusColors,
+  upcoming: "#FFE798",
+  completed: "#FFB08E",
+  cancelled: "#FF8E8E",
+};
+
 export const getPoolStatusColor = (status: AllPoolStatus) => {
   return allPoolStatusColors[status as AllPoolStatus] ?? "#7989ba";
 };
@@ -116,6 +136,7 @@ export type AllPoolStatus =
   | BurnPoolStatus
   | SwapPoolStatus
   | StakePoolStatus
+  | LaunchpadPoolStatus
   | "draft";
 
 // draft is not included in this list because when it is used is situational
@@ -126,12 +147,14 @@ export const allPoolStatusLabels: Record<AllPoolStatus, string> = {
   ...burnPoolStatusLabels,
   ...swapPoolStatusLabels,
   ...stakePoolStatusLabels,
+  ...launchpadPoolStatusLabels,
   draft: "Draft",
 };
 export const allPoolStatusColors: Record<AllPoolStatus, string> = {
   ...burnPoolStatusColors,
   ...swapPoolStatusColors,
   ...stakePoolStatusColors,
+  ...launchpadPoolStatusColors,
   draft: "#7989ba",
 };
 
@@ -248,6 +271,22 @@ export const userHiddenStakePoolStatuses = [
       !(userViewStakePoolStatuses as ReadonlyArray<StakePoolStatus>).includes(
         status,
       ),
+  ),
+  "draft",
+] as const;
+
+export const userViewLaunchpadPoolStatuses = [
+  "on_going",
+  "upcoming",
+  "ended",
+  "completed",
+] as const;
+export const userHiddenLaunchpadPoolStatuses = [
+  ...launchpadPoolStatuses.filter(
+    (status) =>
+      !(
+        userViewLaunchpadPoolStatuses as ReadonlyArray<LaunchpadPoolStatus>
+      ).includes(status),
   ),
   "draft",
 ] as const;

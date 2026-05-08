@@ -6,11 +6,13 @@ import BurnPoolSection from "./components/burn/pool-section";
 import SwapPoolSection from "./components/swap/pool-section";
 import {
   useBurnPoolListSearchFilterStore,
+  useLaunchpadPoolListSearchFilterStore,
   useStakePoolListSearchFilterStore,
   useSwapPoolListSearchFilterStore,
 } from "@/stores/pool-list/search-filter-store";
 import StakeRecentPoolsTable from "./components/stake/recent-table";
 import StakePoolSection from "./components/stake/pool-section";
+import LaunchpadRecentPoolsTable from "./components/launchpad/recent-table";
 
 type Props = {};
 
@@ -81,15 +83,24 @@ const StakePoolList = ({}: Props) => {
 };
 
 const LaunchpadPoolList = ({}: Props) => {
-  // TODO: add filter
+  const { setFilter } = useLaunchpadPoolListSearchFilterStore();
 
   return (
     <PoolGlowPageLayout
       poolKind={PoolKindCodeEnum.Launchpad}
-      recentSection={null} // TODO: add recent section
+      recentSection={
+        <PoolGlowSection
+          title="MY LAUNCHES"
+          poolKind={PoolKindCodeEnum.Launchpad}
+        >
+          <LaunchpadRecentPoolsTable />
+        </PoolGlowSection>
+      }
       poolSection={null} // TODO: add pool section
       onTokenClick={(token) => {
-        // TODO: add onTokenClick
+        setFilter({
+          text: token.customSymbol ?? token.symbol,
+        });
       }}
     />
   );
