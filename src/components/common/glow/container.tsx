@@ -1,7 +1,14 @@
 import { cn } from "@/lib/utils";
 import { useId } from "react";
 
-const ContainerVariants = ["pair", "burn", "swap", "green", "stake"] as const;
+const ContainerVariants = [
+  "pair",
+  "burn",
+  "swap",
+  "green",
+  "stake",
+  "launchpad",
+] as const;
 
 export type ContainerVariant = (typeof ContainerVariants)[number];
 
@@ -30,6 +37,9 @@ export const getVariantBorderClassName = ({
       break;
     case "stake":
       variantClassName = "border-stake-border";
+      break;
+    case "launchpad":
+      variantClassName = "border-launchpad-border";
       break;
     default:
       const _exhaustiveCheck: never = variant;
@@ -64,6 +74,9 @@ export const getVariantShadowClassName = ({
     case "stake":
       variantClassName = "shadow-stake-glow";
       break;
+    case "launchpad":
+      variantClassName = "shadow-launchpad-glow";
+      break;
     default:
       const _exhaustiveCheck: never = variant;
       variantClassName = _exhaustiveCheck;
@@ -96,6 +109,9 @@ export const getVariantBgClassName = ({
       break;
     case "stake":
       variantClassName = "card-stake-bg";
+      break;
+    case "launchpad":
+      variantClassName = "card-launchpad-bg";
       break;
     default:
       const _exhaustiveCheck: never = variant;
@@ -152,6 +168,13 @@ export const getVariantBtnBg50ClassName = ({
         { "bg-mb-btn-stake/50": !isHover && !isGroupHover },
         { "hover:bg-mb-btn-stake/50": isHover },
         { "group-hover:bg-mb-btn-stake/50": isGroupHover },
+      );
+      break;
+    case "launchpad":
+      variantClassName = cn(
+        { "bg-mb-btn-launchpad/50": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-launchpad/50": isHover },
+        { "group-hover:bg-mb-btn-launchpad/50": isGroupHover },
       );
       break;
     default:
@@ -211,6 +234,13 @@ export const getVariantBtnBg30ClassName = ({
         { "group-hover:bg-mb-btn-stake/30": isGroupHover },
       );
       break;
+    case "launchpad":
+      variantClassName = cn(
+        { "bg-mb-btn-launchpad/30": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-launchpad/30": isHover },
+        { "group-hover:bg-mb-btn-launchpad/30": isGroupHover },
+      );
+      break;
     default:
       const _exhaustiveCheck: never = variant;
       variantClassName = _exhaustiveCheck;
@@ -266,6 +296,13 @@ export const getVariantBtnBgClassName = ({
         { "bg-mb-btn-stake": !isHover && !isGroupHover },
         { "hover:bg-mb-btn-stake": isHover },
         { "group-hover:bg-mb-btn-stake": isGroupHover },
+      );
+      break;
+    case "launchpad":
+      variantClassName = cn(
+        { "bg-mb-btn-launchpad": !isHover && !isGroupHover },
+        { "hover:bg-mb-btn-launchpad": isHover },
+        { "group-hover:bg-mb-btn-launchpad": isGroupHover },
       );
       break;
     default:

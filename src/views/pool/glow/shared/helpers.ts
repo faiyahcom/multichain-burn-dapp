@@ -20,7 +20,7 @@ export const getPoolGlowVariant = (
     case PoolKindCodeEnum.Stake:
       return "stake";
     case PoolKindCodeEnum.Launchpad:
-      return "pair"; // TODO: change to launchpad
+      return "launchpad";
     default:
       void (poolKind satisfies never);
       return "pair";
