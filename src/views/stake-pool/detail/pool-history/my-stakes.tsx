@@ -249,7 +249,10 @@ const MyStakesTable = ({ poolDetail, getTimestamp }: Props) => {
                   <TableCell>
                     {row.durationInSecs === 0
                       ? "Unlimited"
-                      : formatDuration(row.durationInSecs)}
+                      : formatDuration(
+                        row.durationInSecs,
+                        poolDetail?.pool?.interestStopDate !== "0",
+                      )}
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <DateTimeCell timestamp={row.interestEndDate} />
