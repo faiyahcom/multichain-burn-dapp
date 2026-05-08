@@ -1,4 +1,4 @@
-export function formatDuration(seconds: number | bigint | string | undefined | null): string {
+export function formatDuration(seconds: number | bigint | string | undefined | null, roundedMinute?: boolean): string {
     if (seconds === undefined || seconds === null || seconds === "") return "—";
     const s = typeof seconds === "bigint" ? Number(seconds) : Number(seconds);
     if (!isFinite(s) || s < 0) return "—";
@@ -12,7 +12,10 @@ export function formatDuration(seconds: number | bigint | string | undefined | n
     if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
     if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
     // if case minute and have odd seconds left, we round up
-    if (minutes || s % 60) parts.push(`${minutes + (s % 60 ? 1 : 0)} ${minutes + (s % 60 ? 1 : 0) === 1 ? "minute" : "minutes"}`);
-    // if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    if (roundedMinute) {
+        if (minutes || s % 60) parts.push(`${minutes + (s % 60 ? 1 : 0)} ${minutes + (s % 60 ? 1 : 0) === 1 ? "minute" : "minutes"}`);
+    } else {
+        if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    }
     return parts.length ? parts.join(" ") : `${s} seconds`;
 }
