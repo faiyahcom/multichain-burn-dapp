@@ -108,7 +108,6 @@ export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
 export const launchpadPoolStatuses = [
   "upcoming",
   "completed",
-  "cancelled",
   ...swapPoolStatuses,
 ] as const;
 export type LaunchpadPoolStatus = (typeof launchpadPoolStatuses)[number];
@@ -116,13 +115,11 @@ export const launchpadPoolStatusLabels: Record<LaunchpadPoolStatus, string> = {
   ...swapPoolStatusLabels,
   upcoming: "Upcoming",
   completed: "Completed",
-  cancelled: "Cancelled",
 };
 export const launchpadPoolStatusColors: Record<LaunchpadPoolStatus, string> = {
   ...swapPoolStatusColors,
   upcoming: "#FFE798",
   completed: "#FFB08E",
-  cancelled: "#FF8E8E",
 };
 
 export const getPoolStatusColor = (status: AllPoolStatus) => {
