@@ -13,6 +13,7 @@ import {
 import StakeRecentPoolsTable from "./components/stake/recent-table";
 import StakePoolSection from "./components/stake/pool-section";
 import LaunchpadRecentPoolsTable from "./components/launchpad/recent-table";
+import LaunchpadPoolSection from "./components/launchpad/pool-section";
 
 type Props = {};
 
@@ -96,7 +97,7 @@ const LaunchpadPoolList = ({}: Props) => {
           <LaunchpadRecentPoolsTable />
         </PoolGlowSection>
       }
-      poolSection={null} // TODO: add pool section
+      poolSection={<LaunchpadPoolSection />}
       onTokenClick={(token) => {
         setFilter({
           text: token.customSymbol ?? token.symbol,
