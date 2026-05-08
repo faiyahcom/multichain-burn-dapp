@@ -80,4 +80,19 @@ const StakePoolList = ({}: Props) => {
   );
 };
 
-export { BurnPoolList, SwapPoolList, StakePoolList };
+const LaunchpadPoolList = ({}: Props) => {
+  // TODO: add filter
+
+  return (
+    <PoolGlowPageLayout
+      poolKind={PoolKindCodeEnum.Launchpad}
+      recentSection={null} // TODO: add recent section
+      poolSection={null} // TODO: add pool section
+      onTokenClick={(token) => {
+        // TODO: add onTokenClick
+      }}
+    />
+  );
+};
+
+export { BurnPoolList, SwapPoolList, StakePoolList, LaunchpadPoolList };

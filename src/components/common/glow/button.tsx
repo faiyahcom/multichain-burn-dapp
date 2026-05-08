@@ -59,7 +59,7 @@ const buttonVariants = ({
             getVariantShadowClassName({ variant: "swap" }),
           ),
           "pair-grid": cn(
-            "bg-mb-btn-pair text-foreground grid-pair-btn-bg",
+            "text-foreground grid-pair-btn-bg",
             getVariantShadowClassName({ variant: "pair" }),
             {
               "hover:bg-foreground hover:bg-none hover:text-mb-btn-pair":
@@ -71,7 +71,7 @@ const buttonVariants = ({
             },
           ),
           "burn-grid": cn(
-            "bg-mb-btn-burn text-foreground grid-burn-btn-bg",
+            "text-foreground grid-burn-btn-bg",
             getVariantShadowClassName({ variant: "burn" }),
             {
               "hover:bg-foreground hover:bg-none hover:text-mb-btn-burn":
@@ -83,7 +83,7 @@ const buttonVariants = ({
             },
           ),
           "swap-grid": cn(
-            "bg-mb-btn-swap text-foreground grid-swap-btn-bg",
+            "text-foreground grid-swap-btn-bg",
             getVariantShadowClassName({ variant: "swap" }),
             {
               "hover:bg-foreground hover:bg-none hover:text-mb-btn-swap":
@@ -109,7 +109,7 @@ const buttonVariants = ({
             getVariantShadowClassName({ variant: "stake" }),
           ),
           "stake-grid": cn(
-            "bg-mb-btn-stake text-foreground grid-stake-btn-bg",
+            "text-foreground grid-stake-btn-bg",
             getVariantShadowClassName({ variant: "stake" }),
             {
               "hover:bg-foreground hover:bg-none hover:text-mb-btn-stake":
@@ -117,6 +117,31 @@ const buttonVariants = ({
             },
             {
               "group-hover:bg-foreground group-hover:bg-none group-hover:text-mb-btn-stake":
+                hasGroupHover,
+            },
+          ),
+          launchpad: cn(
+            "bg-mb-btn-launchpad text-foreground",
+            { "hover:bg-foreground hover:text-mb-btn-launchpad": hasHover },
+            {
+              "group-hover:bg-foreground group-hover:text-mb-btn-launchpad":
+                hasGroupHover,
+            },
+            getVariantShadowClassName({ variant: "launchpad" }),
+          ),
+          "launchpad-active": cn(
+            "bg-foreground text-mb-btn-launchpad",
+            getVariantShadowClassName({ variant: "launchpad" }),
+          ),
+          "launchpad-grid": cn(
+            "grid-launchpad-btn-bg text-foreground",
+            getVariantShadowClassName({ variant: "launchpad" }),
+            {
+              "hover:bg-foreground hover:bg-none hover:text-mb-btn-launchpad":
+                hasHover,
+            },
+            {
+              "group-hover:bg-foreground group-hover:bg-none group-hover:text-mb-btn-launchpad":
                 hasGroupHover,
             },
           ),
@@ -159,6 +184,9 @@ const BUTTON_VARIANT_CONTAINER_VARIANT_MAP: Record<
   stake: "stake",
   "stake-active": "stake",
   "stake-grid": "stake",
+  launchpad: "launchpad",
+  "launchpad-active": "launchpad",
+  "launchpad-grid": "launchpad",
 };
 
 // Mutually exclusive: can pass isActive OR isGrid, but not both

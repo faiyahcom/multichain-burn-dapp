@@ -1,9 +1,10 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { LaunchpadPoolList } from "@/views/pool/glow/pool";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const Route = createFileRoute('/launchpad/')({
+export const Route = createFileRoute("/launchpad/")({
   component: RouteComponent,
-})
+});
 
 function RouteComponent() {
-  return <div>Hello "/launchpad/"!</div>
+  return <LaunchpadPoolList />;
 }

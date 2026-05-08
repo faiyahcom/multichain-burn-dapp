@@ -56,7 +56,7 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
           case PoolKindCodeEnum.Stake:
             return "Total Staked";
           case PoolKindCodeEnum.Launchpad:
-            return "Total Launchpad Volume";
+            return "Total Raised";
           default:
             void (poolKind satisfies never);
             return "Total Volume";
@@ -66,7 +66,19 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
       valueTitle: Number(totalVolume).toLocaleString("en-US"),
     },
     {
-      title: "Total Transactions",
+      title: (() => {
+        switch (poolKind) {
+          case PoolKindCodeEnum.Burn:
+          case PoolKindCodeEnum.Swap:
+          case PoolKindCodeEnum.Stake:
+            return "Total Transactions";
+          case PoolKindCodeEnum.Launchpad:
+            return "Active Launches";
+          default:
+            void (poolKind satisfies never);
+            return "Total Transactions";
+        }
+      })(),
       value: shortenNumber({
         number: Number(overallStats?.totalTransactions ?? 0),
       }),
@@ -75,7 +87,19 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
       ),
     },
     {
-      title: "Total Pools",
+      title: (() => {
+        switch (poolKind) {
+          case PoolKindCodeEnum.Burn:
+          case PoolKindCodeEnum.Swap:
+          case PoolKindCodeEnum.Stake:
+            return "Total Pools";
+          case PoolKindCodeEnum.Launchpad:
+            return "Total Projects";
+          default:
+            void (poolKind satisfies never);
+            return "Total Pools";
+        }
+      })(),
       value: shortenNumber({
         number: Number(overallStats?.totalPools ?? 0),
       }),
