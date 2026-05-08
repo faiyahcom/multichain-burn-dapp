@@ -31,6 +31,7 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
   const [page, setPage] = useState(1);
+  const excludeKinds = [2, 3, 5, 6, 10].join(",");
 
   const { data: poolTxns, isLoading } = useQuery({
     queryKey: poolQueryKeys.txns(poolDetail?.pool?.address || "", page, ""),
@@ -39,7 +40,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
         page,
         DEFAULT_PAGE_SIZE,
         poolDetail?.pool?.address || "",
-        // No excludeKinds — show all transaction types
+        excludeKinds,
       ),
     enabled: !!poolDetail?.pool?.address,
     refetchInterval: 2_500,
@@ -180,7 +181,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                   {tx.executorName
                     ? tx.executorName
                     : truncateString({ str: tx.executor, left: 4, right: 4 }) ||
-                      "—"}
+                    "—"}
                 </TableCell>
                 <TableCell>
                   <CopyableText

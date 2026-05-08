@@ -31,7 +31,7 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
   const [page, setPage] = useState(1);
-  const excludeKinds = [2].join(",");
+  const excludeKinds = [2, 3, 5, 6, 10].join(",");
 
   const { data: poolTxns, isLoading } = useQuery({
     queryKey: poolQueryKeys.txns(
