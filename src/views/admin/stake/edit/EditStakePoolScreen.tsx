@@ -691,9 +691,9 @@ export default function EditStakePoolScreen({
                                 <span className="text-base text-greyed">Interest Stop Date:</span>
                                 {validInterestStopRange ? (
                                     <p className="text-[11px] text-greyed">
-                                        Valid range:{" "}
+                                        Valid value must be after {" "}
                                         {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
-                                        {" – "}
+                                        {" and before "}
                                         {format(new Date(validInterestStopRange.upper * 1000), "MMM dd, yyyy, HH:mm")}
                                     </p>
                                 ) : interestStopWarnings ? (
@@ -720,7 +720,7 @@ export default function EditStakePoolScreen({
                                         disabled={(date) => {
                                             if (!validInterestStopRange) return false;
                                             const ts = date.getTime() / 1000;
-                                            return ts < validInterestStopRange.lower || ts > validInterestStopRange.upper;
+                                            return ts < validInterestStopRange.lower || ts >= validInterestStopRange.upper;
                                         }}
                                     />
                                     {interestStopDateVal && (

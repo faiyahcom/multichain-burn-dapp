@@ -160,11 +160,11 @@ const CreateStakePoolForm = () => {
     Number(interestDurationVal) > 0;
   const maxRewardDisplay = maxRewardEnabled
     ? (
-        Number(stakingLimitVal) *
-        (Number(aprVal) / (100 * 31536000)) *
-        (Number(interestDurationVal) * 24 * 3600)
-      ) // convert from days to seconds
-        .toLocaleString("en-US")
+      Number(stakingLimitVal) *
+      (Number(aprVal) / (100 * 31536000)) *
+      (Number(interestDurationVal) * 24 * 3600)
+    ) // convert from days to seconds
+      .toLocaleString("en-US")
     : "--";
 
   const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
@@ -179,12 +179,12 @@ const CreateStakePoolForm = () => {
   const selectedStakingToken = stakingToken
     ? stakingToken === nativeAddress
       ? {
-          imageUri: network?.iconSrc ?? "",
-          symbol: network?.appKitNetwork.nativeCurrency.symbol ?? "",
-        }
+        imageUri: network?.iconSrc ?? "",
+        symbol: network?.appKitNetwork.nativeCurrency.symbol ?? "",
+      }
       : whitelistTokensData?.whitelistTokens.find(
-          (t) => t.address === stakingToken,
-        )
+        (t) => t.address === stakingToken,
+      )
     : null;
 
   const onSubmit: SubmitHandler<CreateStakePoolFormValues> = async (values) => {
@@ -207,7 +207,7 @@ const CreateStakePoolForm = () => {
           interestStartDelay: Number(values.interestStartDelay) || 0,
           interestAccrualDuration:
             values.interestAccrualDuration === "" ||
-            values.interestAccrualDuration === undefined
+              values.interestAccrualDuration === undefined
               ? null
               : Number(values.interestAccrualDuration),
           claimStartDelay: Number(values.claimStartDelay) || 0,
@@ -242,7 +242,7 @@ const CreateStakePoolForm = () => {
         interestStartDelay: Number(values.interestStartDelay) || 0,
         interestAccrualDuration:
           values.interestAccrualDuration === "" ||
-          values.interestAccrualDuration === undefined
+            values.interestAccrualDuration === undefined
             ? null
             : Number(values.interestAccrualDuration),
         claimStartDelay: Number(values.claimStartDelay) || 0,
@@ -451,7 +451,7 @@ const CreateStakePoolForm = () => {
                   {selectedStakingToken
                     ? "customSymbol" in selectedStakingToken
                       ? selectedStakingToken.customSymbol?.trim() ||
-                        selectedStakingToken.symbol
+                      selectedStakingToken.symbol
                       : selectedStakingToken.symbol
                     : ""}
                 </span>
@@ -508,7 +508,7 @@ const CreateStakePoolForm = () => {
                   {selectedStakingToken
                     ? "customSymbol" in selectedStakingToken
                       ? selectedStakingToken.customSymbol?.trim() ||
-                        selectedStakingToken.symbol
+                      selectedStakingToken.symbol
                       : selectedStakingToken.symbol
                     : ""}
                 </span>
@@ -766,9 +766,9 @@ const CreateStakePoolForm = () => {
           <span className="text-[13px]">Interest Stop Date</span>
           {validInterestStopRange ? (
             <p className="text-[11px] text-greyed">
-              Valid range:{" "}
+              Valid value must be after {" "}
               {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
-              {" – "}
+              {" and before "}
               {format(new Date(validInterestStopRange.upper * 1000), "MMM dd, yyyy, HH:mm")}
             </p>
           ) : interestStopWarnings ? (
@@ -795,7 +795,7 @@ const CreateStakePoolForm = () => {
               disabled={(date) => {
                 if (!validInterestStopRange) return false;
                 const ts = date.getTime() / 1000;
-                return ts < validInterestStopRange.lower || ts > validInterestStopRange.upper;
+                return ts < validInterestStopRange.lower || ts >= validInterestStopRange.upper;
               }}
             />
             {interestStopDateVal && (
