@@ -17,7 +17,7 @@ import NetworkDisplay from "@/components/common/network-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import { useAuthStore } from "@/stores/authStore";
 import { truncateString } from "@/utils/helpers/string";
-import { useNavigate } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 
 const LaunchpadRecentPoolsTable = () => {
   const navigate = useNavigate();
@@ -193,6 +193,20 @@ const LaunchpadRecentPoolsTable = () => {
             ))}
           </TableBody>
         </Table>
+
+        {/* {isAuthenticated && ( */}
+        <div className="flex justify-end">
+          <Link
+            to="/my-participated-pools"
+            search={{
+              tab: "stake-pool",
+            }}
+            className="sm:text-24px pr-3 font-inter text-xl font-semibold"
+          >
+            See more
+          </Link>
+        </div>
+        {/* )} */}
       </div>
     </>
   );
