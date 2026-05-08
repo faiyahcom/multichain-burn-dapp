@@ -120,7 +120,9 @@ export interface TransferTokensDialogProps {
     poolKind?: number;
     poolInfo: {
         tokenInSymbol?: string;
+        tokenInName?: string;
         rewardTokenSymbol?: string;
+        rewardTokenName?: string;
         currentRewardAmount?: string;
         currentDepositAmount?: string;
         rewardTokenDecimals?: number;
@@ -394,8 +396,8 @@ const TransferTokensDialog = ({
                 </svg>
                 <span className="text-sm leading-tight font-bold text-foreground">
                   {mode === "reward"
-                    ? (poolInfo.rewardTokenSymbol ?? "—")
-                    : (poolInfo.tokenInSymbol ?? "—")}{" "}
+                    ? (poolInfo.rewardTokenName ?? poolInfo.rewardTokenSymbol ?? "—")
+                    : (poolInfo.tokenInName ?? poolInfo.tokenInSymbol ?? "—")}{" "}
                   <span className="font-normal text-secondary-text">
                     (
                     {mode === "reward"
