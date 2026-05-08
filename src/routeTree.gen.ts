@@ -21,6 +21,7 @@ import { Route as MyParticipatedPoolsIndexRouteImport } from './routes/my-partic
 import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/index'
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as MyActivityIndexRouteImport } from './routes/my-activity/index'
+import { Route as LaunchpadIndexRouteImport } from './routes/launchpad/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
@@ -92,6 +93,11 @@ const MyActivityIndexRoute = MyActivityIndexRouteImport.update({
   path: '/my-activity/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LaunchpadIndexRoute = LaunchpadIndexRouteImport.update({
+  id: '/launchpad/',
+  path: '/launchpad/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BurnIndexRoute = BurnIndexRouteImport.update({
   id: '/burn/',
   path: '/burn/',
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
   '/burn': typeof BurnIndexRoute
+  '/launchpad': typeof LaunchpadIndexRoute
   '/my-activity': typeof MyActivityIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
@@ -160,6 +167,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
   '/burn': typeof BurnIndexRoute
+  '/launchpad': typeof LaunchpadIndexRoute
   '/my-activity': typeof MyActivityIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/activity-history/': typeof ActivityHistoryIndexRoute
   '/burn/': typeof BurnIndexRoute
+  '/launchpad/': typeof LaunchpadIndexRoute
   '/my-activity/': typeof MyActivityIndexRoute
   '/my-create-pools/': typeof MyCreatePoolsIndexRoute
   '/my-dashboard/': typeof MyDashboardIndexRoute
@@ -207,6 +216,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history'
     | '/burn'
+    | '/launchpad'
     | '/my-activity'
     | '/my-create-pools'
     | '/my-dashboard'
@@ -229,6 +239,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history'
     | '/burn'
+    | '/launchpad'
     | '/my-activity'
     | '/my-create-pools'
     | '/my-dashboard'
@@ -251,6 +262,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history/'
     | '/burn/'
+    | '/launchpad/'
     | '/my-activity/'
     | '/my-create-pools/'
     | '/my-dashboard/'
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivityHistoryIndexRoute: typeof ActivityHistoryIndexRoute
   BurnIndexRoute: typeof BurnIndexRoute
+  LaunchpadIndexRoute: typeof LaunchpadIndexRoute
   MyActivityIndexRoute: typeof MyActivityIndexRoute
   MyCreatePoolsIndexRoute: typeof MyCreatePoolsIndexRoute
   MyDashboardIndexRoute: typeof MyDashboardIndexRoute
@@ -379,6 +392,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyActivityIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/launchpad/': {
+      id: '/launchpad/'
+      path: '/launchpad'
+      fullPath: '/launchpad'
+      preLoaderRoute: typeof LaunchpadIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/burn/': {
       id: '/burn/'
       path: '/burn'
@@ -442,6 +462,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityHistoryIndexRoute: ActivityHistoryIndexRoute,
   BurnIndexRoute: BurnIndexRoute,
+  LaunchpadIndexRoute: LaunchpadIndexRoute,
   MyActivityIndexRoute: MyActivityIndexRoute,
   MyCreatePoolsIndexRoute: MyCreatePoolsIndexRoute,
   MyDashboardIndexRoute: MyDashboardIndexRoute,
