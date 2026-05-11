@@ -19,6 +19,7 @@ import ProfilePoolListSwap from "../pool/list/swap";
 import CustomPagination from "@/components/common/glow/glow-pagination";
 import { useMyParticipatedPoolsStakeSearchFilterStore } from "@/stores/my-participated-pools/stake";
 import ProfilePoolListStake from "../pool/list/stake";
+import ProfilePoolListLaunchpad from "../pool/list/launchpad";
 
 interface Props {
   poolType: PoolType;
@@ -110,6 +111,13 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
       )}
       {poolType === PoolKindCodeEnum.Stake && (
         <ProfilePoolListStake
+          data={participatedData?.pools}
+          isLoading={isParticipatedPending}
+          limit={limit}
+        />
+      )}
+      {poolType === PoolKindCodeEnum.Launchpad && (
+        <ProfilePoolListLaunchpad
           data={participatedData?.pools}
           isLoading={isParticipatedPending}
           limit={limit}

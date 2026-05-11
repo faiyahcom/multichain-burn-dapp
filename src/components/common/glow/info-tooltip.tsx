@@ -23,6 +23,7 @@ interface Props {
     text?: string;
   };
   variant?: ContainerVariant;
+  customIcon?: React.FunctionComponent<React.SVGProps<SVGSVGElement>>;
 }
 
 const InfoTooltip: React.FC<Props> = ({
@@ -31,8 +32,11 @@ const InfoTooltip: React.FC<Props> = ({
   sideOffset = 20,
   classNames,
   variant = "pair",
+  customIcon,
 }) => {
   const [open, setOpen] = useState(false);
+  const Icon = customIcon ?? IconTooltipInfo;
+  
   return (
     <Tooltip open={open} onOpenChange={setOpen}>
       <TooltipTrigger
@@ -41,7 +45,7 @@ const InfoTooltip: React.FC<Props> = ({
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen((v) => !v)}
       >
-        <IconTooltipInfo className={cn("inline-flex", classNames?.icon)} />
+        <Icon className={cn("inline-flex", classNames?.icon)} />
       </TooltipTrigger>
       <TooltipContent
         className={cn(
@@ -61,7 +65,7 @@ const InfoTooltip: React.FC<Props> = ({
         >
           <p
             className={cn(
-              "text-15px font-normal text-foreground",
+              "text-15px font-normal text-foreground w-full",
               classNames?.text,
             )}
           >

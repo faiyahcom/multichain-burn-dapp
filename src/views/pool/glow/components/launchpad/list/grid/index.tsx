@@ -89,7 +89,7 @@ const LaunchpadPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                     }}
                     className="mx-auto"
                   />
-                  <p>
+                  <span>
                     <span>Raised: </span>
                     <MetricNumber
                       classNames={{ container: "inline-flex w-max" }}
@@ -110,7 +110,7 @@ const LaunchpadPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       isShorten
                     />
                     )
-                  </p>
+                  </span>
                   <p>
                     {/* {renderPoolTime(pool)} */}
                     {demoVariant
