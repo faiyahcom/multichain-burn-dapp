@@ -11,7 +11,7 @@ import {
   truncateString,
 } from "@/utils/helpers/string";
 import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 
 interface Props {
   data?: PoolItemType[];
@@ -19,12 +19,10 @@ interface Props {
 }
 
 const LaunchpadPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
-  const [tick, setTick] = useState(0);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTick((prev) => prev + 1);
-    }, 1000);
+    const interval = setInterval(forceUpdate, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -113,7 +111,7 @@ const LaunchpadPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                     />
                     )
                   </p>
-                  <p key={tick}>
+                  <p>
                     {/* {renderPoolTime(pool)} */}
                     {demoVariant
                       ? formatCountdown(demoDiff)
