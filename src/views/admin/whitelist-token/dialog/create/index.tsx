@@ -10,8 +10,8 @@ import {
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import {
   poolTypes,
-  poolTypeLabels,
   type PoolType,
+  adminPoolTypeLabels,
 } from "@/types/admin/master-pool-management";
 import { PlusIcon } from "lucide-react";
 import { Controller, useForm } from "react-hook-form";
@@ -354,7 +354,7 @@ const AdminWhitelistTokenDialogCreate = () => {
                         <AnimateIconButton
                           key={type}
                           variant="letter-icon"
-                          iconLetter={poolTypeLabels[type][0]}
+                          iconLetter={adminPoolTypeLabels[type][0]}
                           isActive={selected}
                           btnProps={{
                             type: "button",
@@ -367,7 +367,7 @@ const AdminWhitelistTokenDialogCreate = () => {
                               );
                             },
                           }}
-                          text={poolTypeLabels[type]}
+                          text={adminPoolTypeLabels[type]}
                           color="#9072f9"
                           classNames={{
                             btn: "after:text-primary-foreground",

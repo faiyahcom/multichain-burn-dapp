@@ -72,8 +72,7 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
   const formattedRemaining =
     vaultBalance?.rewardBalance ??
     fmt(poolDetail?.pool?.currentRewardAmount, rewardDec);
-  const formattedBurn =
-    vaultBalance?.depositBalance ?? fmt(poolDetail?.depositedAmount, burnDec);
+  const formattedBurn = fmt(poolDetail?.depositedAmount, burnDec);
   const settlementFee = fmtFee(poolDetail?.pool?.settlementFee);
   const creationFee =
     poolDetail?.pool?.poolCreationFee !== undefined ? (

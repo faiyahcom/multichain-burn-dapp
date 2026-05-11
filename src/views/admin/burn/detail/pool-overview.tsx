@@ -2,7 +2,10 @@ import { useMemo } from "react";
 import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
 import type { PoolDetailResponse } from "@/types/pool";
 import NetworkIcon from "@/components/layout/header/network-icon";
-import { truncateString } from "@/utils/helpers/string";
+import {
+  formatTimestampSecondsToDate,
+  truncateString,
+} from "@/utils/helpers/string";
 import CopyableText from "@/components/common/copyable-text";
 import PartnerBurnSwitch from "@/views/admin/master-pool-management/partner-burn-switch";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -144,9 +147,13 @@ const PoolOverview = ({ poolDetail, onPartnerToggleSuccess }: Props) => {
         </div>
         <p className="text-[13px] text-greyed">
           {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
-            ? `${new Date(Number(poolDetail?.pool?.timeStart) * 1000).toLocaleString(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })} - ${new Date(
-                Number(poolDetail?.pool?.timeEnd) * 1000,
-              ).toLocaleString(undefined, { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}`
+            ? `${formatTimestampSecondsToDate({
+                timestamp: poolDetail?.pool?.timeStart,
+                formatStr: "yyyy/MM/dd, HH:mm",
+              })} - ${formatTimestampSecondsToDate({
+                timestamp: poolDetail?.pool?.timeEnd,
+                formatStr: "yyyy/MM/dd, HH:mm",
+              })}`
             : "No time limit"}
         </p>
       </div>

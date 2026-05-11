@@ -145,6 +145,12 @@
       {
         "indexed": false,
         "internalType": "uint256",
+        "name": "totalRefunded",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
         "name": "time",
         "type": "uint256"
       }
@@ -699,6 +705,11 @@
           },
           {
             "internalType": "uint256",
+            "name": "interestStopDate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
             "name": "initialReward",
             "type": "uint256"
           },
@@ -804,6 +815,11 @@
           {
             "internalType": "uint256",
             "name": "claimDelay",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "interestStopDate",
             "type": "uint256"
           },
           {

@@ -1,7 +1,11 @@
 import {
   IconActivityHistory,
+  IconArrowLeftRightOutline,
   IconBurnPool,
   IconFeeSettingsGear,
+  IconFlameOutline,
+  IconGridOutline,
+  IconLockOutline,
   IconMyCreatedPools,
   IconMyDashboard,
   IconMyParticipatedPools,
@@ -12,6 +16,7 @@ import {
   IconSupport,
   IconSwap,
   IconSwapHistory,
+  IconUserTag,
 } from "@/assets/react";
 import type { UserRole } from "@/services/authService";
 
@@ -34,6 +39,7 @@ export const NavSectionLabel: Record<NavSection, string> = {
 type NavChild = {
   label: string;
   tab: string;
+  icon?: React.ComponentType<{ className?: string }>;
 };
 
 export type NavItem = {
@@ -168,6 +174,20 @@ export const navItems: NavItem[] = [
 
 export const adminNavItems: NavItem[] = [
   {
+    label: "Dashboard",
+    icon: IconGridOutline,
+    section: navSection.admin,
+    to: "/",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
+    label: "User Management",
+    icon: IconUserTag,
+    section: navSection.admin,
+    to: "/admin/user-management",
+    allowedRoles: ["admin", "super_admin"],
+  },
+  {
     label: "Admin Management",
     section: navSection.admin,
     to: "/admin/admin-management",
@@ -196,6 +216,11 @@ export const adminNavItems: NavItem[] = [
     section: navSection.admin,
     to: "/admin/master-pool-management",
     allowedRoles: ["admin", "super_admin"],
+    children: [
+      { label: "Swap Pool", tab: "swap-pool", icon: IconArrowLeftRightOutline },
+      { label: "Burn Pool", tab: "burn-pool", icon: IconFlameOutline },
+      { label: "Stake Pool", tab: "stake-pool", icon: IconLockOutline },
+    ],
   },
   {
     label: "Draft Pools",

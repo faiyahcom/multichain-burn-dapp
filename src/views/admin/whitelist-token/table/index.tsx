@@ -28,7 +28,7 @@ import {
   type WhitelistToken,
 } from "@/services/whitelistService";
 import { useAdminWhitelistTokenSearchFilterStore } from "@/stores/admin/whitelist-token/search-filter-store";
-import { poolTypeLabels } from "@/types/admin/master-pool-management";
+import { adminPoolTypeLabels } from "@/types/admin/master-pool-management";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { truncateString } from "@/utils/helpers/string";
 import { useAppKitAccount } from "@reown/appkit/react";
@@ -172,7 +172,7 @@ const AdminWhitelistTokenTable = () => {
     "Address",
     "Network",
     "Decimal",
-    "Pool type",
+    "Pool",
     "Description",
     "Links",
     "Status",
@@ -257,7 +257,7 @@ const AdminWhitelistTokenTable = () => {
                           key={kObj.kind}
                           className="text-xs font-medium transition-all group-hover:font-bold"
                         >
-                          {poolTypeLabels[kObj.kind as keyof typeof poolTypeLabels] ?? `Kind ${kObj.kind}`}
+                          {adminPoolTypeLabels[kObj.kind as keyof typeof adminPoolTypeLabels] ?? `Kind ${kObj.kind}`}
                         </span>
                       ))}
                     </div>

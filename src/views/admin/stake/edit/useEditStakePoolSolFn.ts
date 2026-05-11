@@ -24,16 +24,22 @@ export interface EditStakePoolSolParams {
     minStakingAmount: string;
     /** Human-readable max staking amount per tx (0 = unlimited) */
     maxStakingAmount: string;
+    /** Human-readable total staking cap (0 = unlimited) */
+    stakingLimit: string;
     /** Lock-up duration in days */
     lockDuration: number;
     /** Interest start delay (delay_accumulate) in days */
     interestStartDelay: number;
+    /** Interest accrual duration (interest_duration) in days; null / 0 = infinite (uses 0 on-chain) */
+    interestAccrualDuration: number | null;
     /** Claim start delay in days */
     claimStartDelay: number;
     /** APR as plain percentage, e.g. 12 for 12% */
     apr: number;
     /** Decimals of the staking (deposit) token */
     tokenInDecimals: number;
+    /** Optional date/time at which interest stops accruing; undefined = no explicit stop */
+    interestStopDate?: Date;
 }
 
 export const useEditStakePoolSolFn = () => {
@@ -63,10 +69,15 @@ export const useEditStakePoolSolFn = () => {
                 const dec = params.tokenInDecimals;
                 const minStakingBN = toBaseUnits(params.minStakingAmount || "0", dec);
                 const maxStakingBN = toBaseUnits(params.maxStakingAmount || "0", dec);
+                const stakingLimitBN = toBaseUnits(params.stakingLimit || "0", dec);
                 const aprBps = new BN(Math.round(params.apr * DECIMAL_FEE_PERCENT));
                 const lockDurationSec = new BN(Math.round(params.lockDuration * 86400));
                 const delayAccumulate = new BN(Math.round(params.interestStartDelay * 86400));
                 const delayClaim = new BN(Math.round(params.claimStartDelay * 86400));
+                const interestDuration =
+                    params.interestAccrualDuration === null || params.interestAccrualDuration <= 0
+                        ? new BN(0)
+                        : new BN(Math.round(params.interestAccrualDuration * 86400));
 
                 const tx = await program.methods
                     .updatePool({
@@ -75,10 +86,16 @@ export const useEditStakePoolSolFn = () => {
                         name: params.name,
                         maxStakingAmount: maxStakingBN,
                         minStakingAmount: minStakingBN,
+                        stakingLimit: stakingLimitBN,
                         apr: aprBps,
                         lockDuration: lockDurationSec,
                         delayAccumulate,
                         delayClaim,
+                        interestDuration,
+                        stopAccrualAtPoolEnd: false,
+                        interestStopDate: params.interestStopDate
+                            ? new BN(Math.floor(params.interestStopDate.getTime() / 1000))
+                            : null,
                     })
                     .accounts({
                         admin: walletPublicKey,

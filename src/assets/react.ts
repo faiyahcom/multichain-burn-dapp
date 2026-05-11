@@ -49,3 +49,17 @@ export { default as IconToastSuccess } from "./icons/toast-success.svg?react";
 export { default as IconToastWarning } from "./icons/toast-warning.svg?react";
 
 export { default as IconWhiteCamera } from "./icons/white-camera.svg?react";
+
+export { default as IconAdminHomeArrowLeftRight } from "./icons/admin/home/arrow-left-right.svg?react";
+export { default as IconAdminHomeFlame } from "./icons/admin/home/flame.svg?react";
+export { default as IconAdminHomeLock } from "./icons/admin/home/lock.svg?react";
+export { default as IconAdminHomeMultiUsers } from "./icons/admin/home/multi-users.svg?react";
+export { default as IconAdminHomeSingleUser } from "./icons/admin/home/single-user.svg?react";
+export { default as IconAdminHomeStackLayers } from "./icons/admin/home/stack-layers.svg?react";
+
+export { default as IconGridOutline } from "./icons/grid-outline.svg?react";
+export { default as IconUserTag } from "./icons/user-tag.svg?react";
+
+export { default as IconArrowLeftRightOutline } from "./icons/admin/sidebar/arrow-left-right-outline.svg?react";
+export { default as IconFlameOutline } from "./icons/admin/sidebar/flame-outline.svg?react";
+export { default as IconLockOutline } from "./icons/admin/sidebar/lock-outline.svg?react";

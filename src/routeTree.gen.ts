@@ -25,6 +25,7 @@ import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
 import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
 import { Route as AdminWhitelistUserIndexRouteImport } from './routes/admin/whitelist-user/index'
 import { Route as AdminWhitelistTokenIndexRouteImport } from './routes/admin/whitelist-token/index'
+import { Route as AdminUserManagementIndexRouteImport } from './routes/admin/user-management/index'
 import { Route as AdminTransferHistoryIndexRouteImport } from './routes/admin/transfer-history/index'
 import { Route as AdminRevenueFeeStatsIndexRouteImport } from './routes/admin/revenue-fee-stats/index'
 import { Route as AdminMinRatioIndexRouteImport } from './routes/admin/min-ratio/index'
@@ -125,6 +126,12 @@ const AdminWhitelistTokenIndexRoute =
   AdminWhitelistTokenIndexRouteImport.update({
     id: '/admin/whitelist-token/',
     path: '/admin/whitelist-token/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminUserManagementIndexRoute =
+  AdminUserManagementIndexRouteImport.update({
+    id: '/admin/user-management/',
+    path: '/admin/user-management/',
     getParentRoute: () => rootRouteImport,
   } as any)
 const AdminTransferHistoryIndexRoute =
@@ -248,6 +255,7 @@ export interface FileRoutesByFullPath {
   '/admin/min-ratio': typeof AdminMinRatioIndexRoute
   '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
+  '/admin/user-management': typeof AdminUserManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/burn/create': typeof BurnCreateIndexRoute
@@ -284,6 +292,7 @@ export interface FileRoutesByTo {
   '/admin/min-ratio': typeof AdminMinRatioIndexRoute
   '/admin/revenue-fee-stats': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history': typeof AdminTransferHistoryIndexRoute
+  '/admin/user-management': typeof AdminUserManagementIndexRoute
   '/admin/whitelist-token': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user': typeof AdminWhitelistUserIndexRoute
   '/burn/create': typeof BurnCreateIndexRoute
@@ -321,6 +330,7 @@ export interface FileRoutesById {
   '/admin/min-ratio/': typeof AdminMinRatioIndexRoute
   '/admin/revenue-fee-stats/': typeof AdminRevenueFeeStatsIndexRoute
   '/admin/transfer-history/': typeof AdminTransferHistoryIndexRoute
+  '/admin/user-management/': typeof AdminUserManagementIndexRoute
   '/admin/whitelist-token/': typeof AdminWhitelistTokenIndexRoute
   '/admin/whitelist-user/': typeof AdminWhitelistUserIndexRoute
   '/burn/create/': typeof BurnCreateIndexRoute
@@ -359,6 +369,7 @@ export interface FileRouteTypes {
     | '/admin/min-ratio'
     | '/admin/revenue-fee-stats'
     | '/admin/transfer-history'
+    | '/admin/user-management'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
     | '/burn/create'
@@ -395,6 +406,7 @@ export interface FileRouteTypes {
     | '/admin/min-ratio'
     | '/admin/revenue-fee-stats'
     | '/admin/transfer-history'
+    | '/admin/user-management'
     | '/admin/whitelist-token'
     | '/admin/whitelist-user'
     | '/burn/create'
@@ -431,6 +443,7 @@ export interface FileRouteTypes {
     | '/admin/min-ratio/'
     | '/admin/revenue-fee-stats/'
     | '/admin/transfer-history/'
+    | '/admin/user-management/'
     | '/admin/whitelist-token/'
     | '/admin/whitelist-user/'
     | '/burn/create/'
@@ -468,6 +481,7 @@ export interface RootRouteChildren {
   AdminMinRatioIndexRoute: typeof AdminMinRatioIndexRoute
   AdminRevenueFeeStatsIndexRoute: typeof AdminRevenueFeeStatsIndexRoute
   AdminTransferHistoryIndexRoute: typeof AdminTransferHistoryIndexRoute
+  AdminUserManagementIndexRoute: typeof AdminUserManagementIndexRoute
   AdminWhitelistTokenIndexRoute: typeof AdminWhitelistTokenIndexRoute
   AdminWhitelistUserIndexRoute: typeof AdminWhitelistUserIndexRoute
   BurnCreateIndexRoute: typeof BurnCreateIndexRoute
@@ -595,6 +609,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/whitelist-token'
       fullPath: '/admin/whitelist-token'
       preLoaderRoute: typeof AdminWhitelistTokenIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/user-management/': {
+      id: '/admin/user-management/'
+      path: '/admin/user-management'
+      fullPath: '/admin/user-management'
+      preLoaderRoute: typeof AdminUserManagementIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/transfer-history/': {
@@ -748,6 +769,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminMinRatioIndexRoute: AdminMinRatioIndexRoute,
   AdminRevenueFeeStatsIndexRoute: AdminRevenueFeeStatsIndexRoute,
   AdminTransferHistoryIndexRoute: AdminTransferHistoryIndexRoute,
+  AdminUserManagementIndexRoute: AdminUserManagementIndexRoute,
   AdminWhitelistTokenIndexRoute: AdminWhitelistTokenIndexRoute,
   AdminWhitelistUserIndexRoute: AdminWhitelistUserIndexRoute,
   BurnCreateIndexRoute: BurnCreateIndexRoute,

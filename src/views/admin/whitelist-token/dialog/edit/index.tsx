@@ -13,8 +13,8 @@ import {
 } from "@/config/networks";
 import {
   poolTypes,
-  poolTypeLabels,
   type PoolType,
+  adminPoolTypeLabels,
 } from "@/types/admin/master-pool-management";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
@@ -412,7 +412,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                         <AnimateIconButton
                           key={type}
                           variant="letter-icon"
-                          iconLetter={poolTypeLabels[type][0]}
+                          iconLetter={adminPoolTypeLabels[type][0]}
                           isActive={selected || highlighted}
                           btnProps={{
                             type: "button",
@@ -427,7 +427,7 @@ const AdminWhitelistTokenDialogEdit: React.FC<Props> = ({
                               );
                             },
                           }}
-                          text={poolTypeLabels[type]}
+                          text={adminPoolTypeLabels[type]}
                           color="#9072f9"
                           classNames={{
                             btn: "after:text-primary-foreground",

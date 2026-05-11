@@ -13,11 +13,13 @@ import { useAuthStore } from "@/stores/authStore";
 import { truncateString } from "@/utils/helpers/string";
 import { useDisconnect, useWalletInfo } from "@reown/appkit/react";
 import { useQuery } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { LogOutIcon } from "lucide-react";
 
 type Props = {};
 
 const ProfileMenu = ({}: Props) => {
+  const navigate = useNavigate();
   const { logout, user } = useAuthStore();
   const { disconnect } = useDisconnect();
   const { walletInfo } = useWalletInfo();
@@ -40,6 +42,9 @@ const ProfileMenu = ({}: Props) => {
   const handleLogout = async () => {
     await disconnect();
     logout();
+    navigate({
+      to: "/",
+    });
   };
 
   const avatar = userApiData?.avatar ?? walletInfo?.icon;
@@ -86,7 +91,7 @@ const ProfileMenu = ({}: Props) => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-44 rounded-lg p-1">
-          <div className="sm:hidden p-2">
+          <div className="p-2 sm:hidden">
             <p
               className="min-w-0 truncate text-13px font-extrabold"
               title={name}

@@ -90,7 +90,6 @@ const AdminRevenueFeeStats = () => {
       (listData?.txns ?? []).map((record) => ({
         time: formatTimestampSecondsToDate({
           timestamp: record.timestamp,
-          formatStr: "dd/MM/yyyy",
         }),
         poolName: record.pool.name,
         poolAddress: record.poolAddress,
@@ -195,7 +194,6 @@ const AdminRevenueFeeStats = () => {
             <DatePicker
               value={dateFrom}
               onChange={setDateFrom}
-              placeholder="DD/MM/YY"
               calendarProps={{
                 disabled: dateTo ? { after: dateTo } : undefined,
               }}
@@ -204,7 +202,6 @@ const AdminRevenueFeeStats = () => {
             <DatePicker
               value={dateTo}
               onChange={setDateTo}
-              placeholder="DD/MM/YY"
               calendarProps={{
                 disabled: dateFrom ? { before: dateFrom } : undefined,
               }}

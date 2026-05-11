@@ -2,7 +2,7 @@ import BlueSwitch from "@/components/common/blue-switch";
 import { toast } from "@/components/common/custom-toast";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { adminNotificationService } from "@/services/adminNotificationService";
-import { poolQueryKeys } from "@/services/queries/queryKey";
+import { adminPoolManagementQueryKeys } from "@/services/queries/queryKey";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -36,7 +36,7 @@ const LowRewardNotiSwitch: React.FC<Props> = ({
       }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: poolQueryKeys.list().filter(Boolean),
+        queryKey: adminPoolManagementQueryKeys.list().filter(Boolean),
         exact: false,
       });
       onSuccess?.();

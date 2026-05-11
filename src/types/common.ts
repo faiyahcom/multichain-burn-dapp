@@ -4,9 +4,21 @@ import type { FunctionComponent, SVGProps } from "react";
 export const sortOrders = ["asc", "desc"] as const;
 export type SortOrder = (typeof sortOrders)[number];
 
-export const sortBys = ["none", "volume", "tvl", "timestamp"] as const;
+export const sortBys = [
+  "none",
+  "volume",
+  "tvl",
+  "timestamp",
+  "joinedTime",
+  "claimableReward",
+  "amountBurned",
+  "joinedUsersCount",
+  "stakedAmount",
+  "swappedAmount",
+  "burnedAmount",
+] as const;
 export type SortBy = (typeof sortBys)[number];
-export const sortBysLabels: Record<string, string> = {
+export const sortBysLabels: Record<SortBy, string> = {
   none: "None",
   volume: "Volume (24h)",
   tvl: "TVL",
@@ -14,8 +26,12 @@ export const sortBysLabels: Record<string, string> = {
   joinedTime: "Newest Joined",
   claimableReward: "Claimable Reward",
   amountBurned: "Amount Burned",
+  joinedUsersCount: "Joined Users",
+  stakedAmount: "Staked Amount",
+  swappedAmount: "Swapped Amount",
+  burnedAmount: "Burned Amount",
 };
-export const sortBysShortLabels: Record<string, string> = {
+export const sortBysShortLabels: Record<SortBy, string> = {
   none: "None",
   volume: "Volume",
   tvl: "TVL",
@@ -23,6 +39,10 @@ export const sortBysShortLabels: Record<string, string> = {
   joinedTime: "Newest",
   claimableReward: "Claimable",
   amountBurned: "Burned",
+  joinedUsersCount: "Users",
+  stakedAmount: "Staked",
+  swappedAmount: "Swapped",
+  burnedAmount: "Burned",
 };
 
 export const listLayouts = ["card", "list"] as const;

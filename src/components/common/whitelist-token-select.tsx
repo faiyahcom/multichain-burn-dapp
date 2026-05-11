@@ -18,6 +18,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Spinner } from "../ui/spinner";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { cn } from "@/lib/utils";
+import TokenImage from "./token-image";
 
 type Props = {
   value?: string;
@@ -78,11 +79,11 @@ const WhitelistTokenSelect = ({
   // Native token entry shown at top of list
   const nativeToken = nativeCurrency
     ? {
-        address: nativeAddress,
-        name: nativeCurrency.name,
-        symbol: nativeCurrency.symbol,
-        imageUri: networkConfig?.iconSrc ?? "",
-      }
+      address: nativeAddress,
+      name: nativeCurrency.name,
+      symbol: nativeCurrency.symbol,
+      imageUri: networkConfig?.iconSrc ?? "",
+    }
     : null;
 
   // Show native token if search text is empty or matches native token symbol or name
@@ -100,8 +101,8 @@ const WhitelistTokenSelect = ({
     value === nativeAddress
       ? nativeToken
       : whitelistTokens?.whitelistTokens.find(
-          (token) => token.address === value,
-        );
+        (token) => token.address === value,
+      );
 
   return (
     <DropdownMenu open={open} onOpenChange={handleOpenChange}>
@@ -113,8 +114,10 @@ const WhitelistTokenSelect = ({
         >
           {value && selectedDetail ? (
             <div className="flex items-center gap-4">
-              <img
-                className="size-6 rounded-full"
+              <TokenImage
+                classNames={{
+                  common: "size-6 rounded-full",
+                }}
                 src={selectedDetail.imageUri}
                 alt={selectedDetail.name}
               />
@@ -172,10 +175,12 @@ const WhitelistTokenSelect = ({
                   }
                 }}
               >
-                <img
+                <TokenImage
+                  classNames={{
+                    common: "size-7.75 rounded-full",
+                  }}
                   src={nativeToken.imageUri}
                   alt={nativeToken.symbol}
-                  className="size-7.75 rounded-full"
                 />
                 <div className="flex flex-col">
                   <span className="text-xs">{nativeToken.name}</span>
@@ -214,10 +219,12 @@ const WhitelistTokenSelect = ({
                     }
                   }}
                 >
-                  <img
+                  <TokenImage
+                    classNames={{
+                      common: "size-7.75 rounded-full",
+                    }}
                     src={token.imageUri}
                     alt={token.symbol}
-                    className="size-7.75 rounded-full"
                   />
                   <div className="flex flex-col">
                     <span className="text-xs">{resolveName(token)}</span>
