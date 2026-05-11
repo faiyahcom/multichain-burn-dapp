@@ -27,7 +27,7 @@ interface Props {
 const DatePicker: React.FC<Props> = ({
   value,
   onChange,
-  placeholder = "DD/MM/YY",
+  placeholder = "YYYY/MM/DD",
   classNames,
   calendarProps,
 }) => {
@@ -41,7 +41,7 @@ const DatePicker: React.FC<Props> = ({
         >
           <CalendarIcon className="size-5 shrink-0" />
           <span className={cn({ "text-secondary-text": !value })}>
-            {value ? format(value, "dd/MM/yy") : placeholder}
+            {value ? format(value, "yyyy/MM/dd") : placeholder}
           </span>
           <ArrowIcon direction="down" />
         </Button>

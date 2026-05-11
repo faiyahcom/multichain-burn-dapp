@@ -131,7 +131,9 @@ const EndStatus = ({ poolDetail }: Props) => {
                 poolKind={pool?.kind}
                 poolInfo={{
                     tokenInSymbol: tokenInSymbolDisplay,
+                    tokenInName: burnTokenDisplay.name,
                     rewardTokenSymbol: rewardTokenSymbolDisplay,
+                    rewardTokenName: rewardTokenDisplay.name,
                     currentRewardAmount: formattedAvailable,
                     currentDepositAmount: formattedDepositAvailable,
                     rewardTokenDecimals: pool?.rewardTokenDecimals,

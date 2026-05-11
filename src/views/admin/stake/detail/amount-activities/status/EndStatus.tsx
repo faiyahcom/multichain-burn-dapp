@@ -55,6 +55,15 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
         imageUri: poolDetail?.tokenIn?.imageUri,
     });
     const tokenInSymbolDisplay = stakingTokenDisplay.symbol;
+    const rewardTokenDisplay = resolvePoolTokenDisplay({
+        network: networkConfig,
+        tokenAddress: poolDetail?.pool?.rewardToken,
+        tokenSymbol: poolDetail?.tokenOut?.symbol,
+        tokenName: poolDetail?.tokenOut?.name,
+        customName: poolDetail?.tokenOut?.customName,
+        customSymbol: poolDetail?.tokenOut?.customSymbol,
+        imageUri: poolDetail?.tokenOut?.imageUri,
+    });
 
     const refetchVaultBalance = vaultBalance?.refetch;
     const computedEvmBalances = useStakePoolComputedBalancesEvm({
@@ -139,7 +148,9 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
                 poolKind={pool?.kind}
                 poolInfo={{
                     tokenInSymbol: tokenInSymbolDisplay,
+                    tokenInName: stakingTokenDisplay.name,
                     rewardTokenSymbol: rewardTokenSymbolDisplay,
+                    rewardTokenName: rewardTokenDisplay.name,
                     currentRewardAmount: formattedRewardAvailable,
                     currentDepositAmount: formattedDepositAvailable,
                     rewardTokenDecimals: pool?.rewardTokenDecimals,

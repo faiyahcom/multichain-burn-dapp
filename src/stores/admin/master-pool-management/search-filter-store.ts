@@ -24,7 +24,7 @@ export const useMasterPoolManagementSearchFilterStore =
     filter: {
       page: 1,
       type: "all",
-      status: allPoolStatuses,
+      status: [...allPoolStatuses],
       network: NETWORK_CONFIGS.map((network) => network.id),
       text: "",
     },

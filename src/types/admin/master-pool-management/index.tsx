@@ -16,6 +16,13 @@ export const poolTypeLabels: Record<PoolType, string> = {
   3: "Launchpad",
 };
 
+export const adminPoolTypeLabels: Record<PoolType, string> = {
+  0: "Burn",
+  1: "Swap",
+  2: "Stake",
+  3: "Launchpad",
+};
+
 export const poolTypeOptionValues = [
   "all",
   ...poolTypes.map((type) => type.toString()),
@@ -33,6 +40,13 @@ export const poolTypeOptions = poolTypeOptionValues.map((value) => {
 export const poolTypeShortenOptions = poolTypes.map((type) => {
   return {
     label: poolTypeLabels[type],
+    value: type.toString(),
+  };
+});
+
+export const adminPoolTypeShortenOptions = poolTypes.map((type) => {
+  return {
+    label: adminPoolTypeLabels[type],
     value: type.toString(),
   };
 });

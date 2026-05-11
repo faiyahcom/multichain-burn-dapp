@@ -151,7 +151,9 @@ const ClosedStatus = ({ poolDetail, vaultBalance }: Props) => {
                 poolKind={pool?.kind}
                 poolInfo={{
                     tokenInSymbol: tokenInSymbolDisplay,
+                    tokenInName: stakingTokenDisplay.name,
                     rewardTokenSymbol: rewardTokenSymbolDisplay,
+                    rewardTokenName: rewardTokenDisplay.name,
                     currentRewardAmount: formattedRewardAvailable,
                     currentDepositAmount: formattedDepositAvailable,
                     rewardTokenDecimals: pool?.rewardTokenDecimals,

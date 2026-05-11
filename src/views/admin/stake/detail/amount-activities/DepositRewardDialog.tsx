@@ -10,11 +10,10 @@ import {
     DialogPortal,
     DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import {
     toBaseUnits,
@@ -25,7 +24,7 @@ import {
 import Decimal from "decimal.js";
 import { AssetTypeEnum } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import BN from "bn.js";
@@ -143,6 +142,7 @@ const DepositRewardDialog = ({
         setValue,
         reset,
         watch,
+        control,
         formState: { errors, isSubmitting, isValid },
     } = useForm<FormValues>({
         defaultValues: { amount: "" },
@@ -183,7 +183,7 @@ const DepositRewardDialog = ({
 
     const aprDisplay =
         stakePool?.apr !== undefined
-            ? `${(Number(stakePool.apr) / 100).toFixed(2)}%`
+            ? `${shortenNumber({ number: Number(stakePool.apr) / 100, decimalPlaces: 2 })}%`
             : "—";
 
     const currentRewardFormatted = useMemo(() => {
@@ -402,7 +402,7 @@ const DepositRewardDialog = ({
                                         <span>
                                             {isLoadingRewardBalance
                                                 ? "Loading..."
-                                                : `${rewardBalanceFormatted ?? "0"} ${rewardSymbol}`}
+                                                : `${shortenNumber({ number: Number(rewardBalanceFormatted ?? 0), decimalPlaces: 2 })} ${rewardSymbol}`}
                                         </span>
                                     </span>
                                 </div>
@@ -411,12 +411,21 @@ const DepositRewardDialog = ({
                                     className={`relative flex items-center ${errors.amount ? "ring-1 ring-destructive" : ""
                                         }`}
                                 >
-                                    <Input
-                                        {...register("amount")}
-                                        type="number"
-                                        step={DEFAULT_INPUT_NUMBER_STEP}
-                                        placeholder="Enter amount"
-                                        className="h-full flex-1 px-10 py-2 text-base"
+                                    <Controller
+                                        control={control}
+                                        name="amount"
+                                        render={({ field }) => (
+                                            <NumericInput
+                                                placeholder="Enter amount"
+                                                className="h-full flex-1 px-10 py-2 text-base"
+                                                aria-invalid={!!errors.amount}
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                ref={field.ref}
+                                                name={field.name}
+                                                onBlur={field.onBlur}
+                                            />
+                                        )}
                                     />
                                     <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
                                         <TokenImage

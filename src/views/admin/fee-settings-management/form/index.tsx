@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { ethers } from "ethers";
@@ -25,6 +25,7 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import { ArrowIcon } from "@/components/common/arrow-icon";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -36,7 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { cn } from "@/lib/utils";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
+
 
 const createFeeSettingsSchema = (isSolana: boolean) =>
   z.object({
@@ -162,6 +163,7 @@ const FeeSettingsForm = () => {
     reset,
     clearErrors,
     trigger,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<FeeSettingsFormValues>({
     resolver: zodResolver(feeSettingsSchema),
@@ -290,13 +292,21 @@ const FeeSettingsForm = () => {
               errors.creationFee && "rounded-md-plus ring-1 ring-destructive",
             )}
           >
-            <Input
-              {...register("creationFee")}
-              type="number"
-              min="0"
-              step={DEFAULT_INPUT_NUMBER_STEP}
-              placeholder={`Enter fee amount in ${nativeSymbol}`}
-              className="pr-32"
+            <Controller
+              control={control}
+              name="creationFee"
+              render={({ field }) => (
+                <NumericInput
+                  placeholder={`Enter fee amount in ${nativeSymbol}`}
+                  className="pr-32"
+                  aria-invalid={!!errors.creationFee}
+                  value={field.value}
+                  onChange={field.onChange}
+                  ref={field.ref}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
 
             <div className="absolute right-0 flex h-full items-center gap-2 rounded-md-plus bg-mb-summary-token-card px-12.5 py-2 text-lg">
@@ -325,16 +335,23 @@ const FeeSettingsForm = () => {
         <div className="mb-5.5 w-full max-w-60 space-y-0.5">
           <p className="text-base">Settlement Fee (%)</p>
 
-          <Input
-            {...register("settlementFee")}
-            type="number"
-            min="0"
-            max="100"
-            step={DEFAULT_INPUT_NUMBER_STEP}
-            placeholder="Enter settlement fee %"
-            className={cn(
-              "mb-1.75",
-              errors.settlementFee && "ring-1 ring-destructive",
+          <Controller
+            control={control}
+            name="settlementFee"
+            render={({ field }) => (
+              <NumericInput
+                placeholder="Enter settlement fee %"
+                className={cn(
+                  "mb-1.75",
+                  errors.settlementFee && "ring-1 ring-destructive",
+                )}
+                aria-invalid={!!errors.settlementFee}
+                value={field.value}
+                onChange={field.onChange}
+                ref={field.ref}
+                name={field.name}
+                onBlur={field.onBlur}
+              />
             )}
           />
 

@@ -1,7 +1,9 @@
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
+import { format } from "date-fns";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { useSystemStore } from "@/stores/systemStore";
 import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
 import AnimateIconButton from "@/components/common/animate-icon-button";
@@ -14,6 +16,7 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { useNavigate } from "@tanstack/react-router";
+
 
 type CreateStakePoolFormValues = {
   poolName: string;
@@ -30,10 +33,11 @@ type CreateStakePoolFormValues = {
   claimStartDelay: string;
   apr: string;
   lowRewardNotification: boolean;
+  interestStopDate: Date | undefined;
   budget: string;
 };
 
-export const MIN_DAYS = import.meta.env.VITE_ENV !== "production" ? 0 : 1;
+export const MIN_DAYS = import.meta.env.VITE_ENV === "development" ? 0 : 1;
 
 const CreateStakePoolForm = () => {
   const navigate = useNavigate();
@@ -57,6 +61,7 @@ const CreateStakePoolForm = () => {
     setValue,
     watch,
     getValues,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<CreateStakePoolFormValues>({
     mode: "onChange",
@@ -75,6 +80,7 @@ const CreateStakePoolForm = () => {
       claimStartDelay: "",
       apr: "",
       lowRewardNotification: true,
+      interestStopDate: undefined,
       budget: "",
     },
   });
@@ -86,6 +92,67 @@ const CreateStakePoolForm = () => {
   const stakingLimitVal = watch("stakingLimit");
   const aprVal = watch("apr");
   const interestDurationVal = watch("interestAccrualDuration");
+  const lockDurationVal = watch("lockDuration");
+  const interestStartDelayVal = watch("interestStartDelay");
+  const claimStartDelayVal = watch("claimStartDelay");
+  const interestStopDateVal = watch("interestStopDate");
+
+  const validInterestStopRange = useMemo(() => {
+    const startSec = startTime ? startTime.getTime() / 1000 : null;
+    const endSec = endTime ? endTime.getTime() / 1000 : null;
+    if (!startSec || !endSec || endSec <= startSec) return null;
+    const lockDays = Number(lockDurationVal) || 0;
+    const interestDelayDays = Number(interestStartDelayVal) || 0;
+    const interestAccrualDays =
+      interestDurationVal && Number(interestDurationVal) > 0
+        ? Number(interestDurationVal)
+        : null;
+    const claimDelayDays = Number(claimStartDelayVal) || 0;
+    const D = endSec - startSec;
+    const lockSec = lockDays * 86400;
+    const interestDelaySec = interestDelayDays * 86400;
+    const claimDelaySec = claimDelayDays * 86400;
+    if (lockSec <= D + interestDelaySec) return null;
+    if (claimDelaySec <= D) return null;
+    if (interestAccrualDays !== null && interestAccrualDays * 86400 <= D) return null;
+    const lower = endSec + interestDelaySec;
+    const upperCandidates: number[] = [
+      startSec + lockSec,
+      startSec + interestDelaySec + claimDelaySec,
+    ];
+    if (interestAccrualDays !== null) {
+      upperCandidates.push(startSec + interestDelaySec + interestAccrualDays * 86400);
+    }
+    const upper = Math.min(...upperCandidates);
+    if (lower >= upper) return null;
+    return { lower, upper };
+  }, [startTime, endTime, lockDurationVal, interestStartDelayVal, interestDurationVal, claimStartDelayVal]);
+
+  const interestStopWarnings = useMemo((): string[] | null => {
+    if (validInterestStopRange) return null;
+    const startSec = startTime ? startTime.getTime() / 1000 : null;
+    const endSec = endTime ? endTime.getTime() / 1000 : null;
+    if (!startSec || !endSec || endSec <= startSec) return null;
+    // Only evaluate infeasibility once both required duration fields are filled
+    if (!lockDurationVal || !claimStartDelayVal) return null;
+    const D = endSec - startSec;
+    const D_days = D / 86400;
+    const lockDays = Number(lockDurationVal) || 0;
+    const interestDelayDays = Number(interestStartDelayVal) || 0;
+    const claimDelayDays = Number(claimStartDelayVal) || 0;
+    const interestAccrualDays =
+      interestDurationVal && Number(interestDurationVal) > 0
+        ? Number(interestDurationVal)
+        : null;
+    const reasons: string[] = [];
+    if (lockDays * 86400 <= D + interestDelayDays * 86400)
+      reasons.push(`Lock-up Duration must be > ${D_days + interestDelayDays} days (pool duration ${D_days} + interest start delay ${interestDelayDays})`);
+    if (claimDelayDays * 86400 <= D)
+      reasons.push(`Claim Start Delay must be > ${D_days} days (pool duration)`);
+    if (interestAccrualDays !== null && interestAccrualDays * 86400 <= D)
+      reasons.push(`Interest Accrual Duration must be > ${D_days} days (pool duration)`);
+    return reasons.length > 0 ? reasons : null;
+  }, [validInterestStopRange, startTime, endTime, lockDurationVal, interestStartDelayVal, interestDurationVal, claimStartDelayVal]);
 
   const maxRewardEnabled =
     Number(stakingLimitVal) > 0 &&
@@ -146,6 +213,7 @@ const CreateStakePoolForm = () => {
           claimStartDelay: Number(values.claimStartDelay) || 0,
           apr: Number(values.apr) || 0,
           lowRewardNotification: values.lowRewardNotification,
+          interestStopDate: values.interestStopDate,
         });
         if (poolAddress) {
           if (!isDraft) await submitPoolSol(poolAddress);
@@ -180,6 +248,7 @@ const CreateStakePoolForm = () => {
         claimStartDelay: Number(values.claimStartDelay) || 0,
         apr: Number(values.apr) || 0,
         autoSubmit: !isDraft,
+        interestStopDate: values.interestStopDate,
       });
       if (poolAddress) {
         reset();
@@ -343,13 +412,10 @@ const CreateStakePoolForm = () => {
           <div className="flex flex-1 flex-col gap-1.5">
             <span className="text-[13px]">Min Staking Amount</span>
             <InputGroup className="h-fit">
-              <Input
-                type="number"
-                min="0"
-                step="any"
-                placeholder="0"
-                aria-invalid={!!errors.minStakingAmount}
-                {...register("minStakingAmount", {
+              <Controller
+                control={control}
+                name="minStakingAmount"
+                rules={{
                   validate: (v) => {
                     if (!v || v === "") return true;
                     const max = Number(getValues("maxStakingAmount"));
@@ -360,7 +426,18 @@ const CreateStakePoolForm = () => {
                       return "Max 6 decimal places allowed";
                     return true;
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <NumericInput
+                    placeholder="0"
+                    aria-invalid={!!errors.minStakingAmount}
+                    value={field.value}
+                    onChange={field.onChange}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <InputGroupAddon align="inline-end">
                 {selectedStakingToken && (
@@ -389,13 +466,10 @@ const CreateStakePoolForm = () => {
           <div className="flex flex-1 flex-col gap-1.5">
             <span className="text-[13px]">Max Staking Amount</span>
             <InputGroup className="h-fit">
-              <Input
-                type="number"
-                min="0"
-                step="any"
-                placeholder="0"
-                aria-invalid={!!errors.maxStakingAmount}
-                {...register("maxStakingAmount", {
+              <Controller
+                control={control}
+                name="maxStakingAmount"
+                rules={{
                   validate: (v) => {
                     if (!v || v === "") return true;
                     if (Number(v) <= 0) return "Must be greater than 0";
@@ -409,7 +483,18 @@ const CreateStakePoolForm = () => {
                       return "Max 6 decimal places allowed";
                     return true;
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <NumericInput
+                    placeholder="0"
+                    aria-invalid={!!errors.maxStakingAmount}
+                    value={field.value}
+                    onChange={field.onChange}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <InputGroupAddon align="inline-end">
                 {selectedStakingToken && (
@@ -440,13 +525,10 @@ const CreateStakePoolForm = () => {
         {/* Staking Limit */}
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px]">Staking Limit</span>
-          <Input
-            type="number"
-            min="0"
-            step="any"
-            placeholder="0"
-            aria-invalid={!!errors.stakingLimit}
-            {...register("stakingLimit", {
+          <Controller
+            control={control}
+            name="stakingLimit"
+            rules={{
               validate: (v) => {
                 if (!v || v === "") return true;
                 if (Number(v) <= 0) return "Staking limit must be > 0";
@@ -457,7 +539,18 @@ const CreateStakePoolForm = () => {
                   return "Max 6 decimal places allowed";
                 return true;
               },
-            })}
+            }}
+            render={({ field }) => (
+              <NumericInput
+                placeholder="0"
+                aria-invalid={!!errors.stakingLimit}
+                value={field.value}
+                onChange={field.onChange}
+                ref={field.ref}
+                name={field.name}
+                onBlur={field.onBlur}
+              />
+            )}
           />
           {errors.stakingLimit && (
             <p className="text-xs text-destructive">
@@ -509,13 +602,10 @@ const CreateStakePoolForm = () => {
               Lock-up Duration <span className="text-destructive">*</span>
             </span>
             <InputGroup className="h-fit">
-              <Input
-                type="number"
-                min={MIN_DAYS}
-                step="any"
-                placeholder="0"
-                aria-invalid={!!errors.lockDuration}
-                {...register("lockDuration", {
+              <Controller
+                control={control}
+                name="lockDuration"
+                rules={{
                   validate: {
                     required: (v) =>
                       !submitAttemptedRef.current || v !== ""
@@ -525,12 +615,19 @@ const CreateStakePoolForm = () => {
                       v === "" || Number(v) >= MIN_DAYS
                         ? true
                         : `Must be ≥ ${MIN_DAYS}`,
-                    // decimals: (v) =>
-                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
-                    //     ? true
-                    //     : "Max 6 decimal places allowed",
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <NumericInput
+                    placeholder="0"
+                    aria-invalid={!!errors.lockDuration}
+                    value={field.value}
+                    onChange={field.onChange}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <InputGroupAddon align="inline-end">
                 <span className="text-xs">days</span>
@@ -547,24 +644,30 @@ const CreateStakePoolForm = () => {
               Interest Start Delay <span className="text-destructive">*</span>
             </span>
             <InputGroup className="h-fit">
-              <Input
-                type="number"
-                min="0"
-                step="any"
-                placeholder="0"
-                aria-invalid={!!errors.interestStartDelay}
-                {...register("interestStartDelay", {
+              <Controller
+                control={control}
+                name="interestStartDelay"
+                rules={{
                   validate: {
                     required: (v) =>
                       !submitAttemptedRef.current || v !== ""
                         ? true
                         : "Interest start delay is required",
                     gte0: (v) =>
-                      v === "" || Number(v) >= 0
-                        ? true
-                        : "Must be \u2265 0",
+                      v === "" || Number(v) >= 0 ? true : "Must be \u2265 0",
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <NumericInput
+                    placeholder="0"
+                    aria-invalid={!!errors.interestStartDelay}
+                    value={field.value}
+                    onChange={field.onChange}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <InputGroupAddon align="inline-end">
                 <span className="text-xs">days</span>
@@ -583,18 +686,26 @@ const CreateStakePoolForm = () => {
           <div className="flex flex-1 flex-col gap-1.5">
             <span className="text-[13px]">Interest Accrual Duration</span>
             <InputGroup className="h-fit">
-              <Input
-                type="number"
-                min={MIN_DAYS}
-                step="any"
-                placeholder="0"
-                {...register("interestAccrualDuration", {
+              <Controller
+                control={control}
+                name="interestAccrualDuration"
+                rules={{
                   validate: (v) => {
                     if (!v) return true;
                     if (Number(v) < MIN_DAYS) return `Must be ≥ ${MIN_DAYS}`;
                     return true;
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <NumericInput
+                    placeholder="0"
+                    value={field.value}
+                    onChange={field.onChange}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <InputGroupAddon align="inline-end">
                 <span className="text-xs">days</span>
@@ -611,13 +722,10 @@ const CreateStakePoolForm = () => {
               Claim Start Delay <span className="text-destructive">*</span>
             </span>
             <InputGroup className="h-fit">
-              <Input
-                type="number"
-                min={MIN_DAYS}
-                step="any"
-                placeholder="0"
-                aria-invalid={!!errors.claimStartDelay}
-                {...register("claimStartDelay", {
+              <Controller
+                control={control}
+                name="claimStartDelay"
+                rules={{
                   validate: {
                     required: (v) =>
                       !submitAttemptedRef.current || v !== ""
@@ -627,12 +735,19 @@ const CreateStakePoolForm = () => {
                       v === "" || Number(v) >= MIN_DAYS
                         ? true
                         : `Must be ≥ ${MIN_DAYS}`,
-                    // decimals: (v) =>
-                    //   !v || !v.includes(".") || v.split(".")[1].length <= 6
-                    //     ? true
-                    //     : "Max 6 decimal places allowed",
                   },
-                })}
+                }}
+                render={({ field }) => (
+                  <NumericInput
+                    placeholder="0"
+                    aria-invalid={!!errors.claimStartDelay}
+                    value={field.value}
+                    onChange={field.onChange}
+                    ref={field.ref}
+                    name={field.name}
+                    onBlur={field.onBlur}
+                  />
+                )}
               />
               <InputGroupAddon align="inline-end">
                 <span className="text-xs">days</span>
@@ -646,19 +761,113 @@ const CreateStakePoolForm = () => {
           </div>
         </div>
 
+        {/* Interest Stop Date */}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px]">Interest Stop Date</span>
+          {validInterestStopRange ? (
+            <p className="text-[11px] text-greyed">
+              Valid value must be after {" "}
+              {format(new Date(validInterestStopRange.lower * 1000), "MMM dd, yyyy, HH:mm")}
+              {" and before "}
+              {format(new Date(validInterestStopRange.upper * 1000), "MMM dd, yyyy, HH:mm")}
+            </p>
+          ) : interestStopWarnings ? (
+            <div className="space-y-0.5">
+              {interestStopWarnings.map((reason, i) => (
+                <p key={i} className="text-[11px] text-greyed">{reason}</p>
+              ))}
+            </div>
+          ) : (
+            startTime && endTime && (
+              <p className="text-[11px] text-greyed">
+                Set Lock-up Duration, Claim Start Delay, and Interest Start Delay to see valid range.
+              </p>
+            )
+          )}
+          <div className="flex items-center gap-2">
+            <DatePicker
+              value={interestStopDateVal}
+              onChange={(date) =>
+                setValue("interestStopDate", date as Date | undefined, {
+                  shouldValidate: true,
+                })
+              }
+              disabled={(date) => {
+                if (!validInterestStopRange) return false;
+                const dayStart = date.getTime() / 1000;
+                const dayEnd = dayStart + 86400;
+                return dayEnd <= validInterestStopRange.lower || dayStart >= validInterestStopRange.upper;
+              }}
+            />
+            {interestStopDateVal && (
+              <button
+                type="button"
+                className="text-xs text-greyed hover:text-destructive"
+                onClick={() =>
+                  setValue("interestStopDate", undefined, { shouldValidate: true })
+                }
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <input
+            type="hidden"
+            {...register("interestStopDate", {
+              validate: (v) => {
+                if (!v) return true;
+                const start = getValues("startTime");
+                const end = getValues("endTime");
+                if (!start || !end) return true;
+                const startSec = start.getTime() / 1000;
+                const endSec = end.getTime() / 1000;
+                const interestDelayDays = Number(getValues("interestStartDelay")) || 0;
+                const lockDays = Number(getValues("lockDuration")) || 0;
+                const interestAccrualStr = getValues("interestAccrualDuration");
+                const claimDelayDays = Number(getValues("claimStartDelay")) || 0;
+                const D = endSec - startSec;
+                const interestDelaySec = interestDelayDays * 86400;
+                const lockSec = lockDays * 86400;
+                const claimDelaySec = claimDelayDays * 86400;
+                if (lockSec <= D + interestDelaySec) return "Lock-up Duration too short";
+                if (claimDelaySec <= D)
+                  return "Claim Start Delay must be greater than pool duration";
+                const dateTs = v.getTime() / 1000;
+                const lower = endSec + interestDelaySec;
+                const upperCandidates: number[] = [
+                  startSec + lockSec,
+                  startSec + interestDelaySec + claimDelaySec,
+                ];
+                if (interestAccrualStr && Number(interestAccrualStr) > 0) {
+                  const accrualSec = Number(interestAccrualStr) * 86400;
+                  if (accrualSec <= D)
+                    return "Interest Accrual Duration must be greater than pool duration";
+                  upperCandidates.push(startSec + interestDelaySec + accrualSec);
+                }
+                const upper = Math.min(...upperCandidates);
+                if (dateTs <= lower || dateTs >= upper)
+                  return "Interest Stop Date out of valid range";
+                return true;
+              },
+            })}
+          />
+          {errors.interestStopDate && (
+            <p className="text-xs text-destructive">
+              {errors.interestStopDate.message}
+            </p>
+          )}
+        </div>
+
         {/* APR */}
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px]">
             APR <span className="text-destructive">*</span>
           </span>
           <InputGroup className="h-fit max-w-64">
-            <Input
-              type="number"
-              min="0"
-              step="any"
-              placeholder="0"
-              aria-invalid={!!errors.apr}
-              {...register("apr", {
+            <Controller
+              control={control}
+              name="apr"
+              rules={{
                 validate: {
                   required: (v) =>
                     !submitAttemptedRef.current || v !== ""
@@ -671,7 +880,18 @@ const CreateStakePoolForm = () => {
                       ? true
                       : "Max 6 decimal places allowed",
                 },
-              })}
+              }}
+              render={({ field }) => (
+                <NumericInput
+                  placeholder="0"
+                  aria-invalid={!!errors.apr}
+                  value={field.value}
+                  onChange={field.onChange}
+                  ref={field.ref}
+                  name={field.name}
+                  onBlur={field.onBlur}
+                />
+              )}
             />
             <InputGroupAddon align="inline-end">
               <span className="text-xs">%</span>
@@ -700,13 +920,10 @@ const CreateStakePoolForm = () => {
         <span className="text-xl font-medium">Deposit Reward Tokens</span>
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px]">Budget</span>
-          <Input
-            type="number"
-            min="0"
-            step="any"
-            placeholder="0"
-            aria-invalid={!!errors.budget}
-            {...register("budget", {
+          <Controller
+            control={control}
+            name="budget"
+            rules={{
               validate: (v) => {
                 if (!v) return true;
                 if (Number(v) < 0) return "Budget must be ≥ 0";
@@ -714,8 +931,19 @@ const CreateStakePoolForm = () => {
                   return "Max 6 decimal places allowed";
                 return true;
               },
-            })}
-            className="max-w-xs"
+            }}
+            render={({ field }) => (
+              <NumericInput
+                placeholder="0"
+                aria-invalid={!!errors.budget}
+                className="max-w-xs"
+                value={field.value}
+                onChange={field.onChange}
+                ref={field.ref}
+                name={field.name}
+                onBlur={field.onBlur}
+              />
+            )}
           />
           {errors.budget && (
             <p className="text-xs text-destructive">{errors.budget.message}</p>
@@ -751,7 +979,10 @@ const CreateStakePoolForm = () => {
             disabled: isSubmitting,
             onClick: () => {
               reset();
-              navigate({ to: "/admin/master-pool-management" });
+              navigate({
+                to: "/admin/master-pool-management",
+                search: { tab: "stake-pool" },
+              });
             },
           }}
         />

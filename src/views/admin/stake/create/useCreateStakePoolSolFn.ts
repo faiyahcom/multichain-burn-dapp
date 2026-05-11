@@ -63,6 +63,8 @@ export type CreateStakePoolSolParams = {
     apr: number;
     /** Whether to enable low reward notification */
     lowRewardNotification: boolean;
+    /** Optional date/time at which interest stops accruing; undefined = no explicit stop */
+    interestStopDate?: Date;
 };
 
 export const useCreateStakePoolSolFn = () => {
@@ -185,6 +187,26 @@ export const useCreateStakePoolSolFn = () => {
                     );
                 }
 
+                console.log("Creating stake pool with params:", {
+                    poolName: params.poolName,
+                    stakingToken: params.stakingToken,
+                    rewardToken: params.rewardToken,
+                    rewardAmount: rewardAmountBN.toString(),
+                    minStakingAmount: minStakingBN.toString(),
+                    maxStakingAmount: maxStakingBN.toString(),
+                    stakingLimit: stakingLimitBN.toString(),
+                    timeStart: timeStart.toString(),
+                    timeEnd: timeEnd.toString(),
+                    lockDurationSec: lockDurationSec.toString(),
+                    delayAccumulate: delayAccumulate.toString(),
+                    delayClaim: delayClaim.toString(),
+                    interestDuration: interestDuration.toString(),
+                    aprBps: aprBps.toString(),
+                    interestStopDate: params.interestStopDate
+                        ? (new BN(Math.floor(params.interestStopDate.getTime() / 1000))).toString()
+                        : null,
+                });
+
                 // 8. Build the create_pool transaction
                 const tx = await program.methods
                     .createPool({
@@ -204,6 +226,9 @@ export const useCreateStakePoolSolFn = () => {
                         interestDuration,
                         stakingLimit: stakingLimitBN,
                         lowRewardNoti: params.lowRewardNotification,
+                        interestStopDate: params.interestStopDate
+                            ? new BN(Math.floor(params.interestStopDate.getTime() / 1000))
+                            : null,
                     })
                     .accounts({
                         factory: stakingFactoryPDA,
