@@ -13,27 +13,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "usehooks-ts";
 import Decimal from "decimal.js";
 import { formatAmount, safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
+import { formatDuration } from "@/utils/helpers/date";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
 };
-
-/** Formats a duration in seconds into a human-readable string. */
-function formatDuration(seconds: number | bigint | undefined | null): string {
-  if (seconds === undefined || seconds === null) return "0 day";
-  const s = typeof seconds === "bigint" ? Number(seconds) : seconds;
-  if (!isFinite(s) || s <= 0) return "0 day";
-  // i64::MAX or very large value → "Infinite"
-  if (s >= 9_007_199_254_740_991) return "Infinite";
-  const days = Math.floor(s / 86400);
-  const hours = Math.floor((s % 86400) / 3600);
-  const minutes = Math.floor((s % 3600) / 60);
-  const parts: string[] = [];
-  if (days) parts.push(`${shortenNumber({ number: days, decimalPlaces: 2 })} ${days === 1 ? "day" : "days"}`);
-  if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
-  if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
-  return parts.length ? parts.join(" ") : `${s} seconds`;
-}
 
 const PoolOverview = ({ poolDetail }: Props) => {
   const isMobile = useMediaQuery("(max-width: 640px)");
