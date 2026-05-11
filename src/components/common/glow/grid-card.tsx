@@ -15,6 +15,7 @@ interface Props {
     container?: string;
     glowContainer?: string;
     content?: string;
+    separator?: string;
   };
 }
 
@@ -24,6 +25,7 @@ const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
   swap: "grid-swap-bg",
   green: "",
   stake: "grid-stake-bg",
+  launchpad: "grid-launchpad-bg",
 };
 
 export const gridCardButtonClassName = ({
@@ -75,6 +77,7 @@ const GridCard: React.FC<Props> = ({
             className={cn(
               "h-0.75 w-full",
               getVariantBtnBgClassName({ variant }),
+              classNames?.separator,
             )}
           />
           {bottomSection}

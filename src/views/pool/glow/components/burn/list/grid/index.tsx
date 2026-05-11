@@ -13,7 +13,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useReducer } from "react";
 
 interface Props {
   data?: PoolItemType[];
@@ -21,12 +21,10 @@ interface Props {
 }
 
 const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
-  const [tick, setTick] = useState(0);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTick((prev) => prev + 1);
-    }, 1000);
+    const interval = setInterval(forceUpdate, 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -104,7 +102,7 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       unit={tokenOutDisplay.symbol}
                       isShorten
                     />
-                    <p key={tick}>{renderPoolTime(pool)}</p>
+                    <p>{renderPoolTime(pool)}</p>
                   </div>
                 }
                 btn={{
