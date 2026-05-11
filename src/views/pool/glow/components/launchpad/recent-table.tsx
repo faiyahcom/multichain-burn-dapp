@@ -18,6 +18,7 @@ import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import { useAuthStore } from "@/stores/authStore";
 import { truncateString } from "@/utils/helpers/string";
 import { Link, useNavigate } from "@tanstack/react-router";
+import TBDTooltip from "./tbd-tooltip";
 
 const LaunchpadRecentPoolsTable = () => {
   const navigate = useNavigate();
@@ -75,9 +76,7 @@ const LaunchpadRecentPoolsTable = () => {
               />
             )} */}
 
-            {/* TODO: implement */}
-
-            {/* TODO: remove demo data */}
+            {/* TODO: replace with real data */}
             {Array.from({ length: 2 }).map((_, index) => (
               <TableRow key={index} variant="launchpad">
                 {/* Pool name + address */}
@@ -157,16 +156,20 @@ const LaunchpadRecentPoolsTable = () => {
                 </TableCell>
                 {/* Received */}
                 <TableCell>
-                  <MetricNumber
-                    // number={sciToFormatted(
-                    //   pool?.stakedAmount,
-                    //   pool?.tokenInDecimals,
-                    // )}
-                    number={123456789}
-                    // unit={tokenInDisplay.symbol}
-                    unit={"USDT"}
-                    isShorten
-                  />
+                  {index % 2 === 0 ? (
+                    <MetricNumber
+                      // number={sciToFormatted(
+                      //   pool?.stakedAmount,
+                      //   pool?.tokenInDecimals,
+                      // )}
+                      number={123456789}
+                      // unit={tokenInDisplay.symbol}
+                      unit={"USDT"}
+                      isShorten
+                    />
+                  ) : (
+                    <TBDTooltip />
+                  )}
                 </TableCell>
                 {/* Network */}
                 <TableCell>

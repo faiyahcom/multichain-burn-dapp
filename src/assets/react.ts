@@ -81,3 +81,5 @@ export { default as IconDownTriangle } from "./icons/down-triangle.svg?react";
 export { default as IconBell } from "./icons/bell.svg?react";
 
 export { default as IconLaunchpad } from "./icons/categories/launchpad.svg?react";
+
+export { default as IconTooltipQuestion } from "./icons/glow/question.svg?react";
