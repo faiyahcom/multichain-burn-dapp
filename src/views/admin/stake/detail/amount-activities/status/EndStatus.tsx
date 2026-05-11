@@ -8,7 +8,6 @@ import { useBatchTransferSolFn } from "../hooks/useBatchTransferSolFn";
 import { useBatchTransferEvmFn } from "../hooks/useBatchTransferEvmFn";
 import { SOLANA_BACKEND_CHAIN_ID, chainIdToNetworkConfig } from "@/config/networks";
 import type { BatchRecipient, TokenMode } from "../hooks/useBatchTransferSolFn";
-import { AssetTypeEnum } from "@/web3/helpers";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import type { VaultBalance } from "../hooks/useOnChainVaultBalance";
@@ -40,11 +39,6 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
         [pool?.chainId],
     );
 
-    const rewardTokenSymbolDisplay =
-        pool?.assetTypeReward === AssetTypeEnum.NATIVE
-            ? (networkConfig?.appKitNetwork.nativeCurrency.symbol ?? pool?.rewardTokenSymbol ?? "")
-            : (pool?.rewardTokenSymbol ?? "");
-
     const stakingTokenDisplay = resolvePoolTokenDisplay({
         network: networkConfig,
         tokenAddress: poolDetail?.pool?.tokenIn,
@@ -64,6 +58,7 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
         customSymbol: poolDetail?.tokenOut?.customSymbol,
         imageUri: poolDetail?.tokenOut?.imageUri,
     });
+    const rewardTokenSymbolDisplay = rewardTokenDisplay.symbol;
 
     const refetchVaultBalance = vaultBalance?.refetch;
     const computedEvmBalances = useStakePoolComputedBalancesEvm({

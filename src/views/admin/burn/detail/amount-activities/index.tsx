@@ -35,7 +35,7 @@ const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
                 return <CanceledStatus poolDetail={poolDetail} />;
 
             case "on_going":
-                return <OnGoingStatus poolDetail={poolDetail} />;
+                return <OnGoingStatus poolDetail={poolDetail} onAfterClose={() => vaultBalance?.refetch()} />;
 
             case "closed":
             case "ended":

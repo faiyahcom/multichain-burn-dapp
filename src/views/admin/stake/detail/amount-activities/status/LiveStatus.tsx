@@ -8,9 +8,10 @@ import ClosePoolDialog from "@/components/shared/close-pool-dialog";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
+    onAfterClose?: () => void;
 };
 
-const LiveStatus = ({ poolDetail }: Props) => {
+const LiveStatus = ({ poolDetail, onAfterClose }: Props) => {
     const {
         depositRewardOpen,
         setDepositRewardOpen,
@@ -19,6 +20,11 @@ const LiveStatus = ({ poolDetail }: Props) => {
     } = useAmountActivity(poolDetail);
 
     const [closeDialogOpen, setCloseDialogOpen] = useState(false);
+
+    const handleClose = async (reason?: string) => {
+        await handleEmergencyClose(reason);
+        onAfterClose?.();
+    };
 
     return (
         <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
@@ -46,7 +52,7 @@ const LiveStatus = ({ poolDetail }: Props) => {
                 showReason
                 confirmText="Emergency Close"
                 confirmIconLetter="X"
-                onConfirm={handleEmergencyClose}
+                onConfirm={handleClose}
             />
         </PoolChainGuard>
     );
