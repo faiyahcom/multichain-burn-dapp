@@ -2,6 +2,7 @@ import {
   IconArrowLeftRightOutline,
   IconFlameOutline,
   IconLockOutline,
+  IconRocketOutline,
 } from "@/assets/react";
 import { FContainer, FSummarySection } from "@/components/common/fcontainer";
 import CustomPagination from "@/components/common/pagination";
@@ -12,6 +13,7 @@ import {
   useMasterPoolManagementBurnSearchFilterStore,
   type MasterPoolManagementBurnSearchFilterType,
 } from "@/stores/admin/master-pool-management/burn/search-filter-store";
+import { useMasterPoolManagementLaunchpadSearchFilterStore } from "@/stores/admin/master-pool-management/launchpad/search-filter-store";
 import {
   useMasterPoolManagementStakeSearchFilterStore,
   type MasterPoolManagementStakeSearchFilterType,
@@ -31,9 +33,9 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-type Tab = "burn-pool" | "swap-pool" | "stake-pool";
+type Tab = "burn-pool" | "swap-pool" | "stake-pool" | "launchpad";
 
-const validTabs: Tab[] = ["burn-pool", "swap-pool", "stake-pool"];
+const validTabs: Tab[] = ["burn-pool", "swap-pool", "stake-pool", "launchpad"];
 const isValidTab = (value: unknown): value is Tab =>
   typeof value === "string" && validTabs.includes(value as Tab);
 
@@ -41,6 +43,7 @@ const tabToPoolType: Record<Tab, PoolType> = {
   "burn-pool": 0,
   "swap-pool": 1,
   "stake-pool": 2,
+  launchpad: 3,
 };
 
 const poolTypeIcons: Record<
@@ -50,7 +53,7 @@ const poolTypeIcons: Record<
   0: IconFlameOutline,
   1: IconArrowLeftRightOutline,
   2: IconLockOutline,
-  3: IconFlameOutline, // TODO: subject to change
+  3: IconRocketOutline,
 };
 const limit = 20;
 
@@ -72,7 +75,8 @@ function RouteComponent() {
   const poolType = tabToPoolType[tab];
   const isBurnPool = poolType === 0;
   const isStakePool = poolType === 2;
-  const isBurnOrStakePool = isBurnPool || isStakePool;
+  const isLaunchpad = poolType === 3;
+  const isBurnOrStakeOrLaunchpad = isBurnPool || isStakePool || isLaunchpad;
   const PoolIcon = poolTypeIcons[poolType];
 
   const { filter: burnFilter, setFilter: setBurnFilter } =
@@ -81,6 +85,8 @@ function RouteComponent() {
     useMasterPoolManagementSwapSearchFilterStore();
   const { filter: stakeFilter, setFilter: setStakeFilter } =
     useMasterPoolManagementStakeSearchFilterStore();
+  const { filter: launchpadFilter, setFilter: setLaunchpadFilter } =
+    useMasterPoolManagementLaunchpadSearchFilterStore();
 
   const filter = useMemo(() => {
     switch (poolType) {
@@ -94,13 +100,13 @@ function RouteComponent() {
         return stakeFilter;
 
       case 3:
-        return undefined; // TODO: launchpad
+        return launchpadFilter;
 
       default:
         void (poolType satisfies never); // exhaustive check
         return undefined;
     }
-  }, [poolType, burnFilter, swapFilter, stakeFilter]);
+  }, [poolType, burnFilter, swapFilter, stakeFilter, launchpadFilter]);
 
   const setFilter = useMemo(() => {
     switch (poolType) {
@@ -114,13 +120,19 @@ function RouteComponent() {
         return setStakeFilter;
 
       case 3:
-        return () => {}; // TODO: launchpad
+        return setLaunchpadFilter;
 
       default:
         void (poolType satisfies never); // exhaustive check
         return () => {};
     }
-  }, [poolType, setBurnFilter, setSwapFilter, setStakeFilter]);
+  }, [
+    poolType,
+    setBurnFilter,
+    setSwapFilter,
+    setStakeFilter,
+    setLaunchpadFilter,
+  ]);
 
   const { data: poolsData, isPending: isPendingPools } = useQuery({
     queryKey: adminPoolManagementQueryKeys.list({
@@ -147,8 +159,8 @@ function RouteComponent() {
         statuses: convertArrayToStringParam({
           array: filter?.status?.map((status) => status.toString()),
         }),
-        excludeStatuses: isStakePool ? undefined : "draft", // admin does not need to see draft pools (except for stake pool)
-        timeEndFrom: isBurnOrStakePool
+        excludeStatuses: isStakePool || isLaunchpad ? undefined : "draft", // admin does not need to see draft pools (except for stake pool, launchpad)
+        timeEndFrom: isBurnOrStakeOrLaunchpad
           ? dateToUnixSeconds({
               date: (
                 filter as
@@ -158,7 +170,7 @@ function RouteComponent() {
               mod: "startOfDay",
             })
           : undefined,
-        timeEndTo: isBurnOrStakePool
+        timeEndTo: isBurnOrStakeOrLaunchpad
           ? dateToUnixSeconds({
               date: (
                 filter as
@@ -168,7 +180,7 @@ function RouteComponent() {
               mod: "endOfDay",
             })
           : undefined,
-        timeStartFrom: isBurnOrStakePool
+        timeStartFrom: isBurnOrStakeOrLaunchpad
           ? dateToUnixSeconds({
               date: (
                 filter as
@@ -178,7 +190,7 @@ function RouteComponent() {
               mod: "startOfDay",
             })
           : undefined,
-        timeStartTo: isBurnOrStakePool
+        timeStartTo: isBurnOrStakeOrLaunchpad
           ? dateToUnixSeconds({
               date: (
                 filter as
@@ -199,6 +211,7 @@ function RouteComponent() {
         tokens: convertArrayToStringParam({
           array: filter?.tokens,
         }),
+        // TODO: add launchpad filter
       });
     },
   });

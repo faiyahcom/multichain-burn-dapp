@@ -63,3 +63,4 @@ export { default as IconUserTag } from "./icons/user-tag.svg?react";
 export { default as IconArrowLeftRightOutline } from "./icons/admin/sidebar/arrow-left-right-outline.svg?react";
 export { default as IconFlameOutline } from "./icons/admin/sidebar/flame-outline.svg?react";
 export { default as IconLockOutline } from "./icons/admin/sidebar/lock-outline.svg?react";
+export { default as IconRocketOutline } from "./icons/admin/sidebar/rocket-outline.svg?react";
