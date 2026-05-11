@@ -74,6 +74,8 @@ export const useBatchTransferSolFn = () => {
             recipients,
             onSuccess,
         }: BatchTransferSolParams) => {
+            console.log("???????//");
+
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
                 if (!connection || !provider) throw new Error("Solana connection or provider unavailable");
@@ -128,8 +130,8 @@ export const useBatchTransferSolFn = () => {
                 // Staking PoolAccount uses `deposit_balance` (not `total_deposited`)
                 const trackedBalance: InstanceType<typeof BN> =
                     mode === "reward"
-                        ? new BN(poolAccountData.reward_balance.toString())
-                        : new BN(poolAccountData.deposit_balance.toString());
+                        ? new BN(poolAccountData.reward_remaining.toString())
+                        : new BN(poolAccountData.staking_remaining.toString());
 
                 const totalRawRequested = recipients.reduce((sum, r) => {
                     const parsed = parseFloat(r.amountStr);
@@ -199,6 +201,7 @@ export const useBatchTransferSolFn = () => {
                             ),
                         );
                     }
+                    console.log("???????//");
 
                     // withdraw_tokens(token_mint, amount, is_reward)
                     const isReward = mode === "reward";
