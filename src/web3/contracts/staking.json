@@ -1915,7 +1915,8 @@
           "name": "reward_mint"
         },
         {
-          "name": "treasury"
+          "name": "treasury",
+          "writable": true
         },
         {
           "name": "treasury_token_ata",
