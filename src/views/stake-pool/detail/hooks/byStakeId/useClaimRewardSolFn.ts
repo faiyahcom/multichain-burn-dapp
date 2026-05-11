@@ -31,11 +31,17 @@ import {
     type AssetType,
 } from "@/web3/helpers";
 
+const CLAIM_REWARD_ERROR_MESSAGE =
+    "Failed to claim your reward. Please try again.";
+const INSUFFICIENT_REWARD_BALANCE_MESSAGE = "Insufficient reward balance";
+
 export interface ClaimRewardSolParams {
     /** Pool PDA address */
     poolAddress: string;
     /** Stake index / stakeId */
     stakeId: number;
+    /** Deposit (staking) token mint address */
+    depositMint: string;
     /** Reward token mint address */
     rewardMint: string;
     /** Asset type of the reward token (from poolDetail.pool.assetTypeReward) */
@@ -51,6 +57,7 @@ export const useClaimRewardSolFn = () => {
         async ({
             poolAddress,
             stakeId,
+            depositMint,
             rewardMint,
             assetTypeReward,
         }: ClaimRewardSolParams): Promise<string | undefined> => {
@@ -68,6 +75,7 @@ export const useClaimRewardSolFn = () => {
                 const programBurn = getMultichainBurnProgram(connection, anchorWallet);
 
                 const poolPDA = new PublicKey(poolAddress);
+                const depositMintPK = new PublicKey(depositMint);
                 const rewardMintPK = new PublicKey(rewardMint);
                 const isNativeReward = (assetTypeReward as AssetType) === AssetTypeEnum.NATIVE;
                 const rewardTokenProgram = getTokenProgramFromAssetType(assetTypeReward as AssetType)!;
@@ -99,6 +107,7 @@ export const useClaimRewardSolFn = () => {
                         .accounts({
                             user: walletPublicKey,
                             burnFactory: burnFactoryPDA,
+                            depositMint: depositMintPK,
                             burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                             treasury,
                             pool: poolPDA,
@@ -160,6 +169,7 @@ export const useClaimRewardSolFn = () => {
                             pool: poolPDA,
                             factory: factoryPDA,
                             rewardMint: rewardMintPK,
+                            depositMint: depositMintPK,
                             rewardVault: rewardVaultPDA,
                             userTokenAta,
                             stakeEntry: stakeEntryPDA,
@@ -184,9 +194,16 @@ export const useClaimRewardSolFn = () => {
                 toast.success("Reward claimed successfully!", { description: signature });
                 return signature;
             } catch (error: unknown) {
-                toast.error("Failed to claim reward", {
-                    description: getErrorMessage({ error }),
-                });
+                const errorMessage = getErrorMessage({ error });
+
+                if (errorMessage === INSUFFICIENT_REWARD_BALANCE_MESSAGE) {
+                    toast.error(CLAIM_REWARD_ERROR_MESSAGE);
+                } else {
+                    toast.error("Failed to claim reward", {
+                        description: errorMessage,
+                    });
+                }
+
                 throw error;
             }
         },

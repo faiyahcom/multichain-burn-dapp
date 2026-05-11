@@ -130,7 +130,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
           variant="burn"
           className={cn(
             getVariantBgClassName({ variant: "burn" }),
-            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
           )}
           {...register("poolName", {
             validate: {
@@ -168,7 +168,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
         </span>
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Token Burn
             </span>
             <WhitelistTokenSelect
@@ -180,14 +180,14 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                   getVariantBorderClassName({
                     variant: "burn",
                     custom: "rounded-md",
                   }),
                 ),
                 triggerContent:
-                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
               }}
             />
             <input
@@ -204,7 +204,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
 
         <div className="flex flex-wrap gap-4 md:grid md:grid-cols-2 md:gap-6">
           <div className="flex flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Start Time
             </span>
             <DatePicker
@@ -213,7 +213,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               onChange={(date: Date | undefined) =>
                 setValue("startTime", date as Date, { shouldValidate: true })
               }
-              className="rounded-md px-2 py-3 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+              className="rounded-md px-2 py-3 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px"
               disabled={(date: Date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -240,7 +240,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             )}
           </div>
           <div className="flex flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               End Time
             </span>
             <DatePicker
@@ -249,7 +249,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               onChange={(date: Date | undefined) =>
                 setValue("endTime", date as Date, { shouldValidate: true })
               }
-              className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]"
+              className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px"
               disabled={(date: Date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -284,7 +284,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
         </span>
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Token Reward
             </span>
             <WhitelistTokenSelect
@@ -298,14 +298,14 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                   getVariantBorderClassName({
                     variant: "burn",
                     custom: "rounded-md",
                   }),
                 ),
                 triggerContent:
-                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
               }}
             />
             <input
@@ -330,7 +330,7 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <div
               className={cn(
                 getVariantBorderClassName({ variant: "burn" }),
-                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
                 "rounded-md border-2",
               )}
             >
@@ -343,13 +343,13 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
           </div>
 
           <div className="flex flex-col justify-end gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Burn Method
             </span>
             <span
               className={cn(
                 getVariantBorderClassName({ variant: "burn" }),
-                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:text-[23px]",
+                "relative flex gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-8 2xl:text-23px",
                 "rounded-md border-2",
               )}
             >

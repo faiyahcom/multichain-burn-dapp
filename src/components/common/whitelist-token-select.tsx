@@ -201,7 +201,7 @@ const WhitelistTokenSelect = ({
                 <div className="flex flex-col">
                   <span className="text-xs">{nativeToken.name}</span>
                   <div className="flex gap-1.25">
-                    <span className="text-[11px] font-normal text-secondary-text">
+                    <span className="text-11px font-normal text-secondary-text">
                       {nativeToken.symbol}
                     </span>
                     <span className="text-tiny font-light text-secondary-text/80">
@@ -237,7 +237,7 @@ const WhitelistTokenSelect = ({
                   <div className="flex flex-col">
                     <span className="text-xs">{resolveName(token)}</span>
                     <div className="flex gap-1.25">
-                      <span className="text-[11px] font-normal text-secondary-text">
+                      <span className="text-11px font-normal text-secondary-text">
                         {resolveSymbol(token)}
                       </span>
                       <span className="text-tiny font-light text-secondary-text/80">

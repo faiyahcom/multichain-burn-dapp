@@ -225,7 +225,7 @@ export function NotificationBell() {
                 <button className="relative rounded-full bg-mb-dark-profile-btn p-2 sm:p-5">
                     <IconBell className="size-6 sm:size-7.25" />
                     {unread > 0 && (
-                        <span className="absolute top-0.5 right-0.5 flex min-w-4.5 items-center justify-center rounded-full bg-red-500 p-1 font-inter text-[9px] leading-none font-bold sm:top-0 sm:right-0 2xl:text-13px">
+                        <span className="absolute top-0.5 right-0.5 flex min-w-4.5 items-center justify-center rounded-full bg-red-500 p-1 font-inter text-9px leading-none font-bold sm:top-0 sm:right-0 2xl:text-13px">
                             {unread > 99 ? "99+" : unread}
                         </span>
                     )}

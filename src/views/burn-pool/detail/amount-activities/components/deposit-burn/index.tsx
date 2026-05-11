@@ -15,6 +15,7 @@ import {
   getVariantShadowClassName,
 } from "@/components/common/glow/container";
 import { Input } from "@/components/common/glow/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { Button } from "@/components/common/glow/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
@@ -29,7 +30,7 @@ import {
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
 import z from "zod";
 
@@ -130,6 +131,7 @@ const DepositBurnDialog = ({
     setValue,
     reset,
     watch,
+    control,
     formState: { errors, isSubmitting, isValid },
   } = useForm<DepositFormValues>({
     defaultValues: { amount: "" },
@@ -440,14 +442,23 @@ const DepositBurnDialog = ({
                         </span>
                       </div>
                       <div className="flex gap-3">
-                        <Input
-                          {...register("amount")}
-                          variant="burn"
-                          type="number"
-                          step={DEFAULT_INPUT_NUMBER_STEP}
-                          placeholder="Enter amount"
-                          className="w-full border-2 bg-transparent"
-                          aria-invalid={!!errors.amount}
+                        <Controller
+                          control={control}
+                          name="amount"
+                          render={({ field }) => (
+                            <NumericInput
+                              inputComponent={Input}
+                              variant="burn"
+                              placeholder="Enter amount"
+                              className="w-full border-2 bg-transparent"
+                              aria-invalid={!!errors.amount}
+                              value={field.value}
+                              onChange={field.onChange}
+                              ref={field.ref}
+                              name={field.name}
+                              onBlur={field.onBlur}
+                            />
+                          )}
                         />
                         <div
                           className={cn(

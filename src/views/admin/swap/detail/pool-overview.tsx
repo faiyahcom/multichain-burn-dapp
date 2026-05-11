@@ -124,7 +124,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
           <div className="h-1.5 w-1.5 bg-black" />
           <span className="text-xl font-medium">Pool Overview</span>
         </div>
-        {/* <p className="text-[13px] text-greyed">
+        {/* <p className="text-13px text-greyed">
                     {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
                         ? `${new Date(Number(poolDetail.pool.timeStart) * 1000).toLocaleDateString()} - ${new Date(
                             Number(poolDetail.pool.timeEnd) * 1000,

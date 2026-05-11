@@ -25,7 +25,7 @@ export const HeaderNav = () => {
             to={item.href}
             key={index}
             className={cn(
-              "flex items-center justify-center border-y-[3px] border-transparent py-2.5 font-medium text-mb-gray-b8",
+              "flex items-center justify-center border-y-[0.188rem] border-transparent py-2.5 font-medium text-mb-gray-b8",
               "transition-all duration-300",
               "hover:border-b-foreground hover:font-bold hover:text-foreground",
               { "border-b-foreground font-bold text-foreground": isActive },
@@ -61,7 +61,7 @@ export const HeaderNavMobile = () => {
               <Link
                 to={item.href}
                 className={cn(
-                  "mx-auto flex w-max items-center justify-center border-y-[3px] border-transparent py-2.5 font-medium text-mb-gray-b8",
+                  "mx-auto flex w-max items-center justify-center border-y-[0.188rem] border-transparent py-2.5 font-medium text-mb-gray-b8",
                   "transition-all duration-300",
                   "hover:border-b-foreground hover:font-bold hover:text-foreground",
                   { "border-b-foreground font-bold text-foreground": isActive },

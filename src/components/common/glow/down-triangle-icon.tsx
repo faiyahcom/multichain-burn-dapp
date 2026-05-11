@@ -19,8 +19,8 @@ const rotationMap: Record<ArrowDirection, string> = {
 };
 
 const sizeMap: Record<ArrowSize, string> = {
-  normal: "w-[12px] h-[15px] sm:w-6 sm:h-[31px]",
-  small: "w-[8px] h-[11px]",
+  normal: "w-3 h-3.75 sm:w-6 sm:h-7.75",
+  small: "w-2 h-2.75",
 };
 
 export const DownTriangleIcon = ({

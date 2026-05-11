@@ -6,6 +6,7 @@ import {
 } from "@/components/common/glow/container";
 import InfoTooltip from "@/components/common/glow/info-tooltip";
 import { Input } from "@/components/common/glow/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import {
   RadioGroup,
   RadioGroupItem,
@@ -29,7 +30,7 @@ import { PublicKey } from "@solana/web3.js";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
 
 type CreateSwapPoolFormValues = {
@@ -73,6 +74,7 @@ const CreateSwapPoolForm = ({
     reset,
     setValue,
     watch,
+    control,
     formState: { errors, isSubmitting },
     getFieldState,
     trigger,
@@ -330,7 +332,7 @@ const CreateSwapPoolForm = ({
             getVariantBgClassName({
               variant: "swap",
             }),
-            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
           )}
           {...register("poolName", {
             validate: {
@@ -368,7 +370,7 @@ const CreateSwapPoolForm = ({
         </span>
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Token Swap
             </span>
             <WhitelistTokenSelect
@@ -380,14 +382,14 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                   getVariantBorderClassName({
                     variant: "swap",
                     custom: "rounded-md",
                   }),
                 ),
                 triggerContent:
-                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
                 // icon: "size-3.5 md:size-4 lg:size-5",
               }}
             />
@@ -403,7 +405,7 @@ const CreateSwapPoolForm = ({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
             Ratio{" "}
             <InfoTooltip
               variant="swap"
@@ -422,7 +424,7 @@ const CreateSwapPoolForm = ({
               aria-invalid={!!errors.ratio}
               variant="swap"
               className={cn(
-                "border-2 py-1 text-xs font-medium sm:text-sm md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                "border-2 py-1 text-xs font-medium sm:text-sm md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
                 "w-10 bg-transparent px-2 text-center placeholder:text-center sm:w-12 md:w-14 lg:w-16 2xl:w-20",
               )}
               {...register("ratio", {
@@ -476,7 +478,7 @@ const CreateSwapPoolForm = ({
                     custom: "rounded-md border-2",
                   }),
                   getVariantBgClassName({ variant: "swap" }),
-                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                 )}
               >
                 Fixed
@@ -490,50 +492,60 @@ const CreateSwapPoolForm = ({
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
             You Pay
           </span>
-          <Input
-            variant="swap"
-            placeholder="0.0"
-            aria-invalid={!!errors.amountPay}
-            className={cn(
-              "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-[23px]",
-            )}
-            type="number"
-            step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-            {...register("amountPay", {
-              onChange: (e) => {
-                handleOnChangeAmountPay(e.target.value);
-              },
+          <Controller
+            control={control}
+            name="amountPay"
+            rules={{
               required: "Amount pay is required",
               validate: {
                 validNumber: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal?.isFinite()
                     ? true
                     : "Amount pay must be a valid number";
                 },
                 moreThanZero: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal?.isZero()
                     ? "Amount pay must be greater than zero"
                     : true;
                 },
                 notNegative: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal?.isNegative()
                     ? "Amount pay must be positive"
                     : true;
                 },
                 maxDecimals: (value) => {
-                  const decimal = safeDecimalParse({ value });
+                  const decimal = safeDecimalParse({ value: value ?? "" });
                   return decimal && decimal.decimalPlaces() <= 6
                     ? true
                     : "Amount pay must have 6 decimals or less";
                 },
               },
-            })}
+            }}
+            render={({ field: { onChange, value, ref, name, onBlur } }) => (
+              <NumericInput
+                inputComponent={Input}
+                variant="swap"
+                placeholder="0.0"
+                aria-invalid={!!errors.amountPay}
+                className={cn(
+                  "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                )}
+                value={value ?? ""}
+                ref={ref}
+                name={name}
+                onBlur={onBlur}
+                onChange={(val) => {
+                  onChange(val);
+                  handleOnChangeAmountPay(val);
+                }}
+              />
+            )}
           />
           {errors.amountPay && (
             <p className="font-inter text-xs text-destructive">
@@ -549,7 +561,7 @@ const CreateSwapPoolForm = ({
         </span>
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Token Receive
             </span>
             <WhitelistTokenSelect
@@ -562,14 +574,14 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-[23px]",
+                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                   getVariantBorderClassName({
                     variant: "swap",
                     custom: "rounded-md",
                   }),
                 ),
                 triggerContent:
-                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px] font-medium",
+                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
                 // icon: "size-3.5 md:size-4 lg:size-5",
               }}
             />
@@ -589,13 +601,13 @@ const CreateSwapPoolForm = ({
 
         <div className="flex flex-wrap gap-4 md:grid md:grid-cols-2 md:gap-6">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Network
             </span>
             <div
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]",
+                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
                 "rounded-md border-2",
               )}
             >
@@ -608,50 +620,60 @@ const CreateSwapPoolForm = ({
           </div>
 
           <div className="flex flex-col justify-end gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-[23px]">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               You Receive
             </span>
-            <Input
-              variant="swap"
-              placeholder="0.0"
-              aria-invalid={!!errors.budget}
-              className={cn(
-                "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-[23px]",
-              )}
-              type="number"
-              step={DEFAULT_INPUT_NUMBER_STEP} // allow up to 6 decimals
-              {...register("budget", {
-                onChange: (e) => {
-                  handleOnChangeBudget(e.target.value);
-                },
+            <Controller
+              control={control}
+              name="budget"
+              rules={{
                 required: "Budget is required",
                 validate: {
                   validNumber: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal?.isFinite()
                       ? true
                       : "Budget must be a valid number";
                   },
                   moreThanZero: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal?.isZero()
                       ? "Budget must be greater than zero"
                       : true;
                   },
                   notNegative: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal?.isNegative()
                       ? "Budget must be positive"
                       : true;
                   },
                   maxDecimals: (value) => {
-                    const decimal = safeDecimalParse({ value });
+                    const decimal = safeDecimalParse({ value: value ?? "" });
                     return decimal && decimal.decimalPlaces() <= 6
                       ? true
                       : "Budget must have 6 decimals or less";
                   },
                 },
-              })}
+              }}
+              render={({ field: { onChange, value, ref, name, onBlur } }) => (
+                <NumericInput
+                  inputComponent={Input}
+                  variant="swap"
+                  placeholder="0.0"
+                  aria-invalid={!!errors.budget}
+                  className={cn(
+                    "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                  )}
+                  value={value ?? ""}
+                  ref={ref}
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={(val) => {
+                    onChange(val);
+                    handleOnChangeBudget(val);
+                  }}
+                />
+              )}
             />
             {errors.budget && (
               <p className="font-inter text-xs text-destructive">

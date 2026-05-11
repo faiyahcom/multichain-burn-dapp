@@ -50,9 +50,9 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
                 })}
 
             {/* Content */}
-            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 font-inter text-[8px] font-medium text-primary-foreground sm:gap-0 sm:py-px 2xl:gap-[8.5px] 2xl:text-tiny">
+            <div className="relative z-10 flex h-full w-full flex-col items-center justify-between gap-0.5 py-1 font-inter text-8px font-medium text-primary-foreground sm:gap-0 sm:py-px 2xl:gap-[0.531rem] 2xl:text-tiny">
                 {/* Name */}
-                <p className="max-w-full truncate text-center text-[9px] 2xl:text-xs">
+                <p className="max-w-full truncate text-center text-9px 2xl:text-xs">
                     {displayName}
                 </p>
 
@@ -72,12 +72,12 @@ const SwapperCard = ({ swapper, rank }: SwapperCardProps) => {
                 </div>
 
                 {/* Crypto Guy */}
-                <div className="rounded-[4px] border-[0.5px] border-mb-swapper-badge-border bg-mb-swapper-badge-bg px-1 py-0.5">
+                <div className="rounded-4px border-[0.031rem] border-mb-swapper-badge-border bg-mb-swapper-badge-bg px-1 py-0.5">
                     Crypto Guy
                 </div>
 
                 {/* Stats */}
-                <div className="w-full space-y-[8.5px] text-center md:space-y-0.5 2xl:space-y-[8.5px]">
+                <div className="w-full space-y-[0.531rem] text-center md:space-y-0.5 2xl:space-y-[0.531rem]">
                     <p className="tracking-[-2%] text-nowrap">
                         Participated swap pools:{" "}
                         <span className="">

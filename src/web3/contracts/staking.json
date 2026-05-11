@@ -72,8 +72,7 @@
           "signer": true
         },
         {
-          "name": "treasury",
-          "writable": true
+          "name": "treasury"
         },
         {
           "name": "reward_mint"
@@ -334,6 +333,9 @@
           "name": "reward_mint"
         },
         {
+          "name": "deposit_mint"
+        },
+        {
           "name": "reward_vault",
           "docs": [
             "Reward vault — pool PDA is authority"
@@ -505,6 +507,9 @@
           "docs": [
             "The burn program's FactoryAccount — read-only for treasury validation."
           ]
+        },
+        {
+          "name": "deposit_mint"
         },
         {
           "name": "burn_program",
@@ -849,10 +854,7 @@
         {
           "name": "project_owner",
           "writable": true,
-          "signer": true,
-          "relations": [
-            "pool"
-          ]
+          "signer": true
         },
         {
           "name": "factory",
@@ -1027,10 +1029,7 @@
         {
           "name": "project_owner",
           "writable": true,
-          "signer": true,
-          "relations": [
-            "pool"
-          ]
+          "signer": true
         },
         {
           "name": "factory",
@@ -1212,6 +1211,12 @@
           "relations": [
             "stake_entry"
           ]
+        },
+        {
+          "name": "deposit_mint"
+        },
+        {
+          "name": "reward_mint"
         },
         {
           "name": "stake_entry",
@@ -1910,99 +1915,25 @@
           "name": "reward_mint"
         },
         {
-          "name": "treasury"
+          "name": "treasury",
+          "writable": true
         },
         {
           "name": "treasury_token_ata",
           "docs": [
-            "Treasury's ATA for the reward token (fee destination)"
+            "Treasury's ATA for the reward token (fee destination).",
+            "Required only when asset_reward_type != 2 (SOL reward)."
           ],
           "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "treasury"
-              },
-              {
-                "kind": "account",
-                "path": "token_program"
-              },
-              {
-                "kind": "account",
-                "path": "reward_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "optional": true
         },
         {
           "name": "reward_vault",
           "docs": [
-            "Pool's reward vault"
+            "Pool's reward vault. Required only when asset_reward_type != 2."
           ],
           "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  114,
-                  101,
-                  119,
-                  97,
-                  114,
-                  100,
-                  45,
-                  118,
-                  97,
-                  117,
-                  108,
-                  116
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool"
-              }
-            ]
-          }
+          "optional": true
         },
         {
           "name": "deposit_vault",
@@ -2100,62 +2031,10 @@
         {
           "name": "user_reward_ata",
           "docs": [
-            "User's ATA for reward token (auto-claim)"
+            "User's ATA for reward token. Required only when asset_reward_type != 2."
           ],
           "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "user"
-              },
-              {
-                "kind": "account",
-                "path": "token_program"
-              },
-              {
-                "kind": "account",
-                "path": "reward_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
-          }
+          "optional": true
         },
         {
           "name": "user_stake_tracker",
@@ -2240,7 +2119,17 @@
           }
         },
         {
-          "name": "token_program"
+          "name": "token_program",
+          "docs": [
+            "Token program for deposit transfers (always SPL)."
+          ]
+        },
+        {
+          "name": "reward_token_program",
+          "docs": [
+            "Token program for reward transfers. Required only when asset_reward_type != 2."
+          ],
+          "optional": true
         },
         {
           "name": "associated_token_program",
@@ -2419,6 +2308,44 @@
         {
           "name": "system_program",
           "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "reward_mint",
+          "docs": [
+            "Reward mint — for decimals + transfer_checked. Pass program ID if SOL reward."
+          ],
+          "optional": true
+        },
+        {
+          "name": "reward_vault",
+          "docs": [
+            "Reward vault — PDA holding SPL rewards. Pass program ID if SOL reward."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "user_reward_ata",
+          "docs": [
+            "User's ATA for reward token. Pass program ID if SOL reward."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "treasury_token_ata",
+          "docs": [
+            "Treasury's ATA for reward fee. Pass program ID if SOL reward."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "token_program",
+          "docs": [
+            "Token program for SPL transfers. Pass program ID if SOL reward."
+          ],
+          "optional": true
         },
         {
           "name": "burn_factory"
@@ -3168,6 +3095,12 @@
           {
             "name": "low_reward_noti",
             "type": "bool"
+          },
+          {
+            "name": "interest_stop_date",
+            "type": {
+              "option": "i64"
+            }
           }
         ]
       }
@@ -3326,6 +3259,24 @@
           {
             "name": "reward_remaining",
             "type": "u64"
+          },
+          {
+            "name": "stop_accrual_at_pool_end",
+            "docs": [
+              "When true, reward accrual stops at pool_end_ts (no interest after pool ends).",
+              "DEPRECATED — superseded by interest_stop_date. Kept for on-chain storage layout."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "interest_stop_date",
+            "docs": [
+              "Global stop date for interest accrual.  0 = disabled (no global stop).",
+              "When set (> 0) and `now >= interest_stop_date`:",
+              "- No further reward accrual",
+              "- All users can unstake + claim immediately (bypasses lock/delay)"
+            ],
+            "type": "i64"
           }
         ]
       }
@@ -3446,6 +3397,16 @@
           {
             "name": "staking_limit",
             "type": "u64"
+          },
+          {
+            "name": "stop_accrual_at_pool_end",
+            "type": "bool"
+          },
+          {
+            "name": "interest_stop_date",
+            "type": {
+              "option": "i64"
+            }
           }
         ]
       }
