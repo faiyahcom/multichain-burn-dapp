@@ -31,6 +31,10 @@ import {
     type AssetType,
 } from "@/web3/helpers";
 
+const CLAIM_REWARD_ERROR_MESSAGE =
+    "Failed to claim your reward. Please try again.";
+const INSUFFICIENT_REWARD_BALANCE_MESSAGE = "Insufficient reward balance";
+
 export interface ClaimRewardSolParams {
     /** Pool PDA address */
     poolAddress: string;
@@ -190,9 +194,16 @@ export const useClaimRewardSolFn = () => {
                 toast.success("Reward claimed successfully!", { description: signature });
                 return signature;
             } catch (error: unknown) {
-                toast.error("Failed to claim reward", {
-                    description: getErrorMessage({ error }),
-                });
+                const errorMessage = getErrorMessage({ error });
+
+                if (errorMessage === INSUFFICIENT_REWARD_BALANCE_MESSAGE) {
+                    toast.error(CLAIM_REWARD_ERROR_MESSAGE);
+                } else {
+                    toast.error("Failed to claim reward", {
+                        description: errorMessage,
+                    });
+                }
+
                 throw error;
             }
         },
