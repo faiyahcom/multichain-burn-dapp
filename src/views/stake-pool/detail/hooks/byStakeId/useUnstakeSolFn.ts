@@ -34,6 +34,10 @@ import {
 } from "@/web3/helpers";
 import BN from "bn.js";
 
+const UNSTAKE_ERROR_MESSAGE =
+    "Failed to unstake your token. Please try again.";
+const INSUFFICIENT_REWARD_BALANCE_MESSAGE = "Insufficient reward balance";
+
 export interface UnstakeSolParams {
     /** Pool PDA address */
     poolAddress: string;
@@ -272,9 +276,16 @@ export const useUnstakeSolFn = () => {
                 toast.success("Unstaked successfully!", { description: signature });
                 return signature;
             } catch (error: unknown) {
-                toast.error("Failed to unstake", {
-                    description: getErrorMessage({ error }),
-                });
+                const errorMessage = getErrorMessage({ error });
+
+                if (errorMessage === INSUFFICIENT_REWARD_BALANCE_MESSAGE) {
+                    toast.error(UNSTAKE_ERROR_MESSAGE);
+                } else {
+                    toast.error("Failed to unstake", {
+                        description: errorMessage,
+                    });
+                }
+
                 throw error;
             }
         },
