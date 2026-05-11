@@ -12,7 +12,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
-import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 import { useEditStakePoolEvmFn } from "./useEditStakePoolEvmFn";
 import { MIN_DAYS } from "../create/form";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
