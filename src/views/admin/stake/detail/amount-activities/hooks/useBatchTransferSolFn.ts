@@ -74,7 +74,6 @@ export const useBatchTransferSolFn = () => {
             recipients,
             onSuccess,
         }: BatchTransferSolParams) => {
-            console.log("???????//");
 
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
@@ -201,7 +200,6 @@ export const useBatchTransferSolFn = () => {
                             ),
                         );
                     }
-                    console.log("???????//");
 
                     // withdraw_tokens(token_mint, amount, is_reward)
                     const isReward = mode === "reward";
