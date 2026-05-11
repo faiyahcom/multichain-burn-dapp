@@ -230,6 +230,7 @@
 
   --breakpoint-1440px: 90rem;
   /* END */
+  --color-mb-white-ce: var(--mb-white-ce);
 }
 
 /* Light mode design tokens (default) */
@@ -372,6 +373,8 @@
   --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
   --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
   --mb-glow-green: #03db92;
+
+  --mb-white-ce: #cecece;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -514,6 +517,7 @@
   --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
   --mb-glow-green: #03db92;
   /* END */
+  --mb-white-ce: #cecece;
 }
 
 @layer base {
