@@ -726,8 +726,9 @@ export default function EditStakePoolScreen({
                                         }
                                         disabled={(date) => {
                                             if (!validInterestStopRange) return false;
-                                            const ts = date.getTime() / 1000;
-                                            return ts < validInterestStopRange.lower || ts >= validInterestStopRange.upper;
+                                            const dayStart = date.getTime() / 1000;
+                                            const dayEnd = dayStart + 86400;
+                                            return dayEnd <= validInterestStopRange.lower || dayStart >= validInterestStopRange.upper;
                                         }}
                                     />
                                     {interestStopDateVal && (
