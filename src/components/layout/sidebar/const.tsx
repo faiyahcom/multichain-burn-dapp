@@ -225,12 +225,6 @@ export const adminNavItems: NavItem[] = [
     ],
   },
   {
-    label: "Draft Pools",
-    section: navSection.admin,
-    to: "/admin/draft-pools",
-    allowedRoles: ["admin", "super_admin"],
-  },
-  {
     label: "Min Ratio",
     section: navSection.admin,
     to: "/admin/min-ratio",

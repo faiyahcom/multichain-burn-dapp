@@ -1,5 +1,6 @@
 import { type PoolType } from "@/types/admin/master-pool-management";
 import AdminMasterPoolManagementBurnSearch from "./burn";
+import AdminMasterPoolManagementLaunchpadSearch from "./launchpad";
 import AdminMasterPoolManagementStakeSearch from "./stake";
 import AdminMasterPoolManagementSwapSearch from "./swap";
 
@@ -19,7 +20,7 @@ const AdminMasterPoolManagementSearch: React.FC<Props> = ({ poolType }) => {
       return <AdminMasterPoolManagementStakeSearch />;
 
     case 3:
-      return null; // TODO: launchpad
+      return <AdminMasterPoolManagementLaunchpadSearch />;
 
     default:
       void (poolType satisfies never); // exhaustive check
