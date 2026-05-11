@@ -42,6 +42,7 @@ import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/p
 import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
 import { Route as AdminStakeEditAddressRouteImport } from './routes/admin/stake/edit/$address'
 import { Route as AdminStakeDetailAddressRouteImport } from './routes/admin/stake/detail/$address'
+import { Route as AdminLaunchpadDetailAddressRouteImport } from './routes/admin/launchpad/detail/$address'
 import { Route as AdminBurnEditAddressRouteImport } from './routes/admin/burn/edit/$address'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 import { Route as AdminMinRatioEditChainIdTokenInTokenOutRouteImport } from './routes/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
@@ -223,6 +224,12 @@ const AdminStakeDetailAddressRoute = AdminStakeDetailAddressRouteImport.update({
   path: '/admin/stake/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLaunchpadDetailAddressRoute =
+  AdminLaunchpadDetailAddressRouteImport.update({
+    id: '/admin/launchpad/detail/$address',
+    path: '/admin/launchpad/detail/$address',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminBurnEditAddressRoute = AdminBurnEditAddressRouteImport.update({
   id: '/admin/burn/edit/$address',
   path: '/admin/burn/edit/$address',
@@ -269,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/launchpad/detail/$address': typeof AdminLaunchpadDetailAddressRoute
   '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
@@ -307,6 +315,7 @@ export interface FileRoutesByTo {
   '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/launchpad/detail/$address': typeof AdminLaunchpadDetailAddressRoute
   '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
@@ -346,6 +355,7 @@ export interface FileRoutesById {
   '/swap/create/': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/launchpad/detail/$address': typeof AdminLaunchpadDetailAddressRoute
   '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
@@ -386,6 +396,7 @@ export interface FileRouteTypes {
     | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/launchpad/detail/$address'
     | '/admin/stake/detail/$address'
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
@@ -424,6 +435,7 @@ export interface FileRouteTypes {
     | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/launchpad/detail/$address'
     | '/admin/stake/detail/$address'
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
@@ -462,6 +474,7 @@ export interface FileRouteTypes {
     | '/swap/create/'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/launchpad/detail/$address'
     | '/admin/stake/detail/$address'
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
@@ -501,6 +514,7 @@ export interface RootRouteChildren {
   SwapCreateIndexRoute: typeof SwapCreateIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
   AdminBurnEditAddressRoute: typeof AdminBurnEditAddressRoute
+  AdminLaunchpadDetailAddressRoute: typeof AdminLaunchpadDetailAddressRoute
   AdminStakeDetailAddressRoute: typeof AdminStakeDetailAddressRoute
   AdminStakeEditAddressRoute: typeof AdminStakeEditAddressRoute
   AdminSwapDetailAddressRoute: typeof AdminSwapDetailAddressRoute
@@ -744,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminStakeDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/launchpad/detail/$address': {
+      id: '/admin/launchpad/detail/$address'
+      path: '/admin/launchpad/detail/$address'
+      fullPath: '/admin/launchpad/detail/$address'
+      preLoaderRoute: typeof AdminLaunchpadDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/burn/edit/$address': {
       id: '/admin/burn/edit/$address'
       path: '/admin/burn/edit/$address'
@@ -797,6 +818,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapCreateIndexRoute: SwapCreateIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
   AdminBurnEditAddressRoute: AdminBurnEditAddressRoute,
+  AdminLaunchpadDetailAddressRoute: AdminLaunchpadDetailAddressRoute,
   AdminStakeDetailAddressRoute: AdminStakeDetailAddressRoute,
   AdminStakeEditAddressRoute: AdminStakeEditAddressRoute,
   AdminSwapDetailAddressRoute: AdminSwapDetailAddressRoute,

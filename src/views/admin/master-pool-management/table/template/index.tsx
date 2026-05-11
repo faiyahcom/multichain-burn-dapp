@@ -179,7 +179,42 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
         ];
 
       case 3:
-        return []; // TODO: launchpad
+        return [
+          "Pool Name & Address",
+          "Time",
+          "Mode",
+          "Pair",
+          "Network",
+          {
+            label: "Joined Users",
+            render: (
+              <div className="mx-auto flex w-max items-center gap-2">
+                <span>{"Joined \nUsers"}</span>
+                <ArrowSortButton
+                  onToggleSort={onToggleSort}
+                  sortBy="joinedUsersCount"
+                  isActive={sortBy === "joinedUsersCount"}
+                  sortOrder={sortOrder}
+                />
+              </div>
+            ),
+          },
+          {
+            label: "Amount Raised",
+            render: (
+              <div className="mx-auto flex w-max items-center gap-2">
+                <span>{"Amount \nRaised"}</span>
+                <ArrowSortButton
+                  onToggleSort={onToggleSort}
+                  sortBy="amountBurned" // TODO: subject to change
+                  isActive={sortBy === "amountBurned"}
+                  sortOrder={sortOrder}
+                />
+              </div>
+            ),
+          },
+          "Status",
+        ];
 
       default:
         void (poolType satisfies never); // exhaustive check
@@ -211,9 +246,10 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
           isLoading={isLoading}
         />
 
-        {data?.map((item) => {
+        {data?.map((item, index) => {
           const isBurnPool = item.kind === 0;
           const isStakePool = item.kind === 2;
+          const isLaunchpad = item.kind === 3;
           const networkConfig = chainIdToNetworkConfig(item.chainId);
 
           const tokenOutDisplay = resolvePoolTokenDisplay({
@@ -250,7 +286,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 return "/admin/stake/detail/$address";
 
               case 3:
-                return "/"; // TODO: launchpad
+                return "/admin/launchpad/detail/$address";
 
               default:
                 void (poolType satisfies never); // exhaustive check
@@ -317,6 +353,11 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                     }}
                   />
                 </TableCell>
+              )}
+              {/* Mode */}
+              {/* TODO: implement API */}
+              {isLaunchpad && (
+                <TableCell>{index % 2 === 0 ? "Fixed" : "Dynamic"}</TableCell>
               )}
               {/* Pair */}
               <TableCell>

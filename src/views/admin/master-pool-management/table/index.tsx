@@ -4,6 +4,7 @@ import { useMasterPoolManagementStakeSearchFilterStore } from "@/stores/admin/ma
 import { useMasterPoolManagementSwapSearchFilterStore } from "@/stores/admin/master-pool-management/swap/search-filter-store";
 import { type PoolType } from "@/types/admin/master-pool-management";
 import AdminMasterPoolManagementTableTemplate from "./template";
+import { useMasterPoolManagementLaunchpadSearchFilterStore } from "@/stores/admin/master-pool-management/launchpad/search-filter-store";
 
 interface Props {
   poolType: PoolType;
@@ -22,6 +23,8 @@ const AdminMasterPoolManagementTable: React.FC<Props> = ({
     useMasterPoolManagementSwapSearchFilterStore();
   const { filter: stakeFilter, setFilter: setStakeFilter } =
     useMasterPoolManagementStakeSearchFilterStore();
+  const { filter: launchpadFilter, setFilter: setLaunchpadFilter } =
+    useMasterPoolManagementLaunchpadSearchFilterStore();
   switch (poolType) {
     case 0:
       return (
@@ -66,7 +69,18 @@ const AdminMasterPoolManagementTable: React.FC<Props> = ({
       );
 
     case 3:
-      return null; // TODO: launchpad
+      return (
+        <AdminMasterPoolManagementTableTemplate
+          poolType={3}
+          data={data}
+          isLoading={isLoading}
+          sortBy={launchpadFilter.sortBy}
+          sortOrder={launchpadFilter.sortOrder}
+          onToggleSort={({ sortBy, sortOrder }) => {
+            setLaunchpadFilter({ sortBy, sortOrder });
+          }}
+        />
+      );
 
     default:
       void (poolType satisfies never); // exhaustive check
