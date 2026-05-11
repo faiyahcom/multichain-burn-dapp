@@ -12,7 +12,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import { useEditStakePoolEvmFn } from "./useEditStakePoolEvmFn";
 import { MIN_DAYS } from "../create/form";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
@@ -48,12 +48,19 @@ const secsToDays = (secs: string | undefined): string => {
     return String(n / 86400);
 };
 
-const fmtDisplayDays = (secs: string | number | undefined | null): string => {
-    if (secs == null) return "0";
-    const n = Number(secs);
-    if (!isFinite(n)) return "0";
-    return String(n / 86400);
-};
+function formatDuration(seconds: number | undefined | null): string {
+    if (seconds == null || !isFinite(seconds) || seconds < 0) return "—";
+    if (seconds >= 9_007_199_254_740_991) return "Infinite";
+    if (seconds === 0) return "0 days";
+    const days = Math.floor(seconds / 86400);
+    const hours = Math.floor((seconds % 86400) / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const parts: string[] = [];
+    if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+    if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
+    if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
+    return parts.length ? parts.join(" ") : `${seconds} seconds`;
+}
 
 const formatScheduleTime = (ts: string) =>
     format(new Date(Number(ts) * 1000), "MMM dd, yyyy, HH:mm") + " UTC";
@@ -287,7 +294,7 @@ export default function EditStakePoolScreen({
     const fmtCurrentAmt = (raw: string | null | undefined) => {
         if (!raw || raw === "0" || pool?.tokenInDecimals == null)
             return "Unlimited";
-        return sciToFormatted(raw, pool.tokenInDecimals);
+        return formatAmount(raw, pool.tokenInDecimals);
     };
 
     if (isLoading || !pool) return <div className="p-8">Loading...</div>;
@@ -462,14 +469,14 @@ export default function EditStakePoolScreen({
                                 <span className="text-xl text-greyed">APR:</span>
                                 <span className="text-xl text-black max-sm:text-right">
                                     {stakePool?.apr !== undefined
-                                        ? `${(Number(stakePool.apr) / DECIMAL_FEE_PERCENT).toFixed(2)}%`
+                                        ? `${shortenNumber({ number: Number(stakePool.apr) / DECIMAL_FEE_PERCENT, decimalPlaces: 2 })}%`
                                         : "—"}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Lock-up Duration:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {fmtDisplayDays(stakePool?.lockUpDuration)} days
+                                    {formatDuration(Number(stakePool?.lockUpDuration))}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
@@ -477,7 +484,7 @@ export default function EditStakePoolScreen({
                                     Interest Start Delay:
                                 </span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {fmtDisplayDays(stakePool?.interestStartDelay)} days
+                                    {formatDuration(Number(stakePool?.interestStartDelay))}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
@@ -485,13 +492,13 @@ export default function EditStakePoolScreen({
                                 <span className="text-xl text-black max-sm:text-right">
                                     {stakePool?.interestAccrualDuration === "0"
                                         ? "Unlimited"
-                                        : `${fmtDisplayDays(stakePool?.interestAccrualDuration)} days`}
+                                        : formatDuration(Number(stakePool?.interestAccrualDuration))}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">
                                 <span className="text-xl text-greyed">Claim Start Delay:</span>
                                 <span className="text-xl text-black max-sm:text-right">
-                                    {fmtDisplayDays(stakePool?.claimStartDelay)} days
+                                    {formatDuration(Number(stakePool?.claimStartDelay))}
                                 </span>
                             </div>
                             <div className="grid grid-cols-2">

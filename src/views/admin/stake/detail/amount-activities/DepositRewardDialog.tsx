@@ -183,7 +183,7 @@ const DepositRewardDialog = ({
 
     const aprDisplay =
         stakePool?.apr !== undefined
-            ? `${(Number(stakePool.apr) / 100).toFixed(2)}%`
+            ? `${shortenNumber({ number: Number(stakePool.apr) / 100, decimalPlaces: 2 })}%`
             : "—";
 
     const currentRewardFormatted = useMemo(() => {
@@ -402,7 +402,7 @@ const DepositRewardDialog = ({
                                         <span>
                                             {isLoadingRewardBalance
                                                 ? "Loading..."
-                                                : `${rewardBalanceFormatted ?? "0"} ${rewardSymbol}`}
+                                                : `${shortenNumber({ number: Number(rewardBalanceFormatted ?? 0), decimalPlaces: 2 })} ${rewardSymbol}`}
                                         </span>
                                     </span>
                                 </div>

@@ -12,7 +12,7 @@ import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMediaQuery } from "usehooks-ts";
 import Decimal from "decimal.js";
-import { formatAmount, safeDecimal } from "@/utils/helpers/numbers";
+import { formatAmount, safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -92,7 +92,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
 
     const aprDisplay =
       stakePool?.apr !== undefined
-        ? `${(Number(stakePool.apr) / 100).toFixed(2)}%`
+        ? `${shortenNumber({ number: Number(stakePool.apr) / 100, decimalPlaces: 2 })}%`
         : "—";
 
     return [
