@@ -54,7 +54,10 @@ const ProfilePoolSearch: React.FC<Props> = ({
           statuses = [...swapPoolStatuses, "full"]; // For participated pools, user cannot join "holding" and "upcoming" status, so basically it is the same as swap pool
         break;
       case PoolKindCodeEnum.Launchpad:
-        statuses = []; // TODO: implement launchpad pool search
+        if (profileType === "my-create-pools") statuses = []; // user cannot create launchpad
+        if (profileType === "my-participated-pools") {
+          statuses = [...swapPoolStatuses, "completed"]; // For participated pools, user cannot join "upcoming" status, so basically it is the same as swap pool
+        }
         break;
       case "claimable":
         statuses = [];
@@ -88,6 +91,15 @@ const ProfilePoolSearch: React.FC<Props> = ({
       ];
 
     if (poolType === PoolKindCodeEnum.Stake) return ["stakedAmount", "apr"];
+
+    if (poolType === PoolKindCodeEnum.Launchpad)
+      return [
+        {
+          value: "amountBurned", // TODO: subject to change
+          label: "My Amount",
+          shortLabel: "Amount",
+        },
+      ];
 
     return ["volume", "liquidity"];
   }, [poolType]);

@@ -199,7 +199,7 @@ const LaunchpadRecentPoolsTable = () => {
           <Link
             to="/my-participated-pools"
             search={{
-              tab: "stake-pool",
+              tab: "launchpad",
             }}
             className="sm:text-24px pr-3 font-inter text-xl font-semibold"
           >
