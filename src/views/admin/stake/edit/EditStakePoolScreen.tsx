@@ -18,6 +18,7 @@ import { MIN_DAYS } from "../create/form";
 import { useEditStakePoolSolFn } from "./useEditStakePoolSolFn";
 import PoolOverview from "../detail/pool-overview";
 import type { BurnPoolStatus } from "@/types/pool";
+import { formatDuration } from "@/utils/helpers/date";
 
 type EditStakeFormValues = {
     poolName: string;
@@ -47,20 +48,6 @@ const secsToDays = (secs: string | undefined): string => {
     if (n <= 0) return "0";
     return String(n / 86400);
 };
-
-function formatDuration(seconds: number | undefined | null): string {
-    if (seconds == null || !isFinite(seconds) || seconds < 0) return "—";
-    if (seconds >= 9_007_199_254_740_991) return "Infinite";
-    if (seconds === 0) return "0 days";
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const parts: string[] = [];
-    if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
-    if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
-    if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
-    return parts.length ? parts.join(" ") : `${seconds} seconds`;
-}
 
 const formatScheduleTime = (ts: string) =>
     format(new Date(Number(ts) * 1000), "MMM dd, yyyy, HH:mm") + " UTC";
