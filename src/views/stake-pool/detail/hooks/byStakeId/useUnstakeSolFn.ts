@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
-import { getErrorMessage } from "@/utils/helpers/error-message";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
     PublicKey,
@@ -36,7 +35,6 @@ import BN from "bn.js";
 
 const UNSTAKE_ERROR_MESSAGE =
     "Failed to unstake your token. Please try again.";
-const INSUFFICIENT_REWARD_BALANCE_MESSAGE = "Insufficient reward balance";
 
 export interface UnstakeSolParams {
     /** Pool PDA address */
@@ -276,16 +274,7 @@ export const useUnstakeSolFn = () => {
                 toast.success("Unstaked successfully!", { description: signature });
                 return signature;
             } catch (error: unknown) {
-                const errorMessage = getErrorMessage({ error });
-
-                if (errorMessage === INSUFFICIENT_REWARD_BALANCE_MESSAGE) {
-                    toast.error(UNSTAKE_ERROR_MESSAGE);
-                } else {
-                    toast.error("Failed to unstake", {
-                        description: errorMessage,
-                    });
-                }
-
+                toast.error(UNSTAKE_ERROR_MESSAGE);
                 throw error;
             }
         },
