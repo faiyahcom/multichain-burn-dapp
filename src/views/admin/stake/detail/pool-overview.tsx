@@ -29,7 +29,7 @@ function formatDuration(seconds: number | bigint | undefined | null): string {
   const hours = Math.floor((s % 86400) / 3600);
   const minutes = Math.floor((s % 3600) / 60);
   const parts: string[] = [];
-  if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+  if (days) parts.push(`${shortenNumber({ number: days, decimalPlaces: 2 })} ${days === 1 ? "day" : "days"}`);
   if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
   if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
   return parts.length ? parts.join(" ") : `${s} seconds`;
