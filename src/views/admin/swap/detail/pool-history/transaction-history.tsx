@@ -72,24 +72,6 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     imageUri: poolDetail?.tokenOut?.imageUri,
   });
 
-  const resolveTokenSymbol = (
-    txTokenAddress: string,
-    fallbackSymbol: string,
-  ) => {
-    if (
-      txTokenAddress?.toLowerCase() === poolDetail?.pool?.tokenIn?.toLowerCase()
-    ) {
-      return tokenInDisplay.symbol;
-    }
-    if (
-      txTokenAddress?.toLowerCase() ===
-      poolDetail?.pool?.rewardToken?.toLowerCase()
-    ) {
-      return tokenOutDisplay.symbol;
-    }
-    return fallbackSymbol;
-  };
-
   const txns = poolTxns?.txns ?? [];
 
   if (isLoading) {
@@ -145,25 +127,20 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
               tx.tokenOutDecimals != null;
 
             // Fee is always on the input side for swap
-            const feeRaw = parseToBN(tx.fee);
-            const feeDecimals = tx.tokenInDecimals;
-            const feeSymbol = resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol);
+            const feeDecimals = tx.tokenOutDecimals;
             const fee =
               feeDecimals != null
-                ? `${formatAmount(parseToBN(tx.fee || "0").toString(), feeDecimals)} ${feeSymbol}`
-                : `0 ${feeSymbol}`;
+                ? `${formatAmount(parseToBN(tx.fee || "0").toString(), feeDecimals)} ${tokenOutDisplay.symbol}`
+                : `0 ${tokenOutDisplay.symbol}`;
 
-            // User's net received on input side = amountIn - fee
-            const inNetRaw = hasAmountIn
-              ? parseToBN(tx.amountIn).sub(feeRaw).toString()
-              : null;
+            const inNetRaw = hasAmountIn ? tx.amountIn.toString() : null;
             const inPart =
               inNetRaw != null
-                ? `${formatAmount(inNetRaw, tx.tokenInDecimals)} ${resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)}`
-                : `0 ${resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)}`;
+                ? `${formatAmount(inNetRaw, tx.tokenInDecimals)} ${tokenInDisplay.symbol}`
+                : `0 ${tokenInDisplay.symbol}`;
             const outPart = hasAmountOut
-              ? `${formatAmount(tx.amountOut, tx.tokenOutDecimals)} ${resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)}`
-              : `0 ${resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)}`;
+              ? `${formatAmount(tx.amountOut, tx.tokenOutDecimals)} ${tokenOutDisplay.symbol}`
+              : `0 ${tokenOutDisplay.symbol}`;
             const swapped = `${inPart} → ${outPart}`;
 
             const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
