@@ -1,3 +1,5 @@
+import { shortenNumber } from "./numbers";
+
 export function formatDuration(seconds: number | bigint | string | undefined | null, roundedMinute?: boolean): string {
     if (seconds === undefined || seconds === null || seconds === "") return "—";
     const s = typeof seconds === "bigint" ? Number(seconds) : Number(seconds);
@@ -9,7 +11,7 @@ export function formatDuration(seconds: number | bigint | string | undefined | n
     const hours = Math.floor((s % 86400) / 3600);
     const minutes = Math.floor((s % 3600) / 60);
     const parts: string[] = [];
-    if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
+    if (days) parts.push(`${shortenNumber({number: days})} ${days === 1 ? "day" : "days"}`);
     if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
     // if case minute and have odd seconds left, we round up
     if (roundedMinute) {
