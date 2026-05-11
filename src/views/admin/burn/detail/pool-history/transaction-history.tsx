@@ -153,7 +153,6 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
               tx.amountOut.toString() !== "0" &&
               tx.tokenOutDecimals != null;
 
-            const feeRaw = parseToBN(tx.fee);
             const feeDecimals = hasAmountOut
               ? tx.tokenOutDecimals
               : tx.tokenInDecimals;
@@ -166,9 +165,9 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 : `0 ${feeSymbol}`;
 
             const netRaw = hasAmountIn
-              ? parseToBN(tx.amountIn).sub(feeRaw).toString()
+              ? parseToBN(tx.amountIn).toString()
               : hasAmountOut
-                ? parseToBN(tx.amountOut).sub(feeRaw).toString()
+                ? tx.amountOut.toString()
                 : null;
             const amountDecimals = hasAmountIn
               ? tx.tokenInDecimals
