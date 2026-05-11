@@ -605,7 +605,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                     {isLoadingBalance ? (
                                                         <Skeleton className="h-4 w-20" />
                                                     ) : (
-                                                        `${stakingBalanceFormatted ?? "0"} ${stakingTokenDisplay.symbol}`
+                                                        `${shortenNumber({ number: Number(stakingBalanceFormatted ?? "0") })} ${stakingTokenDisplay.symbol}`
                                                     )}
                                                 </span>
                                             </div>
