@@ -33,7 +33,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
       tokenAddress,
       poolTypes,
       disablePoolTypes,
-      isCreate = true,
+      isCreate = false,
     }: {
       tokenAddress: string;
       poolTypes: PoolType[];
@@ -69,6 +69,8 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         // Enable IXs
         for (const poolType of poolTypes) {
           const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
+          console.log("dcmmmmm111");
+          console.log(isCreate ? true : null);
 
           const ix = await program.methods
             .updateWhitelistToken(tokenPubkey, true, poolTypeVariant, isCreate ? true : null)
@@ -85,6 +87,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         if (disablePoolTypes) {
           for (const poolType of disablePoolTypes) {
             const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
+            console.log("dcmmmmm");
 
             const ix = await program.methods
               .updateWhitelistToken(tokenPubkey, false, poolTypeVariant, null)
