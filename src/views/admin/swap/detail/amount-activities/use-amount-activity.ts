@@ -169,8 +169,8 @@ export const useAmountActivity = (poolDetail?: PoolDetailResponse) => {
 
     const handleAdminClose = async (reason?: string) => {
         if (!pool?.address) return;
-        if (isSolana && poolDetail) {
-            await adminClosePoolSol({ poolAddress: pool.address, poolDetail });
+        if (isSolana) {
+            await adminClosePoolSol({ poolAddress: pool.address });
         } else {
             await adminClosePoolEvm({ poolAddress: pool.address });
         }

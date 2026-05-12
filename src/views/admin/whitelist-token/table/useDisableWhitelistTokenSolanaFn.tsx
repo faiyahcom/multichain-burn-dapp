@@ -54,7 +54,7 @@ export const useDisableWhitelistTokenSolanaFn = () => {
         for (const poolType of poolTypes) {
           const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
           const ix = await program.methods
-            .updateWhitelistToken(tokenPubkey, false, poolTypeVariant)
+            .updateWhitelistToken(tokenPubkey, false, poolTypeVariant, null)
             .accounts({
               admin: walletPublicKey,
               factory: factoryPDA,
