@@ -2,7 +2,7 @@ import AnimateIconButton from "@/components/common/animate-icon-button";
 import { toast } from "@/components/common/custom-toast";
 import WhitelistTokenSelect from "@/components/common/whitelist-token-select";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
+import { NumericInput } from "@/components/ui/numeric-input";
 import {
   pairConfigsService,
   type PairConfigCreateRequest,
@@ -32,31 +32,51 @@ const minRatioSchema = z.object({
       error: "Token Out is required",
     })
     .min(1, { error: "Token Out is required" }),
-  minRatio: z
+  numerator: z
     .string()
     .trim()
-    .min(1, { error: "Min Ratio is required" })
-    .refine((value) => /^(-?[\d.]+):(-?[\d.]+)$/.test(value), {
-      error: 'Ratio must be in format "X:Y" (e.g. 1:2)',
+    .min(1, { error: "Numerator is required" })
+    .refine((value) => /^(-?[\d.]+)$/.test(value), {
+      error: "Numerator must be a number",
     })
     .refine(
       (value) => {
-        const match = value.match(/^(-?[\d.]+):(-?[\d.]+)$/);
+        const match = value.match(/^(-?[\d.]+)$/);
         if (!match) return false;
-        return (
-          Number.isInteger(Number(match[1])) &&
-          Number.isInteger(Number(match[2]))
-        );
+        return Number.isInteger(Number(match[1]));
       },
-      { error: "Both numbers must be integers" },
+      { error: "Numerator must be an integer" },
     )
     .refine(
       (value) => {
-        const match = value.match(/^(-?[\d.]+):(-?[\d.]+)$/);
+        const match = value.match(/^(-?[\d.]+)$/);
         if (!match) return false;
-        return Number(match[1]) > 0 && Number(match[2]) > 0;
+        return Number(match[1]) > 0;
       },
-      { error: "Both numbers must be greater than zero" },
+      { error: "Numerator must be greater than zero" },
+    ),
+  denominator: z
+    .string()
+    .trim()
+    .min(1, { error: "Denominator is required" })
+    .refine((value) => /^(-?[\d.]+)$/.test(value), {
+      error: "Denominator must be a number",
+    })
+    .refine(
+      (value) => {
+        const match = value.match(/^(-?[\d.]+)$/);
+        if (!match) return false;
+        return Number.isInteger(Number(match[1]));
+      },
+      { error: "Denominator must be an integer" },
+    )
+    .refine(
+      (value) => {
+        const match = value.match(/^(-?[\d.]+)$/);
+        if (!match) return false;
+        return Number(match[1]) > 0;
+      },
+      { error: "Denominator must be greater than zero" },
     ),
 });
 type MinRatioFormValues = z.infer<typeof minRatioSchema>;
@@ -71,7 +91,8 @@ const AdminMinRatioForm: React.FC<Props> = ({ chainId, tokenIn, tokenOut }) => {
       defaultValues: {
         tokenIn: undefined,
         tokenOut: undefined,
-        minRatio: "",
+        numerator: "",
+        denominator: "",
       },
       resolver: zodResolver(minRatioSchema),
     });
@@ -102,9 +123,8 @@ const AdminMinRatioForm: React.FC<Props> = ({ chainId, tokenIn, tokenOut }) => {
     ) {
       setValue("tokenIn", pairConfigData.pairConfig.tokenIn);
       setValue("tokenOut", pairConfigData.pairConfig.tokenOut);
-      const ratioNumerator = pairConfigData.pairConfig.ratioNumerator;
-      const ratioDenominator = pairConfigData.pairConfig.ratioDenominator;
-      setValue("minRatio", `${ratioNumerator}:${ratioDenominator}`);
+      setValue("numerator", pairConfigData.pairConfig.ratioNumerator);
+      setValue("denominator", pairConfigData.pairConfig.ratioDenominator);
     }
   }, [
     isDetailPairConfigEnabled,
@@ -154,21 +174,20 @@ const AdminMinRatioForm: React.FC<Props> = ({ chainId, tokenIn, tokenOut }) => {
     });
 
   const onSubmit = (values: MinRatioFormValues) => {
-    const [rawNumerator, rawDenominator] = values.minRatio.split(":");
     if (isEdit) {
       updateMinRatioMutate({
         tokenIn: values.tokenIn,
         tokenOut: values.tokenOut,
-        ratioNumerator: rawNumerator,
-        ratioDenominator: rawDenominator,
+        ratioNumerator: values.numerator,
+        ratioDenominator: values.denominator,
         enable: true,
       });
     } else {
       createMinRatioMutate({
         tokenIn: values.tokenIn,
         tokenOut: values.tokenOut,
-        ratioNumerator: rawNumerator,
-        ratioDenominator: rawDenominator,
+        ratioNumerator: values.numerator,
+        ratioDenominator: values.denominator,
         enable: true,
       });
     }
@@ -227,19 +246,38 @@ const AdminMinRatioForm: React.FC<Props> = ({ chainId, tokenIn, tokenOut }) => {
               </Field>
             )}
           />
-          <Controller
-            control={control}
-            name="minRatio"
-            render={({ field, fieldState }) => (
-              <Field data-invalid={fieldState.invalid}>
-                <FieldLabel htmlFor={field.name}>Min Ratio</FieldLabel>
-                <Input {...field} placeholder="1:1" />
-                {fieldState.invalid && (
-                  <FieldError errors={[fieldState.error]} />
-                )}
-              </Field>
-            )}
-          />
+          <div className="flex items-start gap-1">
+            <Controller
+              control={control}
+              name="numerator"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name}>Min Ratio</FieldLabel>
+                  <NumericInput {...field} placeholder="1" />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+            <div className="space-y-0.5">
+              <div className="h-5.5" />
+              <div className="flex h-9 items-center">:</div>
+            </div>
+            <Controller
+              control={control}
+              name="denominator"
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid}>
+                  <FieldLabel htmlFor={field.name} className="invisible">Denominator</FieldLabel>
+                  <NumericInput {...field} placeholder="1" />
+                  {fieldState.invalid && (
+                    <FieldError errors={[fieldState.error]} />
+                  )}
+                </Field>
+              )}
+            />
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-4">
             <AnimateIconButton
               variant="letter-icon"
