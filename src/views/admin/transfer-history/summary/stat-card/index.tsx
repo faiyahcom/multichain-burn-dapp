@@ -1,4 +1,5 @@
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 interface Props {
   chainId: string;
@@ -22,7 +23,7 @@ const StatCard: React.FC<Props> = ({
     >
       <p className="text-15px font-normal">{networkConfig?.label}</p>
       <p className="text-xs font-normal text-secondary-text">
-        {txnCount} transfer{txnCount > 1 ? "s" : ""} · {amount} token
+        {shortenNumber({ number: txnCount })} transfer{txnCount > 1 ? "s" : ""} · {shortenNumber({ number: amount })} token
         {amount > 1 ? "s" : ""}
       </p>
     </div>

@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import type { TransferHistoryAnalysisItem } from "@/services/whitelistUserService";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
 
 export interface DialogData {
   chainId: string;
@@ -81,9 +81,9 @@ const AdminTransferHistorySummaryDialog: React.FC<Props> = ({
                 key={item.tokenAddress}
               >
                 <div>{item.tokenCustomSymbol ?? item.tokenSymbol}</div>
-                <div>{item.txnCount}</div>
+                <div>{shortenNumber({ number: item.txnCount })}</div>
                 <div>
-                  {sciToFormatted(item.totalAmount, item.tokenDecimals)}
+                  {shortenNumber({ number: Number(sciToFormatted(item.totalAmount, item.tokenDecimals)) })}
                 </div>
               </div>
             ))}
@@ -91,7 +91,7 @@ const AdminTransferHistorySummaryDialog: React.FC<Props> = ({
         </div>
 
         <p className="text-center text-15px font-normal text-secondary-text">
-          {totalTransfers} total transfers across {tokenCount} tokens
+          {shortenNumber({ number: totalTransfers })} total transfers across {shortenNumber({ number: tokenCount })} tokens
         </p>
       </DialogContent>
     </Dialog>

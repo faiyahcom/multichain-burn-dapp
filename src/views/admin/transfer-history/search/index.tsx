@@ -3,6 +3,7 @@ import NetworkImgIcon from "@/components/common/network-img-icon";
 import SearchTextDebouncedInput from "@/components/common/search-text-debounced-input";
 import type { SingleSelectOption } from "@/components/common/single-select";
 import SingleSelect from "@/components/common/single-select";
+import { NumericInput } from "@/components/ui/numeric-input";
 import { NETWORK_CONFIGS } from "@/config/networks";
 import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 
@@ -44,53 +45,17 @@ const AdminTransferHistorySearch = () => {
 
       <div className="flex flex-col justify-start gap-2.75 md:flex-row md:items-center">
         <p className="text-13px">Amount</p>
-        <SearchTextDebouncedInput
-          inputProps={{
-            placeholder: "Min",
-            type: "number",
-            min: 0,
-            onKeyDown: (e) => {
-              // Prevent minus sign from being entered
-              if (e.key === "-") {
-                e.preventDefault();
-              }
-            },
-            onPaste: (e) => {
-              // Prevent minus sign from being entered
-              const pasted = e.clipboardData?.getData("text");
-              if (pasted?.includes("-")) {
-                e.preventDefault();
-              }
-            },
-          }}
-          addons={null}
+        <NumericInput
+          placeholder="Min"
           value={filter.amountOutMin}
-          onValueChange={(amountOutMin) => setFilter({ amountOutMin })}
+          onChange={(amountOutMin) => setFilter({ amountOutMin })}
           className="md:max-w-40"
         />
         <p className="text-13px">to</p>
-        <SearchTextDebouncedInput
-          inputProps={{
-            placeholder: "Max",
-            type: "number",
-            min: 0,
-            onKeyDown: (e) => {
-              // Prevent minus sign from being entered
-              if (e.key === "-") {
-                e.preventDefault();
-              }
-            },
-            onPaste: (e) => {
-              // Prevent minus sign from being entered
-              const pasted = e.clipboardData?.getData("text");
-              if (pasted?.includes("-")) {
-                e.preventDefault();
-              }
-            },
-          }}
-          addons={null}
+        <NumericInput
+          placeholder="Max"
           value={filter.amountOutMax}
-          onValueChange={(amountOutMax) => setFilter({ amountOutMax })}
+          onChange={(amountOutMax) => setFilter({ amountOutMax })}
           className="md:max-w-40"
         />
         {errors?.amountOutRange && (
