@@ -124,9 +124,20 @@ export const useCreateWhitelistTokenSolanaFn = () => {
       } catch (error: unknown) {
         console.log(error);
 
-        toast.error("Failed to create whitelist token", {
-          description: getErrorMessage({ error }),
-        });
+        const rawErrorText = JSON.stringify(error) + String((error as Error)?.message ?? "");
+        if (
+          rawErrorText.includes("TokenAlreadyWhitelisted") ||
+          rawErrorText.includes("0x17ad") ||
+          rawErrorText.includes("6045")
+        ) {
+          toast.error("Failed to create whitelist token", {
+            description: "Selected pool types are already whitelisted on-chain",
+          });
+        } else {
+          toast.error("Failed to create whitelist token", {
+            description: getErrorMessage({ error }),
+          });
+        }
         return false;
       }
     },
