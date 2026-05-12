@@ -33,10 +33,12 @@ export const useCreateWhitelistTokenSolanaFn = () => {
       tokenAddress,
       poolTypes,
       disablePoolTypes,
+      isCreate = true,
     }: {
       tokenAddress: string;
       poolTypes: PoolType[];
       disablePoolTypes?: PoolType[];
+      isCreate?: boolean;
     }) => {
       try {
         if (!isConnected || !address) {
@@ -69,7 +71,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
 
           const ix = await program.methods
-            .updateWhitelistToken(tokenPubkey, true, poolTypeVariant)
+            .updateWhitelistToken(tokenPubkey, true, poolTypeVariant, isCreate ? true : null)
             .accounts({
               admin: walletPublicKey,
               factory: factoryPDA,
@@ -85,7 +87,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
             const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
 
             const ix = await program.methods
-              .updateWhitelistToken(tokenPubkey, false, poolTypeVariant)
+              .updateWhitelistToken(tokenPubkey, false, poolTypeVariant, null)
               .accounts({
                 admin: walletPublicKey,
                 factory: factoryPDA,
