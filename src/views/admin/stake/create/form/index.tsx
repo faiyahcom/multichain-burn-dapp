@@ -16,6 +16,7 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { useGetWhitelistTokens } from "@/services/queries/queries";
 import { WSOL_ADDRESS, ZERO_ADDRESS } from "@/config/constant";
 import { useNavigate } from "@tanstack/react-router";
+import TokenImage from "@/components/common/token-image";
 
 
 type CreateStakePoolFormValues = {
@@ -442,13 +443,15 @@ const CreateStakePoolForm = () => {
               />
               <InputGroupAddon align="inline-end">
                 {selectedStakingToken && (
-                  <img
+                  <TokenImage
                     src={selectedStakingToken.imageUri}
                     alt={selectedStakingToken.symbol}
-                    className="size-4 rounded-full"
+                    classNames={{
+                      common: "size-4 rounded-full"
+                    }}
                   />
                 )}
-                <span className="text-xs font-medium">
+                <span className="text-xs font-medium text-nowrap">
                   {selectedStakingToken
                     ? "customSymbol" in selectedStakingToken
                       ? selectedStakingToken.customSymbol?.trim() ||
@@ -499,13 +502,15 @@ const CreateStakePoolForm = () => {
               />
               <InputGroupAddon align="inline-end">
                 {selectedStakingToken && (
-                  <img
+                  <TokenImage
                     src={selectedStakingToken.imageUri}
                     alt={selectedStakingToken.symbol}
-                    className="size-4 rounded-full"
+                    classNames={{
+                      common: "size-4 rounded-full"
+                    }}
                   />
                 )}
-                <span className="text-xs font-medium">
+                <span className="text-xs font-medium text-nowrap">
                   {selectedStakingToken
                     ? "customSymbol" in selectedStakingToken
                       ? selectedStakingToken.customSymbol?.trim() ||
