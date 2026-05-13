@@ -73,8 +73,6 @@ export const useBatchTransferSolFn = () => {
             recipients,
             onSuccess,
         }: BatchTransferSolParams) => {
-            console.log("zxczxczcx");
-
             try {
                 if (!isConnected || !address) throw new Error("Wallet not connected");
                 if (!connection || !provider) throw new Error("Solana connection or provider unavailable");
