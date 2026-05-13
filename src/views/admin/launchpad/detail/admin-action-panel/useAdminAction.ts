@@ -44,7 +44,7 @@ export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
         if (isSolana) {
             throw new Error("Cancel pool is not available for Solana launchpad pools.");
         }
-        await cancelPoolEvm({ poolAddress: pool.address });
+        await cancelPoolEvm({ poolAddress: pool.address, poolDetail });
         invalidatePool(pool.address);
     };
 

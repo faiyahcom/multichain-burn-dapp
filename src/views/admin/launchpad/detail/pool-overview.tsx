@@ -1,11 +1,11 @@
 import { useMemo } from "react";
 import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
+import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 import type { PoolDetailResponse } from "@/types/pool";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
-import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
 import { formatAmount } from "@/utils/helpers/numbers";
 
 type Props = {
@@ -141,10 +141,6 @@ const PoolOverview = ({ poolDetail }: Props) => {
           ? [{ label: "Distribution Mode", value: distributionMode }]
           : [{ label: "Distribution Mode", value: "Instant" }]),
       ],
-      [
-        { label: "Start Time", value: startTime },
-        { label: "End Time", value: endTime },
-      ],
     ];
 
     if (isDynamic && launchpadPool?.showReward !== undefined) {
@@ -161,9 +157,22 @@ const PoolOverview = ({ poolDetail }: Props) => {
 
   return (
     <div className="mt-3 w-full py-4">
-      <div className="mb-4 flex items-center gap-2">
-        <div className="h-1.5 w-1.5 bg-black" />
-        <span className="text-xl font-medium">Pool Overview</span>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="h-1.5 w-1.5 bg-black" />
+          <span className="text-xl font-medium">Pool Overview</span>
+        </div>
+        <p className="text-[13px] text-greyed">
+          {poolDetail?.pool?.timeStart && poolDetail?.pool?.timeEnd
+            ? `${formatTimestampSecondsToDate({
+                timestamp: poolDetail.pool.timeStart,
+                formatStr: "yyyy/MM/dd, HH:mm",
+              })} - ${formatTimestampSecondsToDate({
+                timestamp: poolDetail.pool.timeEnd,
+                formatStr: "yyyy/MM/dd, HH:mm",
+              })}`
+            : "No time limit"}
+        </p>
       </div>
 
       {!poolDetail ? (
@@ -192,12 +201,11 @@ const PoolOverview = ({ poolDetail }: Props) => {
               className="grid grid-cols-1 space-x-2 sm:grid-cols-2"
             >
               {row.map((cell, ci) => (
-                <div
-                  key={ci}
-                  className="grid grid-cols-2 items-center gap-y-1 text-sm"
-                >
-                  <span className="text-greyed">{cell.label}</span>
-                  <span className="text-right sm:text-left">{cell.value}</span>
+                <div key={ci} className="grid grid-cols-2">
+                  <span className="text-xl text-greyed">{cell.label}:</span>
+                  <span className="text-xl break-all text-black max-sm:text-right">
+                    {cell.value}
+                  </span>
                 </div>
               ))}
             </div>

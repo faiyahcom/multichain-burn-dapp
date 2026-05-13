@@ -658,6 +658,11 @@
                         "type": "bytes32"
                     },
                     {
+                        "internalType": "uint256",
+                        "name": "totalSaleAmount",
+                        "type": "uint256"
+                    },
+                    {
                         "internalType": "uint64",
                         "name": "startTime",
                         "type": "uint64"
@@ -666,6 +671,21 @@
                         "internalType": "uint64",
                         "name": "endTime",
                         "type": "uint64"
+                    },
+                    {
+                        "internalType": "enum ILaunchpadPool.LaunchpadPoolType",
+                        "name": "poolType",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "enum ILaunchpadPool.ClaimPolicy",
+                        "name": "claimPolicy",
+                        "type": "uint8"
+                    },
+                    {
+                        "internalType": "enum ILaunchpadPool.DistributionMode",
+                        "name": "distributionMode",
+                        "type": "uint8"
                     },
                     {
                         "internalType": "uint256",

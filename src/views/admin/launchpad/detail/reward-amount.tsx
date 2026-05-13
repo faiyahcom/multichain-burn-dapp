@@ -10,31 +10,18 @@ type Props = {
   poolDetail?: PoolDetailResponse;
 };
 
+const SIMPLE_STATUSES = ["pending", "upcoming", "holding", "draft"];
+
 const fmt = (raw: string | undefined, decimals: number) =>
   raw !== undefined ? formatAmount(raw, decimals) : "0";
 
 const fmtFee = (fee: string | undefined) =>
   fee !== undefined ? `${Number(fee) / DECIMAL_FEE_PERCENT}%` : "-";
 
-const Row = ({
-  label,
-  value,
-  muted = false,
-}: {
-  label: string;
-  value: React.ReactNode;
-  muted?: boolean;
-}) => (
-  <div
-    className={`flex items-center justify-between text-sm ${muted ? "text-greyed" : ""}`}
-  >
-    <span>{label}</span>
-    <span className="font-medium">{value}</span>
-  </div>
-);
-
 const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
   const pool = poolDetail?.pool;
+  const status = pool?.status ?? "upcoming";
+  const isSimple = SIMPLE_STATUSES.includes(status);
 
   const network = pool?.chainId
     ? chainIdToNetworkConfig(pool.chainId)
@@ -118,92 +105,144 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
     pool?.currentRewardAmount ?? "0",
   ).isNegative();
 
+  const extendedRows = [
+    [
+      {
+        label: "Total Reward Pool",
+        value: `${totalReward} ${saleSymbol}`,
+      },
+      {
+        label: "Claimed / Distributed",
+        value: `${claimedReward} ${saleSymbol}`,
+      },
+    ],
+    [
+      {
+        label: "Remaining Reward",
+        value: (
+          <span className={isNegativeRemaining ? "text-red-500" : ""}>
+            {currentReward} {saleSymbol}
+          </span>
+        ),
+      },
+      {
+        label: "Total Raised",
+        value: `${totalRaised} ${paymentSymbol}`,
+      },
+    ],
+    [
+      { label: "Settlement Fee", value: settlementFee },
+      null,
+    ],
+  ];
+
   if (!poolDetail) {
     return (
-      <div className="mt-3 w-full space-y-3 py-4">
-        <div className="flex items-center gap-2">
-          <div className="h-1.5 w-1.5 bg-black" />
-          <Skeleton className="h-6 w-40" />
-        </div>
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="flex items-center justify-between">
-            <Skeleton className="h-5 w-28" />
-            <Skeleton className="h-5 w-24" />
+      <div className="mt-3 w-full py-4">
+        <div className="flex items-center gap-1 pb-4 text-xl font-medium max-sm:justify-between md:gap-14">
+          <div className="flex items-center gap-2">
+            <div className="h-1.5 w-1.5 bg-foreground" />
+            <Skeleton className="h-6 w-40" />
           </div>
-        ))}
+          <Skeleton className="h-6 w-28" />
+        </div>
+        <div className="space-y-2">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="grid grid-cols-1 space-x-2 sm:grid-cols-2">
+              <div className="grid grid-cols-2 items-center gap-y-1">
+                <Skeleton className="h-5 w-28" />
+                <Skeleton className="h-5 w-24" />
+              </div>
+              <div className="grid grid-cols-2 items-center gap-y-1">
+                <Skeleton className="h-5 w-28" />
+                <Skeleton className="h-5 w-24" />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mt-3 w-full space-y-3 py-4">
-      <div className="flex items-center gap-2">
-        <div className="h-1.5 w-1.5 bg-black" />
-        <span className="text-xl font-medium">Reward Amount</span>
-        <span className="ml-auto text-lg font-semibold">
+    <div className="mt-3 w-full py-4">
+      <div className="flex items-center gap-1 pb-4 text-xl font-medium max-sm:justify-between md:gap-14">
+        <div className="flex items-center gap-2">
+          <div className="h-1.5 w-1.5 bg-foreground" />
+          <span>Reward Amount</span>
+        </div>
+        <p>
           {totalReward} {saleSymbol}
-        </span>
+        </p>
       </div>
 
-      <Row
-        label="Total Reward Pool"
-        value={`${totalReward} ${saleSymbol}`}
-        muted
-      />
-      <Row
-        label="Claimed / Distributed"
-        value={`${claimedReward} ${saleSymbol}`}
-        muted
-      />
-      <Row
-        label="Remaining Reward"
-        value={
-          <span className={isNegativeRemaining ? "text-red-500" : ""}>
-            {currentReward} {saleSymbol}
-          </span>
-        }
-        muted
-      />
-      <Row
-        label="Total Raised"
-        value={`${totalRaised} ${paymentSymbol}`}
-        muted
-      />
-      <Row label="Settlement Fee" value={settlementFee} muted />
+      {isSimple ? (
+        <div className="space-y-2">
+          <div className="grid grid-cols-1 space-x-2 sm:grid-cols-2">
+            <div className="grid grid-cols-2">
+              <span className="text-xl text-greyed">Settlement Fee:</span>
+              <span className="text-xl text-foreground max-sm:text-right">
+                {settlementFee}
+              </span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {extendedRows.map((row, i) => (
+            <div className="grid grid-cols-1 space-x-2 sm:grid-cols-2" key={i}>
+              <div className="grid grid-cols-2">
+                <span className="text-xl text-greyed">{row?.[0]?.label}:</span>
+                <span className="text-xl text-foreground max-sm:text-right">
+                  {row?.[0]?.value}
+                </span>
+              </div>
+              {row?.[1] && (
+                <div className="grid grid-cols-2">
+                  <span className="text-xl text-greyed">{row[1].label}:</span>
+                  <span className="text-xl text-foreground max-sm:text-right">
+                    {row[1].value}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
 
-      {!isDynamic && (
-        <div className="space-y-1">
-          <div className="flex justify-between text-xs text-greyed">
-            <span>
-              {fmt(poolDetail?.depositedAmount, paymentDec)} {paymentSymbol}
-            </span>
-            <span>
-              {raisedGoal} {paymentSymbol}
-            </span>
-          </div>
-          <div className="h-2 w-full overflow-hidden rounded-full bg-progress-bg">
-            <div
-              className="h-full rounded-full bg-mb-btn-stake transition-all"
-              style={{ width: `${progressPct}%` }}
-            />
-          </div>
-          <p className="text-right text-xs text-greyed">
-            {progressPct.toFixed(1)}%
-          </p>
+          {!isDynamic && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-greyed">
+                <span>
+                  {fmt(poolDetail?.depositedAmount, paymentDec)} {paymentSymbol}
+                </span>
+                <span>
+                  {raisedGoal} {paymentSymbol}
+                </span>
+              </div>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-progress-bg">
+                <div
+                  className="h-full rounded-full bg-mb-btn-stake transition-all"
+                  style={{ width: `${progressPct}%` }}
+                />
+              </div>
+              <p className="text-right text-xs text-greyed">
+                {progressPct.toFixed(1)}%
+              </p>
+            </div>
+          )}
+
+          {distributionMsg && (
+            <p className="rounded-md bg-progress-bg px-3 py-2 text-xs text-greyed">
+              {distributionMsg}
+            </p>
+          )}
+
+          {pool?.status === "ended" || pool?.status === "closed" ? (
+            <p className="rounded-md bg-progress-bg px-3 py-2 text-xs">
+              This pool has completed. No further deposits are accepted.
+            </p>
+          ) : null}
         </div>
       )}
-
-      {distributionMsg && (
-        <p className="rounded-md bg-progress-bg px-3 py-2 text-xs text-greyed">
-          {distributionMsg}
-        </p>
-      )}
-
-      {pool?.status === "ended" || pool?.status === "closed" ? (
-        <p className="rounded-md bg-progress-bg px-3 py-2 text-xs">
-          This pool has completed. No further deposits are accepted.
-        </p>
-      ) : null}
     </div>
   );
 };
