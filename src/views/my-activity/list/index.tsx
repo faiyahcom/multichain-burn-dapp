@@ -183,8 +183,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Deposit reward token, Deposit burn token, Stake
-  if ([10, 30, 33].includes(kind)) {
+  // Deposit reward token, Deposit burn token, Stake, Join Launchpad
+  if ([10, 30, 33, 36].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountIn}
@@ -197,8 +197,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Claim reward (burn & stake), Unstake
-  if ([31, 35, 34].includes(kind)) {
+  // Claim reward (burn & stake), Unstake, Claim Allocation, Reward Received
+  if ([31, 35, 34, 37, 38].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountOut}

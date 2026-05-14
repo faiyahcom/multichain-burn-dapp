@@ -187,6 +187,8 @@ export const activityKind = {
   8: "Pool Ended",
   9: "Create stake pool",
   69: "Submit stake pool",
+  70: "Create launchpad pool",
+  71: "Submit launchpad pool",
 
   // Maker action
   10: "Deposit reward token",
@@ -204,6 +206,10 @@ export const activityKind = {
   33: "Stake",
   34: "Unstake",
   35: "Claim Stake reward",
+
+  36: "Join Launchpad",
+  37: "Claim Allocation",
+  38: "Reward Received",
 
   40: "Pool End",
 } as const;
@@ -307,6 +313,9 @@ export const myActivityActions = [
   "5",
   "33",
   "34",
+  "36",
+  "37",
+  "38",
 ] as const satisfies ReadonlyArray<ActivityKeyList>;
 export type MyActivityAction = (typeof myActivityActions)[number];
 export const myActivityActionLabels: Record<MyActivityAction, string> = {
@@ -319,6 +328,9 @@ export const myActivityActionLabels: Record<MyActivityAction, string> = {
   "5": "Cancel pool",
   "33": "Stake",
   "34": "Unstake",
+  "36": "Join Launchpad",
+  "37": "Claim Allocation",
+  "38": "Reward Received",
 };
 export const getMyActivityActionLabel = (kind: MyActivityAction) => {
   return myActivityActionLabels[kind];
