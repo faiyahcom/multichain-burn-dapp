@@ -4,6 +4,13 @@ import { useMediaQuery } from "usehooks-ts";
 import LaunchpadPoolListGrid from "./grid";
 import LaunchpadPoolListTable from "./table";
 import CustomPagination from "@/components/common/glow/glow-pagination";
+import { useQuery } from "@tanstack/react-query";
+import { poolQueryKeys } from "@/services/queries/queryKey";
+import { PoolKindCodeEnum } from "@/types/pool";
+import { poolService } from "@/services/poolService";
+import { convertArrayToStringParam } from "@/utils/helpers/array";
+import { networkIdToChainId } from "@/config/networks";
+import { userHiddenLaunchpadPoolStatuses } from "@/types/admin/master-pool-management";
 
 const LaunchpadPoolList = () => {
   const { filter, setFilter } = useLaunchpadPoolListSearchFilterStore();
@@ -11,7 +18,29 @@ const LaunchpadPoolList = () => {
   const limit = 12;
   const onlyShowCurrentPage = useMediaQuery("(max-width: 1024px)");
 
-  // TODO: fetch data
+  const { data: poolList, isPending: isPoolListPending } = useQuery({
+    queryKey: poolQueryKeys.list({
+      type: PoolKindCodeEnum.Launchpad,
+      ...filterWithoutListLayout,
+    }),
+    queryFn: async () => {
+      return poolService.getPoolList({
+        page: filter.page,
+        limit: limit,
+        chainIds: convertArrayToStringParam({
+          array: filter.network?.map((network) => networkIdToChainId(network)),
+        }),
+        excludeStatuses: convertArrayToStringParam({
+          array: [...userHiddenLaunchpadPoolStatuses],
+        }),
+        includeStatuses: convertArrayToStringParam({ array: filter.status }),
+        kind: PoolKindCodeEnum.Launchpad.toString(),
+        search: filter.text || undefined,
+        sortBy: filter.sortBy,
+        sortDirection: filter.sortOrder,
+      });
+    },
+  });
 
   return (
     <GlowContainer
@@ -20,27 +49,26 @@ const LaunchpadPoolList = () => {
     >
       {filter.listLayout === "list" && (
         <LaunchpadPoolListTable
-        //   data={poolList?.pools}
-        //   isLoading={isPoolListPending}
+          data={poolList?.pools}
+          isLoading={isPoolListPending}
         />
       )}
       {filter.listLayout === "card" && (
         <LaunchpadPoolListGrid
-        //   data={poolList?.pools}
-        //   isLoading={isPoolListPending}
+          data={poolList?.pools}
+          isLoading={isPoolListPending}
         />
       )}
-      {/* {!!poolList?.pools?.length && ( */}
-      <CustomPagination
-        currentPage={filter.page}
-        //   totalCount={poolList?.total || 0}
-        totalCount={100}
-        pageSize={limit}
-        onPageChange={(page) => setFilter({ page })}
-        variant="launchpad"
-        onlyShowCurrentPage={onlyShowCurrentPage}
-      />
-      {/* )} */}
+      {!!poolList?.pools?.length && (
+        <CustomPagination
+          currentPage={filter.page}
+          totalCount={poolList?.total || 0}
+          pageSize={limit}
+          onPageChange={(page) => setFilter({ page })}
+          variant="launchpad"
+          onlyShowCurrentPage={onlyShowCurrentPage}
+        />
+      )}
     </GlowContainer>
   );
 };

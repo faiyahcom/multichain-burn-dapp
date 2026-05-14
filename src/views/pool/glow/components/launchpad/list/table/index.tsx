@@ -15,7 +15,13 @@ import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-in
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
-import type { PoolItemType } from "@/types/admin/master-pool-management";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import {
+  getPoolStatusLabel,
+  type PoolItemType,
+} from "@/types/admin/master-pool-management";
+import { sciToFormatted } from "@/utils/helpers/numbers";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
 
@@ -65,23 +71,60 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
           rowCount={12}
           isLoading={isLoading}
         />
-        {/* <TableNoData
+        <TableNoData
           colSpan={columns.length}
           data={data}
           isLoading={isLoading}
-        /> */}
+        />
 
-        {/* TODO: replace with real data */}
-        {Array.from({ length: 12 }).map((_, index) => {
-          const raised = 35000;
-          const goal = 50000;
-          const raisedPercent = (raised / goal) * 100;
+        {data?.map((pool) => {
+          const network = chainIdToNetworkConfig(pool.chainId);
+
+          const tokenOutDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: pool.tokenOut,
+            tokenSymbol: pool.tokenOutSymbol,
+            tokenName: pool.tokenOutSymbol,
+            customName: pool.tokenOutSymbolCustom ?? undefined,
+            customSymbol: pool.tokenOutSymbolCustom ?? undefined,
+            imageUri: pool.tokenOutImageUri ?? undefined,
+          });
+
+          const tokenInDisplay = resolvePoolTokenDisplay({
+            network,
+            tokenAddress: pool.tokenIn,
+            tokenSymbol: pool.tokenInSymbol,
+            tokenName: pool.tokenInSymbol,
+            customName: pool.tokenInSymbolCustom ?? undefined,
+            customSymbol: pool.tokenInSymbolCustom ?? undefined,
+            imageUri: pool.tokenInImageUri ?? undefined,
+          });
+
+          const statusLabel = getPoolStatusLabel(pool.status);
+          const href = `/launchpad/detail/${pool.address}`;
+
+          const rewardDenominator = Number(pool.rewardDenominator ?? "0") || 0;
+          const rewardNumerator = Number(pool.rewardNumerator ?? "0") || 0;
+          // if both rewardDenominator and rewardNumerator are 0, then Dynamic
+          const isDynamic = rewardDenominator === 0 && rewardNumerator === 0;
+          const price =
+            rewardNumerator !== 0 ? rewardDenominator / rewardNumerator : 0;
+
+          const totalRaise = Number(
+            sciToFormatted(pool.totalRaise ?? "0", pool.tokenInDecimals),
+          );
+          const rewardAmount = Number(
+            sciToFormatted(pool.rewardAmount ?? "0", pool.tokenOutDecimals),
+          );
+          const percentRaised =
+            rewardAmount !== 0 ? (totalRaise / rewardAmount) * 100 : null;
 
           return (
             <TableRow
-              key={index}
+              key={pool.address}
               variant="launchpad"
               className="cursor-pointer font-medium"
+              onClick={() => navigate({ to: href })}
             >
               {/* Pool Name + Address */}
               <TableCell
@@ -98,14 +141,14 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   <div className="max-w-[calc(var(--max-w)-var(--spacing)*13.75)] min-w-0">
                     <p
                       className="max-w-full min-w-0 truncate font-semibold"
-                      title={"YUNA 12"}
+                      title={pool.name}
                     >
-                      {"YUNA 12"}
+                      {pool.name}
                     </p>
                     <CopyableText
-                      content={"0x1234567890123456789012345678901234567890"}
+                      content={pool.address}
                       displayText={truncateString({
-                        str: "0x1234567890123456789012345678901234567890",
+                        str: pool.address,
                       })}
                       classNames={{
                         container: "justify-start",
@@ -118,73 +161,80 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               {/* Time */}
               <TableCell>
                 <StartEndDateDisplay
-                  startDate={"1778233567"}
-                  endDate={"1778233567"}
+                  startDate={pool?.timeStart}
+                  endDate={pool?.timeEnd}
                   classNames={{
                     container: "mx-auto w-max",
                   }}
                 />
               </TableCell>
               {/* Mode */}
-              <TableCell>{index % 2 === 0 ? "Fixed" : "Dynamic"}</TableCell>
+              <TableCell>{isDynamic ? "Dynamic" : "Fixed"}</TableCell>
               {/* Pair */}
               <TableCell>
                 <TokenOutInInterceptDisplay
-                  tokenOutProps={
-                    {
-                      //   src: tokenRewardDisplay.imageUri,
-                      //   alt: tokenRewardDisplay.symbol,
-                    }
-                  }
-                  tokenInProps={
-                    {
-                      //   src: tokenInDisplay.imageUri,
-                      //   alt: tokenInDisplay.symbol,
-                    }
-                  }
+                  tokenOutProps={{
+                    src: tokenOutDisplay.imageUri,
+                    alt: tokenOutDisplay.symbol,
+                  }}
+                  tokenInProps={{
+                    src: tokenInDisplay.imageUri,
+                    alt: tokenInDisplay.symbol,
+                  }}
                   className="justify-center"
                 />
               </TableCell>
               {/* Price */}
               <TableCell>
-                <MetricNumber
-                  // number={sciToFormatted(
-                  //   pool?.stakedAmount,
-                  //   pool?.tokenInDecimals,
-                  // )}
-                  number={123456789}
-                  // unit={tokenInDisplay.symbol}
-                  unit={"USDT"}
-                  isShorten
-                />
+                {isDynamic ? (
+                  "Dynamic"
+                ) : (
+                  <MetricNumber
+                    number={price}
+                    unit={tokenInDisplay.symbol}
+                    isShorten
+                  />
+                )}
               </TableCell>
               {/* Raised */}
               <TableCell>
-                <MetricNumber
-                  classNames={{ container: "inline-flex w-max" }}
-                  number={raised}
-                  isShorten
-                />
-                /
-                <MetricNumber
-                  classNames={{ container: "inline-flex w-max" }}
-                  number={goal}
-                  isShorten
-                />{" "}
-                (
-                <MetricNumber
-                  classNames={{ container: "inline-flex w-max gap-0" }}
-                  number={raisedPercent}
-                  unit="%"
-                  isShorten
-                />
-                )
+                <span>
+                  <span>Raised: </span>
+                  <MetricNumber
+                    classNames={{ container: "inline-flex w-max" }}
+                    number={totalRaise}
+                    isShorten
+                  />
+                  {!isDynamic && (
+                    <>
+                      /
+                      <MetricNumber
+                        classNames={{ container: "inline-flex w-max" }}
+                        number={rewardAmount}
+                        isShorten
+                      />{" "}
+                      {percentRaised !== null && (
+                        <>
+                          (
+                          <MetricNumber
+                            classNames={{
+                              container: "inline-flex w-max gap-0",
+                            }}
+                            number={percentRaised}
+                            unit="%"
+                            isShorten
+                          />
+                          )
+                        </>
+                      )}
+                    </>
+                  )}
+                </span>
               </TableCell>
               {/* Network */}
               <TableCell>
                 <NetworkDisplay
-                  // chainId={pool?.chainId}
-                  networkId="xphere"
+                  chainId={pool?.chainId}
                   classNames={{
                     container: "flex items-center justify-center gap-3",
                   }}
@@ -197,8 +247,7 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                   hasGroupHover
                   className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
                 >
-                  {/* {statusLabel} */}
-                  Live
+                  {statusLabel}
                 </Button>
               </TableCell>
             </TableRow>
