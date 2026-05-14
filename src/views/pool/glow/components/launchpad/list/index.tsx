@@ -34,7 +34,7 @@ const LaunchpadPoolList = () => {
           array: [...userHiddenLaunchpadPoolStatuses],
         }),
         includeStatuses: convertArrayToStringParam({ array: filter.status }),
-        kind: PoolKindCodeEnum.Stake.toString(),
+        kind: PoolKindCodeEnum.Launchpad.toString(),
         search: filter.text || undefined,
         sortBy: filter.sortBy,
         sortDirection: filter.sortOrder,

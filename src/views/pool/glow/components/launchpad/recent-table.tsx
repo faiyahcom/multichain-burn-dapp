@@ -221,7 +221,7 @@ const LaunchpadRecentPoolsTable = () => {
                     </TableCell>
                     {/* Received */}
                     <TableCell>
-                      {rewardAmount ? (
+                      {!!rewardAmount ? (
                         <MetricNumber
                           number={rewardAmount}
                           unit={tokenRewardDisplay.symbol}

@@ -103,8 +103,8 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
           const statusLabel = getPoolStatusLabel(pool.status);
           const href = `/launchpad/detail/${pool.address}`;
 
-          const rewardDenominator = Number(pool.rewardDenominator ?? "0") ?? 0;
-          const rewardNumerator = Number(pool.rewardNumerator ?? "0") ?? 0;
+          const rewardDenominator = Number(pool.rewardDenominator ?? "0") || 0;
+          const rewardNumerator = Number(pool.rewardNumerator ?? "0") || 0;
           // if both rewardDenominator and rewardNumerator are 0, then Dynamic
           const isDynamic = rewardDenominator === 0 && rewardNumerator === 0;
           const price =
@@ -189,7 +189,11 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                 {isDynamic ? (
                   "Dynamic"
                 ) : (
-                  <MetricNumber number={price} unit={"USDT"} isShorten />
+                  <MetricNumber
+                    number={price}
+                    unit={tokenInDisplay.symbol}
+                    isShorten
+                  />
                 )}
               </TableCell>
               {/* Raised */}
