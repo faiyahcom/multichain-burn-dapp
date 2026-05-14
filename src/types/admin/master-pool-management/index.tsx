@@ -107,19 +107,19 @@ export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
 
 export const launchpadPoolStatuses = [
   "upcoming",
-  "completed",
+  "complete",
   ...swapPoolStatuses,
 ] as const;
 export type LaunchpadPoolStatus = (typeof launchpadPoolStatuses)[number];
 export const launchpadPoolStatusLabels: Record<LaunchpadPoolStatus, string> = {
   ...swapPoolStatusLabels,
   upcoming: "Upcoming",
-  completed: "Completed",
+  complete: "Completed",
 };
 export const launchpadPoolStatusColors: Record<LaunchpadPoolStatus, string> = {
   ...swapPoolStatusColors,
   upcoming: "#FFE798",
-  completed: "#FFB08E",
+  complete: "#FFB08E",
 };
 
 export const getPoolStatusColor = (status: AllPoolStatus) => {
@@ -187,6 +187,7 @@ export type PoolItemType = {
   tokenOutEnable: boolean;
   apr: string; // divide by 10000 to get display percentage
   stakedAmount: string;
+  totalRaise?: string; // need sci formating
 };
 
 export type PoolListRequest = PaginationRequest & {
@@ -279,7 +280,7 @@ export const userViewLaunchpadPoolStatuses = [
   "on_going",
   "upcoming",
   "ended",
-  "completed",
+  "complete",
 ] as const;
 export const userHiddenLaunchpadPoolStatuses = [
   ...launchpadPoolStatuses.filter(
