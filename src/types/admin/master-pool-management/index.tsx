@@ -224,6 +224,9 @@ export type PoolListStatsResponse = {
   totalBurned?: string;
   totalSwapVolume?: string;
   totalStaked?: number;
+  totalRaised?: string; // number
+  activeLaunchpadCount?: number;
+  totalProject?: number;
 };
 
 // user view pool list can only see certain statuses

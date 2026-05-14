@@ -17,6 +17,7 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
     queryFn: () => poolService.getPoolStats(poolKind),
   });
   const variant = getPoolGlowVariant(poolKind);
+  const isLaunchpad = poolKind === PoolKindCodeEnum.Launchpad;
 
   const totalVolume = useMemo(() => {
     let totalVolume = "";
@@ -34,7 +35,7 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
         break;
 
       case PoolKindCodeEnum.Launchpad:
-        totalVolume = "123456789"; // TODO: implement API for launchpad pool
+        totalVolume = overallStats?.totalRaised ?? "0";
         break;
 
       default:
@@ -66,44 +67,28 @@ const PoolListGlowSummary = ({ poolKind }: Props) => {
       valueTitle: Number(totalVolume).toLocaleString("en-US"),
     },
     {
-      title: (() => {
-        switch (poolKind) {
-          case PoolKindCodeEnum.Burn:
-          case PoolKindCodeEnum.Swap:
-          case PoolKindCodeEnum.Stake:
-            return "Total Transactions";
-          case PoolKindCodeEnum.Launchpad:
-            return "Active Launches";
-          default:
-            void (poolKind satisfies never);
-            return "Total Transactions";
-        }
-      })(),
+      title: isLaunchpad ? "Active Launches" : "Total Transactions",
       value: shortenNumber({
-        number: Number(overallStats?.totalTransactions ?? 0),
+        number: isLaunchpad
+          ? Number(overallStats?.activeLaunchpadCount ?? 0)
+          : Number(overallStats?.totalTransactions ?? 0),
       }),
-      valueTitle: Number(overallStats?.totalTransactions ?? 0).toLocaleString(
-        "en-US",
-      ),
+      valueTitle: (isLaunchpad
+        ? Number(overallStats?.activeLaunchpadCount ?? 0)
+        : Number(overallStats?.totalTransactions ?? 0)
+      ).toLocaleString("en-US"),
     },
     {
-      title: (() => {
-        switch (poolKind) {
-          case PoolKindCodeEnum.Burn:
-          case PoolKindCodeEnum.Swap:
-          case PoolKindCodeEnum.Stake:
-            return "Total Pools";
-          case PoolKindCodeEnum.Launchpad:
-            return "Total Projects";
-          default:
-            void (poolKind satisfies never);
-            return "Total Pools";
-        }
-      })(),
+      title: isLaunchpad ? "Total Projects" : "Total Pools",
       value: shortenNumber({
-        number: Number(overallStats?.totalPools ?? 0),
+        number: isLaunchpad
+          ? Number(overallStats?.totalProject ?? 0)
+          : Number(overallStats?.totalPools ?? 0),
       }),
-      valueTitle: Number(overallStats?.totalPools ?? 0).toLocaleString("en-US"),
+      valueTitle: (isLaunchpad
+        ? Number(overallStats?.totalProject ?? 0)
+        : Number(overallStats?.totalPools ?? 0)
+      ).toLocaleString("en-US"),
     },
     {
       title: "Total Participants",
