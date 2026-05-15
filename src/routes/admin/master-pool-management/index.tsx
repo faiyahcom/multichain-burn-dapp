@@ -13,7 +13,10 @@ import {
   useMasterPoolManagementBurnSearchFilterStore,
   type MasterPoolManagementBurnSearchFilterType,
 } from "@/stores/admin/master-pool-management/burn/search-filter-store";
-import { useMasterPoolManagementLaunchpadSearchFilterStore } from "@/stores/admin/master-pool-management/launchpad/search-filter-store";
+import {
+  useMasterPoolManagementLaunchpadSearchFilterStore,
+  type MasterPoolManagementLaunchpadSearchFilterType,
+} from "@/stores/admin/master-pool-management/launchpad/search-filter-store";
 import {
   useMasterPoolManagementStakeSearchFilterStore,
   type MasterPoolManagementStakeSearchFilterType,
@@ -140,6 +143,56 @@ function RouteComponent() {
       kind: poolType.toString(),
     }),
     queryFn: async () => {
+      const timeEndFrom = isBurnOrStakeOrLaunchpad
+        ? dateToUnixSeconds({
+            date: (
+              filter as
+                | MasterPoolManagementBurnSearchFilterType
+                | MasterPoolManagementStakeSearchFilterType
+                | MasterPoolManagementLaunchpadSearchFilterType
+            )?.poolEndRange?.from,
+            mod: "startOfDay",
+          })
+        : undefined;
+      const timeEndTo = isBurnOrStakeOrLaunchpad
+        ? dateToUnixSeconds({
+            date: (
+              filter as
+                | MasterPoolManagementBurnSearchFilterType
+                | MasterPoolManagementStakeSearchFilterType
+                | MasterPoolManagementLaunchpadSearchFilterType
+            )?.poolEndRange?.to,
+            mod: "endOfDay",
+          })
+        : undefined;
+      const timeStartFrom = isBurnOrStakeOrLaunchpad
+        ? dateToUnixSeconds({
+            date: (
+              filter as
+                | MasterPoolManagementBurnSearchFilterType
+                | MasterPoolManagementStakeSearchFilterType
+                | MasterPoolManagementLaunchpadSearchFilterType
+            )?.poolStartRange?.from,
+            mod: "startOfDay",
+          })
+        : undefined;
+      const timeStartTo = isBurnOrStakeOrLaunchpad
+        ? dateToUnixSeconds({
+            date: (
+              filter as
+                | MasterPoolManagementBurnSearchFilterType
+                | MasterPoolManagementStakeSearchFilterType
+                | MasterPoolManagementLaunchpadSearchFilterType
+            )?.poolStartRange?.to,
+            mod: "endOfDay",
+          })
+        : undefined;
+
+      const mode =
+        isLaunchpad && launchpadFilter.mode !== "all"
+          ? launchpadFilter.mode
+          : undefined;
+
       return adminPoolManagementService.getList({
         page: filter?.page ?? 1,
         limit: limit,
@@ -154,52 +207,16 @@ function RouteComponent() {
             ? stakeFilter?.type
             : undefined,
         search: filter?.text ?? undefined,
-        sortBy: filter?.sortBy ?? "timestamp",
-        sortDirection: filter?.sortOrder ?? "desc",
+        sortBy: filter?.sortBy,
+        sortDirection: filter?.sortOrder,
         statuses: convertArrayToStringParam({
           array: filter?.status?.map((status) => status.toString()),
         }),
         excludeStatuses: isStakePool || isLaunchpad ? undefined : "draft", // admin does not need to see draft pools (except for stake pool, launchpad)
-        timeEndFrom: isBurnOrStakeOrLaunchpad
-          ? dateToUnixSeconds({
-              date: (
-                filter as
-                  | MasterPoolManagementBurnSearchFilterType
-                  | MasterPoolManagementStakeSearchFilterType
-              )?.poolEndRange?.from,
-              mod: "startOfDay",
-            })
-          : undefined,
-        timeEndTo: isBurnOrStakeOrLaunchpad
-          ? dateToUnixSeconds({
-              date: (
-                filter as
-                  | MasterPoolManagementBurnSearchFilterType
-                  | MasterPoolManagementStakeSearchFilterType
-              )?.poolEndRange?.to,
-              mod: "endOfDay",
-            })
-          : undefined,
-        timeStartFrom: isBurnOrStakeOrLaunchpad
-          ? dateToUnixSeconds({
-              date: (
-                filter as
-                  | MasterPoolManagementBurnSearchFilterType
-                  | MasterPoolManagementStakeSearchFilterType
-              )?.poolStartRange?.from,
-              mod: "startOfDay",
-            })
-          : undefined,
-        timeStartTo: isBurnOrStakeOrLaunchpad
-          ? dateToUnixSeconds({
-              date: (
-                filter as
-                  | MasterPoolManagementBurnSearchFilterType
-                  | MasterPoolManagementStakeSearchFilterType
-              )?.poolStartRange?.to,
-              mod: "endOfDay",
-            })
-          : undefined,
+        timeEndFrom,
+        timeEndTo,
+        timeStartFrom,
+        timeStartTo,
         timestampFrom: dateToUnixSeconds({
           date: filter?.dateRange?.from,
           mod: "startOfDay",
@@ -211,7 +228,7 @@ function RouteComponent() {
         tokens: convertArrayToStringParam({
           array: filter?.tokens,
         }),
-        // TODO: add launchpad filter
+        mode,
       });
     },
   });
