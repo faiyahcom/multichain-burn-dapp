@@ -64,7 +64,7 @@ const LaunchpadSearch = () => {
             value: "timestamp",
             shortLabel: "Latest",
           },
-          "poolEnd",
+          "timeEnd",
         ]}
         sortBy={filter.sortBy ?? "none"}
         sortOrder={filter.sortOrder}
