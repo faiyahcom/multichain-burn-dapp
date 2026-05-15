@@ -23,8 +23,8 @@ const AdminHomeSummaryCard: React.FC<AdminHomeSummaryCardProps> = ({
           "0px 1px 3px rgba(0, 0, 0, 0.1), 0px 1px 2px -1px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <div className="flex items-center justify-between gap-1">
-        <p className="text-base font-medium text-[#6B7280]">{title}</p>
+      <div className="flex items-center justify-between gap-1 text-[#6B7280]">
+        <p className="text-base font-medium">{title}</p>
         {Icon && <Icon className="w-4" />}
       </div>
 
