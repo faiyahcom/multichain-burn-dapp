@@ -36,9 +36,9 @@ export type AdminPoolItemType = {
   burnedAmount: string | null; // string number
   swappedAmount: string | null; // string number
   stakedAmount: string; // string number
-  raiseAmount: string; // string number
-  rewardDenominator: string; // string number
-  rewardNumerator: string; // string number
+  raiseAmount: string | null; // string number
+  rewardDenominator: string | null; // string number
+  rewardNumerator: string | null; // string number
 };
 
 export interface AdminPoolListRequest extends PaginationRequest {
