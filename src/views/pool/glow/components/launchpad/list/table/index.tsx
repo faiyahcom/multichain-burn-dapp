@@ -14,6 +14,7 @@ import TableSkeleton from "@/components/common/glow/table-skeleton";
 import TokenOutInInterceptDisplay from "@/components/common/glow/token-out-in-intercept-display";
 import MetricNumber from "@/components/common/metric-number";
 import NetworkDisplay from "@/components/common/network-display";
+import RatioDisplay from "@/components/common/ratio-display";
 import StartEndDateDisplay from "@/components/common/start-end-date-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import {
@@ -107,8 +108,6 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
           const rewardNumerator = Number(pool.rewardNumerator ?? "0") || 0;
           // if both rewardDenominator and rewardNumerator are 0, then Dynamic
           const isDynamic = rewardDenominator === 0 && rewardNumerator === 0;
-          const price =
-            rewardNumerator !== 0 ? rewardDenominator / rewardNumerator : 0;
 
           const totalRaise = Number(
             sciToFormatted(pool.totalRaise ?? "0", pool.tokenInDecimals),
@@ -189,10 +188,11 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                 {isDynamic ? (
                   "Dynamic"
                 ) : (
-                  <MetricNumber
-                    number={price}
-                    unit={tokenInDisplay.symbol}
-                    isShorten
+                  <RatioDisplay
+                    inValue={pool.rewardDenominator}
+                    outValue={pool.rewardNumerator}
+                    inSymbol={tokenInDisplay.symbol}
+                    outSymbol={tokenOutDisplay.symbol}
                   />
                 )}
               </TableCell>

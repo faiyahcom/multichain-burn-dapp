@@ -188,6 +188,8 @@ export type PoolItemType = {
   apr: string; // divide by 10000 to get display percentage
   stakedAmount: string;
   totalRaise?: string; // need sci formating
+  depositedAmount?: string; // need sci formating
+  receivedAmount?: string; // need sci formating
 };
 
 export type PoolListRequest = PaginationRequest & {
