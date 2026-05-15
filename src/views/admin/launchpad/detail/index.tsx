@@ -7,7 +7,7 @@ import AdminActionPanel from "./admin-action-panel";
 import PoolHistory from "./pool-history";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import ScanLink from "@/components/common/scan-link";
-import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
+import { LAUNCHPAD_POOL_STATUS } from "@/types/admin/whitelist-token";
 import {
   StartsInCountdown,
   EndsInCountdown,
@@ -27,8 +27,8 @@ const AdminLaunchpadPoolDetail = ({ address }: Props) => {
   const pool = poolDetail?.pool;
   const status = pool?.status ?? "draft";
   const statusDisplay =
-    BURN_POOL_STATUS[status as keyof typeof BURN_POOL_STATUS] ??
-    BURN_POOL_STATUS["draft"];
+    LAUNCHPAD_POOL_STATUS[status as keyof typeof LAUNCHPAD_POOL_STATUS] ??
+    LAUNCHPAD_POOL_STATUS["draft"];
 
   const renderExtraContent = () => {
     switch (status) {
@@ -59,6 +59,12 @@ const AdminLaunchpadPoolDetail = ({ address }: Props) => {
         return (
           <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
             This pool has ended.
+          </p>
+        );
+      case "completed":
+        return (
+          <p className="ml-auto rounded-md bg-admin-warning px-6 py-2 text-base">
+            All allocations have been distributed successfully.
           </p>
         );
       case "closed":

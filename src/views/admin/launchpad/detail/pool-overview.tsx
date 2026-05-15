@@ -17,9 +17,6 @@ const PoolOverview = ({ poolDetail }: Props) => {
     ? chainIdToNetworkConfig(poolDetail.pool.chainId)
     : undefined;
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const launchpadPool = poolDetail?.pool as any;
-
   const saleTokenDisplay = resolvePoolTokenDisplay({
     network,
     tokenAddress: poolDetail?.pool?.rewardToken,
@@ -58,33 +55,24 @@ const PoolOverview = ({ poolDetail }: Props) => {
           0,
         );
 
-    const isInstant = launchpadPool?.isInstant as boolean | undefined;
-    const isAuto = launchpadPool?.isAuto as boolean | undefined;
+    const claimPolicyStr = poolDetail.pool.claimPolicy;
+    const distributionModeStr = poolDetail.pool.distributionMode;
 
-    const claimPolicy = isInstant
-      ? "Instant"
-      : isInstant === false
-        ? "After End"
-        : "-";
+    const claimPolicy =
+      claimPolicyStr === "instant"
+        ? "Instant"
+        : claimPolicyStr === "after_end"
+          ? "After End"
+          : "-";
 
     const distributionMode =
-      isInstant === false
-        ? isAuto
+      claimPolicyStr === "after_end"
+        ? distributionModeStr === "automatic"
           ? "Auto Distribution"
-          : isAuto === false
+          : distributionModeStr === "claim"
             ? "Claim Mode"
             : "-"
         : null;
-
-    const startTime = formatTimestampSecondsToDate({
-      timestamp: poolDetail.pool.timeStart,
-      formatStr: "dd/MM/yyyy HH:mm",
-    });
-
-    const endTime = formatTimestampSecondsToDate({
-      timestamp: poolDetail.pool.timeEnd,
-      formatStr: "dd/MM/yyyy HH:mm",
-    });
 
     const tokenImageProps = {
       classNames: { common: "size-6", img: "size-6", placeholder: "size-6" },
@@ -143,17 +131,17 @@ const PoolOverview = ({ poolDetail }: Props) => {
       ],
     ];
 
-    if (isDynamic && launchpadPool?.showReward !== undefined) {
+    if (isDynamic && poolDetail.pool.rewardVisibility !== undefined) {
       base.push([
         {
           label: "Reward Visibility",
-          value: launchpadPool.showReward ? "ON" : "OFF",
+          value: poolDetail.pool.rewardVisibility ? "ON" : "OFF",
         },
       ]);
     }
 
     return base;
-  }, [poolDetail, network, saleTokenDisplay, paymentTokenDisplay, launchpadPool]);
+  }, [poolDetail, network, saleTokenDisplay, paymentTokenDisplay]);
 
   return (
     <div className="mt-3 w-full py-4">

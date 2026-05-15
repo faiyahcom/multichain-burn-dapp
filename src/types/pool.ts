@@ -65,7 +65,7 @@ export interface PoolDetailResponse {
     kind: number;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus;
+    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus | LaunchpadPoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -86,12 +86,17 @@ export interface PoolDetailResponse {
     rewardAmount: string;
     settlementFee: string;
     poolCreationFee: string;
-    claimPolicy?: number;
-    distributionMode?: number;
+    claimPolicy?: string;
+    distributionMode?: string;
     rewardVisibility?: boolean;
     isPartner?: boolean;
     settlementRetryCount?: number;
+    distributeStatus?: string | null;
+    distributeRetryCount?: number;
+    distributeFailedAccounts?: string[];
     lowRewardNotiEnabled?: boolean;
+    lowRewardNotiLastSentAt?: string | null;
+    creationFeeTotal?: string;
     // Staking pool fields
     apr?: string;
     lockUpDuration?: string;
@@ -124,6 +129,16 @@ export interface PoolDetailResponse {
   returningAmountOnCanceling?: {
     amount: string;
     to: string;
+  };
+  launchpad?: {
+    totalReward: string;
+    totalRaised: string;
+    user?: {
+      address: string;
+      depositedAmount: string;
+      allocation: string;
+      fee: string;
+    };
   };
 }
 
@@ -169,6 +184,10 @@ export const txnKind = {
   8: "Claim",
   9: "Unstake & Claim",
   10: "Emergency Withdraw",
+  11: "Taker Deposit to Launchpad Pool",
+  12: "Taker Deposit & Instant Claim Reward",
+  13: "Taker Claim Reward from Launchpad Pool",
+  14: "Taker Receive Reward from Launchpad Pool",
 } as const;
 
 export const activityKind = {
@@ -201,8 +220,15 @@ export const activityKind = {
   33: "Stake",
   34: "Unstake",
   35: "Claim Stake reward",
+  36: "Taker Join Launchpad Pool",
+  37: "Taker Claim Reward from Launchpad Pool",
+  38: "Taker Receive Reward from Launchpad Pool",
 
   40: "Pool End",
+
+  // Pool lifecycle (additional)
+  70: "Create Launchpad Pool",
+  71: "Launchpad Pool Submitted",
 } as const;
 
 export interface MyStakeSnapshot {
@@ -237,6 +263,14 @@ export type StakePoolStatus =
   | "holding"
   | "full"
   | "ended";
+export type LaunchpadPoolStatus =
+  | "draft"
+  | "canceled"
+  | "upcoming"
+  | "on_going"
+  | "ended"
+  | "completed"
+  | "closed";
 
 export type ActivityKindKey = keyof typeof activityKind;
 

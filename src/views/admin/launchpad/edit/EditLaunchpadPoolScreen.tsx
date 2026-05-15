@@ -90,8 +90,8 @@ export default function EditLaunchpadPoolScreen({
         ? formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)
         : "",
       claimPolicy: (() => {
-        if (pool.claimPolicy === 0) return "instant";
-        if (pool.claimPolicy === 1 && pool.distributionMode === 1) return "after_end_auto";
+        if (pool.claimPolicy === "instant") return "instant";
+        if (pool.claimPolicy === "after_end" && pool.distributionMode === "automatic") return "after_end_auto";
         return "after_end_claim";
       })() as ClaimPolicyValue,
       rewardVisibility: pool.rewardVisibility ?? false,
@@ -231,9 +231,9 @@ export default function EditLaunchpadPoolScreen({
               )}              <div className="flex justify-between gap-2">
                 <span className="text-greyed">Claim Policy</span>
                 <span className="font-medium">
-                  {pool.claimPolicy === 0
+                  {pool.claimPolicy === "instant"
                     ? "Instant"
-                    : pool.distributionMode === 1
+                    : pool.distributionMode === "automatic"
                       ? "After End \u2013 Auto"
                       : "After End \u2013 Claim"}
                 </span>

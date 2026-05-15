@@ -87,19 +87,14 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
     }
   }
 
-  // Distribution mode message
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const launchpadPool = pool as any;
-  const isInstant = launchpadPool?.isInstant as boolean | undefined;
-  const isAuto = launchpadPool?.isAuto as boolean | undefined;
-
-  const distributionMsg = isInstant
-    ? "Rewards are distributed instantly upon deposit."
-    : isAuto
-      ? "Rewards will be automatically distributed after the pool ends."
-      : isAuto === false
-        ? "Users can claim rewards after the pool ends."
-        : null;
+  // const distributionMsg =
+  //   pool?.claimPolicy === "instant"
+  //     ? "Rewards are distributed instantly upon deposit."
+  //     : pool?.claimPolicy === "after_end" && pool?.distributionMode === "automatic"
+  //       ? "Rewards will be automatically distributed after the pool ends."
+  //       : pool?.claimPolicy === "after_end" && pool?.distributionMode === "claim"
+  //         ? "Users can claim rewards after the pool ends."
+  //         : null;
 
   const isNegativeRemaining = safeDecimal(
     pool?.currentRewardAmount ?? "0",
@@ -230,13 +225,13 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
             </div>
           )}
 
-          {distributionMsg && (
+          {/* {distributionMsg && (
             <p className="rounded-md bg-progress-bg px-3 py-2 text-xs text-greyed">
               {distributionMsg}
             </p>
-          )}
+          )} */}
 
-          {pool?.status === "ended" || pool?.status === "closed" ? (
+          {pool?.status === "ended" || pool?.status === "closed" || pool?.status === "completed" ? (
             <p className="rounded-md bg-progress-bg px-3 py-2 text-xs">
               This pool has completed. No further deposits are accepted.
             </p>
