@@ -17,7 +17,11 @@ export const useMyParticipatedPoolsClaimableSearchFilterStore =
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "claimableReward",
       sortOrder: "desc",
-      poolType: [PoolKindCodeEnum.Burn, PoolKindCodeEnum.Stake],
+      poolType: [
+        PoolKindCodeEnum.Burn,
+        PoolKindCodeEnum.Stake,
+        PoolKindCodeEnum.Launchpad,
+      ],
     },
     setFilter: (filter) =>
       set((state) => ({

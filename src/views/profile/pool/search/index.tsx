@@ -107,6 +107,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
   const poolTypeOptions: MultipleSelectOption[] = [
     PoolKindCodeEnum.Burn,
     PoolKindCodeEnum.Stake,
+    PoolKindCodeEnum.Launchpad,
   ].map((type) => ({
     label: poolTypeLabels[type],
     value: type.toString(),
