@@ -27,6 +27,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { getPoolStatusLabel } from "@/types/admin/master-pool-management";
 import { sciToFormatted } from "@/utils/helpers/numbers";
+import ConnectButton from "@/components/layout/header/connect-button";
 
 const LaunchpadRecentPoolsTable = () => {
   const navigate = useNavigate();
@@ -96,6 +97,15 @@ const LaunchpadRecentPoolsTable = () => {
                 text="No pools found"
               />
             )}
+            {!isAuthenticated && (
+              <TableRow>
+                <TableCell colSpan={columns.length}>
+                  <div className="flex w-full items-center justify-center py-5 font-orbitron">
+                    <ConnectButton />
+                  </div>
+                </TableCell>
+              </TableRow>
+            )}
 
             {isAuthenticated &&
               recentPools?.pools?.map((pool) => {
@@ -132,12 +142,15 @@ const LaunchpadRecentPoolsTable = () => {
                 const isDynamic =
                   rewardDenominator === 0 && rewardNumerator === 0;
 
-                const totalRaise = Number(
-                  sciToFormatted(pool.totalRaise ?? "0", pool.tokenInDecimals),
-                );
-                const rewardAmount = Number(
+                const depositedAmount = Number(
                   sciToFormatted(
-                    pool.rewardAmount ?? "0",
+                    pool.depositedAmount ?? "0",
+                    pool.tokenInDecimals,
+                  ),
+                );
+                const receivedAmount = Number(
+                  sciToFormatted(
+                    pool.receivedAmount ?? "0",
                     pool.tokenOutDecimals,
                   ),
                 );
@@ -214,16 +227,16 @@ const LaunchpadRecentPoolsTable = () => {
                     {/* Deposited */}
                     <TableCell>
                       <MetricNumber
-                        number={totalRaise}
+                        number={depositedAmount}
                         unit={tokenInDisplay.symbol}
                         isShorten
                       />
                     </TableCell>
                     {/* Received */}
                     <TableCell>
-                      {!!rewardAmount ? (
+                      {!!receivedAmount ? (
                         <MetricNumber
-                          number={rewardAmount}
+                          number={receivedAmount}
                           unit={tokenRewardDisplay.symbol}
                           isShorten
                         />
