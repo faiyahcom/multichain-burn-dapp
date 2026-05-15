@@ -587,6 +587,11 @@
                     },
                     {
                         "internalType": "bool",
+                        "name": "rewardVisibility",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "bool",
                         "name": "submitPool",
                         "type": "bool"
                     }
@@ -686,6 +691,11 @@
                         "internalType": "enum ILaunchpadPool.DistributionMode",
                         "name": "distributionMode",
                         "type": "uint8"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "rewardVisibility",
+                        "type": "bool"
                     },
                     {
                         "internalType": "uint256",

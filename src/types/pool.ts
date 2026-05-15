@@ -88,6 +88,7 @@ export interface PoolDetailResponse {
     poolCreationFee: string;
     claimPolicy?: number;
     distributionMode?: number;
+    rewardVisibility?: boolean;
     isPartner?: boolean;
     settlementRetryCount?: number;
     lowRewardNotiEnabled?: boolean;

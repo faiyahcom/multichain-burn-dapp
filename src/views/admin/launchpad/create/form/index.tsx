@@ -15,6 +15,7 @@ import BlueSwitch from "@/components/common/blue-switch";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import { useCreateLaunchpadPoolSolFn } from "../useCreateLaunchpadPoolSolFn";
 import { useCreateLaunchpadPoolEvmFn } from "../useCreateLaunchpadPoolEvmFn";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 type ClaimPolicy = "instant" | "after_end_auto" | "after_end_claim";
 
@@ -78,9 +79,16 @@ const CreateLaunchpadPoolForm = () => {
     const startTime = watch("startTime");
     const endTime = watch("endTime");
     const claimPolicy = watch("claimPolicy");
+    const price = watch("price");
+    const budget = watch("budget");
 
     const isFixed = mode === "fixed";
     const isDynamic = mode === "dynamic";
+
+    const totalTargetRaised =
+        isFixed && Number(price) > 0 && Number(budget) > 0
+            ? Number(price) * Number(budget)
+            : null;
 
     const onSubmit: SubmitHandler<CreateLaunchpadPoolFormValues> = async (
         values,
@@ -425,7 +433,7 @@ const CreateLaunchpadPoolForm = () => {
 
             {/* Reward Visibility — Dynamic mode only */}
             {isDynamic && (
-                <div className="flex gap-3 items-center">
+                <div className="flex items-center gap-3">
                     <span className="font-medium">Reward Visibility</span>
                     <div className="flex items-center gap-3">
                         <Controller
@@ -478,6 +486,18 @@ const CreateLaunchpadPoolForm = () => {
                         <p className="text-xs text-destructive">{errors.budget.message}</p>
                     )}
                 </div>
+                {/* Total Target Raised — Fixed pools only */}
+                {isFixed && (
+                    <div className="flex flex-col gap-1.5">
+                        <span className="text-[13px]">Total Target Raised</span>
+                        <Input
+                            type="text"
+                            readOnly
+                            value={shortenNumber({ number: totalTargetRaised ?? 0 })}
+                            className="max-w-xs"
+                        />
+                    </div>
+                )}
             </div>
 
             {/* Network info */}

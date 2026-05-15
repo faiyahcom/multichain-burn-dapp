@@ -4,10 +4,8 @@ import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import { ethers, type Eip1193Provider } from "ethers";
 import {
   getContractLaunchpadFactory,
-  getERC20Contract,
 } from "@/web3/contracts/multichainBurnContractEVM";
 import { getErrorMessage } from "@/utils/helpers/error-message";
-import { isNativeToken } from "@/hooks/useTokenBalance";
 
 const RATIO_DENOMINATOR = 10_000n;
 
@@ -24,6 +22,7 @@ export interface EditLaunchpadPoolEvmParams {
   mode: "fixed" | "dynamic";
   price: string; // human-readable price (ignored for dynamic pools)
   claimPolicy: "instant" | "after_end_auto" | "after_end_claim";
+  rewardVisibility: boolean; // whether reward amount is shown publicly
   budget: string; // human-readable total sale amount
   saleToken: string; // sale token address (for ERC20 approval)
   saleTokenDecimals: number; // sale token decimals
@@ -44,11 +43,7 @@ export const useEditLaunchpadPoolEvmFn = () => {
           walletProvider as Eip1193Provider,
         );
         const signer = await provider.getSigner();
-        const userAddress = await signer.getAddress();
         const contract = getContractLaunchpadFactory(signer);
-        const contractAddress = await contract.getAddress();
-
-        const saleIsNative = isNativeToken(params.saleToken);
         const totalSaleAmount = ethers.parseUnits(
           params.budget || "0",
           params.saleTokenDecimals,
@@ -82,33 +77,12 @@ export const useEditLaunchpadPoolEvmFn = () => {
           poolType,
           claimPolicy: claimPolicyEnum,
           distributionMode: distributionModeEnum,
+          rewardVisibility: params.rewardVisibility,
           saleRate,
           depositRate,
         };
 
-        // Approve ERC20 sale token allowance before editing
-        if (totalSaleAmount > 0n && !saleIsNative) {
-          const saleTokenContract = getERC20Contract(params.saleToken, signer);
-          const balance: bigint = await saleTokenContract.balanceOf(userAddress);
-          if (balance < totalSaleAmount) {
-            throw new Error(
-              `Insufficient sale token balance. Required: ${ethers.formatUnits(totalSaleAmount, params.saleTokenDecimals)}`,
-            );
-          }
-          const allowance: bigint = await saleTokenContract.allowance(
-            userAddress,
-            contractAddress,
-          );
-          if (allowance < totalSaleAmount) {
-            const approveTx = await saleTokenContract.approve(
-              contractAddress,
-              totalSaleAmount,
-            );
-            await approveTx.wait();
-          }
-        }
-
-        // editPool is nonpayable — no native value sent
+        // editPool is nonpayable — no native value sent, no token transfer (deposits are separate)
         const tx = await contract.editPool(params.poolAddress, payload);
         const receipt = await tx.wait();
 

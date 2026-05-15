@@ -118,6 +118,7 @@ export const useCreateLaunchpadPoolEvmFn = () => {
                     poolType,
                     claimPolicy,
                     distributionMode,
+                    rewardVisibility: params.rewardVisibility,
                     submitPool: !params.isDraft,
                 };
 

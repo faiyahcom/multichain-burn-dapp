@@ -1,11 +1,12 @@
 import { useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { useForm, Controller } from "react-hook-form";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import { DatePicker } from "@/components/ui/date-picker";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import BlueSwitch from "@/components/common/blue-switch";
 import { poolService } from "@/services/poolService";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
@@ -25,6 +26,7 @@ type EditLaunchpadFormValues = {
   price: string;
   budget: string; // total sale amount (human-readable)
   claimPolicy: ClaimPolicyValue;
+  rewardVisibility: boolean;
 };
 
 const formatScheduleTime = (ts: string) =>
@@ -66,6 +68,7 @@ export default function EditLaunchpadPoolScreen({
       price: "",
       budget: "",
       claimPolicy: "after_end_claim" as ClaimPolicyValue,
+      rewardVisibility: false,
     },
   });
 
@@ -80,8 +83,8 @@ export default function EditLaunchpadPoolScreen({
       endTime: new Date(Number(pool.timeEnd) * 1000),
       price: poolIsFixed
         ? String(
-            Number(pool.rewardDenominator) / Number(pool.rewardNumerator),
-          )
+          Number(pool.rewardDenominator) / Number(pool.rewardNumerator),
+        )
         : "",
       budget: pool.rewardAmount
         ? formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)
@@ -91,12 +94,15 @@ export default function EditLaunchpadPoolScreen({
         if (pool.claimPolicy === 1 && pool.distributionMode === 1) return "after_end_auto";
         return "after_end_claim";
       })() as ClaimPolicyValue,
+      rewardVisibility: pool.rewardVisibility ?? false,
     });
   }, [pool?.address]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const startTime = watch("startTime");
   const endTime = watch("endTime");
   const claimPolicy = watch("claimPolicy");
+  const price = watch("price");
+  const budget = watch("budget");
 
   const onSubmit = async (values: EditLaunchpadFormValues) => {
     if (!pool || inFlightRef.current) return;
@@ -110,6 +116,7 @@ export default function EditLaunchpadPoolScreen({
         mode: poolIsFixed ? "fixed" : "dynamic",
         price: values.price,
         claimPolicy: values.claimPolicy,
+        rewardVisibility: values.rewardVisibility,
         budget: values.budget,
         saleToken: pool.rewardToken ?? "",
         saleTokenDecimals: pool.rewardTokenDecimals ?? 18,
@@ -135,6 +142,16 @@ export default function EditLaunchpadPoolScreen({
     !!pool.rewardDenominator && Number(pool.rewardDenominator) !== 0;
   const isFixed = poolIsFixed;
   const today = new Date(new Date().setHours(0, 0, 0, 0));
+
+  const currentTargetRaised = poolIsFixed
+    ? (Number(pool.rewardDenominator) / Number(pool.rewardNumerator)) *
+    Number(formatAmount(pool.rewardAmount ?? "0", pool.rewardTokenDecimals ?? 0))
+    : null;
+
+  const formTargetRaised =
+    isFixed && Number(price) > 0 && Number(budget) > 0
+      ? Number(price) * Number(budget)
+      : null;
 
   return (
     <div className="p-4 pb-10 md:pt-9.5 md:pr-14 md:pl-14">
@@ -203,7 +220,15 @@ export default function EditLaunchpadPoolScreen({
                     ? formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)
                     : "—"}
                 </span>
-              </div>              <div className="flex justify-between gap-2">
+              </div>
+              {currentTargetRaised !== null && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-greyed">Total Target Raised</span>
+                  <span className="font-medium">
+                    {currentTargetRaised.toLocaleString(undefined, { maximumFractionDigits: 6 })}
+                  </span>
+                </div>
+              )}              <div className="flex justify-between gap-2">
                 <span className="text-greyed">Claim Policy</span>
                 <span className="font-medium">
                   {pool.claimPolicy === 0
@@ -212,7 +237,15 @@ export default function EditLaunchpadPoolScreen({
                       ? "After End \u2013 Auto"
                       : "After End \u2013 Claim"}
                 </span>
-              </div>              <div className="flex justify-between gap-2">
+              </div>
+              {!poolIsFixed && (
+                <div className="flex justify-between gap-2">
+                  <span className="text-greyed">Reward Visibility</span>
+                  <span className="font-medium">
+                    {pool.rewardVisibility ? "Public" : "Hidden"}
+                  </span>
+                </div>
+              )}              <div className="flex justify-between gap-2">
                 <span className="text-greyed">Start Time</span>
                 <span className="font-medium">
                   {formatScheduleTime(pool.timeStart)}
@@ -311,6 +344,19 @@ export default function EditLaunchpadPoolScreen({
                 )}
               </div>
 
+              {/* Total Target Raised (fixed pools only) */}
+              {poolIsFixed && (
+                <div className="flex flex-col gap-1.5">
+                  <span className="text-[13px]">Total Target Raised</span>
+                  <Input
+                    type="text"
+                    readOnly
+                    value={shortenNumber({ number: formTargetRaised ?? 0 })}
+                    className="max-w-xs"
+                  />
+                </div>
+              )}
+
               {/* Claim Policy */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Claim Policy</label>
@@ -373,6 +419,23 @@ export default function EditLaunchpadPoolScreen({
                   />
                 )}
               </div>
+
+              {/* Reward Visibility (dynamic pools only) */}
+              {!isFixed && (
+                <div className="flex items-center justify-between gap-3">
+                  <label className="text-sm font-medium">Reward Visibility</label>
+                  <Controller
+                    control={control}
+                    name="rewardVisibility"
+                    render={({ field }) => (
+                      <BlueSwitch
+                        active={field.value}
+                        onClick={() => field.onChange(!field.value)}
+                      />
+                    )}
+                  />
+                </div>
+              )}
 
               {/* Start Time */}
               <div className="space-y-1">
