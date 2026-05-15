@@ -56,7 +56,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
       case PoolKindCodeEnum.Launchpad:
         if (profileType === "my-create-pools") statuses = []; // user cannot create launchpad
         if (profileType === "my-participated-pools") {
-          statuses = [...swapPoolStatuses, "completed"]; // For participated pools, user cannot join "upcoming" status, so basically it is the same as swap pool
+          statuses = [...swapPoolStatuses, "complete"]; // For participated pools, user cannot join "upcoming" status, so basically it is the same as swap pool
         }
         break;
       case "claimable":
@@ -95,7 +95,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
     if (poolType === PoolKindCodeEnum.Launchpad)
       return [
         {
-          value: "amountBurned", // TODO: subject to change
+          value: "depositedAmount",
           label: "My Amount",
           shortLabel: "Amount",
         },
@@ -107,6 +107,7 @@ const ProfilePoolSearch: React.FC<Props> = ({
   const poolTypeOptions: MultipleSelectOption[] = [
     PoolKindCodeEnum.Burn,
     PoolKindCodeEnum.Stake,
+    PoolKindCodeEnum.Launchpad,
   ].map((type) => ({
     label: poolTypeLabels[type],
     value: type.toString(),

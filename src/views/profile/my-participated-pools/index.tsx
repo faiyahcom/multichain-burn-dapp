@@ -20,6 +20,7 @@ import CustomPagination from "@/components/common/glow/glow-pagination";
 import { useMyParticipatedPoolsStakeSearchFilterStore } from "@/stores/my-participated-pools/stake";
 import ProfilePoolListStake from "../pool/list/stake";
 import ProfilePoolListLaunchpad from "../pool/list/launchpad";
+import { useMyParticipatedPoolsLaunchpadSearchFilterStore } from "@/stores/my-participated-pools/launchpad";
 
 interface Props {
   poolType: PoolType;
@@ -32,6 +33,8 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
     useMyParticipatedPoolsSwapSearchFilterStore();
   const { filter: filterStake, setFilter: setFilterStake } =
     useMyParticipatedPoolsStakeSearchFilterStore();
+  const { filter: filterLaunchpad, setFilter: setFilterLaunchpad } =
+    useMyParticipatedPoolsLaunchpadSearchFilterStore();
   const { user } = useAuthStore();
   const limit = 10;
   const isDesktop = useMediaQuery("(min-width: 1024px)");
@@ -45,12 +48,12 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
       case PoolKindCodeEnum.Stake:
         return filterStake;
       case PoolKindCodeEnum.Launchpad:
-        return undefined;
+        return filterLaunchpad;
       default:
         void (poolType satisfies never); // exhaustive check
         return undefined;
     }
-  }, [poolType, filterBurn, filterSwap, filterStake]);
+  }, [poolType, filterBurn, filterSwap, filterStake, filterLaunchpad]);
 
   const setFilter = useMemo(() => {
     switch (poolType) {
@@ -61,12 +64,18 @@ const ProfileMyParticipatedPools: React.FC<Props> = ({ poolType }) => {
       case PoolKindCodeEnum.Stake:
         return setFilterStake;
       case PoolKindCodeEnum.Launchpad:
-        return undefined;
+        return setFilterLaunchpad;
       default:
         void (poolType satisfies never); // exhaustive check
         return undefined;
     }
-  }, [poolType, setFilterBurn, setFilterSwap, setFilterStake]);
+  }, [
+    poolType,
+    setFilterBurn,
+    setFilterSwap,
+    setFilterStake,
+    setFilterLaunchpad,
+  ]);
 
   const participatedQueryParams: GetParticipatedPoolsByUserParams = {
     page: filter?.page ?? 1,
