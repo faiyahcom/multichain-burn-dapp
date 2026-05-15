@@ -13,9 +13,9 @@ export const useMyParticipatedPoolsLaunchpadSearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      status: [...swapPoolStatuses, "completed"], // user cannot join "upcoming" status, so basically it is the same as swap pool
+      status: [...swapPoolStatuses, "complete"], // user cannot join "upcoming" status, so basically it is the same as swap pool
       network: NETWORK_CONFIGS.map((network) => network.id),
-      sortBy: "amountBurned", // TODO: subject to change
+      sortBy: "depositedAmount",
       sortOrder: "desc",
     },
     setFilter: (filter) =>
