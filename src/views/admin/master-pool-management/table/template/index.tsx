@@ -206,8 +206,8 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 <span>{"Amount \nRaised"}</span>
                 <ArrowSortButton
                   onToggleSort={onToggleSort}
-                  sortBy="amountBurned" // TODO: subject to change
-                  isActive={sortBy === "amountBurned"}
+                  sortBy="raiseAmount"
+                  isActive={sortBy === "raiseAmount"}
                   sortOrder={sortOrder}
                 />
               </div>
