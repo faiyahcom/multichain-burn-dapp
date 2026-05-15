@@ -1,6 +1,7 @@
 import { apiClient } from "@/config/axios";
 import type {
   AllPoolStatus,
+  LaunchpadMode,
   PoolType,
 } from "@/types/admin/master-pool-management";
 import type {
@@ -35,6 +36,9 @@ export type AdminPoolItemType = {
   burnedAmount: string | null; // string number
   swappedAmount: string | null; // string number
   stakedAmount: string; // string number
+  raiseAmount: string; // string number
+  rewardDenominator: string; // string number
+  rewardNumerator: string; // string number
 };
 
 export interface AdminPoolListRequest extends PaginationRequest {
@@ -54,6 +58,7 @@ export interface AdminPoolListRequest extends PaginationRequest {
   search?: string;
   sortBy?: SortBy; // default to timestamp
   sortDirection?: SortOrder; // default to desc
+  mode?: LaunchpadMode; // default to all
 }
 
 export interface AdminPoolListResponse extends PaginationResponse {
