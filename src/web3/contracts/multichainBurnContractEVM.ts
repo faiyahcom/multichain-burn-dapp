@@ -5,6 +5,7 @@ import MULTICHAIN_BURN_ABI_BURN_FACTORY from "./abis/abi_evm_burn_factory.json";
 import MULTICHAIN_BURN_ABI_BURN_ROUTER from "./abis/abi_evm_burn_router.json";
 import MULTICHAIN_BURN_ABI_ACCESS_MANAGER from "./abis/abi_evm_access_manager.json";
 import MULTICHAIN_STAKE_ABI_FACTORY from "./abis/abi_evm_stake_factory.json";
+import MULTICHAIN_LAUNCHPAD_ABI_FACTORY from "./abis/abi_evm_launchpad_factory.json";
 import { useSystemStore } from "@/stores/systemStore";
 
 import {
@@ -26,6 +27,9 @@ import {
   MULTICHAIN_STAKE_PROGRAM_EVM_FACTORY_ADDRESS,
   MULTICHAIN_STAKE_PROGRAM_BSC_FACTORY_ADDRESS,
   MULTICHAIN_STAKE_PROGRAM_XPHERE_FACTORY_ADDRESS,
+  MULTICHAIN_LAUNCHPAD_PROGRAM_EVM_FACTORY_ADDRESS,
+  MULTICHAIN_LAUNCHPAD_PROGRAM_BSC_FACTORY_ADDRESS,
+  MULTICHAIN_LAUNCHPAD_PROGRAM_XPHERE_FACTORY_ADDRESS,
 } from "@/web3";
 
 export const EVM_POOL_TYPES = {
@@ -164,6 +168,23 @@ export const getContractStakeFactoryInterface = () => {
 
 export const getContractAccessManagerInterface = () => {
   return new ethers.Interface(MULTICHAIN_BURN_ABI_ACCESS_MANAGER);
+};
+
+export const getContractLaunchpadFactory = (signer: Signer) => {
+  const networkId = useSystemStore.getState().selectedNetworkId;
+  let address: string;
+  switch (networkId) {
+    case "xphere":
+      address = MULTICHAIN_LAUNCHPAD_PROGRAM_XPHERE_FACTORY_ADDRESS;
+      break;
+    case "binance":
+      address = MULTICHAIN_LAUNCHPAD_PROGRAM_BSC_FACTORY_ADDRESS;
+      break;
+    default:
+      address = MULTICHAIN_LAUNCHPAD_PROGRAM_EVM_FACTORY_ADDRESS;
+  }
+  console.log("[getContractLaunchpadFactory] address:", address);
+  return new ethers.Contract(address, MULTICHAIN_LAUNCHPAD_ABI_FACTORY, signer);
 };
 
 export const getERC20Contract = (token: string, signer: Signer) => {

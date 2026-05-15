@@ -1,4 +1,4 @@
-import type { BurnPoolStatus, StakePoolStatus, SwapPoolStatus } from "@/types/pool";
+import type { BurnPoolStatus, LaunchpadPoolStatus, StakePoolStatus, SwapPoolStatus } from "@/types/pool";
 
 export const tokenStatus = ["all", "enable", "disable"] as const;
 export type TokenStatus = (typeof tokenStatus)[number];
@@ -71,4 +71,14 @@ export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
 
 export const STAKE_POOL_STATUS: Record<StakePoolStatus, any> = {
   ...BURN_POOL_STATUS,
+};
+
+export const LAUNCHPAD_POOL_STATUS: Record<LaunchpadPoolStatus, { label: string; color: string; letter: string }> = {
+  draft: { label: "Draft", color: "#C2C2C2", letter: "D" },
+  canceled: { label: "Cancel", color: "#f698ff", letter: "C" },
+  upcoming: { label: "Upcoming", color: "#FFC198", letter: "U" },
+  on_going: { label: "Live", color: "#7af4cb", letter: "O" },
+  ended: { label: "Ended", color: "#A6B7FF", letter: "E" },
+  completed: { label: "Completed", color: "#8eeaff", letter: "C" },
+  closed: { label: "Closed", color: "#8eeaff", letter: "C" },
 };

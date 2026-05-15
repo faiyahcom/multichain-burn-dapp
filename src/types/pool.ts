@@ -76,7 +76,7 @@ export interface PoolDetailResponse {
     kind: PoolKindCode;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus;
+    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus | LaunchpadPoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -109,6 +109,10 @@ export interface PoolDetailResponse {
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
     interestStopDate?: string | null;
+    // Launchpad pool fields
+    claimPolicy?: string; // "instant" | "after_end"
+    distributionMode?: string; // "none" | "automatic" | "claim"
+    rewardVisibility?: boolean;
   };
   // Staking pool aggregate data
   staking?: {
@@ -123,6 +127,20 @@ export interface PoolDetailResponse {
       availableClaim: string;
       totalClaimed: string;
       totalSettlementFee: string;
+    };
+  };
+  // Launchpad pool aggregate data
+  launchpad?: {
+    totalReward: string;
+    totalRaised: string;
+    user?: {
+      address: string;
+      depositedAmount: string;
+      allocation: string;
+      fee: string;
+      claimable?: string;
+      claimed?: string;
+      canClaim?: boolean;
     };
   };
   returningAmountOnCanceling?: {
@@ -172,6 +190,10 @@ export const txnKind = {
   8: "Claim",
   9: "Unstake & Claim",
   10: "Emergency Withdraw",
+  11: "Launchpad Deposit",
+  12: "Launchpad Claim",
+  13: "Launchpad Receive Allocation",
+  14: "Launchpad Refund",
 } as const;
 
 export const activityKind = {
@@ -290,6 +312,15 @@ export type StakePoolStatus =
   | "holding"
   | "full"
   | "ended";
+
+export type LaunchpadPoolStatus =
+  | "draft"
+  | "canceled"
+  | "upcoming"
+  | "on_going"
+  | "ended"
+  | "completed"
+  | "closed";
 
 export type ActivityKindKey = keyof typeof activityKind;
 
