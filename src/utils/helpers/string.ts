@@ -78,7 +78,7 @@ export const getPoolHref = (
       return `/staking/detail/${address}`;
 
     case PoolKindCodeEnum.Launchpad:
-      return `/`; // TODO: change to launchpad
+      return `/launchpad/detail/${address}`;
 
     default:
       void (kind satisfies never); // exhaustive check
