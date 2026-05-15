@@ -21,7 +21,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { useTokenBalance } from "@/hooks/useTokenBalance";
 import type { PoolDetailResponse } from "@/types/pool";
-import { formatAmount, safeDecimalParse } from "@/utils/helpers/numbers";
+import {
+    formatAmount,
+    safeDecimalParse,
+    shortenNumber,
+} from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
@@ -106,9 +110,16 @@ const SummaryRow = ({
     </div>
 );
 
-const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
+const DepositDialog = ({
+    open,
+    onOpenChange,
+    poolDetail,
+    onConfirm,
+}: Props) => {
     const pool = poolDetail?.pool;
-    const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+    const network = pool?.chainId
+        ? chainIdToNetworkConfig(pool.chainId)
+        : undefined;
 
     const saleTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -130,7 +141,8 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
         imageUri: poolDetail?.tokenIn?.imageUri,
     });
 
-    const isDynamic = !pool?.rewardDenominator || Number(pool.rewardDenominator) === 0;
+    const isDynamic =
+        !pool?.rewardDenominator || Number(pool.rewardDenominator) === 0;
 
     const priceDisplay = useMemo(() => {
         if (isDynamic) return "Dynamic";
@@ -142,9 +154,16 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
         } catch {
             return "Dynamic";
         }
-    }, [isDynamic, pool?.rewardDenominator, pool?.rewardNumerator, paymentTokenDisplay.symbol, saleTokenDisplay.symbol]);
+    }, [
+        isDynamic,
+        pool?.rewardDenominator,
+        pool?.rewardNumerator,
+        paymentTokenDisplay.symbol,
+        saleTokenDisplay.symbol,
+    ]);
 
-    const claimPolicyLabel = pool?.claimPolicy === "instant" ? "Instant" : "After Pool Ends";
+    const claimPolicyLabel =
+        pool?.claimPolicy === "instant" ? "Instant" : "After Pool Ends";
     const distributionModeLabel =
         pool?.distributionMode === "automatic"
             ? "Automatic"
@@ -171,7 +190,12 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
                 balanceFormatted,
                 symbol: paymentTokenDisplay.symbol,
             }),
-        [balanceRaw, balanceFormatted, paymentTokenDisplay.symbol, pool?.tokenInDecimals],
+        [
+            balanceRaw,
+            balanceFormatted,
+            paymentTokenDisplay.symbol,
+            pool?.tokenInDecimals,
+        ],
     );
 
     const {
@@ -296,7 +320,11 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
                                                         <TokenImage
                                                             src={saleTokenDisplay.imageUri}
                                                             alt={saleTokenDisplay.symbol}
-                                                            classNames={{ common: "size-4", img: "size-4", placeholder: "size-4" }}
+                                                            classNames={{
+                                                                common: "size-4",
+                                                                img: "size-4",
+                                                                placeholder: "size-4",
+                                                            }}
                                                         />
                                                         {saleTokenDisplay.symbol}
                                                     </span>
@@ -310,7 +338,11 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
                                                         <TokenImage
                                                             src={paymentTokenDisplay.imageUri}
                                                             alt={paymentTokenDisplay.symbol}
-                                                            classNames={{ common: "size-4", img: "size-4", placeholder: "size-4" }}
+                                                            classNames={{
+                                                                common: "size-4",
+                                                                img: "size-4",
+                                                                placeholder: "size-4",
+                                                            }}
                                                         />
                                                         {paymentTokenDisplay.symbol}
                                                     </span>
@@ -329,7 +361,9 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
 
                                     {/* Your Total Deposited */}
                                     <div className="flex items-center justify-between">
-                                        <span className="font-inter text-base font-medium sm:text-xl 2xl:text-2xl">Your Total Deposited</span>
+                                        <span className="font-inter text-base font-medium sm:text-xl 2xl:text-2xl">
+                                            Your Total Deposited
+                                        </span>
                                         <span className="font-inter text-base font-bold text-nowrap sm:text-xl 2xl:text-2xl">
                                             {yourTotalDeposited} {paymentTokenDisplay.symbol}
                                         </span>
@@ -345,7 +379,9 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
                                                     <Skeleton className="h-4 w-20" />
                                                 ) : (
                                                     <>
-                                                        {balanceFormatted ?? "0"}{" "}
+                                                        {shortenNumber({
+                                                            number: Number(balanceFormatted ?? 0),
+                                                        })}{" "}
                                                         {paymentTokenDisplay.symbol}
                                                     </>
                                                 )}
@@ -382,7 +418,7 @@ const DepositDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => 
                                                     type="button"
                                                     onClick={() => handleSelectPercent(pct)}
                                                     className={cn(
-                                                        "rounded-full border border-foreground bg-mb-dark-popover px-2.5 py-1 font-inter text-sm font-medium transition hover:bg-mb-btn-launchpad text-white",
+                                                        "rounded-full border border-foreground bg-mb-dark-popover px-2.5 py-1 font-inter text-sm font-medium text-white transition hover:bg-mb-btn-launchpad",
                                                         // getVariantBorderClassName({ variant: "launchpad" }),
                                                     )}
                                                 >

@@ -61,13 +61,15 @@ const AmountActivity = ({ poolDetail }: Props) => {
         ? formatAmount(launchpadUser.fee, pool?.rewardTokenDecimals ?? 0)
         : "0";
 
-    const userClaimableFormatted = launchpadUser?.claimable
-        ? formatAmount(launchpadUser.claimable, pool?.rewardTokenDecimals ?? 0)
-        : "0";
+    const userClaimableFormatted = userAllocationFormatted;
 
-    const userClaimedFormatted = launchpadUser?.claimed
-        ? formatAmount(launchpadUser.claimed, pool?.rewardTokenDecimals ?? 0)
-        : "0";
+    const userClaimedFormatted =
+        poolDetail?.userAmount?.claimed || "0"
+            ? formatAmount(
+                poolDetail?.userAmount?.claimed || "0",
+                pool?.rewardTokenDecimals ?? 0,
+            )
+            : "0";
 
     const isEndedOrCompleted = status === "ended" || status === "completed";
 
@@ -95,14 +97,16 @@ const AmountActivity = ({ poolDetail }: Props) => {
         />
     );
 
-    // Claim button only shows when claimPolicy === "after_end" && distributionMode === "claim"
+    // Claim button shows for "instant" policy or "after_end + claim" policy
     const showClaimButton =
-        claimPolicy === "after_end" && distributionMode === "claim";
+        claimPolicy !== "instant" &&
+        claimPolicy === "after_end" &&
+        distributionMode === "claim";
 
     const claimEnabled =
         showClaimButton &&
-        (status === "ended" || status === "completed") &&
-        launchpadUser?.canClaim === true;
+        poolDetail?.userAmount?.canClaim === true &&
+        (status === "ended" || status === "completed");
 
     // Deposit button always rendered, enabled only when on_going
     const depositEnabled = status === "on_going";
