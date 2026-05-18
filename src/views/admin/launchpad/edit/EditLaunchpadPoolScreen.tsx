@@ -16,6 +16,8 @@ import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
 import { useEditLaunchpadPoolEvmFn } from "./useEditLaunchpadPoolEvmFn";
 import PoolOverview from "../detail/pool-overview";
 import type { BurnPoolStatus } from "@/types/pool";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { chainIdToNetworkConfig } from "@/config/networks";
 
 type ClaimPolicyValue = "instant" | "after_end_auto" | "after_end_claim";
 
@@ -146,17 +148,46 @@ export default function EditLaunchpadPoolScreen({
   const isFixed = poolIsFixed;
   const today = new Date(new Date().setHours(0, 0, 0, 0));
 
-  const currentTargetRaised = poolIsFixed
-    ? (Number(pool.rewardDenominator) / Number(pool.rewardNumerator)) *
-      Number(
-        formatAmount(pool.rewardAmount ?? "0", pool.rewardTokenDecimals ?? 0),
-      )
-    : null;
+  const network = pool.chainId
+    ? chainIdToNetworkConfig(pool.chainId)
+    : undefined;
+  const saleTokenDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: pool.rewardToken,
+    tokenSymbol: poolDetail?.tokenOut?.symbol,
+    tokenName: poolDetail?.tokenOut?.name,
+    customName: poolDetail?.tokenOut?.customName,
+    customSymbol: poolDetail?.tokenOut?.customSymbol,
+    imageUri: poolDetail?.tokenOut?.imageUri,
+  });
+  const paymentTokenDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: pool.tokenIn,
+    tokenSymbol: poolDetail?.tokenIn?.symbol,
+    tokenName: poolDetail?.tokenIn?.name,
+    customName: poolDetail?.tokenIn?.customName,
+    customSymbol: poolDetail?.tokenIn?.customSymbol,
+    imageUri: poolDetail?.tokenIn?.imageUri,
+  });
+  const saleSymbol = saleTokenDisplay.symbol;
+  const paymentSymbol = paymentTokenDisplay.symbol;
 
-  const formTargetRaised =
-    isFixed && Number(price) > 0 && Number(budget) > 0
-      ? Number(price) * Number(budget)
-      : null;
+  const currentTargetRaised = (() => {
+    if (!poolIsFixed) return null;
+    const price =
+      Number(pool.rewardDenominator) / Number(pool.rewardNumerator);
+    const budget = Number(
+      formatAmount(pool.rewardAmount ?? "0", pool.rewardTokenDecimals ?? 0),
+    );
+    const result = price * budget;
+    return Number.isFinite(result) ? result : null;
+  })();
+
+  const formTargetRaised = (() => {
+    if (!isFixed) return null;
+    const result = Number(price) * Number(budget);
+    return Number.isFinite(result) && result > 0 ? result : null;
+  })();
 
   return (
     <div className="p-4 pb-10 md:pt-9.5 md:pr-14 md:pl-14">
@@ -224,23 +255,18 @@ export default function EditLaunchpadPoolScreen({
                 <span className="text-greyed">Budget</span>
                 <span className="font-medium">
                   {pool.rewardAmount
-                    ? formatAmount(
-                        pool.rewardAmount,
-                        pool.rewardTokenDecimals ?? 0,
-                      )
+                    ? `${formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)} ${saleSymbol}`
                     : "—"}
                 </span>
               </div>
-              {currentTargetRaised !== null && (
+              {/* {currentTargetRaised !== null && (
                 <div className="flex justify-between gap-2">
                   <span className="text-greyed">Total Target Raised</span>
                   <span className="font-medium">
-                    {currentTargetRaised.toLocaleString(undefined, {
-                      maximumFractionDigits: 6,
-                    })}
+                    {shortenNumber({ number: currentTargetRaised })} {paymentSymbol}
                   </span>
                 </div>
-              )}{" "}
+              )}{" "} */}
               <div className="flex justify-between gap-2">
                 <span className="text-greyed">Claim Policy</span>
                 <span className="font-medium">
