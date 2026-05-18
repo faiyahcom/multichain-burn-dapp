@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
+import { BN } from "bn.js";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
@@ -54,8 +55,13 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
 
   const totalReward = fmt(pool?.rewardAmount, rewardDec);
   const currentReward = fmt(pool?.currentRewardAmount, rewardDec);
-  const claimedReward = fmt(poolDetail?.claimedRewardAmount, rewardDec);
-  const totalRaised = fmt(poolDetail?.depositedAmount, paymentDec);
+  const claimedReward = fmt(
+    new BN(poolDetail?.launchpad?.claimed ?? "0")
+      .add(new BN(poolDetail?.launchpad?.distributed ?? "0"))
+      .toString(),
+    rewardDec,
+  );
+  const totalRaised = fmt(poolDetail?.launchpad?.totalRaised, paymentDec);
   const settlementFee = fmtFee(pool?.settlementFee);
 
   // Fixed mode: rewardDenominator = on-chain ratioBps, rewardNumerator = ratioDenominator
@@ -77,24 +83,15 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
       );
       const goalHuman = rewardHuman.mul(price);
       raisedGoal = goalHuman.toFixed(2);
-      const raisedHuman = safeDecimal(poolDetail?.depositedAmount ?? "0").div(
-        new Decimal(10).pow(paymentDec),
-      );
+      const raisedHuman = safeDecimal(
+        poolDetail?.launchpad?.totalRaised ?? "0",
+      ).div(new Decimal(10).pow(paymentDec));
       const ratio = raisedHuman.div(goalHuman.isZero() ? 1 : goalHuman);
       progressPct = Math.min(100, ratio.mul(100).toNumber());
     } catch {
       progressPct = 0;
     }
   }
-
-  // const distributionMsg =
-  //   pool?.claimPolicy === "instant"
-  //     ? "Rewards are distributed instantly upon deposit."
-  //     : pool?.claimPolicy === "after_end" && pool?.distributionMode === "automatic"
-  //       ? "Rewards will be automatically distributed after the pool ends."
-  //       : pool?.claimPolicy === "after_end" && pool?.distributionMode === "claim"
-  //         ? "Users can claim rewards after the pool ends."
-  //         : null;
 
   const isNegativeRemaining = safeDecimal(
     pool?.currentRewardAmount ?? "0",
@@ -125,10 +122,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
         value: `${totalRaised} ${paymentSymbol}`,
       },
     ],
-    [
-      { label: "Settlement Fee", value: settlementFee },
-      null,
-    ],
+    [{ label: "Settlement Fee", value: settlementFee }, null],
   ];
 
   if (!poolDetail) {
@@ -215,7 +209,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
               </div>
               <div className="h-2 w-full overflow-hidden rounded-full bg-progress-bg">
                 <div
-                  className="h-full rounded-full bg-mb-btn-stake transition-all"
+                  className="bg-mb-btn-stake h-full rounded-full transition-all"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
@@ -231,7 +225,9 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
             </p>
           )} */}
 
-          {pool?.status === "ended" || pool?.status === "closed" || pool?.status === "completed" ? (
+          {pool?.status === "ended" ||
+            pool?.status === "closed" ||
+            pool?.status === "completed" ? (
             <p className="rounded-md bg-progress-bg px-3 py-2 text-xs">
               This pool has completed. No further deposits are accepted.
             </p>

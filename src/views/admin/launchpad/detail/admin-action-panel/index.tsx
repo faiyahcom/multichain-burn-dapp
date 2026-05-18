@@ -5,31 +5,39 @@ import { ActionBtn, Container } from "./components";
 import { useAdminAction } from "./useAdminAction";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import ClosePoolDialog from "@/components/shared/close-pool-dialog";
-import ConfirmDialog from "@/components/common/confirm-dialog";
+import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
+import { useBatchTransferEvmFn } from "./hooks/useBatchTransferEvmFn";
+import type { BatchRecipient, TokenMode } from "@/views/admin/stake/detail/amount-activities/hooks/useBatchTransferSolFn";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
+import { chainIdToNetworkConfig } from "@/config/networks";
+import { formatAmount } from "@/utils/helpers/numbers";
+import { useQueryClient } from "@tanstack/react-query";
+import { poolQueryKeys } from "@/services/queries/queryKey";
 
 type Props = {
   poolDetail?: PoolDetailResponse;
 };
 
 const AdminActionPanel = ({ poolDetail }: Props) => {
-  const { address: walletAddress } = useAppKitAccount();
+  const { } = useAppKitAccount();
   const status = poolDetail?.pool?.status;
+  const queryClient = useQueryClient();
 
   const {
     handleCancelPool,
     handleSubmitPool,
     handleEdit,
     handleEmergencyClose,
-    handleWithdrawRaised,
-    handleWithdrawRemainingSale,
+    isSolana,
   } = useAdminAction(poolDetail);
+
+  const { batchTransferEvm } = useBatchTransferEvmFn();
 
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
-  const [withdrawDialogOpen, setWithdrawDialogOpen] = useState(false);
-  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [transferDialogOpen, setTransferDialogOpen] = useState(false);
 
-  const isRunning = activeAction !== null || isWithdrawing;
+  const isRunning = activeAction !== null;
 
   const run = async (name: string, fn: () => Promise<void>) => {
     setActiveAction(name);
@@ -40,19 +48,48 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     }
   };
 
-  const handleWithdrawConfirm = () => {
-    const recipient = walletAddress ?? "";
-    if (!recipient) return;
-    setIsWithdrawing(true);
-    (async () => {
-      try {
-        await handleWithdrawRaised(recipient);
-        await handleWithdrawRemainingSale(recipient);
-        setWithdrawDialogOpen(false);
-      } finally {
-        setIsWithdrawing(false);
-      }
-    })();
+  const pool = poolDetail?.pool;
+  const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+
+  const paymentTokenDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: pool?.tokenIn,
+    tokenSymbol: poolDetail?.tokenIn?.symbol,
+    tokenName: poolDetail?.tokenIn?.name,
+    customName: poolDetail?.tokenIn?.customName,
+    customSymbol: poolDetail?.tokenIn?.customSymbol,
+    imageUri: poolDetail?.tokenIn?.imageUri,
+  });
+
+  const saleTokenDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: pool?.rewardToken,
+    tokenSymbol: poolDetail?.tokenOut?.symbol,
+    tokenName: poolDetail?.tokenOut?.name,
+    customName: poolDetail?.tokenOut?.customName,
+    customSymbol: poolDetail?.tokenOut?.customSymbol,
+    imageUri: poolDetail?.tokenOut?.imageUri,
+  });
+
+  const formattedRaisedAmount =
+    poolDetail?.depositedAmount != null && pool?.tokenInDecimals != null
+      ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
+      : undefined;
+
+  const formattedRemainingSale =
+    pool?.currentRewardAmount != null && pool?.rewardTokenDecimals != null
+      ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
+      : undefined;
+
+  const invalidatePoolQueries = (poolAddress: string) => {
+    queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress), exact: false });
+  };
+
+  const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
+    if (!pool?.address || !poolDetail) return;
+    if (isSolana) throw new Error("Token transfer is not yet available for Solana launchpad pools.");
+    await batchTransferEvm({ poolAddress: pool.address, poolDetail, mode, recipients });
+    invalidatePoolQueries(pool.address);
   };
 
   const renderActions = () => {
@@ -125,9 +162,8 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
               letter="T"
               text="Transfer Tokens"
               color="#FFC198"
-              isLoading={isWithdrawing}
               disabled={isRunning}
-              onClick={() => setWithdrawDialogOpen(true)}
+              onClick={() => setTransferDialogOpen(true)}
             />
             <ClosePoolDialog
               open={closeDialogOpen}
@@ -137,14 +173,22 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
               showReason
               onConfirm={(reason) => handleEmergencyClose(reason)}
             />
-            <ConfirmDialog
-              open={withdrawDialogOpen}
-              onOpenChange={setWithdrawDialogOpen}
-              title="Transfer Tokens"
-              description={`Withdraw raised funds and remaining sale tokens to your wallet (${walletAddress ?? "connected wallet"}).`}
-              buttonConfirmText="Withdraw"
-              isLoading={isWithdrawing}
-              onConfirm={handleWithdrawConfirm}
+            <TransferTokensDialog
+              open={transferDialogOpen}
+              onOpenChange={setTransferDialogOpen}
+              chainId={pool?.chainId ?? ""}
+              poolKind={pool?.kind}
+              poolInfo={{
+                tokenInSymbol: paymentTokenDisplay.symbol,
+                tokenInName: paymentTokenDisplay.name,
+                rewardTokenSymbol: saleTokenDisplay.symbol,
+                rewardTokenName: saleTokenDisplay.name,
+                currentRewardAmount: formattedRemainingSale,
+                currentDepositAmount: formattedRaisedAmount,
+                rewardTokenDecimals: pool?.rewardTokenDecimals,
+                tokenInDecimals: pool?.tokenInDecimals,
+              }}
+              onTransfer={handleTransfer}
             />
           </PoolChainGuard>
         );

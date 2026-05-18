@@ -65,7 +65,11 @@ export interface PoolDetailResponse {
     kind: number;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus | LaunchpadPoolStatus;
+    status:
+    | SwapPoolStatus
+    | BurnPoolStatus
+    | StakePoolStatus
+    | LaunchpadPoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -133,6 +137,8 @@ export interface PoolDetailResponse {
   launchpad?: {
     totalReward: string;
     totalRaised: string;
+    claimed: string;
+    distributed: string;
     user?: {
       address: string;
       depositedAmount: string;
