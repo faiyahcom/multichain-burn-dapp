@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { formatAmount, safeDecimal } from "@/utils/helpers/numbers";
+import { formatAmount, safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -102,7 +102,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 </p>
                 <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                     {totalRewardFormatted}{" "}
-                    <span className="text-mb-gray-b8">{saleTokenDisplay.symbol}</span>
+                    <span>{saleTokenDisplay.symbol}</span>
                 </p>
             </div>
 
@@ -111,25 +111,25 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     <span className="text-mb-gray-b8">Total Raised:</span>
                     <span>
                         {totalRaisedFormatted}{" "}
-                        <span className="text-mb-gray-b8">{paymentTokenDisplay.symbol}</span>
+                        <span>{paymentTokenDisplay.symbol}</span>
                     </span>
                 </p>
 
                 {!isDynamic && progressPercent !== null && targetRaisedFormatted && (
                     <div className="space-y-1.5">
                         {/* progress bar */}
-                        <div className="h-2.5 w-full overflow-hidden rounded-full bg-launchpad-border/40">
+                        <p className="flex justify-end text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                            <span>
+                                {totalRaisedFormatted} / {targetRaisedFormatted}
+                            </span>
+                            <span>&nbsp;({shortenNumber({ number: progressPercent })}%)</span>
+                        </p>
+                        <div className="h-4 w-full overflow-hidden rounded-full bg-launchpad-border/40">
                             <div
-                                className="h-full rounded-full bg-mb-btn-launchpad transition-all duration-300"
+                                className="h-full rounded-full bg-mb-btn-swap transition-all duration-300"
                                 style={{ width: `${progressPercent}%` }}
                             />
                         </div>
-                        <p className="flex justify-between text-xs text-mb-gray-b8 md:text-sm lg:text-base">
-                            <span>
-                                {totalRaisedFormatted} / {targetRaisedFormatted} {paymentTokenDisplay.symbol}
-                            </span>
-                            <span>{progressPercent.toFixed(1)}%</span>
-                        </p>
                     </div>
                 )}
             </div>
