@@ -465,7 +465,7 @@ const CreateSwapPoolForm = ({
                   placeholder="1"
                   aria-invalid={!!errors.numerator}
                   className={cn(
-                    "w-30 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-20 md:w-30 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
@@ -541,7 +541,7 @@ const CreateSwapPoolForm = ({
                   placeholder="1"
                   aria-invalid={!!errors.denominator}
                   className={cn(
-                    "w-30 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-20 md:w-30 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
