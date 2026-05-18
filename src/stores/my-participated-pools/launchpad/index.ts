@@ -1,6 +1,6 @@
 import { NETWORK_CONFIGS } from "@/config/networks";
 import type { ProfilePoolSearchType } from "@/stores/common/profile-pool";
-import { swapPoolStatuses } from "@/types/admin/master-pool-management";
+import { userJoinedLaunchpadPoolStatuses } from "@/types/admin/master-pool-management";
 import { create } from "zustand";
 
 type MyParticipatedPoolsLaunchpadSearchFilterState = {
@@ -13,7 +13,7 @@ export const useMyParticipatedPoolsLaunchpadSearchFilterStore =
     filter: {
       page: 1,
       text: "",
-      status: [...swapPoolStatuses, "complete"], // user cannot join "upcoming" status, so basically it is the same as swap pool
+      status: [...userJoinedLaunchpadPoolStatuses],
       network: NETWORK_CONFIGS.map((network) => network.id),
       sortBy: "depositedAmount",
       sortOrder: "desc",

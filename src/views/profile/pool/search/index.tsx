@@ -13,6 +13,8 @@ import {
   getPoolStatusLabel,
   poolTypeLabels,
   swapPoolStatuses,
+  userJoinedLaunchpadPoolStatuses,
+  userJoinedStakePoolStatuses,
   type AllPoolStatus,
   type PoolType,
 } from "@/types/admin/master-pool-management";
@@ -51,12 +53,12 @@ const ProfilePoolSearch: React.FC<Props> = ({
       case PoolKindCodeEnum.Stake:
         if (profileType === "my-create-pools") statuses = []; // user cannot create stake pool
         if (profileType === "my-participated-pools")
-          statuses = [...swapPoolStatuses, "full"]; // For participated pools, user cannot join "holding" and "upcoming" status, so basically it is the same as swap pool
+          statuses = [...userJoinedStakePoolStatuses];
         break;
       case PoolKindCodeEnum.Launchpad:
         if (profileType === "my-create-pools") statuses = []; // user cannot create launchpad
         if (profileType === "my-participated-pools") {
-          statuses = [...swapPoolStatuses, "complete"]; // For participated pools, user cannot join "upcoming" status, so basically it is the same as swap pool
+          statuses = [...userJoinedLaunchpadPoolStatuses];
         }
         break;
       case "claimable":
