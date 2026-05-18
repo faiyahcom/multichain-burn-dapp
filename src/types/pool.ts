@@ -363,6 +363,11 @@ export const myActivityActionLabels: Record<MyActivityAction, string> = {
 export const getMyActivityActionLabel = (kind: MyActivityAction) => {
   return myActivityActionLabels[kind];
 };
+export const myActivityExcludes = (
+  Object.keys(activityKind) as ActivityKindKeyStr[]
+)
+  .filter((k) => !myActivityActions.some((a) => a.split(",").includes(k)))
+  .join(",");
 
 export interface PoolActivitiesResponse {
   page: number;

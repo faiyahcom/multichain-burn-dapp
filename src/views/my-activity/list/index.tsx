@@ -16,7 +16,7 @@ import { userQueryKeys } from "@/services/queries/queryKey";
 import { userService, type UserActivityType } from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
 import { useMyActivitySearchFilterStore } from "@/stores/my-activity/search-filter-store";
-import { getActivityKindLabel } from "@/types/pool";
+import { getActivityKindLabel, myActivityExcludes } from "@/types/pool";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import {
   formatTimestampSecondsToDate,
@@ -50,6 +50,7 @@ const MyActivityList = () => {
           limit: limit,
           search: filter.text ? filter.text : undefined,
           kinds: convertArrayToStringParam({ array: filter.activityKind }),
+          excludeKinds: myActivityExcludes,
         }),
       enabled: !!user,
     },
