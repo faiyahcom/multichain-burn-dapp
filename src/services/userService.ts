@@ -92,6 +92,7 @@ export interface PoolMerkleProofResponse {
 export interface GetUserActivitiesRequest extends PaginationRequest {
   search?: string;
   kinds?: string; // comma separated
+  excludeKinds?: string; // comma separated
 }
 
 export interface UserActivityType {
