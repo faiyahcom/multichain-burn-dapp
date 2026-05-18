@@ -26,7 +26,7 @@ const DEFAULT_PAGE_SIZE = 5;
 
 const ActivitiesHistory = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
-    const excludeKinds = [20].join(",");
+    const excludeKinds = [12, 20].join(",");
 
     const { data: poolActivities, isLoading } = useQuery({
         queryKey: poolQueryKeys.activities(poolDetail?.pool.address || "", page, excludeKinds),
