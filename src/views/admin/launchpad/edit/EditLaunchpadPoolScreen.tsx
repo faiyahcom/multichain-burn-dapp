@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { format } from "date-fns";
 import { useForm, Controller } from "react-hook-form";
 import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
 import { DatePicker } from "@/components/ui/date-picker";
 import { NumericInput } from "@/components/ui/numeric-input";
 import { Input } from "@/components/ui/input";
@@ -88,7 +89,9 @@ export default function EditLaunchpadPoolScreen({
         ? String(Number(pool.rewardDenominator) / Number(pool.rewardNumerator))
         : "",
       budget: pool.rewardAmount
-        ? formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)
+        ? new Decimal(pool.rewardAmount)
+            .div(new Decimal(10).pow(pool.rewardTokenDecimals ?? 0))
+            .toFixed()
         : "",
       claimPolicy: (() => {
         if (pool.claimPolicy === "instant") return "instant";
@@ -160,28 +163,7 @@ export default function EditLaunchpadPoolScreen({
     customSymbol: poolDetail?.tokenOut?.customSymbol,
     imageUri: poolDetail?.tokenOut?.imageUri,
   });
-  const paymentTokenDisplay = resolvePoolTokenDisplay({
-    network,
-    tokenAddress: pool.tokenIn,
-    tokenSymbol: poolDetail?.tokenIn?.symbol,
-    tokenName: poolDetail?.tokenIn?.name,
-    customName: poolDetail?.tokenIn?.customName,
-    customSymbol: poolDetail?.tokenIn?.customSymbol,
-    imageUri: poolDetail?.tokenIn?.imageUri,
-  });
   const saleSymbol = saleTokenDisplay.symbol;
-  const paymentSymbol = paymentTokenDisplay.symbol;
-
-  const currentTargetRaised = (() => {
-    if (!poolIsFixed) return null;
-    const price =
-      Number(pool.rewardDenominator) / Number(pool.rewardNumerator);
-    const budget = Number(
-      formatAmount(pool.rewardAmount ?? "0", pool.rewardTokenDecimals ?? 0),
-    );
-    const result = price * budget;
-    return Number.isFinite(result) ? result : null;
-  })();
 
   const formTargetRaised = (() => {
     if (!isFixed) return null;
