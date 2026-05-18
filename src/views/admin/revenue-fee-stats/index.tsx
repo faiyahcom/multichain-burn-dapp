@@ -57,6 +57,8 @@ const AdminRevenueFeeStats = () => {
           feeTxnKind.claimBurnReward,
           feeTxnKind.swap,
           feeTxnKind.claimStakeReward,
+          feeTxnKind.joinLaunchpad,
+          feeTxnKind.claimLaunchpadReward,
         ].join(",");
 
   const statsParams = { chainId, from: fromParam, to: toParam };
