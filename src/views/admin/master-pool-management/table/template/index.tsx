@@ -206,8 +206,8 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 <span>{"Amount \nRaised"}</span>
                 <ArrowSortButton
                   onToggleSort={onToggleSort}
-                  sortBy="amountBurned" // TODO: subject to change
-                  isActive={sortBy === "amountBurned"}
+                  sortBy="raiseAmount"
+                  isActive={sortBy === "raiseAmount"}
                   sortOrder={sortOrder}
                 />
               </div>
@@ -246,7 +246,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
           isLoading={isLoading}
         />
 
-        {data?.map((item, index) => {
+        {data?.map((item) => {
           const isBurnPool = item.kind === 0;
           const isStakePool = item.kind === 2;
           const isLaunchpad = item.kind === 3;
@@ -307,13 +307,18 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 return item.stakedAmount ?? "0";
 
               case 3:
-                return "0"; // TODO: launchpad
+                return item.raiseAmount ?? "0";
 
               default:
                 void (poolType satisfies never); // exhaustive check
                 return "0";
             }
           })();
+
+          const rewardDenominator = item.rewardDenominator ?? "0";
+          const rewardNumerator = item.rewardNumerator ?? "0";
+          const isDynamic =
+            rewardDenominator === "0" && rewardNumerator === "0";
 
           return (
             <TableRow
@@ -342,7 +347,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 />
               </TableCell>
               {/* Time */}
-              {(isBurnPool || isStakePool) && (
+              {(isBurnPool || isStakePool || isLaunchpad) && (
                 <TableCell>
                   <StartEndDateDisplay
                     startDate={item.timeStart}
@@ -355,9 +360,8 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 </TableCell>
               )}
               {/* Mode */}
-              {/* TODO: implement API */}
               {isLaunchpad && (
-                <TableCell>{index % 2 === 0 ? "Fixed" : "Dynamic"}</TableCell>
+                <TableCell>{isDynamic ? "Dynamic" : "Fixed"}</TableCell>
               )}
               {/* Pair */}
               <TableCell>

@@ -16,6 +16,7 @@ export const sortBys = [
   "stakedAmount",
   "swappedAmount",
   "burnedAmount",
+  "raiseAmount",
 ] as const;
 export type SortBy = (typeof sortBys)[number];
 export const sortBysLabels: Record<SortBy, string> = {
@@ -30,6 +31,7 @@ export const sortBysLabels: Record<SortBy, string> = {
   stakedAmount: "Staked Amount",
   swappedAmount: "Swapped Amount",
   burnedAmount: "Burned Amount",
+  raiseAmount: "Raise Amount",
 };
 export const sortBysShortLabels: Record<SortBy, string> = {
   none: "None",
@@ -43,6 +45,7 @@ export const sortBysShortLabels: Record<SortBy, string> = {
   stakedAmount: "Staked",
   swappedAmount: "Swapped",
   burnedAmount: "Burned",
+  raiseAmount: "Raise",
 };
 
 export const listLayouts = ["card", "list"] as const;

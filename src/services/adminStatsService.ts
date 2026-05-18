@@ -8,6 +8,7 @@ interface AdminStatsResponse {
   totalBurnPools: number;
   totalSwapPools: number;
   totalStakingPools: number;
+  totalLaunchPools: number;
 }
 
 export const adminStatsService = {

@@ -53,6 +53,26 @@ const SOLANA_IDL_ERRORS = [
     name: "RewardTooSmall",
     msg: "Reward amount too small (rounds to zero)",
   },
+  { code: 6034, name: "ExceedBalance", msg: "Exceed balance" },
+  {
+    code: 6035,
+    name: "BothAssetsNative",
+    msg: "Deposit and reward asset cannot both be native SOL",
+  },
+  { code: 6036, name: "CannotRemoveLastAdmin", msg: "Cannot remove last admin" },
+  { code: 6037, name: "CannotSelfRemove", msg: "Cannot self remove" },
+  { code: 6038, name: "UserAlreadyWhitelisted", msg: "User already whitelisted" },
+  { code: 6039, name: "NotBurnPool", msg: "Not burn pool" },
+  { code: 6040, name: "InvalidPoolType", msg: "Invalid pool type" },
+  { code: 6041, name: "InvalidMaxDeposit", msg: "Invalid max deposit" },
+  { code: 6042, name: "InvalidMinDeposit", msg: "Invalid min deposit" },
+  { code: 6043, name: "InvalidMaxParticipants", msg: "Invalid max participants" },
+  { code: 6044, name: "InvalidMinParticipants", msg: "Invalid min participants" },
+  {
+    code: 6045,
+    name: "TokenAlreadyWhitelisted",
+    msg: "Selected pool types are already whitelisted on-chain",
+  },
 ] as const;
 
 const SOLANA_ERROR_NAMES = SOLANA_IDL_ERRORS.map((error) => error.name);

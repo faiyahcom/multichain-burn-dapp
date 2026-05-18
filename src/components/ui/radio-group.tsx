@@ -29,7 +29,7 @@ function RadioGroupItem({
       className={cn(
         "relative flex items-center gap-2 cursor-pointer rounded-full px-4 py-2 text-sm font-medium transition-all",
         "text-muted-foreground",
-        "data-[state=checked]:bg-inactive",
+        "bg-inactive",
         "data-[state=checked]:text-black",
         className
       )}
