@@ -293,3 +293,17 @@ export const userHiddenLaunchpadPoolStatuses = [
   ),
   "draft",
 ] as const;
+
+export const userJoinedStakePoolStatuses: StakePoolStatus[] = [
+  "on_going",
+  "closed",
+  "ended",
+  "full",
+] as const;
+
+export const userJoinedLaunchpadPoolStatuses: LaunchpadPoolStatus[] = [
+  "on_going",
+  "upcoming",
+  "ended",
+  "complete",
+] as const;
