@@ -212,8 +212,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Swap
-  if (kind === 32) {
+  // Swap, Deposit & Instant Claim
+  if ([32, 39].includes(kind)) {
     return (
       <div className="flex min-w-0 flex-wrap items-center justify-start gap-1">
         <MetricNumber
