@@ -40,6 +40,7 @@ export default function EditLaunchpadPoolScreen({
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const inFlightRef = useRef(false);
+  const submitAttemptedRef = useRef(false);
 
   const { editPool: editPoolEvm } = useEditLaunchpadPoolEvmFn();
 
@@ -82,16 +83,18 @@ export default function EditLaunchpadPoolScreen({
       startTime: new Date(Number(pool.timeStart) * 1000),
       endTime: new Date(Number(pool.timeEnd) * 1000),
       price: poolIsFixed
-        ? String(
-          Number(pool.rewardDenominator) / Number(pool.rewardNumerator),
-        )
+        ? String(Number(pool.rewardDenominator) / Number(pool.rewardNumerator))
         : "",
       budget: pool.rewardAmount
         ? formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)
         : "",
       claimPolicy: (() => {
         if (pool.claimPolicy === "instant") return "instant";
-        if (pool.claimPolicy === "after_end" && pool.distributionMode === "automatic") return "after_end_auto";
+        if (
+          pool.claimPolicy === "after_end" &&
+          pool.distributionMode === "automatic"
+        )
+          return "after_end_auto";
         return "after_end_claim";
       })() as ClaimPolicyValue,
       rewardVisibility: pool.rewardVisibility ?? false,
@@ -145,7 +148,9 @@ export default function EditLaunchpadPoolScreen({
 
   const currentTargetRaised = poolIsFixed
     ? (Number(pool.rewardDenominator) / Number(pool.rewardNumerator)) *
-    Number(formatAmount(pool.rewardAmount ?? "0", pool.rewardTokenDecimals ?? 0))
+      Number(
+        formatAmount(pool.rewardAmount ?? "0", pool.rewardTokenDecimals ?? 0),
+      )
     : null;
 
   const formTargetRaised =
@@ -192,32 +197,37 @@ export default function EditLaunchpadPoolScreen({
             <div className="space-y-3 text-sm">
               <div className="flex justify-between gap-2">
                 <span className="text-greyed">Pool Name</span>
-                <span className="max-w-[60%] break-all text-right font-medium">
+                <span className="max-w-[60%] text-right font-medium break-all">
                   {pool.name ?? "—"}
                 </span>
               </div>
               <div className="flex justify-between gap-2">
                 <span className="text-greyed">Pool Type</span>
                 <span className="font-medium">
-                  {!pool.rewardDenominator || Number(pool.rewardDenominator) === 0
+                  {!pool.rewardDenominator ||
+                  Number(pool.rewardDenominator) === 0
                     ? "Dynamic"
                     : "Fixed"}
                 </span>
               </div>
-              {!!pool.rewardDenominator && Number(pool.rewardDenominator) !== 0 && (
-                <div className="flex justify-between gap-2">
-                  <span className="text-greyed">Price</span>
-                  <span className="font-medium">
-                    {Number(pool.rewardDenominator) /
-                      Number(pool.rewardNumerator)}
-                  </span>
-                </div>
-              )}
+              {!!pool.rewardDenominator &&
+                Number(pool.rewardDenominator) !== 0 && (
+                  <div className="flex justify-between gap-2">
+                    <span className="text-greyed">Price</span>
+                    <span className="font-medium">
+                      {Number(pool.rewardDenominator) /
+                        Number(pool.rewardNumerator)}
+                    </span>
+                  </div>
+                )}
               <div className="flex justify-between gap-2">
                 <span className="text-greyed">Budget</span>
                 <span className="font-medium">
                   {pool.rewardAmount
-                    ? formatAmount(pool.rewardAmount, pool.rewardTokenDecimals ?? 0)
+                    ? formatAmount(
+                        pool.rewardAmount,
+                        pool.rewardTokenDecimals ?? 0,
+                      )
                     : "—"}
                 </span>
               </div>
@@ -225,10 +235,13 @@ export default function EditLaunchpadPoolScreen({
                 <div className="flex justify-between gap-2">
                   <span className="text-greyed">Total Target Raised</span>
                   <span className="font-medium">
-                    {currentTargetRaised.toLocaleString(undefined, { maximumFractionDigits: 6 })}
+                    {currentTargetRaised.toLocaleString(undefined, {
+                      maximumFractionDigits: 6,
+                    })}
                   </span>
                 </div>
-              )}              <div className="flex justify-between gap-2">
+              )}{" "}
+              <div className="flex justify-between gap-2">
                 <span className="text-greyed">Claim Policy</span>
                 <span className="font-medium">
                   {pool.claimPolicy === "instant"
@@ -245,7 +258,8 @@ export default function EditLaunchpadPoolScreen({
                     {pool.rewardVisibility ? "Public" : "Hidden"}
                   </span>
                 </div>
-              )}              <div className="flex justify-between gap-2">
+              )}{" "}
+              <div className="flex justify-between gap-2">
                 <span className="text-greyed">Start Time</span>
                 <span className="font-medium">
                   {formatScheduleTime(pool.timeStart)}
@@ -272,17 +286,24 @@ export default function EditLaunchpadPoolScreen({
                 <label className="text-sm font-medium">Pool Name</label>
                 <Input
                   {...register("poolName", {
-                    required: "Pool name is required",
-                    maxLength: {
-                      value: 31,
-                      message: "Pool name must be 31 characters or fewer",
+                    validate: {
+                      required: (v) =>
+                        v.trim().length > 0 ? true : "Pool name is required",
+                      minLength: (v) =>
+                        !v.trim() || v.trim().length >= 3
+                          ? true
+                          : "Pool name must be at least 3 characters",
+                      maxLength: (v) =>
+                        !v.trim() || v.trim().length <= 50
+                          ? true
+                          : "Pool name must be at most 50 characters",
                     },
                   })}
                   placeholder="Enter pool name"
                   className="w-full"
                 />
                 {errors.poolName && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {errors.poolName.message}
                   </p>
                 )}
@@ -296,9 +317,13 @@ export default function EditLaunchpadPoolScreen({
                     name="price"
                     control={control}
                     rules={{
-                      required: "Price is required for fixed pools",
-                      validate: (v) =>
-                        Number(v) > 0 || "Price must be greater than 0",
+                      validate: (v) => {
+                        if (!v || v === "")
+                          return "Price is required for Fixed mode";
+                        if (Number(v) <= 0)
+                          return "Price must be greater than 0";
+                        return true;
+                      },
                     }}
                     render={({ field }) => (
                       <NumericInput
@@ -310,7 +335,7 @@ export default function EditLaunchpadPoolScreen({
                     )}
                   />
                   {errors.price && (
-                    <p className="text-xs text-red-500">
+                    <p className="text-xs text-destructive">
                       {errors.price.message}
                     </p>
                   )}
@@ -324,9 +349,15 @@ export default function EditLaunchpadPoolScreen({
                   name="budget"
                   control={control}
                   rules={{
-                    required: "Budget is required",
-                    validate: (v) =>
-                      Number(v) > 0 || "Budget must be greater than 0",
+                    validate: (v) => {
+                      if (!v || v === "")
+                        return submitAttemptedRef.current
+                          ? "Budget is required"
+                          : true;
+                      if (Number(v) <= 0)
+                        return "Budget must be greater than 0";
+                      return true;
+                    },
                   }}
                   render={({ field }) => (
                     <NumericInput
@@ -338,7 +369,7 @@ export default function EditLaunchpadPoolScreen({
                   )}
                 />
                 {errors.budget && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {errors.budget.message}
                   </p>
                 )}
@@ -365,7 +396,9 @@ export default function EditLaunchpadPoolScreen({
                   name="claimPolicy"
                   render={({ field }) => (
                     <RadioGroup
-                      value={field.value === "instant" ? "instant" : "after_end"}
+                      value={
+                        field.value === "instant" ? "instant" : "after_end"
+                      }
                       onValueChange={(val) => {
                         if (val === "instant") {
                           field.onChange("instant");
@@ -423,7 +456,9 @@ export default function EditLaunchpadPoolScreen({
               {/* Reward Visibility (dynamic pools only) */}
               {!isFixed && (
                 <div className="flex items-center justify-between gap-3">
-                  <label className="text-sm font-medium">Reward Visibility</label>
+                  <label className="text-sm font-medium">
+                    Reward Visibility
+                  </label>
                   <Controller
                     control={control}
                     name="rewardVisibility"
@@ -443,7 +478,16 @@ export default function EditLaunchpadPoolScreen({
                 <Controller
                   name="startTime"
                   control={control}
-                  rules={{ required: "Start time is required" }}
+                  rules={{
+                    validate: (v) => {
+                      if (!v) return "Start time is required";
+                      if (v <= new Date())
+                        return "Start time must be in the future";
+                      if (endTime && v >= endTime)
+                        return "Start time must be before end time";
+                      return true;
+                    },
+                  }}
                   render={({ field }) => (
                     <DatePicker
                       value={field.value}
@@ -456,7 +500,7 @@ export default function EditLaunchpadPoolScreen({
                   )}
                 />
                 {errors.startTime && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {errors.startTime.message}
                   </p>
                 )}
@@ -468,7 +512,16 @@ export default function EditLaunchpadPoolScreen({
                 <Controller
                   name="endTime"
                   control={control}
-                  rules={{ required: "End time is required" }}
+                  rules={{
+                    validate: (v) => {
+                      if (!v) return "End time is required";
+                      if (v <= new Date())
+                        return "End time must be in the future";
+                      if (startTime && v <= startTime)
+                        return "End time must be after start time";
+                      return true;
+                    },
+                  }}
                   render={({ field }) => (
                     <DatePicker
                       value={field.value}
@@ -479,7 +532,7 @@ export default function EditLaunchpadPoolScreen({
                   )}
                 />
                 {errors.endTime && (
-                  <p className="text-xs text-red-500">
+                  <p className="text-xs text-destructive">
                     {errors.endTime.message}
                   </p>
                 )}
@@ -525,8 +578,12 @@ export default function EditLaunchpadPoolScreen({
             isLoading={isSubmitting}
             isLoadingText="Updating..."
             btnProps={{
-              type: "submit",
+              type: "button",
               disabled: isSubmitting,
+              onClick: () => {
+                submitAttemptedRef.current = true;
+                handleSubmit(onSubmit)();
+              },
             }}
           />
         </div>
