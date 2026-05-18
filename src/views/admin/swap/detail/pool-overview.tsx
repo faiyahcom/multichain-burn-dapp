@@ -78,7 +78,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
       [
         { label: "Ratio", value: cleanRatio },
         {
-          label: "Burn Token",
+          label: "Swap Token",
           // value: `${poolDetail?.pool?.tokenInSymbol}`,
           value: (
             <div className="flex items-center gap-2 max-sm:justify-end">
@@ -97,7 +97,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         },
       ],
       [
-        { label: "Burn Method", value: "Transfer to Maker" },
+        { label: "Swap Method", value: "Transfer to Maker" },
         {
           label: "Reward Token",
           value: (

@@ -115,7 +115,7 @@ const EndStatus = ({ poolDetail }: Props) => {
                 valueClassName="text-2xl font-bold"
             />
             <StatRow
-                label="Your Burned Amount"
+                label="Your Swapped Amount"
                 value={!pool ? <Skeleton className="h-4 w-20" /> : `${formattedBurned} ${tokenInSymbolDisplay}`}
             />
             <ActionBtn
