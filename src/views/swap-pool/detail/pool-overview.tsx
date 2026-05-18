@@ -5,6 +5,7 @@ import NetworkIcon from "@/components/layout/header/network-icon";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import { Skeleton } from "@/components/ui/skeleton";
+import { shortenNumber } from "@/utils/helpers/numbers";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -23,7 +24,7 @@ export function toCleanRatio(numerator?: string, denominator?: string): string {
     if (!num || !den) return "—";
 
     const divisor = gcd(num, den);
-    return `${num / divisor}:${den / divisor}`;
+    return `${shortenNumber({ number: num / divisor })}:${shortenNumber({ number: den / divisor })}`;
 }
 
 const PoolOverview = ({ poolDetail }: Props) => {
@@ -120,7 +121,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                 <span className="text-xl font-medium">Pool Overview</span>
             </div>
 
-            {(!poolDetail) && !rows.length ? (
+            {!poolDetail && !rows.length ? (
                 <div className="space-y-2">
                     {Array.from({ length: 3 }).map((_, i) => (
                         <div className="grid grid-cols-2 space-x-2" key={i}>
