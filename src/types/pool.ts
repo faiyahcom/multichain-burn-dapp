@@ -76,7 +76,11 @@ export interface PoolDetailResponse {
     kind: PoolKindCode;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus | LaunchpadPoolStatus;
+    status:
+      | SwapPoolStatus
+      | BurnPoolStatus
+      | StakePoolStatus
+      | LaunchpadPoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -229,6 +233,7 @@ export const activityKind = {
   36: "Join Launchpad",
   37: "Claim Allocation",
   38: "Reward Received",
+  39: "Deposit & Instant Claim",
 
   40: "Pool End",
 } as const;
@@ -344,6 +349,7 @@ export const myActivityActions = [
   "36",
   "37",
   "38",
+  "39",
 ] as const satisfies ReadonlyArray<ActivityKeyList>;
 export type MyActivityAction = (typeof myActivityActions)[number];
 export const myActivityActionLabels: Record<MyActivityAction, string> = {
@@ -359,6 +365,7 @@ export const myActivityActionLabels: Record<MyActivityAction, string> = {
   "36": "Join Launchpad",
   "37": "Claim Allocation",
   "38": "Reward Received",
+  "39": "Deposit & Instant Claim",
 };
 export const getMyActivityActionLabel = (kind: MyActivityAction) => {
   return myActivityActionLabels[kind];
