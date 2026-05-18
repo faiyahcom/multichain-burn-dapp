@@ -18,8 +18,8 @@ export interface FeeRecord {
     name: string;
   };
   executor: {
-    name: string;
-  };
+    name: string | null;
+  } | null;
 }
 
 export interface GetFeeListRequest {
