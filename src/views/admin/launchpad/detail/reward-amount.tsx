@@ -1,5 +1,9 @@
 import Decimal from "decimal.js";
-import { formatAmount, safeDecimal } from "@/utils/helpers/numbers";
+import {
+  formatAmount,
+  safeDecimal,
+  shortenNumber,
+} from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -214,7 +218,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
                 />
               </div>
               <p className="text-right text-xs text-greyed">
-                {progressPct.toFixed(1)}%
+                {shortenNumber({ number: progressPct })}%
               </p>
             </div>
           )}
@@ -224,14 +228,6 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
               {distributionMsg}
             </p>
           )} */}
-
-          {pool?.status === "ended" ||
-            pool?.status === "closed" ||
-            pool?.status === "completed" ? (
-            <p className="rounded-md bg-progress-bg px-3 py-2 text-xs">
-              This pool has completed. No further deposits are accepted.
-            </p>
-          ) : null}
         </div>
       )}
     </div>
