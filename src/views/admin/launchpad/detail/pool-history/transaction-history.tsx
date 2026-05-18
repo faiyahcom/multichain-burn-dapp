@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import CustomPagination from "@/components/common/pagination";
 import CopyableText from "@/components/common/copyable-text";
 import {
@@ -13,7 +13,7 @@ import { chainIdToNetworkConfig } from "@/config/networks";
 import { getExplorerTxUrl } from "@/utils/helpers/networks";
 import { poolService } from "@/services/poolService";
 import { poolQueryKeys } from "@/services/queries/queryKey";
-import type { PoolDetailResponse } from "@/types/pool";
+import { txnKind, type PoolDetailResponse } from "@/types/pool";
 import { formatAmount, parseToBN } from "@/utils/helpers/numbers";
 import { IconGoTo } from "@/assets/react";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -29,15 +29,16 @@ type Props = {
 
 const DEFAULT_PAGE_SIZE = 5;
 
-// Launchpad-specific action label map
 const launchpadActionLabel = (kind: number): string => {
   switch (kind) {
-    case 1:
+    case 11:
       return "Deposit";
-    case 4:
+    case 12:
+      return "Deposit & Instant Claim";
+    case 13:
       return "Claim";
-    case 3:
-      return "Reward Distribution";
+    case 14:
+      return "Receive Reward";
     default:
       return `Kind ${kind}`;
   }
@@ -46,7 +47,6 @@ const launchpadActionLabel = (kind: number): string => {
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
   const [page, setPage] = useState(1);
 
-  // Only fetch deposit (1), claim (4), reward distribution (3) kinds
   const { data: poolTxns, isLoading } = useQuery({
     queryKey: poolQueryKeys.txns(poolDetail?.pool?.address || "", page, ""),
     queryFn: () =>
@@ -54,7 +54,10 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
         page,
         DEFAULT_PAGE_SIZE,
         poolDetail?.pool?.address || "",
-        "",
+        Object.keys(txnKind)
+          .map((k) => Number(k))
+          .filter((k) => k < 11)
+          .join(","),
       ),
     enabled: !!poolDetail?.pool?.address,
     refetchInterval: 2_500,
@@ -89,8 +92,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
     fallbackSymbol: string,
   ) => {
     if (
-      txTokenAddress?.toLowerCase() ===
-      poolDetail?.pool?.tokenIn?.toLowerCase()
+      txTokenAddress?.toLowerCase() === poolDetail?.pool?.tokenIn?.toLowerCase()
     ) {
       return paymentTokenDisplay.symbol;
     }
@@ -151,6 +153,8 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
         </TableHeader>
         <TableBody className="[&>tr:not(:last-child)>td]:border-b [&>tr:not(:last-child)>td]:border-progress-bg">
           {txns.map((tx) => {
+            const kind = Number(tx.kind);
+
             const hasAmountIn =
               tx.amountIn != null &&
               tx.amountIn.toString() !== "0" &&
@@ -171,23 +175,34 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 ? `${formatAmount(parseToBN(tx.fee || "0").toString(), feeDecimals)} ${feeSymbol}`
                 : `0 ${feeSymbol}`;
 
-            const netRaw = hasAmountIn
-              ? tx.amountIn.toString()
-              : hasAmountOut
-                ? tx.amountOut.toString()
-                : null;
-            const amountDecimals = hasAmountIn
-              ? tx.tokenInDecimals
-              : tx.tokenOutDecimals;
-            const amountSymbol = hasAmountIn
-              ? resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)
-              : hasAmountOut
-                ? resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)
-                : "";
-            const amount =
-              netRaw != null && amountDecimals != null
-                ? `${formatAmount(netRaw, amountDecimals)} ${amountSymbol}`
-                : `0 ${amountSymbol}`;
+            const inStr = hasAmountIn
+              ? `${formatAmount(tx.amountIn.toString(), tx.tokenInDecimals!)} ${resolveTokenSymbol(tx.tokenIn, tx.tokenInSymbol)}`
+              : null;
+            const outStr = hasAmountOut
+              ? `${formatAmount(tx.amountOut.toString(), tx.tokenOutDecimals!)} ${resolveTokenSymbol(tx.tokenOut, tx.tokenOutSymbol)}`
+              : null;
+
+            let amountCell: React.ReactNode;
+            switch (kind) {
+              case 12: // Deposit & Instant Claim
+                amountCell = (
+                  <span className="inline-flex items-center gap-1">
+                    <span>{inStr ?? "—"}</span>
+                    <span className="text-greyed">→</span>
+                    <span>{outStr ?? "—"}</span>
+                  </span>
+                );
+                break;
+              case 11: // Deposit
+                amountCell = <span>{inStr ?? "—"}</span>;
+                break;
+              case 13: // Claim
+              case 14: // Receive Reward
+                amountCell = <span>{outStr ?? "—"}</span>;
+                break;
+              default:
+                amountCell = <span>{inStr ?? outStr ?? "—"}</span>;
+            }
 
             const explorerUrl = getExplorerTxUrl(tx.chainId, tx.hash);
 
@@ -216,8 +231,8 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                     formatStr: "yyyy/MM/dd HH:mm",
                   })}
                 </TableCell>
-                <TableCell>{launchpadActionLabel(Number(tx.kind))}</TableCell>
-                <TableCell>{amount}</TableCell>
+                <TableCell>{launchpadActionLabel(kind)}</TableCell>
+                <TableCell>{amountCell}</TableCell>
                 <TableCell>{fee}</TableCell>
                 <TableCell>
                   <a
