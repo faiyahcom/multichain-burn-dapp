@@ -530,7 +530,11 @@ const CreateLaunchpadPoolForm = () => {
                         disabled: isSubmitting,
                         onClick: () => {
                             reset();
-                            navigate({ to: "/admin/draft-pools" });
+                            navigate({ to: "/admin/master-pool-management",
+                                search: {
+                                    tab: "launchpad",
+                                }
+                             });
                         },
                     }}
                 />

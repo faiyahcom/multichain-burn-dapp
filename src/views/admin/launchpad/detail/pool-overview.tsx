@@ -127,7 +127,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
         { label: "Claim Policy", value: claimPolicy },
         ...(distributionMode !== null
           ? [{ label: "Distribution Mode", value: distributionMode }]
-          : [{ label: "Distribution Mode", value: "Instant" }]),
+          : []),
       ],
     ];
 

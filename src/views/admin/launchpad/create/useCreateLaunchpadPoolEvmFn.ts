@@ -15,8 +15,7 @@ import type { CreateLaunchpadPoolSolParams } from "./useCreateLaunchpadPoolSolFn
 
 export type CreateLaunchpadPoolEvmParams = CreateLaunchpadPoolSolParams;
 
-/** Price precision base — 4 decimal places, matches Solana RATIO_DENOMINATOR */
-const RATIO_DENOMINATOR = 10_000n;
+const RATIO_DENOMINATOR = 1_000_000_000_000n;
 
 // Enum orderings (must match ILaunchpadPool Solidity enums)
 const LaunchpadPoolType = { Dynamic: 0, Fixed: 1 } as const;
