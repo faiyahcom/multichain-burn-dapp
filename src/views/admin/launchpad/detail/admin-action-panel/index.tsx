@@ -7,7 +7,10 @@ import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import ClosePoolDialog from "@/components/shared/close-pool-dialog";
 import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
 import { useBatchTransferEvmFn } from "./hooks/useBatchTransferEvmFn";
-import type { BatchRecipient, TokenMode } from "@/views/admin/stake/detail/amount-activities/hooks/useBatchTransferSolFn";
+import type {
+  BatchRecipient,
+  TokenMode,
+} from "@/views/admin/stake/detail/amount-activities/hooks/useBatchTransferSolFn";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { formatAmount } from "@/utils/helpers/numbers";
@@ -49,7 +52,9 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
   };
 
   const pool = poolDetail?.pool;
-  const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+  const network = pool?.chainId
+    ? chainIdToNetworkConfig(pool.chainId)
+    : undefined;
 
   const paymentTokenDisplay = resolvePoolTokenDisplay({
     network,
@@ -82,13 +87,27 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
       : undefined;
 
   const invalidatePoolQueries = (poolAddress: string) => {
-    queryClient.invalidateQueries({ queryKey: poolQueryKeys.detail(poolAddress), exact: false });
+    queryClient.invalidateQueries({
+      queryKey: poolQueryKeys.detail(poolAddress),
+      exact: false,
+    });
   };
 
-  const handleTransfer = async (recipients: BatchRecipient[], mode: TokenMode) => {
+  const handleTransfer = async (
+    recipients: BatchRecipient[],
+    mode: TokenMode,
+  ) => {
     if (!pool?.address || !poolDetail) return;
-    if (isSolana) throw new Error("Token transfer is not yet available for Solana launchpad pools.");
-    await batchTransferEvm({ poolAddress: pool.address, poolDetail, mode, recipients });
+    if (isSolana)
+      throw new Error(
+        "Token transfer is not yet available for Solana launchpad pools.",
+      );
+    await batchTransferEvm({
+      poolAddress: pool.address,
+      poolDetail,
+      mode,
+      recipients,
+    });
     invalidatePoolQueries(pool.address);
   };
 
@@ -148,6 +167,25 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
 
       // ── Ongoing / Ended: Close Pool + Transfer Tokens ──────────────────────
       case "on_going":
+        return (
+          <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
+            <ActionBtn
+              letter="X"
+              text="Close Pool"
+              color="#FF6B6B"
+              disabled={isRunning}
+              onClick={() => setCloseDialogOpen(true)}
+            />
+            <ClosePoolDialog
+              open={closeDialogOpen}
+              onOpenChange={setCloseDialogOpen}
+              title="Emergency Close Pool"
+              description="Are you sure you want to emergency close this pool?"
+              showReason
+              onConfirm={(reason) => handleEmergencyClose(reason)}
+            />
+          </PoolChainGuard>
+        );
       case "completed":
       case "ended":
         return (
@@ -224,9 +262,7 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
         );
       // ── Cancelled: No actions ──────────────────────────────────────────────
       case "canceled":
-        return (
-          <p className="text-sm text-greyed">No actions available.</p>
-        );
+        return <p className="text-sm text-greyed">No actions available.</p>;
 
       default:
         return null;
@@ -237,4 +273,3 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
 };
 
 export default AdminActionPanel;
-

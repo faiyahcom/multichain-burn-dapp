@@ -86,7 +86,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
         new Decimal(10).pow(rewardDec),
       );
       const goalHuman = rewardHuman.mul(price);
-      raisedGoal = goalHuman.toFixed(2);
+      raisedGoal = shortenNumber({ number: goalHuman.toNumber() });
       const raisedHuman = safeDecimal(
         poolDetail?.launchpad?.totalRaised ?? "0",
       ).div(new Decimal(10).pow(paymentDec));
@@ -201,7 +201,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
             </div>
           ))}
 
-          {!isDynamic && (
+          {!isDynamic && pool?.status !== "canceled" && (
             <div className="space-y-1">
               <div className="flex justify-between text-xs text-greyed">
                 <span>
