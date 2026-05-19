@@ -155,6 +155,9 @@ const LaunchpadRecentPoolsTable = () => {
                   ),
                 );
 
+                // show TBD if it is dynamic and rewardVisibility is false
+                const showTBD = isDynamic && pool?.rewardVisibility === false;
+
                 return (
                   <TableRow
                     key={pool?.address}
@@ -234,14 +237,14 @@ const LaunchpadRecentPoolsTable = () => {
                     </TableCell>
                     {/* Received */}
                     <TableCell>
-                      {!!receivedAmount ? (
+                      {showTBD ? (
+                        <TBDTooltip />
+                      ) : (
                         <MetricNumber
                           number={receivedAmount}
                           unit={tokenRewardDisplay.symbol}
                           isShorten
                         />
-                      ) : (
-                        <TBDTooltip />
                       )}
                     </TableCell>
                     {/* Network */}
