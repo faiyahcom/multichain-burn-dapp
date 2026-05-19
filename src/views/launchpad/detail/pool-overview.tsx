@@ -64,24 +64,24 @@ const PoolOverview = ({ poolDetail }: Props) => {
         saleTokenDisplay.symbol,
     ]);
 
-    const claimPolicyLabel = useMemo(() => {
-        if (!pool?.claimPolicy) return "—";
-        return pool.claimPolicy === "instant" ? "Instant" : "After Pool Ends";
-    }, [pool?.claimPolicy]);
+    const claimPolicyStr = poolDetail?.pool?.claimPolicy;
+    const distributionModeStr = poolDetail?.pool?.distributionMode;
 
-    const distributionModeLabel = useMemo(() => {
-        if (!pool?.distributionMode) return "—";
-        switch (pool.distributionMode) {
-            case "none":
-                return "None";
-            case "automatic":
-                return "Automatic";
-            case "claim":
-                return "Claim";
-            default:
-                return pool.distributionMode;
-        }
-    }, [pool?.distributionMode]);
+    const claimPolicy =
+        claimPolicyStr === "instant"
+            ? "Instant"
+            : claimPolicyStr === "after_end"
+                ? "After End"
+                : "-";
+
+    const distributionMode =
+        claimPolicyStr === "after_end"
+            ? distributionModeStr === "automatic"
+                ? "Auto Distribution"
+                : distributionModeStr === "claim"
+                    ? "Claim Mode"
+                    : "-"
+            : null;
 
     const modeLabel = useMemo(() => {
         if (!pool?.rewardDenominator) return "—";
@@ -96,7 +96,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
             ],
             [
                 { label: "Price", value: priceDisplay },
-                { label: "Claim Policy", value: claimPolicyLabel },
+                { label: "Claim Policy", value: claimPolicy },
             ],
             [
                 {
@@ -147,14 +147,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
                         </div>
                     ),
                 },
-                { label: "Distribution Mode", value: distributionModeLabel },
+                distributionMode && { label: "Distribution Mode", value: distributionMode },
             ],
         ],
         [
             modeLabel,
             priceDisplay,
-            claimPolicyLabel,
-            distributionModeLabel,
+            claimPolicy,
+            distributionMode,
             pool?.timeStart,
             pool?.timeEnd,
             pool?.chainId,
@@ -200,7 +200,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                                 {row[0]?.value}
                             </span>
                         </div>
-                        {row[1] && (
+                        {row[1] ? (
                             <div className={cn("grid grid-cols-2")}>
                                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                                     {row[1]?.label}:
@@ -209,6 +209,8 @@ const PoolOverview = ({ poolDetail }: Props) => {
                                     {row[1]?.value}
                                 </span>
                             </div>
+                        ) : (
+                            <div />
                         )}
                     </div>
                 ))}

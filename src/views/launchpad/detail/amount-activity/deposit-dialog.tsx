@@ -23,6 +23,7 @@ import { useTokenBalance } from "@/hooks/useTokenBalance";
 import type { PoolDetailResponse } from "@/types/pool";
 import {
     formatAmount,
+    safeDecimal,
     safeDecimalParse,
     shortenNumber,
 } from "@/utils/helpers/numbers";
@@ -32,6 +33,7 @@ import { useMemo } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
 import z from "zod";
+import NetworkDisplay from "@/components/common/network-display";
 
 const createDepositFormSchema = ({
     decimals,
@@ -147,10 +149,11 @@ const DepositDialog = ({
     const priceDisplay = useMemo(() => {
         if (isDynamic) return "Dynamic";
         try {
-            const denom = Number(pool?.rewardDenominator ?? 0);
-            const num = Number(pool?.rewardNumerator ?? 1);
-            if (num === 0) return "Dynamic";
-            return `${(denom / num).toLocaleString()} ${paymentTokenDisplay.symbol} / ${saleTokenDisplay.symbol}`;
+            const denominator = safeDecimal(pool?.rewardDenominator);
+            const numerator = safeDecimal(pool?.rewardNumerator);
+            if (numerator.isZero()) return "Dynamic";
+            const price = denominator.div(numerator);
+            return shortenNumber({ number: price.toNumber() });
         } catch {
             return "Dynamic";
         }
@@ -162,14 +165,24 @@ const DepositDialog = ({
         saleTokenDisplay.symbol,
     ]);
 
-    const claimPolicyLabel =
-        pool?.claimPolicy === "instant" ? "Instant" : "After Pool Ends";
-    const distributionModeLabel =
-        pool?.distributionMode === "automatic"
-            ? "Automatic"
-            : pool?.distributionMode === "claim"
-                ? "Claim"
-                : "None";
+    const claimPolicyStr = poolDetail?.pool?.claimPolicy;
+    const distributionModeStr = poolDetail?.pool?.distributionMode;
+
+    const claimPolicy =
+        claimPolicyStr === "instant"
+            ? "Instant"
+            : claimPolicyStr === "after_end"
+                ? "After End"
+                : "-";
+
+    const distributionMode =
+        claimPolicyStr === "after_end"
+            ? distributionModeStr === "automatic"
+                ? "Auto Distribution"
+                : distributionModeStr === "claim"
+                    ? "Claim Mode"
+                    : "-"
+            : null;
 
     const {
         formatted: balanceFormatted,
@@ -307,7 +320,16 @@ const DepositDialog = ({
                                             <SummaryRow label="Pool Type" value="Launchpad" />
                                             <SummaryRow
                                                 label="Network"
-                                                value={network?.label ?? pool?.chainId ?? "—"}
+                                                value={
+                                                    <NetworkDisplay
+                                                        chainId={pool?.chainId ?? ""}
+                                                        hasLabel
+                                                        classNames={{
+                                                            container: "flex items-center justify-center",
+                                                            img: "sm:size-4",
+                                                        }}
+                                                    />
+                                                }
                                             />
                                             <SummaryRow
                                                 label="Mode"
@@ -348,14 +370,15 @@ const DepositDialog = ({
                                                     </span>
                                                 }
                                             />
-                                            <SummaryRow
-                                                label="Claim Policy"
-                                                value={claimPolicyLabel}
-                                            />
-                                            <SummaryRow
-                                                label="Distribution Mode"
-                                                value={distributionModeLabel}
-                                            />
+                                            <SummaryRow label="Claim Policy" value={claimPolicy} />
+                                            {distributionMode ? (
+                                                <SummaryRow
+                                                    label="Distribution Mode"
+                                                    value={distributionMode}
+                                                />
+                                            ) : (
+                                                <SummaryRow />
+                                            )}
                                         </div>
                                     </div>
 
@@ -395,7 +418,7 @@ const DepositDialog = ({
                                                     inputComponent={Input}
                                                     variant="launchpad"
                                                     placeholder="0.00"
-                                                    className="w-full border-foreground"
+                                                    className="w-full border-2 border-foreground"
                                                     value={field.value}
                                                     onChange={field.onChange}
                                                     ref={field.ref}
