@@ -199,7 +199,6 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
               {/* Raised */}
               <TableCell>
                 <span>
-                  <span>Raised: </span>
                   <MetricNumber
                     classNames={{ container: "inline-flex w-max" }}
                     number={totalRaise}
