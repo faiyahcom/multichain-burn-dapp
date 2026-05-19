@@ -190,6 +190,7 @@ export type PoolItemType = {
   totalRaise?: string; // need sci formating
   depositedAmount?: string; // need sci formating
   receivedAmount?: string; // need sci formating
+  rewardVisibility?: boolean;
 };
 
 export type PoolListRequest = PaginationRequest & {

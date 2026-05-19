@@ -76,6 +76,7 @@ export interface ParticipatedUserPool {
   apr: string; // divide by 10000 to get display percentage
   depositedAmount?: string; // need sci formating
   receivedAmount?: string; // need sci formating
+  rewardVisibility?: boolean;
 }
 
 export type ParticipatedPoolsResponse = PaginationResponse & {

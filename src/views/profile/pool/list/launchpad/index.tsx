@@ -116,6 +116,9 @@ const ProfilePoolListLaunchpad: React.FC<Props> = ({
             sciToFormatted(pool.receivedAmount ?? "0", pool.tokenOutDecimals),
           );
 
+          // show TBD if it is dynamic and rewardVisibility is false
+          const showTBD = isDynamic && pool.rewardVisibility === false;
+
           return (
             <TableRow
               key={pool.address}
@@ -178,14 +181,14 @@ const ProfilePoolListLaunchpad: React.FC<Props> = ({
               </TableCell>
               {/* Received */}
               <TableCell>
-                {!!receivedAmount ? (
+                {showTBD ? (
+                  <TBDTooltip />
+                ) : (
                   <MetricNumber
                     number={receivedAmount}
                     unit={tokenOutDisplay.symbol}
                     isShorten
                   />
-                ) : (
-                  <TBDTooltip />
                 )}
               </TableCell>
               {/* Network */}
