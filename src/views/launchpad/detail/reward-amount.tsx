@@ -9,7 +9,6 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import GlowContainer from "@/components/common/glow/container";
-import { cn } from "@/lib/utils";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -45,6 +44,10 @@ const RewardAmount = ({ poolDetail }: Props) => {
         if (!pool?.rewardDenominator) return true;
         return Number(pool.rewardDenominator) === 0;
     }, [pool?.rewardDenominator]);
+
+    const settlementFee = pool?.settlementFee
+        ? `${shortenNumber({ number: Number(pool.settlementFee) / 100, decimalPlaces: 2 })}%`
+        : "—";
 
     // total reward (the full cap in sale tokens)
     const totalRewardFormatted = useMemo(() => {
@@ -136,12 +139,18 @@ const RewardAmount = ({ poolDetail }: Props) => {
             </div>
 
             <div className="space-y-2">
-                <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
-                    <span className="text-mb-gray-b8">Total Raised:</span>
-                    <span>
-                        {totalRaisedFormatted} <span>{paymentTokenDisplay.symbol}</span>
-                    </span>
-                </p>
+                <div className="grid grid-cols-1 gap-y-1 md:grid-cols-2 md:space-x-8">
+                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                        <span className="text-mb-gray-b8">Settlement Fee:</span>
+                        <span>{settlementFee}</span>
+                    </p>
+                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                        <span className="text-mb-gray-b8">Total Raised:</span>
+                        <span>
+                            {totalRaisedFormatted} <span>{paymentTokenDisplay.symbol}</span>
+                        </span>
+                    </p>
+                </div>
 
                 {!isDynamic && progressPercent !== null && targetRaisedFormatted && (
                     <div className="space-y-1.5">
