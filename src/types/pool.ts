@@ -227,8 +227,9 @@ export const activityKind = {
   34: "Unstake",
   35: "Claim Stake reward",
   36: "Taker Join Launchpad Pool",
-  37: "Taker Claim Reward from Launchpad Pool",
-  38: "Taker Receive Reward from Launchpad Pool",
+  37: "Taker Claim Reward",
+  38: "Taker Receive Reward",
+  39: "Taker Deposit & Instantly Claim Reward",
 
   40: "Pool End",
 
