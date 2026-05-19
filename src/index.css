@@ -257,7 +257,7 @@
   --stake-shadow: rgba(20, 184, 166, 0.25);
 
   --launchpad-border: rgb(107, 114, 128);
-  --launchpad-shadow: rgba(142, 142, 147, 0.25);
+  --launchpad-shadow: rgba(142, 142, 147, 0.15);
   /* END */
 
   --sub-bg: #ffffff;
@@ -401,7 +401,7 @@
   --stake-shadow: rgba(20, 184, 166, 0.878431);
 
   --launchpad-border: rgb(107, 114, 128);
-  --launchpad-shadow: rgba(142, 142, 147, 0.25);
+  --launchpad-shadow: rgba(142, 142, 147, 0.15);
   /* END */
 
   --sub-bg: #ffffff;

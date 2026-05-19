@@ -303,6 +303,7 @@ export const userJoinedStakePoolStatuses: StakePoolStatus[] = [
 
 export const userJoinedLaunchpadPoolStatuses: LaunchpadPoolStatus[] = [
   "on_going",
+  "closed",
   "upcoming",
   "ended",
   "complete",

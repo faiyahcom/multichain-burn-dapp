@@ -204,7 +204,7 @@ export const activityKind = {
   2: "Pool Requested",
   3: "Pool Approved",
   4: "Pool Rejected",
-  5: "Cancel pool",
+  5: "Cancel pool", // user cancel only
   6: "Pool Closed",
   7: "Pool Updated",
   8: "Pool Ended",
@@ -236,6 +236,8 @@ export const activityKind = {
   39: "Deposit & Instant Claim",
 
   40: "Pool End",
+  72: "Cancel Stake",
+  73: "Cancel Launchpad",
 } as const;
 
 export interface MyStakeSnapshot {
