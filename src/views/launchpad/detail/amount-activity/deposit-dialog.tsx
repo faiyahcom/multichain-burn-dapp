@@ -525,6 +525,19 @@ const DepositDialog = ({
                                         </span>
                                     </div>
 
+                                    {/* Remaining Capacity (fixed pools only) */}
+                                    {!isDynamic && hardcapHuman && (
+                                        <div className="flex items-center justify-between">
+                                            <span className="font-inter text-sm font-medium text-mb-gray-b8 sm:text-base 2xl:text-xl">
+                                                Remaining Capacity
+                                            </span>
+                                            <span className="font-inter text-sm font-bold text-nowrap sm:text-base 2xl:text-xl">
+                                                {shortenNumber({ number: Number(hardcapHuman) })}{" "}
+                                                {paymentTokenDisplay.symbol}
+                                            </span>
+                                        </div>
+                                    )}
+
                                     {/* Amount Input */}
                                     <div className="space-y-2">
                                         <div className="flex items-center justify-between px-1 text-sm md:text-base">
