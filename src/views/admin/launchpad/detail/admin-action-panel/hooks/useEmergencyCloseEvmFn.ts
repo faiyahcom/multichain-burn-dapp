@@ -11,17 +11,30 @@ export const useEmergencyCloseEvmFn = () => {
 
     const emergencyCloseEvm = useCallback(
         async ({ poolAddress }: { poolAddress: string }) => {
-            if (!isConnected || !walletProvider) throw new Error("Wallet not connected");
+            try {
+                if (!isConnected || !walletProvider) {
+                    throw new Error("Wallet not connected");
+                }
 
-            const provider = new ethers.BrowserProvider(walletProvider as Eip1193Provider);
-            const signer = await provider.getSigner();
-            const contract = getContractLaunchpadFactory(signer);
+                const provider = new ethers.BrowserProvider(
+                    walletProvider as Eip1193Provider,
+                );
+                const signer = await provider.getSigner();
+                const contract = getContractLaunchpadFactory(signer);
 
-            const tx = await contract.emergencyClosePool(poolAddress);
-            const receipt = await tx.wait();
+                const tx = await contract.emergencyClosePool(poolAddress);
+                const receipt = await tx.wait();
 
-            toast.success("Pool emergency closed!", { description: `Tx: ${receipt.hash}` });
-            return receipt.hash as string;
+                toast.success("Pool emergency closed!", {
+                    description: `Tx: ${receipt.hash}`,
+                });
+                return receipt.hash as string;
+            } catch (error: unknown) {
+                toast.error("Emergency close failed", {
+                    description: getErrorMessage({ error }),
+                });
+                throw error;
+            }
         },
         [isConnected, walletProvider],
     );
