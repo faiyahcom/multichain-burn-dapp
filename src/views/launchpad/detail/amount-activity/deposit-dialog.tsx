@@ -34,17 +34,21 @@ import { useForm, Controller } from "react-hook-form";
 import { formatUnits, parseUnits } from "viem";
 import z from "zod";
 import NetworkDisplay from "@/components/common/network-display";
+import Decimal from "decimal.js";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 const createDepositFormSchema = ({
     decimals,
     rawBalance,
     balanceFormatted,
     symbol,
+    hardcapHuman,
 }: {
     decimals: number;
     rawBalance: bigint | undefined;
     balanceFormatted: string | undefined;
     symbol: string;
+    hardcapHuman?: string;
 }) =>
     z.object({
         amount: z
@@ -72,6 +76,16 @@ const createDepositFormSchema = ({
                 {
                     error: `Amount exceeds wallet balance (${balanceFormatted} ${symbol})`,
                 },
+            )
+            .refine(
+                (v) => {
+                    if (!hardcapHuman) return true;
+                    const dHardcap = safeDecimalParse({ value: hardcapHuman });
+                    const dAmount = safeDecimalParse({ value: v });
+                    if (!dHardcap || !dAmount) return true;
+                    return dAmount.lte(dHardcap);
+                },
+                { error: "Amount exceeds pool capacity" },
             ),
     });
 
@@ -195,6 +209,24 @@ const DepositDialog = ({
         symbol: pool?.tokenInSymbol,
     });
 
+    // Max deposit allowed by remaining pool capacity (fixed pools only)
+    const hardcapHuman = useMemo(() => {
+        if (isDynamic || !pool) return undefined;
+        try {
+            const rewardDec = pool.rewardTokenDecimals ?? 0;
+            const paymentDec = pool.tokenInDecimals ?? 0;
+            const num = safeDecimal(pool.rewardNumerator);
+            if (num.isZero()) return undefined;
+            const currentRewardHuman = safeDecimal(pool.currentRewardAmount).div(
+                new Decimal(10).pow(rewardDec),
+            );
+            const price = safeDecimal(pool.rewardDenominator).div(num);
+            return currentRewardHuman.mul(price).toFixed(paymentDec);
+        } catch {
+            return undefined;
+        }
+    }, [isDynamic, pool]);
+
     const depositFormSchema = useMemo(
         () =>
             createDepositFormSchema({
@@ -202,12 +234,14 @@ const DepositDialog = ({
                 rawBalance: balanceRaw,
                 balanceFormatted,
                 symbol: paymentTokenDisplay.symbol,
+                hardcapHuman,
             }),
         [
             balanceRaw,
             balanceFormatted,
             paymentTokenDisplay.symbol,
             pool?.tokenInDecimals,
+            hardcapHuman,
         ],
     );
 
@@ -216,7 +250,8 @@ const DepositDialog = ({
         setValue,
         reset,
         control,
-        formState: { errors, isSubmitting },
+        watch,
+        formState: { errors, isSubmitting, isValid },
     } = useForm<DepositFormValues>({
         defaultValues: { amount: "" },
         resolver: zodResolver(depositFormSchema),
@@ -229,6 +264,104 @@ const DepositDialog = ({
             pool?.tokenInDecimals ?? 0,
         )
         : "0";
+
+    const amountStr = watch("amount");
+
+    // Allocation / fee estimation rows — 3 cases depending on pool mode + visibility
+    const estRows = useMemo(() => {
+        if (!pool) return null;
+        const saleSymbol = saleTokenDisplay.symbol;
+        const rewardDec = pool.rewardTokenDecimals ?? 0;
+        const paymentDec = pool.tokenInDecimals ?? 0;
+        // feeRate = settlementFee / (DECIMAL_FEE_PERCENT * 100) — e.g. 150 / 10000 = 1.5%
+        const feeRate = pool.settlementFee
+            ? safeDecimal(pool.settlementFee).div(DECIMAL_FEE_PERCENT).div(100)
+            : new Decimal(0);
+        const amt = safeDecimalParse({ value: amountStr });
+        const hasAmount = !!(amt && amt.gt(0));
+        const addAmt = hasAmount ? amt! : new Decimal(0);
+
+        // Previous deposits by this user (in human payment units)
+        const yourDepositedHuman = safeDecimal(
+            poolDetail?.launchpad?.user?.depositedAmount ?? "0",
+        ).div(new Decimal(10).pow(paymentDec));
+
+        if (!isDynamic) {
+            // TH1: Fixed pool — fee is charged on reward (sale) tokens
+            try {
+                const num = safeDecimal(pool.rewardNumerator);
+                const denom = safeDecimal(pool.rewardDenominator);
+                const totalUserAmount = yourDepositedHuman.add(addAmt);
+                // gross allocation in sale tokens
+                const grossAllocation = !denom.isZero()
+                    ? totalUserAmount.mul(num).div(denom)
+                    : new Decimal(0);
+                const fee = grossAllocation.mul(feeRate); // fee in sale tokens
+                const netAllocation = grossAllocation.sub(fee);
+                return [
+                    {
+                        label: "Allocation",
+                        value: `${shortenNumber({ number: netAllocation.toNumber() })} ${saleSymbol}`,
+                    },
+                    {
+                        label: "Fee",
+                        value: `${shortenNumber({ number: fee.toNumber() })} ${saleSymbol}`,
+                    },
+                ];
+            } catch {
+                return null;
+            }
+        }
+
+        // Dynamic pool
+        if (!pool.rewardVisibility) {
+            // TH3: visibility OFF — values unknown
+            return [
+                { label: "Est. Allocation", value: "TBD" },
+                { label: "Est. Fee", value: "TBD" },
+            ];
+        }
+
+        // TH2: Dynamic, visibility ON — proportional estimate
+        // estAllocation = (yourDeposited + amount) / (totalRaised + amount) * rewardPool
+        try {
+            const totalRaisedHuman = safeDecimal(
+                poolDetail?.launchpad?.totalRaised ?? "0",
+            ).div(new Decimal(10).pow(paymentDec));
+            const rewardPoolHuman = safeDecimal(pool.currentRewardAmount).div(
+                new Decimal(10).pow(rewardDec),
+            );
+            const newTotal = totalRaisedHuman.add(addAmt);
+            const newYours = yourDepositedHuman.add(addAmt);
+            const grossAllocation = newTotal.isZero()
+                ? new Decimal(0)
+                : newYours.div(newTotal).mul(rewardPoolHuman);
+            const estFee = grossAllocation.mul(feeRate); // fee in sale tokens
+            const netAllocation = grossAllocation.sub(estFee);
+            return [
+                {
+                    label: "Est. Allocation",
+                    value: `${shortenNumber({ number: netAllocation.toNumber() })} ${saleSymbol}`,
+                },
+                {
+                    label: "Est. Fee",
+                    value: `${shortenNumber({ number: estFee.toNumber() })} ${saleSymbol}`,
+                },
+            ];
+        } catch {
+            return [
+                { label: "Est. Allocation", value: "—" },
+                { label: "Est. Fee", value: "—" },
+            ];
+        }
+    }, [
+        isDynamic,
+        pool,
+        poolDetail,
+        amountStr,
+        saleTokenDisplay.symbol,
+        paymentTokenDisplay.symbol,
+    ]);
 
     const handleSelectPercent = (percent: number) => {
         if (!balanceFormatted || pool?.tokenInDecimals == null) return;
@@ -377,7 +510,7 @@ const DepositDialog = ({
                                                     value={distributionMode}
                                                 />
                                             ) : (
-                                                <SummaryRow />
+                                                <div />
                                             )}
                                         </div>
                                     </div>
@@ -410,23 +543,52 @@ const DepositDialog = ({
                                                 )}
                                             </span>
                                         </div>
-                                        <Controller
-                                            name="amount"
-                                            control={control}
-                                            render={({ field }) => (
-                                                <NumericInput
-                                                    inputComponent={Input}
-                                                    variant="launchpad"
-                                                    placeholder="0.00"
-                                                    className="w-full border-2 border-foreground"
-                                                    value={field.value}
-                                                    onChange={field.onChange}
-                                                    ref={field.ref}
-                                                    name={field.name}
-                                                    onBlur={field.onBlur}
-                                                />
-                                            )}
-                                        />
+                                        <div className="flex gap-3">
+                                            <Controller
+                                                name="amount"
+                                                control={control}
+                                                render={({ field }) => (
+                                                    <NumericInput
+                                                        inputComponent={Input}
+                                                        variant="launchpad"
+                                                        placeholder="0.00"
+                                                        className="w-full border-2 border-foreground"
+                                                        value={field.value}
+                                                        onChange={field.onChange}
+                                                        ref={field.ref}
+                                                        name={field.name}
+                                                        onBlur={field.onBlur}
+                                                    />
+                                                )}
+                                            />
+                                            <div
+                                                className={cn(
+                                                    "flex items-center gap-2 rounded-xl border-2 border-foreground bg-mb-dark-popover px-2 sm:px-4",
+                                                )}
+                                            >
+                                                {!pool ? (
+                                                    <>
+                                                        <Skeleton className="size-5 rounded-full" />
+                                                        <Skeleton className="h-5 w-12" />
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <TokenImage
+                                                            src={paymentTokenDisplay.imageUri}
+                                                            alt={paymentTokenDisplay.symbol}
+                                                            classNames={{
+                                                                common: "size-5",
+                                                                img: "size-5",
+                                                                placeholder: "size-5",
+                                                            }}
+                                                        />
+                                                        <span className="font-inter text-sm font-medium text-nowrap sm:text-base">
+                                                            {paymentTokenDisplay.symbol}
+                                                        </span>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
                                         {errors.amount && (
                                             <p className="px-1 text-xs text-destructive md:text-sm">
                                                 {errors.amount.message}
@@ -451,6 +613,25 @@ const DepositDialog = ({
                                         </div>
                                     </div>
 
+                                    {/* Allocation / Fee estimate */}
+                                    {estRows && (
+                                        <div className="space-y-1">
+                                            {estRows.map((row) => (
+                                                <div
+                                                    key={row.label}
+                                                    className="flex items-center justify-between"
+                                                >
+                                                    <span className="font-inter text-sm font-medium text-mb-gray-b8 sm:text-base 2xl:text-xl">
+                                                        {row.label}:
+                                                    </span>
+                                                    <span className="font-inter text-sm font-bold text-nowrap sm:text-base 2xl:text-xl">
+                                                        {row.value}
+                                                    </span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     {/* Actions */}
                                     <div className="flex gap-3">
                                         <Button
@@ -467,6 +648,7 @@ const DepositDialog = ({
                                             variant="launchpad"
                                             hasHover
                                             isLoading={isSubmitting}
+                                            disabled={!isValid || isSubmitting}
                                             className="flex-1 font-orbitron font-semibold sm:text-xl xl:text-2xl"
                                         >
                                             Deposit
