@@ -203,23 +203,24 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
 
           {!isDynamic && pool?.status !== "canceled" && (
             <div className="space-y-1">
-              <div className="flex justify-between text-xs text-greyed">
+              <div className="flex justify-end text-xl">
                 <span>
-                  {fmt(poolDetail?.depositedAmount, paymentDec)} {paymentSymbol}
+                  {fmt(poolDetail?.launchpad?.totalRaised, paymentDec)} {paymentSymbol}
                 </span>
+                /
                 <span>
                   {raisedGoal} {paymentSymbol}
                 </span>
+                <p>
+                  &nbsp;({shortenNumber({ number: progressPct })}%)
+                </p>
               </div>
-              <div className="h-2 w-full overflow-hidden rounded-full bg-progress-bg">
+              <div className="h-4 w-full overflow-hidden rounded-full bg-progress-bg">
                 <div
-                  className="bg-mb-btn-stake h-full rounded-full transition-all"
+                  className="bg-active h-full rounded-full transition-all"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
-              <p className="text-right text-xs text-greyed">
-                {shortenNumber({ number: progressPct })}%
-              </p>
             </div>
           )}
 
