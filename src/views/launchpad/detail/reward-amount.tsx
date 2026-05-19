@@ -1,5 +1,10 @@
 import { useMemo } from "react";
-import { formatAmount, safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
+import Decimal from "decimal.js";
+import {
+    formatAmount,
+    safeDecimal,
+    shortenNumber,
+} from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -12,7 +17,9 @@ type Props = {
 
 const RewardAmount = ({ poolDetail }: Props) => {
     const pool = poolDetail?.pool;
-    const network = pool?.chainId ? chainIdToNetworkConfig(pool.chainId) : undefined;
+    const network = pool?.chainId
+        ? chainIdToNetworkConfig(pool.chainId)
+        : undefined;
 
     const saleTokenDisplay = resolvePoolTokenDisplay({
         network,
@@ -55,41 +62,64 @@ const RewardAmount = ({ poolDetail }: Props) => {
         return formatAmount(raised, decimals);
     }, [poolDetail?.launchpad?.totalRaised, pool?.tokenInDecimals]);
 
-    // target raised = total reward * (denominator / numerator)
+    // target raised = rewardAmount (human) * price  —  price = denom / num (human-unit ratio)
     const targetRaisedFormatted = useMemo(() => {
         if (isDynamic) return null;
         try {
             const rewardAmt = pool?.rewardAmount;
-            const decimals = pool?.tokenInDecimals;
-            if (!rewardAmt || decimals == null) return null;
+            const rewardDec = pool?.rewardTokenDecimals;
+            if (!rewardAmt || rewardDec == null) return null;
             const num = safeDecimal(pool?.rewardNumerator);
             const denom = safeDecimal(pool?.rewardDenominator);
             if (num.isZero()) return null;
-            const rewardDecimal = safeDecimal(rewardAmt);
-            const target = rewardDecimal.mul(denom).div(num);
-            return formatAmount(target.toFixed(0, 1), decimals);
+            const rewardHuman = safeDecimal(rewardAmt).div(
+                new Decimal(10).pow(rewardDec),
+            );
+            const goalHuman = rewardHuman.mul(denom).div(num);
+            return shortenNumber({ number: goalHuman.toNumber() });
         } catch {
             return null;
         }
-    }, [isDynamic, pool?.rewardAmount, pool?.rewardNumerator, pool?.rewardDenominator, pool?.tokenInDecimals]);
+    }, [
+        isDynamic,
+        pool?.rewardAmount,
+        pool?.rewardTokenDecimals,
+        pool?.rewardNumerator,
+        pool?.rewardDenominator,
+    ]);
 
     // progress percent 0-100
     const progressPercent = useMemo(() => {
         if (isDynamic || !targetRaisedFormatted) return null;
         try {
-            const raised = safeDecimal(poolDetail?.launchpad?.totalRaised ?? "0");
+            const rewardDec = pool?.rewardTokenDecimals ?? 0;
+            const paymentDec = pool?.tokenInDecimals ?? 0;
             const num = safeDecimal(pool?.rewardNumerator ?? "1");
             const denom = safeDecimal(pool?.rewardDenominator ?? "1");
             if (num.isZero() || denom.isZero()) return null;
-            const rewardAmt = safeDecimal(pool?.rewardAmount ?? "0");
-            const target = rewardAmt.mul(denom).div(num);
-            if (target.isZero()) return null;
-            const pct = raised.div(target).mul(100).toNumber();
+            const rewardHuman = safeDecimal(pool?.rewardAmount ?? "0").div(
+                new Decimal(10).pow(rewardDec),
+            );
+            const goalHuman = rewardHuman.mul(denom).div(num);
+            if (goalHuman.isZero()) return null;
+            const raisedHuman = safeDecimal(
+                poolDetail?.launchpad?.totalRaised ?? "0",
+            ).div(new Decimal(10).pow(paymentDec));
+            const pct = raisedHuman.div(goalHuman).mul(100).toNumber();
             return Math.min(pct, 100);
         } catch {
             return null;
         }
-    }, [isDynamic, poolDetail?.launchpad?.totalRaised, pool?.rewardNumerator, pool?.rewardDenominator, pool?.rewardAmount]);
+    }, [
+        isDynamic,
+        targetRaisedFormatted,
+        poolDetail?.launchpad?.totalRaised,
+        pool?.rewardNumerator,
+        pool?.rewardDenominator,
+        pool?.rewardAmount,
+        pool?.rewardTokenDecimals,
+        pool?.tokenInDecimals,
+    ]);
 
     return (
         <GlowContainer
@@ -101,8 +131,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                     Total Reward Pool
                 </p>
                 <p className="text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
-                    {totalRewardFormatted}{" "}
-                    <span>{saleTokenDisplay.symbol}</span>
+                    {totalRewardFormatted} <span>{saleTokenDisplay.symbol}</span>
                 </p>
             </div>
 
@@ -110,8 +139,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
                     <span className="text-mb-gray-b8">Total Raised:</span>
                     <span>
-                        {totalRaisedFormatted}{" "}
-                        <span>{paymentTokenDisplay.symbol}</span>
+                        {totalRaisedFormatted} <span>{paymentTokenDisplay.symbol}</span>
                     </span>
                 </p>
 
@@ -122,7 +150,13 @@ const RewardAmount = ({ poolDetail }: Props) => {
                             <span>
                                 {totalRaisedFormatted} / {targetRaisedFormatted}
                             </span>
-                            <span>&nbsp;({shortenNumber({ number: progressPercent })}%)</span>
+                            <span>
+                                &nbsp;(
+                                {shortenNumber({
+                                    number: parseFloat(progressPercent.toFixed(7)),
+                                })}
+                                %)
+                            </span>
                         </p>
                         <div className="h-4 w-full overflow-hidden rounded-full bg-launchpad-border/40">
                             <div

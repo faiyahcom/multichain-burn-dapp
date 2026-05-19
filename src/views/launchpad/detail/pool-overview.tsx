@@ -6,7 +6,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenImage from "@/components/common/token-image";
 import GlowContainer from "@/components/common/glow/container";
 import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
-import { safeDecimal } from "@/utils/helpers/numbers";
+import { safeDecimal, shortenNumber } from "@/utils/helpers/numbers";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -52,11 +52,17 @@ const PoolOverview = ({ poolDetail }: Props) => {
             const numerator = safeDecimal(pool?.rewardNumerator);
             if (numerator.isZero()) return "Dynamic";
             const price = denominator.div(numerator);
-            return `${price.toSignificantDigits(6).toString()} ${paymentTokenDisplay.symbol} / ${saleTokenDisplay.symbol}`;
+            return shortenNumber({ number: price.toNumber() });
         } catch {
             return "Dynamic";
         }
-    }, [isDynamic, pool?.rewardDenominator, pool?.rewardNumerator, paymentTokenDisplay.symbol, saleTokenDisplay.symbol]);
+    }, [
+        isDynamic,
+        pool?.rewardDenominator,
+        pool?.rewardNumerator,
+        paymentTokenDisplay.symbol,
+        saleTokenDisplay.symbol,
+    ]);
 
     const claimPolicyLabel = useMemo(() => {
         if (!pool?.claimPolicy) return "—";
@@ -66,10 +72,14 @@ const PoolOverview = ({ poolDetail }: Props) => {
     const distributionModeLabel = useMemo(() => {
         if (!pool?.distributionMode) return "—";
         switch (pool.distributionMode) {
-            case "none": return "None";
-            case "automatic": return "Automatic";
-            case "claim": return "Claim";
-            default: return pool.distributionMode;
+            case "none":
+                return "None";
+            case "automatic":
+                return "Automatic";
+            case "claim":
+                return "Claim";
+            default:
+                return pool.distributionMode;
         }
     }, [pool?.distributionMode]);
 
@@ -78,71 +88,81 @@ const PoolOverview = ({ poolDetail }: Props) => {
         return Number(pool.rewardDenominator) === 0 ? "Dynamic" : "Fixed";
     }, [pool?.rewardDenominator]);
 
-    const rows = useMemo(() => [
-        [
-            { label: "Pool Type", value: "Launchpad" },
-            { label: "Mode", value: modeLabel },
+    const rows = useMemo(
+        () => [
+            [
+                { label: "Pool Type", value: "Launchpad" },
+                { label: "Mode", value: modeLabel },
+            ],
+            [
+                { label: "Price", value: priceDisplay },
+                { label: "Claim Policy", value: claimPolicyLabel },
+            ],
+            [
+                {
+                    label: "Network",
+                    value: (
+                        <div className="flex h-fit items-center gap-2">
+                            <NetworkIcon
+                                networkId={network?.id || ("" as NetworkId)}
+                                className="size-4 md:size-5 2xl:size-6"
+                            />
+                            <span>{network?.label ?? pool?.chainId ?? "—"}</span>
+                        </div>
+                    ),
+                },
+                {
+                    label: "Sale Token",
+                    value: (
+                        <div className="flex h-fit items-center gap-2">
+                            <TokenImage
+                                src={saleTokenDisplay.imageUri}
+                                alt={saleTokenDisplay.name}
+                                classNames={{
+                                    common: "size-4 md:size-5 2xl:size-6",
+                                    img: "size-4 md:size-5 2xl:size-6",
+                                    placeholder: "size-4 md:size-5 2xl:size-6",
+                                }}
+                            />
+                            <span>{saleTokenDisplay.symbol}</span>
+                        </div>
+                    ),
+                },
+            ],
+            [
+                {
+                    label: "Payment Token",
+                    value: (
+                        <div className="flex h-fit items-center gap-2">
+                            <TokenImage
+                                src={paymentTokenDisplay.imageUri}
+                                alt={paymentTokenDisplay.name}
+                                classNames={{
+                                    common: "size-4 md:size-5 2xl:size-6",
+                                    img: "size-4 md:size-5 2xl:size-6",
+                                    placeholder: "size-4 md:size-5 2xl:size-6",
+                                }}
+                            />
+                            <span>{paymentTokenDisplay.symbol}</span>
+                        </div>
+                    ),
+                },
+                { label: "Distribution Mode", value: distributionModeLabel },
+            ],
         ],
         [
-            { label: "Price", value: priceDisplay },
-            { label: "Claim Policy", value: claimPolicyLabel },
+            modeLabel,
+            priceDisplay,
+            claimPolicyLabel,
+            distributionModeLabel,
+            pool?.timeStart,
+            pool?.timeEnd,
+            pool?.chainId,
+            network,
+            saleTokenDisplay,
+            paymentTokenDisplay,
         ],
-        [
-            {
-                label: "Network",
-                value: (
-                    <div className="flex h-fit items-center gap-2">
-                        <NetworkIcon
-                            networkId={network?.id || ("" as NetworkId)}
-                            className="size-4 md:size-5 2xl:size-6"
-                        />
-                        <span>{network?.label ?? pool?.chainId ?? "—"}</span>
-                    </div>
-                ),
-            },
-            {
-                label: "Sale Token",
-                value: (
-                    <div className="flex h-fit items-center gap-2">
-                        <TokenImage
-                            src={saleTokenDisplay.imageUri}
-                            alt={saleTokenDisplay.name}
-                            classNames={{
-                                common: "size-4 md:size-5 2xl:size-6",
-                                img: "size-4 md:size-5 2xl:size-6",
-                                placeholder: "size-4 md:size-5 2xl:size-6",
-                            }}
-                        />
-                        <span>{saleTokenDisplay.symbol}</span>
-                    </div>
-                ),
-            },
-        ],
-        [
-            {
-                label: "Payment Token",
-                value: (
-                    <div className="flex h-fit items-center gap-2">
-                        <TokenImage
-                            src={paymentTokenDisplay.imageUri}
-                            alt={paymentTokenDisplay.name}
-                            classNames={{
-                                common: "size-4 md:size-5 2xl:size-6",
-                                img: "size-4 md:size-5 2xl:size-6",
-                                placeholder: "size-4 md:size-5 2xl:size-6",
-                            }}
-                        />
-                        <span>{paymentTokenDisplay.symbol}</span>
-                    </div>
-                ),
-            },
-            { label: "Distribution Mode", value: distributionModeLabel },
-        ],
-    ], [
-        modeLabel, priceDisplay, claimPolicyLabel, distributionModeLabel,
-        pool?.timeStart, pool?.timeEnd, pool?.chainId,
-        network, saleTokenDisplay, paymentTokenDisplay,
-    ]);
+    );
 
     if (!poolDetail) return null;
 
@@ -176,7 +196,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                             <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                                 {row[0]?.label}:
                             </span>
-                            <span className="flex justify-end text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                            <span className="flex justify-end text-right text-sm md:text-base lg:text-xl 2xl:text-2xl">
                                 {row[0]?.value}
                             </span>
                         </div>
@@ -185,7 +205,7 @@ const PoolOverview = ({ poolDetail }: Props) => {
                                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-xl 2xl:text-2xl">
                                     {row[1]?.label}:
                                 </span>
-                                <span className="flex justify-end text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
+                                <span className="flex justify-end text-right text-sm font-medium md:text-base lg:text-xl 2xl:text-2xl">
                                     {row[1]?.value}
                                 </span>
                             </div>
