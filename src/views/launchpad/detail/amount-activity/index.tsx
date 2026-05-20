@@ -15,6 +15,7 @@ import { useDepositLaunchpadEvmFn } from "../hooks/useDepositLaunchpadEvmFn";
 import { useClaimLaunchpadEvmFn } from "../hooks/useClaimLaunchpadEvmFn";
 import { useDepositLaunchpadSolFn } from "../hooks/useDepositLaunchpadSolFn";
 import { useClaimLaunchpadSolFn } from "../hooks/useClaimLaunchpadSolFn";
+import TBDTooltip from "@/views/pool/glow/components/launchpad/tbd-tooltip";
 import DepositDialog from "./deposit-dialog";
 
 type Props = {
@@ -231,18 +232,44 @@ const AmountActivity = ({ poolDetail }: Props) => {
                         <StatRow
                             label="Allocation"
                             value={
-                                <span className="inline-flex items-center gap-1">
-                                    {userAllocationFormatted} {saleToken}
-                                </span>
+                                pool?.rewardVisibility === false ? (
+                                    <TBDTooltip
+                                        classNames={{
+                                            container: "gap-2 flex-row-reverse"
+                                        }}
+                                        tooltipProps={{
+                                            classNames: {
+                                                icon: "size-3.5 text-xs",
+                                            },
+                                        }}
+                                    />
+                                ) : (
+                                    <span className="inline-flex items-center gap-1">
+                                        {userAllocationFormatted} {saleToken}
+                                    </span>
+                                )
                             }
                         />
                     )}
                     <StatRow
                         label="Fee"
                         value={
-                            <span className="inline-flex items-center gap-1">
-                                {userFeeFormatted} {saleToken}
-                            </span>
+                            !isEndedOrCompleted && pool?.rewardVisibility === false ? (
+                                <TBDTooltip
+                                    classNames={{
+                                        container: "gap-2 flex-row-reverse"
+                                    }}
+                                    tooltipProps={{
+                                        classNames: {
+                                            icon: "size-3.5 text-xs",
+                                        },
+                                    }}
+                                />
+                            ) : (
+                                <span className="inline-flex items-center gap-1">
+                                    {userFeeFormatted} {saleToken}
+                                </span>
+                            )
                         }
                     />
                 </div>
