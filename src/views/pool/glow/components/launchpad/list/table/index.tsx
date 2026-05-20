@@ -21,10 +21,11 @@ import {
   getPoolStatusLabel,
   type PoolItemType,
 } from "@/types/admin/master-pool-management";
-import { sciToFormatted } from "@/utils/helpers/numbers";
+import { safeDecimal } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { useNavigate } from "@tanstack/react-router";
+import Decimal from "decimal.js";
 
 interface Props {
   data?: PoolItemType[];
@@ -104,19 +105,23 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
           const statusLabel = getPoolStatusLabel(pool.status);
           const href = `/launchpad/detail/${pool.address}`;
 
-          const rewardDenominator = Number(pool.rewardDenominator ?? "0") || 0;
-          const rewardNumerator = Number(pool.rewardNumerator ?? "0") || 0;
+          const rewardDenominator = safeDecimal(pool.rewardDenominator);
+          const rewardNumerator = safeDecimal(pool.rewardNumerator);
           // if both rewardDenominator and rewardNumerator are 0, then Dynamic
-          const isDynamic = rewardDenominator === 0 && rewardNumerator === 0;
+          const isDynamic =
+            rewardDenominator.isZero() && rewardNumerator.isZero();
 
-          const totalRaise = Number(
-            sciToFormatted(pool.totalRaise ?? "0", pool.tokenInDecimals),
+          const raisehuman = safeDecimal(pool.totalRaise).div(
+            new Decimal(10).pow(pool.tokenInDecimals),
           );
-          const rewardAmount = Number(
-            sciToFormatted(pool.rewardAmount ?? "0", pool.tokenOutDecimals),
+          const rewardHuman = safeDecimal(pool.rewardAmount).div(
+            new Decimal(10).pow(pool.tokenOutDecimals),
           );
-          const percentRaised =
-            rewardAmount !== 0 ? (totalRaise / rewardAmount) * 100 : null;
+          const goalHuman = rewardHuman
+            .mul(rewardDenominator)
+            .div(rewardNumerator);
+
+          const percentRaised = raisehuman.div(goalHuman).mul(100).toNumber();
 
           return (
             <TableRow
@@ -201,7 +206,7 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                 <span>
                   <MetricNumber
                     classNames={{ container: "inline-flex w-max" }}
-                    number={totalRaise}
+                    number={raisehuman.isFinite() ? raisehuman.toNumber() : 0}
                     isShorten
                   />
                   {!isDynamic && (
@@ -209,10 +214,10 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
                       /
                       <MetricNumber
                         classNames={{ container: "inline-flex w-max" }}
-                        number={rewardAmount}
+                        number={goalHuman.isFinite() ? goalHuman.toNumber() : 0}
                         isShorten
                       />{" "}
-                      {percentRaised !== null && (
+                      {!isNaN(percentRaised) && isFinite(percentRaised) && (
                         <>
                           (
                           <MetricNumber
