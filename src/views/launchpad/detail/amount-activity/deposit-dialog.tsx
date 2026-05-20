@@ -317,36 +317,18 @@ const DepositDialog = ({
         // Dynamic pool
         if (!pool.rewardVisibility) {
             // TH3: visibility OFF — values unknown
+            const hasDeposit = yourDepositedHuman.gt(0) || addAmt.gt(0);
+            const tbd = hasDeposit ? (
+                <TBDTooltip
+                    classNames={{ container: "gap-2" }}
+                    tooltipProps={{ classNames: { icon: "size-3.5 text-xs" } }}
+                />
+            ) : (
+                <span>0 {saleSymbol}</span>
+            );
             return [
-                {
-                    label: "Est. Allocation",
-                    value: (
-                        <TBDTooltip
-                            classNames={{
-                                container: "gap-2"
-                            }}
-                            tooltipProps={{
-                                classNames: {
-                                    icon: "size-3.5 text-xs",
-                                },
-                            }}
-                        />
-                    ),
-                },
-                {
-                    label: "Est. Fee", value: (
-                        <TBDTooltip
-                            classNames={{
-                                container: "gap-2"
-                            }}
-                            tooltipProps={{
-                                classNames: {
-                                    icon: "size-3.5 text-xs",
-                                },
-                            }}
-                        />
-                    ),
-                },
+                { label: "Est. Allocation", value: tbd },
+                { label: "Est. Fee", value: tbd },
             ];
         }
 

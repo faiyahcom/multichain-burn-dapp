@@ -75,6 +75,8 @@ const AmountActivity = ({ poolDetail }: Props) => {
         : "0";
 
     const isEndedOrCompleted = status === "ended" || status === "completed";
+    const hasDeposited =
+        !!launchpadUser?.depositedAmount && launchpadUser.depositedAmount !== "0";
 
     const paymentToken = (
         <TokenDisplay
@@ -233,10 +235,10 @@ const AmountActivity = ({ poolDetail }: Props) => {
                         <StatRow
                             label="Allocation"
                             value={
-                                pool?.rewardVisibility === false ? (
+                                pool?.rewardVisibility === false && hasDeposited ? (
                                     <TBDTooltip
                                         classNames={{
-                                            container: "gap-2 flex-row-reverse"
+                                            container: "gap-2"
                                         }}
                                         tooltipProps={{
                                             classNames: {
@@ -255,10 +257,10 @@ const AmountActivity = ({ poolDetail }: Props) => {
                     <StatRow
                         label="Fee"
                         value={
-                            !isEndedOrCompleted && pool?.rewardVisibility === false ? (
+                            !isEndedOrCompleted && pool?.rewardVisibility === false && hasDeposited ? (
                                 <TBDTooltip
                                     classNames={{
-                                        container: "gap-2 flex-row-reverse"
+                                        container: "gap-2"
                                     }}
                                     tooltipProps={{
                                         classNames: {
