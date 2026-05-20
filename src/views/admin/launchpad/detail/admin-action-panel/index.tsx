@@ -12,8 +12,9 @@ import type {
   TokenMode,
 } from "@/views/admin/stake/detail/amount-activities/hooks/useBatchTransferSolFn";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
-import { chainIdToNetworkConfig } from "@/config/networks";
+import { chainIdToNetworkConfig, SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { formatAmount } from "@/utils/helpers/numbers";
+import { useOnChainVaultBalance } from "@/views/admin/burn/detail/amount-activities/hooks/useOnChainVaultBalance";
 import { useQueryClient } from "@tanstack/react-query";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 
@@ -31,7 +32,6 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     handleSubmitPool,
     handleEdit,
     handleEmergencyClose,
-    isSolana,
   } = useAdminAction(poolDetail);
 
   const { batchTransferEvm } = useBatchTransferEvmFn();
@@ -76,15 +76,30 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     imageUri: poolDetail?.tokenOut?.imageUri,
   });
 
-  const formattedRaisedAmount =
+  const isSolanaPool = pool?.chainId === SOLANA_BACKEND_CHAIN_ID;
+
+  const { rewardBalance: onChainReward, depositBalance: onChainDeposit, refetch: refetchVaultBalance } = useOnChainVaultBalance({
+    poolAddress: pool?.address,
+    chainId: pool?.chainId,
+    rewardToken: pool?.rewardToken,
+    tokenIn: pool?.tokenIn,
+    rewardTokenDecimals: pool?.rewardTokenDecimals,
+    tokenInDecimals: pool?.tokenInDecimals,
+    assetTypeReward: pool?.assetTypeReward,
+    assetTypeIn: pool?.assetTypeIn,
+  });
+
+  const formattedRaisedAmountBackend =
     poolDetail?.depositedAmount != null && pool?.tokenInDecimals != null
       ? formatAmount(poolDetail.depositedAmount, pool.tokenInDecimals)
       : undefined;
+  const formattedRaisedAmount = onChainDeposit !== undefined ? onChainDeposit : formattedRaisedAmountBackend;
 
-  const formattedRemainingSale =
+  const formattedRemainingSaleBackend =
     pool?.currentRewardAmount != null && pool?.rewardTokenDecimals != null
       ? formatAmount(pool.currentRewardAmount, pool.rewardTokenDecimals)
       : undefined;
+  const formattedRemainingSale = onChainReward !== undefined ? onChainReward : formattedRemainingSaleBackend;
 
   const invalidatePoolQueries = (poolAddress: string) => {
     queryClient.invalidateQueries({
@@ -98,7 +113,7 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     mode: TokenMode,
   ) => {
     if (!pool?.address || !poolDetail) return;
-    if (isSolana)
+    if (isSolanaPool)
       throw new Error(
         "Token transfer is not yet available for Solana launchpad pools.",
       );
@@ -107,8 +122,10 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
       poolDetail,
       mode,
       recipients,
+      onSuccess: () => refetchVaultBalance(),
     });
     invalidatePoolQueries(pool.address);
+    refetchVaultBalance();
   };
 
   const renderActions = () => {
