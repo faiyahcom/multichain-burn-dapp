@@ -256,8 +256,8 @@ const AmountActivity = ({ poolDetail }: Props) => {
 
                 {/* Completed success message */}
                 {isCompleted && (
-                    <p className="flex items-center gap-1.5 text-xs text-mb-btn-launchpad md:text-sm lg:text-base">
-                        <span>✓</span>
+                    <p className="flex items-center text-mb-gray-b8 gap-1.5 text-xs md:text-sm lg:text-base">
+                        <span className="text-success">✓</span>
                         <span>All allocations have been distributed successfully.</span>
                     </p>
                 )}
