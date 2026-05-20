@@ -8,6 +8,161 @@
   },
   "instructions": [
     {
+      "name": "cancel_pool",
+      "discriminator": [
+        211,
+        11,
+        27,
+        100,
+        252,
+        115,
+        57,
+        77
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin validation."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_vault",
+          "docs": [
+            "Pool's reward vault. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "docs": [
+            "Sale token mint. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "admin_reward_ata",
+          "docs": [
+            "Admin's ATA to receive refunded tokens. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_token_program",
+          "optional": true
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "claim_native",
       "discriminator": [
         169,
@@ -355,10 +510,6 @@
           }
         },
         {
-          "name": "treasury",
-          "writable": true
-        },
-        {
           "name": "reward_mint"
         },
         {
@@ -427,63 +578,6 @@
                 "path": "pool"
               }
             ]
-          }
-        },
-        {
-          "name": "admin_reward_ata",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "account",
-                "path": "admin"
-              },
-              {
-                "kind": "account",
-                "path": "reward_token_program"
-              },
-              {
-                "kind": "account",
-                "path": "reward_mint"
-              }
-            ],
-            "program": {
-              "kind": "const",
-              "value": [
-                140,
-                151,
-                37,
-                143,
-                78,
-                36,
-                137,
-                241,
-                187,
-                61,
-                16,
-                41,
-                20,
-                142,
-                13,
-                131,
-                11,
-                90,
-                19,
-                153,
-                218,
-                255,
-                16,
-                132,
-                4,
-                142,
-                123,
-                216,
-                219,
-                233,
-                248,
-                89
-              ]
-            }
           }
         },
         {
@@ -646,6 +740,10 @@
         },
         {
           "name": "owner_account",
+          "docs": [
+            "DEPRECATED: This field is unused in the instruction handler but kept",
+            "for IDL backward-compatibility. Do not reference in new code."
+          ],
           "writable": true,
           "optional": true
         },
@@ -1183,6 +1281,63 @@
       "args": []
     },
     {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "launchpad_config",
+          "docs": [
+            "Launchpad-local config PDA holding the pool counter."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
       "name": "retreive_reward",
       "discriminator": [
         170,
@@ -1590,6 +1745,154 @@
           "type": "u64"
         }
       ]
+    },
+    {
+      "name": "submit_pool",
+      "discriminator": [
+        138,
+        6,
+        64,
+        197,
+        135,
+        17,
+        242,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "burn_factory"
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_vault",
+          "docs": [
+            "Pool's reward vault — receives the deposited sale tokens."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "docs": [
+            "Sale token mint. Required when asset_reward_type != 2 (native SOL)."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "admin_reward_ata",
+          "docs": [
+            "Admin's ATA holding the sale tokens to deposit. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_token_program",
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
     },
     {
       "name": "update_pool",
@@ -2096,6 +2399,10 @@
           {
             "name": "is_instant",
             "type": "bool"
+          },
+          {
+            "name": "reward_visibility",
+            "type": "bool"
           }
         ]
       }
@@ -2597,16 +2904,13 @@
             "name": "Draft"
           },
           {
-            "name": "Pending"
-          },
-          {
-            "name": "Approved"
-          },
-          {
-            "name": "Holding"
+            "name": "Upcoming"
           },
           {
             "name": "Ongoing"
+          },
+          {
+            "name": "Holding"
           },
           {
             "name": "Ended"
@@ -2643,6 +2947,30 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "is_auto",
+            "type": "bool"
+          },
+          {
+            "name": "is_instant",
+            "type": "bool"
+          },
+          {
+            "name": "reward_cap",
+            "type": "u64"
+          },
+          {
+            "name": "ratio_bps",
+            "type": "u64"
+          },
+          {
+            "name": "ratio_denominator",
+            "type": "u64"
+          },
+          {
+            "name": "reward_visibility",
+            "type": "bool"
           }
         ]
       }

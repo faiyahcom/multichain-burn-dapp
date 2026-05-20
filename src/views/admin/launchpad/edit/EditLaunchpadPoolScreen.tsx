@@ -14,7 +14,9 @@ import { poolQueryKeys } from "@/services/queries/queryKey";
 import { useNavigate } from "@tanstack/react-router";
 import AnimateIconButton from "@/components/common/animate-icon-button";
 import { BURN_POOL_STATUS } from "@/types/admin/whitelist-token";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useEditLaunchpadPoolEvmFn } from "./useEditLaunchpadPoolEvmFn";
+import { useEditLaunchpadPoolSolFn } from "./useEditLaunchpadPoolSolFn";
 import PoolOverview from "../detail/pool-overview";
 import type { BurnPoolStatus } from "@/types/pool";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
@@ -45,7 +47,11 @@ export default function EditLaunchpadPoolScreen({
   const inFlightRef = useRef(false);
   const submitAttemptedRef = useRef(false);
 
+  const { caipAddress } = useAppKitAccount();
+  const isSolana = caipAddress?.split(":")[0] === "solana";
+
   const { editPool: editPoolEvm } = useEditLaunchpadPoolEvmFn();
+  const { editPool: editPoolSol } = useEditLaunchpadPoolSolFn();
 
   const { data: poolDetail, isLoading } = useQuery({
     queryKey: poolQueryKeys.detail(poolAddress),
@@ -115,20 +121,30 @@ export default function EditLaunchpadPoolScreen({
   const onSubmit = async (values: EditLaunchpadFormValues) => {
     if (!pool || inFlightRef.current) return;
     inFlightRef.current = true;
+    const editParams = {
+      poolAddress: pool.address,
+      name: values.poolName.trim(),
+      startTime: Math.floor(values.startTime.getTime() / 1000),
+      endTime: Math.floor(values.endTime.getTime() / 1000),
+      mode: (poolIsFixed ? "fixed" : "dynamic") as "fixed" | "dynamic",
+      price: values.price,
+      claimPolicy: values.claimPolicy,
+      rewardVisibility: values.rewardVisibility,
+      budget: values.budget,
+      saleTokenDecimals: pool.rewardTokenDecimals ?? 18,
+    };
     try {
-      await editPoolEvm({
-        poolAddress: pool.address,
-        name: values.poolName.trim(),
-        startTime: Math.floor(values.startTime.getTime() / 1000),
-        endTime: Math.floor(values.endTime.getTime() / 1000),
-        mode: poolIsFixed ? "fixed" : "dynamic",
-        price: values.price,
-        claimPolicy: values.claimPolicy,
-        rewardVisibility: values.rewardVisibility,
-        budget: values.budget,
-        saleToken: pool.rewardToken ?? "",
-        saleTokenDecimals: pool.rewardTokenDecimals ?? 18,
-      });
+      if (isSolana) {
+        await editPoolSol({
+          ...editParams,
+          targetAddress: pool.targetAddress ?? undefined,
+        });
+      } else {
+        await editPoolEvm({
+          ...editParams,
+          saleToken: pool.rewardToken ?? "",
+        });
+      }
 
       queryClient.invalidateQueries({
         queryKey: poolQueryKeys.detail(pool.address),

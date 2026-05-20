@@ -11,6 +11,9 @@ import { useSubmitPoolEvmFn } from "./hooks/useSubmitPoolEvmFn";
 import { useEmergencyCloseEvmFn } from "./hooks/useEmergencyCloseEvmFn";
 import { useWithdrawEvmFn } from "./hooks/useWithdrawEvmFn";
 import { useEmergencyCloseSolFn } from "./hooks/useEmergencyCloseSolFn";
+import { useSubmitPoolSolFn } from "./hooks/useSubmitPoolSolFn";
+import { useCancelPoolSolFn } from "./hooks/useCancelPoolSolFn";
+import { useWithdrawSolFn } from "./hooks/useWithdrawSolFn";
 
 export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
     const { caipAddress } = useAppKitAccount();
@@ -28,6 +31,9 @@ export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
 
     // Sol hooks
     const { emergencyCloseSol } = useEmergencyCloseSolFn();
+    const { submitPoolSol } = useSubmitPoolSolFn();
+    const { cancelPoolSol } = useCancelPoolSolFn();
+    const { withdrawRaisedSol, withdrawRemainingSaleSol } = useWithdrawSolFn();
 
     const pool = poolDetail?.pool;
 
@@ -41,33 +47,31 @@ export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
     // ── Draft actions ─────────────────────────────────────────────────────────
 
     const handleCancelPool = async () => {
-        if (!pool?.address) return;
+        if (!pool?.address || !poolDetail) return;
         if (isSolana) {
-            throw new Error(
-                "Cancel pool is not available for Solana launchpad pools.",
-            );
+            await cancelPoolSol({ poolAddress: pool.address, poolDetail });
+        } else {
+            await cancelPoolEvm({ poolAddress: pool.address, poolDetail });
         }
-        await cancelPoolEvm({ poolAddress: pool.address, poolDetail });
         invalidatePool(pool.address);
     };
 
     const handleSubmitPool = async () => {
         if (!pool?.address || !poolDetail) return;
-        if (isSolana) {
-            throw new Error(
-                "Submit pool is not available for Solana launchpad pools.",
-            );
-        }
         if (
             pool.timeStart &&
-            new Date(Number(pool.timeStart) / 1000) <= new Date()
+            new Date(Number(pool.timeStart)).getTime() <= Date.now() / 1000
         ) {
             toast.error("Cannot submit pool", {
                 description: "Start time must be greater than current time",
             });
             return;
         }
-        await submitPoolEvm({ poolAddress: pool.address, poolDetail });
+        if (isSolana) {
+            await submitPoolSol({ poolAddress: pool.address, poolDetail });
+        } else {
+            await submitPoolEvm({ poolAddress: pool.address, poolDetail });
+        }
         invalidatePool(pool.address);
     };
 
@@ -97,36 +101,44 @@ export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
     // ── Withdraw (ended / ongoing) ────────────────────────────────────────────
 
     const handleWithdrawRaised = async (recipientAddress: string) => {
-        if (!pool?.address) return;
-        if (isSolana) {
-            throw new Error(
-                "Withdraw raised is not yet available for Solana launchpad pools.",
-            );
-        }
+        if (!pool?.address || !poolDetail) return;
         // depositedAmount is in raw units (string from backend)
-        const amount = BigInt(poolDetail?.depositedAmount ?? "0");
-        await withdrawRaisedEvm({
-            poolAddress: pool.address,
-            recipientAddress,
-            amount,
-        });
+        const amount = BigInt(poolDetail.depositedAmount ?? "0");
+        if (isSolana) {
+            await withdrawRaisedSol({
+                poolAddress: pool.address,
+                poolDetail,
+                recipientAddress,
+                amount,
+            });
+        } else {
+            await withdrawRaisedEvm({
+                poolAddress: pool.address,
+                recipientAddress,
+                amount,
+            });
+        }
         invalidatePool(pool.address);
     };
 
     const handleWithdrawRemainingSale = async (recipientAddress: string) => {
-        if (!pool?.address) return;
-        if (isSolana) {
-            throw new Error(
-                "Withdraw remaining sale is not yet available for Solana launchpad pools.",
-            );
-        }
+        if (!pool?.address || !poolDetail) return;
         // currentRewardAmount is in raw units (string from backend)
         const amount = BigInt(pool.currentRewardAmount ?? "0");
-        await withdrawRemainingSaleEvm({
-            poolAddress: pool.address,
-            recipientAddress,
-            amount,
-        });
+        if (isSolana) {
+            await withdrawRemainingSaleSol({
+                poolAddress: pool.address,
+                poolDetail,
+                recipientAddress,
+                amount,
+            });
+        } else {
+            await withdrawRemainingSaleEvm({
+                poolAddress: pool.address,
+                recipientAddress,
+                amount,
+            });
+        }
         invalidatePool(pool.address);
     };
 

@@ -185,6 +185,7 @@ export const useCreateLaunchpadPoolSolFn = () => {
                         targetAddress: walletPublicKey,
                         isAuto,
                         isInstant,
+                        rewardVisibility: params.rewardVisibility,
                     })
                     .accounts({
                         burnFactory: burnFactoryPDA,
