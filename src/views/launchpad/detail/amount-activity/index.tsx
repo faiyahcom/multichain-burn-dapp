@@ -64,15 +64,13 @@ const AmountActivity = ({ poolDetail }: Props) => {
         ? formatAmount(launchpadUser.fee, pool?.rewardTokenDecimals ?? 0)
         : "0";
 
-    const userClaimableFormatted = userAllocationFormatted;
+    const userClaimableFormatted = launchpadUser?.claimableAmount
+        ? formatAmount(launchpadUser.claimableAmount, pool?.rewardTokenDecimals ?? 0)
+        : "0";
 
-    const userClaimedFormatted =
-        poolDetail?.userAmount?.claimed || "0"
-            ? formatAmount(
-                poolDetail?.userAmount?.claimed || "0",
-                pool?.rewardTokenDecimals ?? 0,
-            )
-            : "0";
+    const userClaimedFormatted = launchpadUser?.claimed
+        ? formatAmount(launchpadUser.claimed, pool?.rewardTokenDecimals ?? 0)
+        : "0";
 
     const isEndedOrCompleted = status === "ended" || status === "completed";
 
@@ -108,7 +106,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
 
     const claimEnabled =
         showClaimButton &&
-        poolDetail?.userAmount?.canClaim === true &&
+        launchpadUser?.canClaim === true &&
         (status === "ended" || status === "completed");
 
     // Deposit button always rendered, enabled only when on_going

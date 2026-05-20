@@ -142,6 +142,9 @@ export interface PoolDetailResponse {
       depositedAmount: string;
       allocation: string;
       fee: string;
+      claimed: string;
+      canClaim: boolean;
+      claimableAmount: string;
     };
   };
   returningAmountOnCanceling?: {
