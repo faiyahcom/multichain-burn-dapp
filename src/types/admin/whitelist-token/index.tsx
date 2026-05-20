@@ -28,12 +28,12 @@ export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
     letter: "O",
   },
   canceled: {
-    label: "Cancel",
+    label: "Canceled",
     color: "#f698ff",
     letter: "C",
   },
   closed: {
-    label: "Close",
+    label: "Closed",
     color: "#8eeaff",
     letter: "C",
   },
@@ -43,7 +43,7 @@ export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
     letter: "D",
   },
   ended: {
-    label: "End",
+    label: "Ended",
     color: "#A6B7FF",
     letter: "E",
   },
@@ -71,11 +71,16 @@ export const BURN_POOL_STATUS: Record<BurnPoolStatus, any> = {
 
 export const STAKE_POOL_STATUS: Record<StakePoolStatus, any> = {
   ...BURN_POOL_STATUS,
+  full: {
+    label: "Full",
+    color: "#FF8E97",
+    letter: "F",
+  },
 };
 
 export const LAUNCHPAD_POOL_STATUS: Record<LaunchpadPoolStatus, { label: string; color: string; letter: string }> = {
   draft: { label: "Draft", color: "#C2C2C2", letter: "D" },
-  canceled: { label: "Cancel", color: "#f698ff", letter: "C" },
+  canceled: { label: "Canceled", color: "#f698ff", letter: "C" },
   upcoming: { label: "Upcoming", color: "#FFC198", letter: "U" },
   on_going: { label: "Live", color: "#7af4cb", letter: "O" },
   ended: { label: "Ended", color: "#A6B7FF", letter: "E" },

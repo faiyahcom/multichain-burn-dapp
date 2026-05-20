@@ -54,9 +54,9 @@ export const swapPoolStatuses = [
 export type SwapPoolStatus = (typeof swapPoolStatuses)[number];
 export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
   on_going: "Live",
-  ended: "End",
-  canceled: "Cancel",
-  closed: "Close",
+  ended: "Ended",
+  canceled: "Canceled",
+  closed: "Closed",
 };
 export const swapPoolStatusColors: Record<SwapPoolStatus, string> = {
   on_going: "#7AF4CB",
@@ -107,19 +107,19 @@ export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
 
 export const launchpadPoolStatuses = [
   "upcoming",
-  "complete",
+  "completed",
   ...swapPoolStatuses,
 ] as const;
 export type LaunchpadPoolStatus = (typeof launchpadPoolStatuses)[number];
 export const launchpadPoolStatusLabels: Record<LaunchpadPoolStatus, string> = {
   ...swapPoolStatusLabels,
   upcoming: "Upcoming",
-  complete: "Completed",
+  completed: "Completed",
 };
 export const launchpadPoolStatusColors: Record<LaunchpadPoolStatus, string> = {
   ...swapPoolStatusColors,
   upcoming: "#FFE798",
-  complete: "#FFB08E",
+  completed: "#FFB08E",
 };
 
 export const getPoolStatusColor = (status: AllPoolStatus) => {
@@ -138,7 +138,7 @@ export type AllPoolStatus =
 
 // draft is not included in this list because when it is used is situational
 export const allPoolStatuses: AllPoolStatus[] = Array.from(
-  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses]),
+  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses, ...launchpadPoolStatuses]),
 );
 export const allPoolStatusLabels: Record<AllPoolStatus, string> = {
   ...burnPoolStatusLabels,
@@ -283,7 +283,8 @@ export const userViewLaunchpadPoolStatuses = [
   "on_going",
   "upcoming",
   "ended",
-  "complete",
+  "completed",
+  "closed",
 ] as const;
 export const userHiddenLaunchpadPoolStatuses = [
   ...launchpadPoolStatuses.filter(
@@ -307,5 +308,5 @@ export const userJoinedLaunchpadPoolStatuses: LaunchpadPoolStatus[] = [
   "closed",
   "upcoming",
   "ended",
-  "complete",
+  "completed",
 ] as const;
