@@ -28,12 +28,12 @@ export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
     letter: "O",
   },
   canceled: {
-    label: "Cancel",
+    label: "Canceled",
     color: "#f698ff",
     letter: "C",
   },
   closed: {
-    label: "Close",
+    label: "Closed",
     color: "#8eeaff",
     letter: "C",
   },
@@ -43,7 +43,7 @@ export const SWAP_POOL_STATUS: Record<SwapPoolStatus, any> = {
     letter: "D",
   },
   ended: {
-    label: "End",
+    label: "Ended",
     color: "#A6B7FF",
     letter: "E",
   },
@@ -85,7 +85,7 @@ export const LAUNCHPAD_POOL_STATUS: Record<LaunchpadPoolStatus, any> = {
     letter: "D",
   },
   canceled: {
-    label: "Cancel",
+    label: "Canceled",
     color: "#f698ff",
     letter: "C",
   },
