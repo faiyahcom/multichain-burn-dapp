@@ -36,6 +36,7 @@ import z from "zod";
 import NetworkDisplay from "@/components/common/network-display";
 import Decimal from "decimal.js";
 import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
+import TBDTooltip from "@/views/pool/glow/components/launchpad/tbd-tooltip";
 
 const createDepositFormSchema = ({
     decimals,
@@ -317,8 +318,35 @@ const DepositDialog = ({
         if (!pool.rewardVisibility) {
             // TH3: visibility OFF — values unknown
             return [
-                { label: "Est. Allocation", value: "TBD" },
-                { label: "Est. Fee", value: "TBD" },
+                {
+                    label: "Est. Allocation",
+                    value: (
+                        <TBDTooltip
+                            classNames={{
+                                container: "gap-2"
+                            }}
+                            tooltipProps={{
+                                classNames: {
+                                    icon: "size-3.5 text-xs",
+                                },
+                            }}
+                        />
+                    ),
+                },
+                {
+                    label: "Est. Fee", value: (
+                        <TBDTooltip
+                            classNames={{
+                                container: "gap-2"
+                            }}
+                            tooltipProps={{
+                                classNames: {
+                                    icon: "size-3.5 text-xs",
+                                },
+                            }}
+                        />
+                    ),
+                },
             ];
         }
 

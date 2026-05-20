@@ -12,7 +12,7 @@ import {
   type ContainerVariant,
 } from "./container";
 
-interface Props {
+export interface Props {
   content?: string;
   side?: React.ComponentProps<typeof TooltipContent>["side"];
   sideOffset?: React.ComponentProps<typeof TooltipContent>["sideOffset"];
