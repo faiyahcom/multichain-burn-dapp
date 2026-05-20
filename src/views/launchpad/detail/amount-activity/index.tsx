@@ -17,6 +17,7 @@ import { useDepositLaunchpadSolFn } from "../hooks/useDepositLaunchpadSolFn";
 import { useClaimLaunchpadSolFn } from "../hooks/useClaimLaunchpadSolFn";
 import TBDTooltip from "@/views/pool/glow/components/launchpad/tbd-tooltip";
 import DepositDialog from "./deposit-dialog";
+import { IconTick } from "@/assets/react";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -284,7 +285,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
                 {/* Completed success message */}
                 {isCompleted && (
                     <p className="flex items-center text-mb-gray-b8 gap-1.5 text-xs md:text-sm lg:text-base">
-                        <span className="text-success">✓</span>
+                        <IconTick className="inline size-3 md:size-3.5" />
                         <span>All allocations have been distributed successfully.</span>
                     </p>
                 )}

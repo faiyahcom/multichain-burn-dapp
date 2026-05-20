@@ -65,8 +65,8 @@ const RewardAmount = ({ poolDetail }: Props) => {
         return formatAmount(raised, decimals);
     }, [poolDetail?.launchpad?.totalRaised, pool?.tokenInDecimals]);
 
-    // target raised = rewardAmount (human) * price  —  price = denom / num (human-unit ratio)
-    const targetRaisedFormatted = useMemo(() => {
+    // goal raised in payment tokens (human units) — shared by display + progress
+    const goalHuman = useMemo(() => {
         if (isDynamic) return null;
         try {
             const rewardAmt = pool?.rewardAmount;
@@ -78,8 +78,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
             const rewardHuman = safeDecimal(rewardAmt).div(
                 new Decimal(10).pow(rewardDec),
             );
-            const goalHuman = rewardHuman.mul(denom).div(num);
-            return shortenNumber({ number: goalHuman.toNumber() });
+            return rewardHuman.mul(denom).div(num);
         } catch {
             return null;
         }
@@ -91,20 +90,17 @@ const RewardAmount = ({ poolDetail }: Props) => {
         pool?.rewardDenominator,
     ]);
 
+    // target raised = formatted goalHuman
+    const targetRaisedFormatted = useMemo(() => {
+        if (!goalHuman) return null;
+        return shortenNumber({ number: goalHuman.toNumber() });
+    }, [goalHuman]);
+
     // progress percent 0-100
     const progressPercent = useMemo(() => {
-        if (isDynamic || !targetRaisedFormatted) return null;
+        if (!goalHuman || goalHuman.isZero()) return null;
         try {
-            const rewardDec = pool?.rewardTokenDecimals ?? 0;
             const paymentDec = pool?.tokenInDecimals ?? 0;
-            const num = safeDecimal(pool?.rewardNumerator ?? "1");
-            const denom = safeDecimal(pool?.rewardDenominator ?? "1");
-            if (num.isZero() || denom.isZero()) return null;
-            const rewardHuman = safeDecimal(pool?.rewardAmount ?? "0").div(
-                new Decimal(10).pow(rewardDec),
-            );
-            const goalHuman = rewardHuman.mul(denom).div(num);
-            if (goalHuman.isZero()) return null;
             const raisedHuman = safeDecimal(
                 poolDetail?.launchpad?.totalRaised ?? "0",
             ).div(new Decimal(10).pow(paymentDec));
@@ -113,16 +109,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
         } catch {
             return null;
         }
-    }, [
-        isDynamic,
-        targetRaisedFormatted,
-        poolDetail?.launchpad?.totalRaised,
-        pool?.rewardNumerator,
-        pool?.rewardDenominator,
-        pool?.rewardAmount,
-        pool?.rewardTokenDecimals,
-        pool?.tokenInDecimals,
-    ]);
+    }, [goalHuman, poolDetail?.launchpad?.totalRaised, pool?.tokenInDecimals]);
 
     return (
         <GlowContainer
@@ -162,7 +149,11 @@ const RewardAmount = ({ poolDetail }: Props) => {
                             <span>
                                 &nbsp;(
                                 {shortenNumber({
-                                    number: parseFloat(progressPercent.toFixed(7)),
+                                    number:
+                                        // handle case almost full because limit 6 decimal after comma input
+                                        parseFloat(progressPercent.toFixed(7)) === 99.9999999
+                                            ? 100
+                                            : parseFloat(progressPercent.toFixed(7)),
                                 })}
                                 %)
                             </span>
