@@ -10,8 +10,11 @@ import { formatAmount } from "@/utils/helpers/numbers";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { StatRow } from "@/views/burn-pool/detail/amount-activities/components";
 import TokenDisplay from "@/components/common/token-display";
+import { useAppKitAccount } from "@reown/appkit/react";
 import { useDepositLaunchpadEvmFn } from "../hooks/useDepositLaunchpadEvmFn";
 import { useClaimLaunchpadEvmFn } from "../hooks/useClaimLaunchpadEvmFn";
+import { useDepositLaunchpadSolFn } from "../hooks/useDepositLaunchpadSolFn";
+import { useClaimLaunchpadSolFn } from "../hooks/useClaimLaunchpadSolFn";
 import DepositDialog from "./deposit-dialog";
 
 type Props = {
@@ -132,8 +135,13 @@ const AmountActivity = ({ poolDetail }: Props) => {
     const [depositDialogOpen, setDepositDialogOpen] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
 
+    const { caipAddress } = useAppKitAccount();
+    const isSolana = caipAddress?.split(":")[0] === "solana";
+
     const { depositLaunchpadEvm } = useDepositLaunchpadEvmFn();
     const { claimLaunchpadEvm } = useClaimLaunchpadEvmFn();
+    const { depositLaunchpadSol } = useDepositLaunchpadSolFn();
+    const { claimLaunchpadSol } = useClaimLaunchpadSolFn();
     const queryClient = useQueryClient();
 
     const invalidatePool = () => {
@@ -145,22 +153,34 @@ const AmountActivity = ({ poolDetail }: Props) => {
     };
 
     const handleDepositConfirm = async (amount: string) => {
-        if (!pool) return;
-        await depositLaunchpadEvm({
-            poolAddress: pool.address,
-            paymentToken: pool.tokenIn,
-            amountStr: amount,
-            decimals: pool.tokenInDecimals,
-        });
+        if (!pool || !poolDetail) return;
+        if (isSolana) {
+            await depositLaunchpadSol({
+                poolAddress: pool.address,
+                poolDetail,
+                amountStr: amount,
+            });
+        } else {
+            await depositLaunchpadEvm({
+                poolAddress: pool.address,
+                paymentToken: pool.tokenIn,
+                amountStr: amount,
+                decimals: pool.tokenInDecimals,
+            });
+        }
         setDepositDialogOpen(false);
         invalidatePool();
     };
 
     const handleClaim = async () => {
-        if (!pool) return;
+        if (!pool || !poolDetail) return;
         setIsClaiming(true);
         try {
-            await claimLaunchpadEvm({ poolAddress: pool.address });
+            if (isSolana) {
+                await claimLaunchpadSol({ poolAddress: pool.address, poolDetail });
+            } else {
+                await claimLaunchpadEvm({ poolAddress: pool.address });
+            }
             invalidatePool();
         } finally {
             setIsClaiming(false);
