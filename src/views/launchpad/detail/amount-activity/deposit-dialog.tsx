@@ -222,11 +222,16 @@ const DepositDialog = ({
                 new Decimal(10).pow(rewardDec),
             );
             const price = safeDecimal(pool.rewardDenominator).div(num);
-            return currentRewardHuman.mul(price).toFixed(paymentDec);
+            const totalCapacity = currentRewardHuman.mul(price);
+            const totalRaisedHuman = safeDecimal(
+                poolDetail?.launchpad?.totalRaised ?? "0",
+            ).div(new Decimal(10).pow(paymentDec));
+            const remaining = totalCapacity.sub(totalRaisedHuman);
+            return remaining.lte(0) ? "0" : remaining.toFixed(paymentDec);
         } catch {
             return undefined;
         }
-    }, [isDynamic, pool]);
+    }, [isDynamic, pool, poolDetail?.launchpad?.totalRaised]);
 
     const depositFormSchema = useMemo(
         () =>
