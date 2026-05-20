@@ -216,7 +216,7 @@ export const activityKind = {
   12: "Maker Withdraw Reward",
 
   // Admin action
-  20: "Admin Refund",
+  20: "Admin Transfer Token",
   21: "Admin Deposit Reward",
 
   // User actions

@@ -67,6 +67,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
   );
   const totalRaised = fmt(poolDetail?.launchpad?.totalRaised, paymentDec);
   const settlementFee = fmtFee(pool?.settlementFee);
+  const collectedFee = fmt(pool?.settlementFeeTotal, paymentDec);
 
   // Fixed mode: rewardDenominator = on-chain ratioBps, rewardNumerator = ratioDenominator
   const isDynamic =
@@ -126,7 +127,13 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
         value: `${totalRaised} ${paymentSymbol}`,
       },
     ],
-    [{ label: "Settlement Fee", value: settlementFee }, null],
+    [
+      { label: "Settlement Fee", value: settlementFee },
+      {
+        label: "Collected Fee",
+        value: `${collectedFee} ${paymentSymbol}`,
+      },
+    ],
   ];
 
   if (!poolDetail) {
@@ -164,9 +171,6 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
           <div className="h-1.5 w-1.5 bg-foreground" />
           <span>Reward Amount</span>
         </div>
-        <p>
-          {totalReward} {saleSymbol}
-        </p>
       </div>
 
       {isSimple ? (
@@ -205,19 +209,18 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
             <div className="space-y-1">
               <div className="flex justify-end text-xl">
                 <span>
-                  {fmt(poolDetail?.launchpad?.totalRaised, paymentDec)} {paymentSymbol}
+                  {fmt(poolDetail?.launchpad?.totalRaised, paymentDec)}{" "}
+                  {paymentSymbol}
                 </span>
                 /
                 <span>
                   {raisedGoal} {paymentSymbol}
                 </span>
-                <p>
-                  &nbsp;({shortenNumber({ number: progressPct })}%)
-                </p>
+                <p>&nbsp;({shortenNumber({ number: progressPct })}%)</p>
               </div>
               <div className="h-4 w-full overflow-hidden rounded-full bg-progress-bg">
                 <div
-                  className="bg-active h-full rounded-full transition-all"
+                  className="h-full rounded-full bg-active transition-all"
                   style={{ width: `${progressPct}%` }}
                 />
               </div>
