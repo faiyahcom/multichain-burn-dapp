@@ -212,7 +212,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
                         labelClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl"
                         valueClassName="text-base md:text-lg lg:text-xl 2xl:text-2xl font-bold"
                     />
-                    {isEndedOrCompleted ? (
+                    {/* {isEndedOrCompleted ? (
                         <>
                             <StatRow
                                 label="Claimable"
@@ -231,7 +231,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
                                 }
                             />
                         </>
-                    ) : (
+                    ) : ( */}
                         <StatRow
                             label="Allocation"
                             value={
@@ -253,7 +253,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
                                 )
                             }
                         />
-                    )}
+                    {/* )} */}
                     <StatRow
                         label="Fee"
                         value={
