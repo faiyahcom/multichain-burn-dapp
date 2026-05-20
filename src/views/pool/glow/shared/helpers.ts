@@ -27,7 +27,10 @@ export const getPoolGlowVariant = (
   }
 };
 
-export const renderPoolTime = (pool: PoolItemType): string => {
+export const renderPoolTime = (
+  pool: PoolItemType,
+  onTimeEnd?: () => void,
+): string => {
   const nowInSeconds = Math.floor(Date.now() / 1000);
   // all possible status is stored in userViewBurnPoolStatuses
   if (
@@ -58,6 +61,12 @@ export const renderPoolTime = (pool: PoolItemType): string => {
     if (diffEnd > 0) {
       return formatCountdown(diffEnd);
     } else {
+      // If diffEnd is zero
+      // (this is to prevent calling the function too many times),
+      // then call the onTimeEnd function
+      if (diffEnd === 0) {
+        onTimeEnd?.();
+      }
       return getPoolStatusLabel("ended");
     }
   };
@@ -70,6 +79,12 @@ export const renderPoolTime = (pool: PoolItemType): string => {
     if (diffStart > 0) {
       return formatCountdown(diffStart);
     } else {
+      // If diffStart is zero
+      // (this is to prevent calling the function too many times),
+      // then call the onTimeEnd function
+      if (diffStart === 0) {
+        onTimeEnd?.();
+      }
       return renderTimeEnd();
     }
   }
