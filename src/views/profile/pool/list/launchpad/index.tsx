@@ -116,8 +116,12 @@ const ProfilePoolListLaunchpad: React.FC<Props> = ({
             sciToFormatted(pool.receivedAmount ?? "0", pool.tokenOutDecimals),
           );
 
-          // show TBD if it is dynamic and rewardVisibility is false
-          const showTBD = isDynamic && pool.rewardVisibility === false;
+          // show TBD if it is dynamic and rewardVisibility is false and status is not ended or completed
+          const showTBD =
+            isDynamic &&
+            pool.rewardVisibility === false &&
+            pool.status !== "ended" &&
+            pool.status !== "completed";
 
           return (
             <TableRow
