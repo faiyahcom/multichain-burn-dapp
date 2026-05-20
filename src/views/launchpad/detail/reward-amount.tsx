@@ -141,14 +141,14 @@ const RewardAmount = ({ poolDetail }: Props) => {
             <div className="space-y-2">
                 <div className="grid grid-cols-1 gap-y-1 md:grid-cols-2 md:space-x-8">
                     <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
-                        <span className="text-mb-gray-b8">Settlement Fee:</span>
-                        <span>{settlementFee}</span>
-                    </p>
-                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
                         <span className="text-mb-gray-b8">Total Raised:</span>
                         <span>
                             {totalRaisedFormatted} <span>{paymentTokenDisplay.symbol}</span>
                         </span>
+                    </p>
+                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                        <span className="text-mb-gray-b8">Settlement Fee:</span>
+                        <span>{settlementFee}</span>
                     </p>
                 </div>
 
