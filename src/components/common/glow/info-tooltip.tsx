@@ -45,7 +45,7 @@ const InfoTooltip: React.FC<Props> = ({
         onMouseLeave={() => setOpen(false)}
         onClick={() => setOpen((v) => !v)}
       >
-        <Icon className={cn("inline-flex", classNames?.icon)} />
+        <Icon className={cn("inline-flex overflow-visible", classNames?.icon)} />
       </TooltipTrigger>
       <TooltipContent
         className={cn(
