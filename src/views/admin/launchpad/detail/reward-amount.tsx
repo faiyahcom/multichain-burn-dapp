@@ -216,7 +216,17 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
                 <span>
                   {raisedGoal} {paymentSymbol}
                 </span>
-                <p>&nbsp;({shortenNumber({ number: progressPct })}%)</p>
+                <span>
+                  &nbsp;(
+                  {shortenNumber({
+                    number:
+                      // handle case almost full because limit 6 decimal after comma input
+                      parseFloat(progressPct.toFixed(7)) === 99.9999999
+                        ? 100
+                        : parseFloat(progressPct.toFixed(7)),
+                  })}
+                  %)
+                </span>
               </div>
               <div className="h-4 w-full overflow-hidden rounded-full bg-progress-bg">
                 <div
