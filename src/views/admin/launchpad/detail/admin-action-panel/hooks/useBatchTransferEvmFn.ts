@@ -63,8 +63,13 @@ export const useBatchTransferEvmFn = () => {
                 });
 
                 // Check vault balance before sending
-                const erc20 = getERC20Contract(tokenAddress, signer);
-                const balance = await erc20.balanceOf(poolAddress);
+                let balance = BigInt(0);
+                if (tokenAddress === "0x0000000000000000000000000000000000000000") {
+                    balance = await provider.getBalance(poolAddress);
+                } else {
+                    const erc20 = getERC20Contract(tokenAddress, signer);
+                    balance = await erc20.balanceOf(poolAddress);
+                }
                 if (balance < amounts.reduce((a, b) => a + b, BigInt(0))) {
                     throw new Error("Total requested exceeds vault balance");
                 }
