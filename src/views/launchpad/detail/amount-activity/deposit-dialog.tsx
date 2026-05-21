@@ -226,7 +226,7 @@ const DepositDialog = ({
             const totalRaisedHuman = safeDecimal(
                 poolDetail?.launchpad?.totalRaised ?? "0",
             ).div(new Decimal(10).pow(paymentDec));
-            const remaining = totalCapacity.sub(totalRaisedHuman);
+            const remaining = totalCapacity;
             return remaining.lte(0) ? "0" : remaining.toFixed(paymentDec);
         } catch {
             return undefined;
