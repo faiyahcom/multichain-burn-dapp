@@ -100,28 +100,32 @@ const createStakeFormSchema = ({
             )
             .refine(
                 (v) => {
-                    if (maxRaw === null) return true;
+                    // Use the smaller of maxRaw and remainingRaw as the effective cap
+                    const cap =
+                        maxRaw !== null && remainingRaw !== null
+                            ? maxRaw < remainingRaw ? maxRaw : remainingRaw
+                            : maxRaw ?? remainingRaw;
+                    if (cap === null) return true;
                     try {
-                        return parseUnits(v, decimals) <= maxRaw;
+                        return parseUnits(v, decimals) <= cap;
                     } catch {
                         return false;
                     }
                 },
                 {
-                    error: `Amount exceeds maximum staking amount (${maxFormatted} ${symbol})`,
-                },
-            )
-            .refine(
-                (v) => {
-                    if (remainingRaw === null) return true;
-                    try {
-                        return parseUnits(v, decimals) <= remainingRaw;
-                    } catch {
-                        return false;
-                    }
-                },
-                {
-                    error: `Amount exceeds remaining pool capacity (${remainingFormatted} ${symbol})`,
+                    error: (() => {
+                        // Show the error for whichever limit is the binding (smaller) cap
+                        if (maxRaw !== null && remainingRaw !== null) {
+                            return maxRaw <= remainingRaw
+                                ? `Amount exceeds maximum staking amount (${maxFormatted} ${symbol})`
+                                : `Amount exceeds remaining pool capacity (${remainingFormatted} ${symbol})`;
+                        }
+                        if (maxRaw !== null)
+                            return `Amount exceeds maximum staking amount (${maxFormatted} ${symbol})`;
+                        if (remainingRaw !== null)
+                            return `Amount exceeds remaining pool capacity (${remainingFormatted} ${symbol})`;
+                        return "";
+                    })(),
                 },
             ),
     });

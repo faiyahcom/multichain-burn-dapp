@@ -29,9 +29,11 @@ import {
     AssetTypeEnum,
     type AssetType,
 } from "@/web3/helpers";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 const CLAIM_REWARD_ERROR_MESSAGE =
     "Failed to claim your reward. Please try again.";
+const INSUFFICIENT_REWARD_BALANCE_MESSAGE = "Insufficient reward balance";
 
 export interface ClaimRewardSolParams {
     /** Pool PDA address */
@@ -192,7 +194,16 @@ export const useClaimRewardSolFn = () => {
                 toast.success("Reward claimed successfully!", { description: signature });
                 return signature;
             } catch (error: unknown) {
-                toast.error(CLAIM_REWARD_ERROR_MESSAGE);
+                const errorMessage = getErrorMessage({ error });
+
+                if (errorMessage === INSUFFICIENT_REWARD_BALANCE_MESSAGE) {
+                    toast.error(CLAIM_REWARD_ERROR_MESSAGE);
+                } else {
+                    toast.error("Failed to claim reward", {
+                        description: errorMessage,
+                    });
+                }
+
                 throw error;
             }
         },
