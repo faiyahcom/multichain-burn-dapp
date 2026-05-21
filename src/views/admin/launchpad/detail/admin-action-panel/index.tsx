@@ -177,7 +177,10 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
               title="Emergency Close Pool"
               description="Are you sure you want to emergency close this upcoming pool?"
               showReason
-              onConfirm={(reason) => handleEmergencyClose(reason)}
+              onConfirm={async (reason) => {
+                await handleEmergencyClose(reason);
+                refetchVaultBalance();
+              }}
             />
           </PoolChainGuard>
         );
@@ -199,7 +202,10 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
               title="Emergency Close Pool"
               description="Are you sure you want to emergency close this pool?"
               showReason
-              onConfirm={(reason) => handleEmergencyClose(reason)}
+              onConfirm={async (reason) => {
+                await handleEmergencyClose(reason);
+                refetchVaultBalance();
+              }}
             />
           </PoolChainGuard>
         );
@@ -255,7 +261,10 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
               title="Emergency Close Pool"
               description="Are you sure you want to emergency close this pool?"
               showReason
-              onConfirm={(reason) => handleEmergencyClose(reason)}
+              onConfirm={async (reason) => {
+                await handleEmergencyClose(reason);
+                refetchVaultBalance();
+              }}
             />
             <TransferTokensDialog
               open={transferDialogOpen}
