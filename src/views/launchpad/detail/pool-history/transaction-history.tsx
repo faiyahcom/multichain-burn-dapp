@@ -56,7 +56,7 @@ const TransactionHistoryTable = ({ poolDetail }: Props) => {
                 poolDetail?.pool.address || "",
                 Object.keys(txnKind)
                     .map((k) => Number(k))
-                    .filter((k) => k < 11)
+                    .filter((k) => ![11, 12, 13, 14].includes(k))
                     .join(","),
             ),
         enabled: !!poolDetail?.pool.address,

@@ -198,6 +198,7 @@ export const txnKind = {
   12: "Launchpad Claim",
   13: "Launchpad Receive Allocation",
   14: "Launchpad Refund",
+  50: "Admin Transfer Token"
 } as const;
 
 export const activityKind = {
