@@ -93,6 +93,64 @@ export const getStakeEntryPDA = (
 };
 
 // ==============================
+// LAUNCHPAD PDA HELPERS
+// ==============================
+
+export const getLaunchpadConfigPDA = (programId: PublicKey): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("launchpad-config")],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadPoolPDA = (
+    poolId: number | InstanceType<typeof BN>,
+    programId: PublicKey,
+): PublicKey => {
+    const idBN = typeof poolId === "number" ? new BN(poolId) : poolId;
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("launchpad-pool"), idBN.toArrayLike(Buffer, "le", 8)],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadRewardVaultPDA = (
+    poolPDA: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("lp-reward-vault"), poolPDA.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadDepositVaultPDA = (
+    poolPDA: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("lp-deposit-vault"), poolPDA.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadUserDepositPDA = (
+    poolPDA: PublicKey,
+    user: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("lp-user-deposit"), poolPDA.toBuffer(), user.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+// ==============================
 // ASSET DETECTION
 // ==============================
 

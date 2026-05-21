@@ -76,7 +76,11 @@ export interface PoolDetailResponse {
     kind: PoolKindCode;
     chainId: string;
     timestamp: string;
-    status: SwapPoolStatus | BurnPoolStatus | StakePoolStatus;
+    status:
+      | SwapPoolStatus
+      | BurnPoolStatus
+      | StakePoolStatus
+      | LaunchpadPoolStatus;
     currentRewardAmount: string;
     merkleRootStatus: string;
     merkleRoot: string | null;
@@ -109,6 +113,10 @@ export interface PoolDetailResponse {
     maxStakingAmount?: string | null;
     stakingLimit?: string | null;
     interestStopDate?: string | null;
+    // Launchpad pool fields
+    claimPolicy?: string; // "instant" | "after_end"
+    distributionMode?: string; // "none" | "automatic" | "claim"
+    rewardVisibility?: boolean;
   };
   // Staking pool aggregate data
   staking?: {
@@ -123,6 +131,20 @@ export interface PoolDetailResponse {
       availableClaim: string;
       totalClaimed: string;
       totalSettlementFee: string;
+    };
+  };
+  // Launchpad pool aggregate data
+  launchpad?: {
+    totalReward: string;
+    totalRaised: string;
+    user?: {
+      address: string;
+      depositedAmount: string;
+      allocation: string;
+      fee: string;
+      claimed: string;
+      canClaim: boolean;
+      claimableAmount: string;
     };
   };
   returningAmountOnCanceling?: {
@@ -172,6 +194,11 @@ export const txnKind = {
   8: "Claim",
   9: "Unstake & Claim",
   10: "Emergency Withdraw",
+  11: "Launchpad Deposit",
+  12: "Launchpad Claim",
+  13: "Launchpad Receive Allocation",
+  14: "Launchpad Refund",
+  50: "Admin Transfer Token"
 } as const;
 
 export const activityKind = {
@@ -181,12 +208,14 @@ export const activityKind = {
   2: "Pool Requested",
   3: "Pool Approved",
   4: "Pool Rejected",
-  5: "Cancel pool",
+  5: "Cancel pool", // user cancel only
   6: "Pool Closed",
   7: "Pool Updated",
   8: "Pool Ended",
   9: "Create stake pool",
   69: "Submit stake pool",
+  70: "Create launchpad pool",
+  71: "Submit launchpad pool",
 
   // Maker action
   10: "Deposit reward token",
@@ -205,7 +234,14 @@ export const activityKind = {
   34: "Unstake",
   35: "Claim Stake reward",
 
+  36: "Join Launchpad",
+  37: "Claim Allocation",
+  38: "Reward Received",
+  39: "Deposit & Instant Claim",
+
   40: "Pool End",
+  72: "Cancel Stake",
+  73: "Cancel Launchpad",
 } as const;
 
 export interface MyStakeSnapshot {
@@ -285,6 +321,15 @@ export type StakePoolStatus =
   | "full"
   | "ended";
 
+export type LaunchpadPoolStatus =
+  | "draft"
+  | "canceled"
+  | "upcoming"
+  | "on_going"
+  | "ended"
+  | "completed"
+  | "closed";
+
 export type ActivityKindKey = keyof typeof activityKind;
 
 export const getActivityKindLabel = (kind: ActivityKindKey) => {
@@ -307,6 +352,10 @@ export const myActivityActions = [
   "5",
   "33",
   "34",
+  "36",
+  "37",
+  "38",
+  "39",
 ] as const satisfies ReadonlyArray<ActivityKeyList>;
 export type MyActivityAction = (typeof myActivityActions)[number];
 export const myActivityActionLabels: Record<MyActivityAction, string> = {
@@ -319,10 +368,19 @@ export const myActivityActionLabels: Record<MyActivityAction, string> = {
   "5": "Cancel pool",
   "33": "Stake",
   "34": "Unstake",
+  "36": "Join Launchpad",
+  "37": "Claim Allocation",
+  "38": "Reward Received",
+  "39": "Deposit & Instant Claim",
 };
 export const getMyActivityActionLabel = (kind: MyActivityAction) => {
   return myActivityActionLabels[kind];
 };
+export const myActivityExcludes = (
+  Object.keys(activityKind) as ActivityKindKeyStr[]
+)
+  .filter((k) => !myActivityActions.some((a) => a.split(",").includes(k)))
+  .join(",");
 
 export interface PoolActivitiesResponse {
   page: number;

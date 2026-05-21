@@ -5,6 +5,7 @@ import TokenOutInNetworkDisplay from "@/components/common/glow/token-out-in-netw
 import MetricNumber from "@/components/common/metric-number";
 import NoData from "@/components/common/no-data";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { poolQueryKeys } from "@/services/queries/queryKey";
 import {
   getPoolStatusLabel,
   type PoolItemType,
@@ -13,8 +14,9 @@ import { sciToFormatted } from "@/utils/helpers/numbers";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
+import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useReducer } from "react";
 
 interface Props {
   data?: PoolItemType[];
@@ -22,13 +24,19 @@ interface Props {
 }
 
 const StakePoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
-  const [tick, setTick] = useState(0);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTick((prev) => prev + 1);
-    }, 1000);
+    const interval = setInterval(forceUpdate, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  const handleOnTimeEnd = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: poolQueryKeys.list().filter(Boolean),
+      exact: false,
+    });
   }, []);
 
   return (
@@ -110,7 +118,7 @@ const StakePoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       unit={tokenInDisplay.symbol}
                       isShorten
                     />
-                    <p key={tick}>{renderPoolTime(pool)}</p>
+                    <p>{renderPoolTime(pool, handleOnTimeEnd)}</p>
                   </div>
                 }
                 btn={{

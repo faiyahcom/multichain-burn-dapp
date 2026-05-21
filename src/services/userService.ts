@@ -74,6 +74,9 @@ export interface ParticipatedUserPool {
 
   stakedAmount: string; // string number
   apr: string; // divide by 10000 to get display percentage
+  depositedAmount?: string; // need sci formating
+  receivedAmount?: string; // need sci formating
+  rewardVisibility?: boolean;
 }
 
 export type ParticipatedPoolsResponse = PaginationResponse & {
@@ -90,6 +93,7 @@ export interface PoolMerkleProofResponse {
 export interface GetUserActivitiesRequest extends PaginationRequest {
   search?: string;
   kinds?: string; // comma separated
+  excludeKinds?: string; // comma separated
 }
 
 export interface UserActivityType {

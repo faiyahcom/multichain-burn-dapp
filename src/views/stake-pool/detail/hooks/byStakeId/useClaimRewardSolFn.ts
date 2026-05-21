@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
-import { getErrorMessage } from "@/utils/helpers/error-message";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
     PublicKey,
@@ -30,6 +29,7 @@ import {
     AssetTypeEnum,
     type AssetType,
 } from "@/web3/helpers";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 const CLAIM_REWARD_ERROR_MESSAGE =
     "Failed to claim your reward. Please try again.";

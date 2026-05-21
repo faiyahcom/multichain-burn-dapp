@@ -54,9 +54,9 @@ export const swapPoolStatuses = [
 export type SwapPoolStatus = (typeof swapPoolStatuses)[number];
 export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
   on_going: "Live",
-  ended: "End",
-  canceled: "Cancel",
-  closed: "Close",
+  ended: "Ended",
+  canceled: "Canceled",
+  closed: "Closed",
 };
 export const swapPoolStatusColors: Record<SwapPoolStatus, string> = {
   on_going: "#7AF4CB",
@@ -105,6 +105,23 @@ export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
   full: "#FFB08E",
 };
 
+export const launchpadPoolStatuses = [
+  "upcoming",
+  "completed",
+  ...swapPoolStatuses,
+] as const;
+export type LaunchpadPoolStatus = (typeof launchpadPoolStatuses)[number];
+export const launchpadPoolStatusLabels: Record<LaunchpadPoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  upcoming: "Upcoming",
+  completed: "Completed",
+};
+export const launchpadPoolStatusColors: Record<LaunchpadPoolStatus, string> = {
+  ...swapPoolStatusColors,
+  upcoming: "#FFE798",
+  completed: "#FFB08E",
+};
+
 export const getPoolStatusColor = (status: AllPoolStatus) => {
   return allPoolStatusColors[status as AllPoolStatus] ?? "#7989ba";
 };
@@ -116,22 +133,30 @@ export type AllPoolStatus =
   | BurnPoolStatus
   | SwapPoolStatus
   | StakePoolStatus
+  | LaunchpadPoolStatus
   | "draft";
 
 // draft is not included in this list because when it is used is situational
 export const allPoolStatuses: AllPoolStatus[] = Array.from(
-  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses]),
+  new Set([
+    ...burnPoolStatuses,
+    ...swapPoolStatuses,
+    ...stakePoolStatuses,
+    ...launchpadPoolStatuses,
+  ]),
 );
 export const allPoolStatusLabels: Record<AllPoolStatus, string> = {
   ...burnPoolStatusLabels,
   ...swapPoolStatusLabels,
   ...stakePoolStatusLabels,
+  ...launchpadPoolStatusLabels,
   draft: "Draft",
 };
 export const allPoolStatusColors: Record<AllPoolStatus, string> = {
   ...burnPoolStatusColors,
   ...swapPoolStatusColors,
   ...stakePoolStatusColors,
+  ...launchpadPoolStatusColors,
   draft: "#7989ba",
 };
 
@@ -167,6 +192,10 @@ export type PoolItemType = {
   tokenOutEnable: boolean;
   apr: string; // divide by 10000 to get display percentage
   stakedAmount: string;
+  totalRaise?: string; // need sci formating
+  depositedAmount?: string; // need sci formating
+  receivedAmount?: string; // need sci formating
+  rewardVisibility?: boolean;
 };
 
 export type PoolListRequest = PaginationRequest & {
@@ -204,6 +233,9 @@ export type PoolListStatsResponse = {
   totalBurned?: string;
   totalSwapVolume?: string;
   totalStaked?: number;
+  totalRaised?: string; // number
+  activeLaunchpadCount?: number;
+  totalProject?: number;
 };
 
 // user view pool list can only see certain statuses
@@ -249,4 +281,35 @@ export const userHiddenStakePoolStatuses = [
       ),
   ),
   "draft",
+] as const;
+
+export const userViewLaunchpadPoolStatuses = [
+  "on_going",
+  "upcoming",
+  "ended",
+  "completed",
+  "closed",
+] as const;
+export const userHiddenLaunchpadPoolStatuses = [
+  ...launchpadPoolStatuses.filter(
+    (status) =>
+      !(
+        userViewLaunchpadPoolStatuses as ReadonlyArray<LaunchpadPoolStatus>
+      ).includes(status),
+  ),
+  "draft",
+] as const;
+
+export const userJoinedStakePoolStatuses: StakePoolStatus[] = [
+  "on_going",
+  "closed",
+  "ended",
+  "full",
+] as const;
+
+export const userJoinedLaunchpadPoolStatuses: LaunchpadPoolStatus[] = [
+  "on_going",
+  "closed",
+  "ended",
+  "completed",
 ] as const;
