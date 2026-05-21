@@ -67,7 +67,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
   );
   const totalRaised = fmt(poolDetail?.launchpad?.totalRaised, paymentDec);
   const settlementFee = fmtFee(pool?.settlementFee);
-  const collectedFee = fmt(pool?.settlementFeeTotal, paymentDec);
+  const collectedFee = fmt(pool?.settlementFeeTotal, rewardDec);
 
   // Fixed mode: rewardDenominator = on-chain ratioBps, rewardNumerator = ratioDenominator
   const isDynamic =
@@ -131,7 +131,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
       { label: "Settlement Fee", value: settlementFee },
       {
         label: "Collected Fee",
-        value: `${collectedFee} ${paymentSymbol}`,
+        value: `${collectedFee} ${saleSymbol}`,
       },
     ],
   ];
