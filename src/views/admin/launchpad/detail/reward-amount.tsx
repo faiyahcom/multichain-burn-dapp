@@ -91,8 +91,15 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
       const raisedHuman = safeDecimal(
         poolDetail?.launchpad?.totalRaised ?? "0",
       ).div(new Decimal(10).pow(paymentDec));
-      const ratio = raisedHuman.div(goalHuman.isZero() ? 1 : goalHuman);
-      progressPct = Math.min(100, ratio.mul(100).toNumber());
+      // If remaining capacity has 6+ zeros after decimal (< 0.000001),
+      // treat as fully filled given the 6-decimal input limit
+      const remaining = goalHuman.sub(raisedHuman);
+      if (remaining.lte(0) || remaining.lt(new Decimal("0.000001"))) {
+        progressPct = 100;
+      } else {
+        const ratio = raisedHuman.div(goalHuman.isZero() ? 1 : goalHuman);
+        progressPct = Math.min(100, ratio.mul(100).toNumber());
+      }
     } catch {
       progressPct = 0;
     }
@@ -224,13 +231,7 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
                 </span>
                 <span>
                   &nbsp;(
-                  {shortenNumber({
-                    number:
-                      // handle case almost full because limit 6 decimal after comma input
-                      parseFloat(progressPct.toFixed(7)) === 99.9999999
-                        ? 100
-                        : parseFloat(progressPct.toFixed(7)),
-                  })}
+                  {shortenNumber({ number: progressPct })}
                   %)
                 </span>
               </div>
