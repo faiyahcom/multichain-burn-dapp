@@ -138,6 +138,10 @@ const DepositDialog = ({
         ? chainIdToNetworkConfig(pool.chainId)
         : undefined;
 
+    const isPoolEnded = ["ended", "completed", "closed", "canceled"].includes(
+        pool?.status ?? "",
+    );
+
     const saleTokenDisplay = resolvePoolTokenDisplay({
         network,
         tokenAddress: pool?.rewardToken,
@@ -659,6 +663,11 @@ const DepositDialog = ({
                                             ))}
                                         </div>
                                     )}
+                                    {isPoolEnded && (
+                                        <p className="text-left w-full flex text-sm font-medium text-destructive sm:text-base">
+                                            ⚠️ This pool has ended. Deposits are no longer accepted.
+                                        </p>
+                                    )}
 
                                     {/* Actions */}
                                     <div className="flex gap-3">
@@ -676,7 +685,7 @@ const DepositDialog = ({
                                             variant="launchpad"
                                             hasHover
                                             isLoading={isSubmitting}
-                                            disabled={!isValid || isSubmitting}
+                                            disabled={!isValid || isSubmitting || isPoolEnded}
                                             className="flex-1 font-orbitron font-semibold sm:text-xl xl:text-2xl"
                                         >
                                             Deposit

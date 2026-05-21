@@ -134,7 +134,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
 
     const isCompleted = status === "completed";
 
-    const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+    const [depositDialogOpen, setDepositDialogOpen] = useState(true);
     const [isClaiming, setIsClaiming] = useState(false);
 
     const { caipAddress } = useAppKitAccount();
