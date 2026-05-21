@@ -38,12 +38,12 @@ const AmountAndActivity = ({ poolDetail, vaultBalance }: Props) => {
 
             case "on_going":
                 return (
-                    <LiveStatus poolDetail={poolDetail} />
+                    <LiveStatus poolDetail={poolDetail} onAfterClose={() => vaultBalance?.refetch()} />
                 );
 
             case "full":
                 return (
-                    <LiveStatus poolDetail={poolDetail} />
+                    <LiveStatus poolDetail={poolDetail} onAfterClose={() => vaultBalance?.refetch()} />
                 );
 
             case "ended":

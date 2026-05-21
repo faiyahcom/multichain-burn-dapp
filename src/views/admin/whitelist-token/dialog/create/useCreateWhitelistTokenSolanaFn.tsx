@@ -33,10 +33,12 @@ export const useCreateWhitelistTokenSolanaFn = () => {
       tokenAddress,
       poolTypes,
       disablePoolTypes,
+      isCreate = false,
     }: {
       tokenAddress: string;
       poolTypes: PoolType[];
       disablePoolTypes?: PoolType[];
+      isCreate?: boolean;
     }) => {
       try {
         if (!isConnected || !address) {
@@ -69,7 +71,7 @@ export const useCreateWhitelistTokenSolanaFn = () => {
           const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
 
           const ix = await program.methods
-            .updateWhitelistToken(tokenPubkey, true, poolTypeVariant)
+            .updateWhitelistToken(tokenPubkey, true, poolTypeVariant, isCreate ? true : null)
             .accounts({
               admin: walletPublicKey,
               factory: factoryPDA,
@@ -83,9 +85,8 @@ export const useCreateWhitelistTokenSolanaFn = () => {
         if (disablePoolTypes) {
           for (const poolType of disablePoolTypes) {
             const poolTypeVariant = POOL_TYPE_VARIANTS[poolType];
-
             const ix = await program.methods
-              .updateWhitelistToken(tokenPubkey, false, poolTypeVariant)
+              .updateWhitelistToken(tokenPubkey, false, poolTypeVariant, null)
               .accounts({
                 admin: walletPublicKey,
                 factory: factoryPDA,
@@ -122,9 +123,20 @@ export const useCreateWhitelistTokenSolanaFn = () => {
       } catch (error: unknown) {
         console.log(error);
 
-        toast.error("Failed to create whitelist token", {
-          description: getErrorMessage({ error }),
-        });
+        const rawErrorText = JSON.stringify(error) + String((error as Error)?.message ?? "");
+        if (
+          rawErrorText.includes("TokenAlreadyWhitelisted") ||
+          rawErrorText.includes("0x17ad") ||
+          rawErrorText.includes("6045")
+        ) {
+          toast.error("Failed to create whitelist token", {
+            description: "Selected pool types are already whitelisted on-chain",
+          });
+        } else {
+          toast.error("Failed to create whitelist token", {
+            description: getErrorMessage({ error }),
+          });
+        }
         return false;
       }
     },

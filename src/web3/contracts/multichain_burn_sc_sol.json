@@ -1978,38 +1978,38 @@
             "program": {
               "kind": "const",
               "value": [
-                163,
-                130,
-                85,
-                208,
-                254,
-                162,
-                58,
-                114,
-                37,
-                193,
-                10,
-                107,
-                164,
-                126,
-                164,
-                160,
-                3,
+                185,
+                20,
                 6,
-                156,
-                44,
-                27,
-                28,
-                85,
-                172,
-                237,
-                210,
-                37,
-                183,
-                144,
-                111,
-                221,
-                109
+                130,
+                3,
+                233,
+                129,
+                95,
+                165,
+                10,
+                245,
+                202,
+                10,
+                96,
+                79,
+                206,
+                3,
+                136,
+                203,
+                184,
+                178,
+                166,
+                58,
+                88,
+                202,
+                225,
+                241,
+                220,
+                169,
+                24,
+                158,
+                208
               ]
             }
           }
@@ -3054,6 +3054,12 @@
               "name": "PoolType"
             }
           }
+        },
+        {
+          "name": "is_create",
+          "type": {
+            "option": "bool"
+          }
         }
       ]
     },
@@ -3874,6 +3880,11 @@
       "code": 6044,
       "name": "InvalidMinParticipants",
       "msg": "Invalid min participants"
+    },
+    {
+      "code": 6045,
+      "name": "TokenAlreadyWhitelisted",
+      "msg": "Token already whitelisted"
     }
   ],
   "types": [
@@ -4154,6 +4165,10 @@
           {
             "name": "total_amount",
             "type": "u64"
+          },
+          {
+            "name": "is_auto",
+            "type": "bool"
           }
         ]
       }
@@ -4309,6 +4324,14 @@
               {
                 "name": "name",
                 "type": "string"
+              },
+              {
+                "name": "is_auto",
+                "type": "bool"
+              },
+              {
+                "name": "is_instant",
+                "type": "bool"
               }
             ]
           },
@@ -4420,6 +4443,10 @@
               {
                 "name": "total_amount",
                 "type": "u64"
+              },
+              {
+                "name": "is_auto",
+                "type": "bool"
               }
             ]
           },
@@ -4605,6 +4632,14 @@
           {
             "name": "name",
             "type": "string"
+          },
+          {
+            "name": "is_auto",
+            "type": "bool"
+          },
+          {
+            "name": "is_instant",
+            "type": "bool"
           }
         ]
       }
@@ -5514,6 +5549,14 @@
               {
                 "name": "timestamp",
                 "type": "i64"
+              },
+              {
+                "name": "reward_amount",
+                "type": "u64"
+              },
+              {
+                "name": "fee",
+                "type": "u64"
               }
             ]
           },
@@ -5592,6 +5635,10 @@
               {
                 "name": "total_amount",
                 "type": "u64"
+              },
+              {
+                "name": "is_only_claim",
+                "type": "bool"
               }
             ]
           },
@@ -6067,6 +6114,10 @@
           {
             "name": "total_amount",
             "type": "u64"
+          },
+          {
+            "name": "is_only_claim",
+            "type": "bool"
           }
         ]
       }
@@ -6219,6 +6270,14 @@
           {
             "name": "timestamp",
             "type": "i64"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
           }
         ]
       }

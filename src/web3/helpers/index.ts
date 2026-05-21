@@ -63,6 +63,54 @@ export const getUserDepositPDA = (
 };
 
 // ==============================
+// LAUNCHPAD PDA HELPERS
+// ==============================
+
+export const getLaunchpadConfigPDA = (programId: PublicKey): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("launchpad-config")],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadPoolPDA = (
+    poolCount: number,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [
+            Buffer.from("launchpad-pool"),
+            new BN(poolCount).toArrayLike(Buffer, "le", 8),
+        ],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadRewardVaultPDA = (
+    poolPDA: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("lp-reward-vault"), poolPDA.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+export const getLaunchpadDepositVaultPDA = (
+    poolPDA: PublicKey,
+    programId: PublicKey,
+): PublicKey => {
+    const [pda] = PublicKey.findProgramAddressSync(
+        [Buffer.from("lp-deposit-vault"), poolPDA.toBuffer()],
+        programId,
+    );
+    return pda;
+};
+
+// ==============================
 // ASSET DETECTION
 // ==============================
 

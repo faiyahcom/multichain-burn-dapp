@@ -179,7 +179,42 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
         ];
 
       case 3:
-        return []; // TODO: launchpad
+        return [
+          "Pool Name & Address",
+          "Time",
+          "Mode",
+          "Pair",
+          "Network",
+          {
+            label: "Joined Users",
+            render: (
+              <div className="mx-auto flex w-max items-center gap-2">
+                <span>{"Joined \nUsers"}</span>
+                <ArrowSortButton
+                  onToggleSort={onToggleSort}
+                  sortBy="joinedUsersCount"
+                  isActive={sortBy === "joinedUsersCount"}
+                  sortOrder={sortOrder}
+                />
+              </div>
+            ),
+          },
+          {
+            label: "Amount Raised",
+            render: (
+              <div className="mx-auto flex w-max items-center gap-2">
+                <span>{"Amount \nRaised"}</span>
+                <ArrowSortButton
+                  onToggleSort={onToggleSort}
+                  sortBy="raiseAmount"
+                  isActive={sortBy === "raiseAmount"}
+                  sortOrder={sortOrder}
+                />
+              </div>
+            ),
+          },
+          "Status",
+        ];
 
       default:
         void (poolType satisfies never); // exhaustive check
@@ -214,6 +249,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
         {data?.map((item) => {
           const isBurnPool = item.kind === 0;
           const isStakePool = item.kind === 2;
+          const isLaunchpad = item.kind === 3;
           const networkConfig = chainIdToNetworkConfig(item.chainId);
 
           const tokenOutDisplay = resolvePoolTokenDisplay({
@@ -250,7 +286,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 return "/admin/stake/detail/$address";
 
               case 3:
-                return "/"; // TODO: launchpad
+                return "/admin/launchpad/detail/$address";
 
               default:
                 void (poolType satisfies never); // exhaustive check
@@ -271,13 +307,18 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 return item.stakedAmount ?? "0";
 
               case 3:
-                return "0"; // TODO: launchpad
+                return item.raiseAmount ?? "0";
 
               default:
                 void (poolType satisfies never); // exhaustive check
                 return "0";
             }
           })();
+
+          const rewardDenominator = item.rewardDenominator ?? "0";
+          const rewardNumerator = item.rewardNumerator ?? "0";
+          const isDynamic =
+            rewardDenominator === "0" && rewardNumerator === "0";
 
           return (
             <TableRow
@@ -306,7 +347,7 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                 />
               </TableCell>
               {/* Time */}
-              {(isBurnPool || isStakePool) && (
+              {(isBurnPool || isStakePool || isLaunchpad) && (
                 <TableCell>
                   <StartEndDateDisplay
                     startDate={item.timeStart}
@@ -317,6 +358,10 @@ const AdminMasterPoolManagementTableTemplate: React.FC<Props> = ({
                     }}
                   />
                 </TableCell>
+              )}
+              {/* Mode */}
+              {isLaunchpad && (
+                <TableCell>{isDynamic ? "Dynamic" : "Fixed"}</TableCell>
               )}
               {/* Pair */}
               <TableCell>

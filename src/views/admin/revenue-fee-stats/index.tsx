@@ -57,6 +57,8 @@ const AdminRevenueFeeStats = () => {
           feeTxnKind.claimBurnReward,
           feeTxnKind.swap,
           feeTxnKind.claimStakeReward,
+          feeTxnKind.joinLaunchpad,
+          feeTxnKind.claimLaunchpadReward,
         ].join(",");
 
   const statsParams = { chainId, from: fromParam, to: toParam };
@@ -93,7 +95,7 @@ const AdminRevenueFeeStats = () => {
         }),
         poolName: record.pool.name,
         poolAddress: record.poolAddress,
-        userName: record.executor.name,
+        userName: record?.executor?.name ?? "--",
         userAddress: record.executorAddress,
         chainId: record.chainId,
         txHash: record.hash,

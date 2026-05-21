@@ -11,6 +11,7 @@ import {
   IconAdminHomeMultiUsers,
   IconAdminHomeSingleUser,
   IconAdminHomeStackLayers,
+  IconRocketOutline,
 } from "@/assets/react";
 import { shortenNumber } from "@/utils/helpers/numbers";
 import AdminHomeSummaryCard from "./summary-card";
@@ -53,6 +54,11 @@ const AdminHome = () => {
       title: "Total Staking Pools",
       value: shortenNumber({ number: statsData?.totalStakingPools ?? 0 }),
       icon: IconAdminHomeLock,
+    },
+    {
+      title: "Total Launchpads",
+      value: shortenNumber({ number: statsData?.totalLaunchPools ?? 0 }),
+      icon: IconRocketOutline,
     },
   ];
 

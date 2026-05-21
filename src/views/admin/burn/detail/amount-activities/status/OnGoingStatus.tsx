@@ -14,9 +14,10 @@ import { useAmountActivity } from "../use-amount-activity";
 import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 type Props = {
     poolDetail?: PoolDetailResponse;
+    onAfterClose?: () => void;
 };
 
-const OnGoingStatus = ({ poolDetail }: Props) => {
+const OnGoingStatus = ({ poolDetail, onAfterClose }: Props) => {
     const [dialogOpen, setDialogOpen] = useState(false);
     const [reason, setReason] = useState("");
 
@@ -28,6 +29,7 @@ const OnGoingStatus = ({ poolDetail }: Props) => {
         setIsLoading(true);
         try {
             await handleAdminClose(reason);
+            onAfterClose?.();
             setDialogOpen(false);
             setReason("");
         } finally {

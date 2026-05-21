@@ -11,7 +11,6 @@ import {
     type Provider,
 } from "@reown/appkit-adapter-solana/react";
 import {
-    createAssociatedTokenAccountInstruction,
     getAssociatedTokenAddress,
     getMint,
     TOKEN_PROGRAM_ID,
@@ -156,7 +155,9 @@ export const useBatchTransferSolFn = () => {
                     const rawAmount = toRawAmount(recipient.amountStr, decimals);
                     const receiverPubkey = new PublicKey(recipient.address);
 
-                    // Receiver's ATAs
+                    // Derive both ATA addresses — needed as accounts for withdrawTokens.
+                    // No need to create them here: the on-chain instruction uses init_if_needed
+                    // for both receiver ATAs internally.
                     const receiverRewardAta = await getAssociatedTokenAddress(
                         rewardMint,
                         receiverPubkey,
@@ -172,34 +173,7 @@ export const useBatchTransferSolFn = () => {
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
 
-                    // Create ATAs if needed
-                    const rewardAtaInfo = await connection.getAccountInfo(receiverRewardAta);
-                    if (!rewardAtaInfo) {
-                        tx.add(
-                            createAssociatedTokenAccountInstruction(
-                                adminPubkey,
-                                receiverRewardAta,
-                                receiverPubkey,
-                                rewardMint,
-                                rewardTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
-                        );
-                    }
 
-                    const depositAtaInfo = await connection.getAccountInfo(receiverDepositAta);
-                    if (!depositAtaInfo) {
-                        tx.add(
-                            createAssociatedTokenAccountInstruction(
-                                adminPubkey,
-                                receiverDepositAta,
-                                receiverPubkey,
-                                depositMint,
-                                depositTokenProgram,
-                                ASSOCIATED_TOKEN_PROGRAM_ID,
-                            ),
-                        );
-                    }
 
                     // withdraw_tokens(token_mint, amount, is_reward)
                     const isReward = mode === "reward";
