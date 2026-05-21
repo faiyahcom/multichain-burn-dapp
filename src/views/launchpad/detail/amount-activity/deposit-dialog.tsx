@@ -218,15 +218,15 @@ const DepositDialog = ({
             const paymentDec = pool.tokenInDecimals ?? 0;
             const num = safeDecimal(pool.rewardNumerator);
             if (num.isZero()) return undefined;
-            const currentRewardHuman = safeDecimal(pool.currentRewardAmount).div(
+            const rewardHuman = safeDecimal(pool.rewardAmount).div(
                 new Decimal(10).pow(rewardDec),
             );
             const price = safeDecimal(pool.rewardDenominator).div(num);
-            const totalCapacity = currentRewardHuman.mul(price);
+            const totalCapacity = rewardHuman.mul(price);
             const totalRaisedHuman = safeDecimal(
                 poolDetail?.launchpad?.totalRaised ?? "0",
             ).div(new Decimal(10).pow(paymentDec));
-            const remaining = totalCapacity;
+            const remaining = totalCapacity.sub(totalRaisedHuman);
             return remaining.lte(0) ? "0" : remaining.toFixed(paymentDec);
         } catch {
             return undefined;
