@@ -204,6 +204,34 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
           </PoolChainGuard>
         );
       case "completed":
+        return (
+          <PoolChainGuard chainId={poolDetail?.pool?.chainId}>
+            <ActionBtn
+              letter="T"
+              text="Transfer Tokens"
+              color="#FFC198"
+              disabled={isRunning}
+              onClick={() => setTransferDialogOpen(true)}
+            />
+            <TransferTokensDialog
+              open={transferDialogOpen}
+              onOpenChange={setTransferDialogOpen}
+              chainId={pool?.chainId ?? ""}
+              poolKind={pool?.kind}
+              poolInfo={{
+                tokenInSymbol: paymentTokenDisplay.symbol,
+                tokenInName: paymentTokenDisplay.name,
+                rewardTokenSymbol: saleTokenDisplay.symbol,
+                rewardTokenName: saleTokenDisplay.name,
+                currentRewardAmount: formattedRemainingSale,
+                currentDepositAmount: formattedRaisedAmount,
+                rewardTokenDecimals: pool?.rewardTokenDecimals,
+                tokenInDecimals: pool?.tokenInDecimals,
+              }}
+              onTransfer={handleTransfer}
+            />
+          </PoolChainGuard>
+        );
       case "ended":
         return (
           <PoolChainGuard chainId={poolDetail?.pool?.chainId}>

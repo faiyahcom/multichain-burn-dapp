@@ -177,6 +177,12 @@ const LaunchpadRewardAmount = ({ poolDetail }: Props) => {
         <div className="space-y-2">
           <div className="grid grid-cols-1 space-x-2 sm:grid-cols-2">
             <div className="grid grid-cols-2">
+              <span className="text-xl text-greyed">Total Reward Pool:</span>
+              <span className="text-xl text-foreground max-sm:text-right">
+                {totalReward} {saleSymbol}
+              </span>
+            </div>
+            <div className="grid grid-cols-2">
               <span className="text-xl text-greyed">Settlement Fee:</span>
               <span className="text-xl text-foreground max-sm:text-right">
                 {settlementFee}

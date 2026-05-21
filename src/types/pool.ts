@@ -194,6 +194,7 @@ export const txnKind = {
   12: "Taker Deposit & Instant Claim Reward",
   13: "Taker Claim Reward from Launchpad Pool",
   14: "Taker Receive Reward from Launchpad Pool",
+  50: "Admin Transfer Token",
 } as const;
 
 export const activityKind = {
