@@ -138,7 +138,12 @@ export type AllPoolStatus =
 
 // draft is not included in this list because when it is used is situational
 export const allPoolStatuses: AllPoolStatus[] = Array.from(
-  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses, ...launchpadPoolStatuses]),
+  new Set([
+    ...burnPoolStatuses,
+    ...swapPoolStatuses,
+    ...stakePoolStatuses,
+    ...launchpadPoolStatuses,
+  ]),
 );
 export const allPoolStatusLabels: Record<AllPoolStatus, string> = {
   ...burnPoolStatusLabels,
@@ -306,7 +311,6 @@ export const userJoinedStakePoolStatuses: StakePoolStatus[] = [
 export const userJoinedLaunchpadPoolStatuses: LaunchpadPoolStatus[] = [
   "on_going",
   "closed",
-  "upcoming",
   "ended",
   "completed",
 ] as const;
