@@ -235,7 +235,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
                         <StatRow
                             label="Allocation"
                             value={
-                                pool?.rewardVisibility === false && hasDeposited ? (
+                                pool?.rewardVisibility === false && hasDeposited && !isEndedOrCompleted ? (
                                     <TBDTooltip
                                         classNames={{
                                             container: "gap-2"
