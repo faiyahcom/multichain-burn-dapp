@@ -207,7 +207,7 @@ const ProfilePoolListLaunchpad: React.FC<Props> = ({
               {/* Status */}
               <TableCell className="w-max max-w-max min-w-max">
                 <Button
-                  variant={"launchpad"}
+                  variant={"pair"}
                   hasGroupHover
                   className="sm:text-24px min-w-full rounded-13px px-6 py-2 font-orbitron text-xl font-semibold"
                 >
