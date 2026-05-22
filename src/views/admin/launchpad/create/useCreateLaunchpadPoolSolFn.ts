@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
-import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     useAppKitConnection,
@@ -32,7 +32,7 @@ import { getErrorMessage } from "@/utils/helpers/error-message";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 
 /** ratio_denominator base — 4 decimal places of price precision */
-const RATIO_DENOMINATOR = 10_000;
+const RATIO_DENOMINATOR = 1_000_000_000_000;
 
 export type CreateLaunchpadPoolSolParams = {
     poolName: string;
@@ -172,7 +172,7 @@ export const useCreateLaunchpadPoolSolFn = () => {
                 }
 
                 // 7. Build transaction
-                const tx = await program.methods
+                const createIx = await program.methods
                     .createPool({
                         timeStart,
                         timeEnd,
@@ -205,11 +205,30 @@ export const useCreateLaunchpadPoolSolFn = () => {
                         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                         burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                     })
-                    .transaction();
+                    .instruction();
 
-                if (prependIxs.length > 0) {
-                    tx.instructions.unshift(...prependIxs);
+                const instructions = [...prependIxs, createIx];
+
+                if (!params.isDraft) {
+                    const submitIx = await program.methods
+                        .submitPool()
+                        .accounts({
+                            admin: walletPublicKey,
+                            pool: poolPDA,
+                            burnFactory: burnFactoryPDA,
+                            launchpadConfig: launchpadConfigPDA,
+                            rewardVault: rewardVaultPDA,
+                            rewardMint,
+                            adminRewardAta,
+                            rewardTokenProgram: rewardTokenProgramId!,
+                            systemProgram: SystemProgram.programId,
+                            burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
+                        })
+                        .instruction();
+                    instructions.push(submitIx);
                 }
+
+                const tx = new Transaction().add(...instructions);
 
                 const { blockhash, lastValidBlockHeight } =
                     await connection.getLatestBlockhash();
