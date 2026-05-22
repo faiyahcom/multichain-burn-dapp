@@ -93,9 +93,9 @@ const CreateSwapPoolForm = ({
 
   const selectedTokenBurn = watch("tokenBurn");
   const selectedTokenReward = watch("tokenReward");
-  const budget = watch("budget");
   const numerator = watch("numerator");
   const denominator = watch("denominator");
+  const amountPay = watch("amountPay");
 
   const chainId = networkIdToChainId(selectedNetworkId);
   const shouldCheckMinRatio =
@@ -121,13 +121,19 @@ const CreateSwapPoolForm = ({
     retry: false,
   });
 
+  // Trigger denominator field check when any of these dependent fields change
   useEffect(() => {
     const denominatorFieldState = getFieldState("denominator");
     const isDenominatorDirty = denominatorFieldState?.isDirty;
     if (isDenominatorDirty) {
       trigger("denominator");
     }
-  }, [pairConfigData, isDetailPairConfigEnabled, isDetailPairConfigPending]);
+  }, [
+    pairConfigData,
+    isDetailPairConfigEnabled,
+    isDetailPairConfigPending,
+    numerator,
+  ]);
 
   const isRatioBiggerOrEqualToMinRatio = ({
     ratioNumerator,
@@ -284,12 +290,12 @@ const CreateSwapPoolForm = ({
   const handleOnChangeNumerator = (value: string) => {
     const numeratorNumber = Number(value);
     const denominatorNumber = Number(denominator);
-    const budgetNumber = Number(budget);
+    const amountPayNumber = Number(amountPay);
 
-    if (numeratorNumber && denominatorNumber && budgetNumber) {
-      const numberAmountPay =
-        (budgetNumber / denominatorNumber) * numeratorNumber;
-      setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
+    if (numeratorNumber && denominatorNumber && amountPayNumber) {
+      const numberBudget =
+        (amountPayNumber / numeratorNumber) * denominatorNumber;
+      setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
         shouldValidate: true,
       });
     }
@@ -298,12 +304,12 @@ const CreateSwapPoolForm = ({
   const handleOnChangeDenominator = (value: string) => {
     const numeratorNumber = Number(numerator);
     const denominatorNumber = Number(value);
-    const budgetNumber = Number(budget);
+    const amountPayNumber = Number(amountPay);
 
-    if (numeratorNumber && denominatorNumber && budgetNumber) {
-      const numberAmountPay =
-        (budgetNumber / denominatorNumber) * numeratorNumber;
-      setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
+    if (numeratorNumber && denominatorNumber && amountPayNumber) {
+      const numberBudget =
+        (amountPayNumber / numeratorNumber) * denominatorNumber;
+      setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
         shouldValidate: true,
       });
     }
@@ -465,7 +471,7 @@ const CreateSwapPoolForm = ({
                   placeholder="1"
                   aria-invalid={!!errors.numerator}
                   className={cn(
-                    "w-20 md:w-30 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-20 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:w-30 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
@@ -474,7 +480,6 @@ const CreateSwapPoolForm = ({
                   onChange={(val) => {
                     onChange(val);
                     handleOnChangeNumerator(val);
-                    trigger("denominator");
                   }}
                 />
               )}
@@ -541,7 +546,7 @@ const CreateSwapPoolForm = ({
                   placeholder="1"
                   aria-invalid={!!errors.denominator}
                   className={cn(
-                    "w-20 md:w-30 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-20 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:w-30 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
