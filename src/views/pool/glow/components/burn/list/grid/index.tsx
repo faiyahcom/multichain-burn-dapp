@@ -14,7 +14,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
 import { useQueryClient } from "@tanstack/react-query";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useReducer } from "react";
 
 interface Props {
@@ -25,6 +25,7 @@ interface Props {
 const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
   const [, forceUpdate] = useReducer((x) => x + 1, 0);
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const interval = setInterval(forceUpdate, 1000);
@@ -116,23 +117,21 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   </div>
                 }
                 btn={{
-                  asChild: true,
-                  children: (
-                    <Link
-                      to="/burn/detail/$address"
-                      params={{
-                        address: pool.address,
-                      }}
-                      search={{
-                        depositReward: undefined,
-                      }}
-                    >
-                      {statusLabel}
-                    </Link>
-                  ),
+                  children: statusLabel,
+                  hasGroupHover: true,
                 }}
                 classNames={{
                   content: "space-y-1.5 sm:space-y-3",
+                  container: "cursor-pointer group",
+                }}
+                onContainerClick={() => {
+                  navigate({
+                    to: "/burn/detail/$address",
+                    params: { address: pool.address },
+                    search: {
+                      depositReward: undefined,
+                    },
+                  });
                 }}
               />
             );

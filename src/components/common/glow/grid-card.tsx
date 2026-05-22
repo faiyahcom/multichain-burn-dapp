@@ -17,6 +17,7 @@ interface Props {
     content?: string;
     separator?: string;
   };
+  onContainerClick?: () => void;
 }
 
 const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
@@ -51,11 +52,15 @@ const GridCard: React.FC<Props> = ({
   bottomSection,
   btn,
   classNames,
+  onContainerClick,
 }) => {
   const { className: btnClassName, ...btnProps } = btn;
 
   return (
-    <div className={cn("relative rounded-24px", classNames?.container)}>
+    <div
+      className={cn("relative rounded-24px", classNames?.container)}
+      onClick={onContainerClick}
+    >
       <GlowContainer
         variant={variant}
         className={cn(
