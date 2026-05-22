@@ -303,9 +303,9 @@ const CreateSwapPoolForm = ({
       });
     }
 
-    // Only if the amountPay is empty and the budgetNumber is not falsy
+    // Only if the amountPayNumber is falsy and the budgetNumber is not falsy
     if (
-      amountPay === "" &&
+      !amountPayNumber &&
       numeratorNumber &&
       denominatorNumber &&
       budgetNumber
@@ -332,9 +332,9 @@ const CreateSwapPoolForm = ({
       });
     }
 
-    // Only if the amountPay is empty and the budgetNumber is not falsy
+    // Only if the amountPayNumber is falsy and the budgetNumber is not falsy
     if (
-      amountPay === "" &&
+      !amountPayNumber &&
       numeratorNumber &&
       denominatorNumber &&
       budgetNumber
