@@ -237,6 +237,8 @@ export const activityKind = {
   // Pool lifecycle (additional)
   70: "Create Launchpad Pool",
   71: "Launchpad Pool Submitted",
+  72: "Cancel Stake Pool",
+  73: "Cancel Launchpad Pool",
 } as const;
 
 export interface MyStakeSnapshot {
