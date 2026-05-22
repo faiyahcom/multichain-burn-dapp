@@ -17,7 +17,7 @@ import { useDepositLaunchpadSolFn } from "../hooks/useDepositLaunchpadSolFn";
 import { useClaimLaunchpadSolFn } from "../hooks/useClaimLaunchpadSolFn";
 import TBDTooltip from "@/views/pool/glow/components/launchpad/tbd-tooltip";
 import DepositDialog from "./deposit-dialog";
-import { IconTick } from "@/assets/react";
+import { IconExclaimation, IconTick } from "@/assets/react";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -67,7 +67,10 @@ const AmountActivity = ({ poolDetail }: Props) => {
         : "0";
 
     const userClaimableFormatted = launchpadUser?.claimableAmount
-        ? formatAmount(launchpadUser.claimableAmount, pool?.rewardTokenDecimals ?? 0)
+        ? formatAmount(
+            launchpadUser.claimableAmount,
+            pool?.rewardTokenDecimals ?? 0,
+        )
         : "0";
 
     const userClaimedFormatted = launchpadUser?.claimed
@@ -133,6 +136,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
     })();
 
     const isCompleted = status === "completed";
+    const isEmergencyClosed = status === "closed";
 
     const [depositDialogOpen, setDepositDialogOpen] = useState(false);
     const [isClaiming, setIsClaiming] = useState(false);
@@ -232,35 +236,39 @@ const AmountActivity = ({ poolDetail }: Props) => {
                             />
                         </>
                     ) : ( */}
-                        <StatRow
-                            label="Allocation"
-                            value={
-                                pool?.rewardVisibility === false && hasDeposited && !isEndedOrCompleted ? (
-                                    <TBDTooltip
-                                        classNames={{
-                                            container: "gap-2"
-                                        }}
-                                        tooltipProps={{
-                                            classNames: {
-                                                icon: "size-3.5 text-xs",
-                                            },
-                                        }}
-                                    />
-                                ) : (
-                                    <span className="inline-flex items-center gap-1">
-                                        {userAllocationFormatted} {saleToken}
-                                    </span>
-                                )
-                            }
-                        />
+                    <StatRow
+                        label="Allocation"
+                        value={
+                            pool?.rewardVisibility === false &&
+                                hasDeposited &&
+                                !isEndedOrCompleted ? (
+                                <TBDTooltip
+                                    classNames={{
+                                        container: "gap-2",
+                                    }}
+                                    tooltipProps={{
+                                        classNames: {
+                                            icon: "size-3.5 text-xs",
+                                        },
+                                    }}
+                                />
+                            ) : (
+                                <span className="inline-flex items-center gap-1">
+                                    {userAllocationFormatted} {saleToken}
+                                </span>
+                            )
+                        }
+                    />
                     {/* )} */}
                     <StatRow
                         label="Fee"
                         value={
-                            !isEndedOrCompleted && pool?.rewardVisibility === false && hasDeposited ? (
+                            !isEndedOrCompleted &&
+                                pool?.rewardVisibility === false &&
+                                hasDeposited ? (
                                 <TBDTooltip
                                     classNames={{
-                                        container: "gap-2"
+                                        container: "gap-2",
                                     }}
                                     tooltipProps={{
                                         classNames: {
@@ -286,10 +294,17 @@ const AmountActivity = ({ poolDetail }: Props) => {
 
                 {/* Completed success message */}
                 {isCompleted && (
-                    <p className="flex items-center text-mb-gray-b8 gap-1.5 text-xs md:text-sm lg:text-base">
+                    <p className="flex items-center gap-1.5 text-xs text-mb-gray-b8 md:text-sm lg:text-base">
                         <IconTick className="inline size-3 md:size-3.5" />
                         <span>All allocations have been distributed successfully.</span>
                     </p>
+                )}
+
+                {isEmergencyClosed && (
+                    <div className="gap-1.5 text-xs text-mb-gray-b8 md:text-sm lg:text-base">
+                        <IconExclaimation className="inline size-4 md:size-6.5" />
+                        <span className="">This pool was emergency closed by admin.</span>
+                    </div>
                 )}
 
                 {/* Action buttons */}
