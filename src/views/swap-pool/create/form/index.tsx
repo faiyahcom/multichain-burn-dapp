@@ -83,8 +83,8 @@ const CreateSwapPoolForm = ({
       poolName: "",
       tokenBurn: undefined,
       tokenReward: undefined,
-      budget: undefined,
-      amountPay: undefined,
+      budget: "",
+      amountPay: "",
       numerator: "",
       denominator: "",
     },
@@ -95,6 +95,7 @@ const CreateSwapPoolForm = ({
   const selectedTokenReward = watch("tokenReward");
   const numerator = watch("numerator");
   const denominator = watch("denominator");
+  const budget = watch("budget");
   const amountPay = watch("amountPay");
 
   const chainId = networkIdToChainId(selectedNetworkId);
@@ -122,6 +123,7 @@ const CreateSwapPoolForm = ({
   });
 
   // Trigger denominator field check when any of these dependent fields change
+  // Trigger on the Min ratio config (if any) and numerator field
   useEffect(() => {
     const denominatorFieldState = getFieldState("denominator");
     const isDenominatorDirty = denominatorFieldState?.isDirty;
@@ -291,11 +293,26 @@ const CreateSwapPoolForm = ({
     const numeratorNumber = Number(value);
     const denominatorNumber = Number(denominator);
     const amountPayNumber = Number(amountPay);
+    const budgetNumber = Number(budget);
 
     if (numeratorNumber && denominatorNumber && amountPayNumber) {
       const numberBudget =
         (amountPayNumber / numeratorNumber) * denominatorNumber;
       setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
+        shouldValidate: true,
+      });
+    }
+
+    // Only if the amountPayNumber is falsy and the budgetNumber is not falsy
+    if (
+      !amountPayNumber &&
+      numeratorNumber &&
+      denominatorNumber &&
+      budgetNumber
+    ) {
+      const numberAmountPay =
+        (budgetNumber / denominatorNumber) * numeratorNumber;
+      setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
         shouldValidate: true,
       });
     }
@@ -305,11 +322,26 @@ const CreateSwapPoolForm = ({
     const numeratorNumber = Number(numerator);
     const denominatorNumber = Number(value);
     const amountPayNumber = Number(amountPay);
+    const budgetNumber = Number(budget);
 
     if (numeratorNumber && denominatorNumber && amountPayNumber) {
       const numberBudget =
         (amountPayNumber / numeratorNumber) * denominatorNumber;
       setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
+        shouldValidate: true,
+      });
+    }
+
+    // Only if the amountPayNumber is falsy and the budgetNumber is not falsy
+    if (
+      !amountPayNumber &&
+      numeratorNumber &&
+      denominatorNumber &&
+      budgetNumber
+    ) {
+      const numberAmountPay =
+        (budgetNumber / denominatorNumber) * numeratorNumber;
+      setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
         shouldValidate: true,
       });
     }
