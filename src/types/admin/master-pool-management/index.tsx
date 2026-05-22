@@ -288,7 +288,6 @@ export const userViewLaunchpadPoolStatuses = [
   "upcoming",
   "ended",
   "completed",
-  "closed",
 ] as const;
 export const userHiddenLaunchpadPoolStatuses = [
   ...launchpadPoolStatuses.filter(
