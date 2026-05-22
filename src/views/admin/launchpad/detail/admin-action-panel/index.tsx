@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAppKitAccount } from "@reown/appkit/react";
 import type { PoolDetailResponse } from "@/types/pool";
 import { ActionBtn, Container } from "./components";
@@ -87,7 +87,15 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     tokenInDecimals: pool?.tokenInDecimals,
     assetTypeReward: pool?.assetTypeReward,
     assetTypeIn: pool?.assetTypeIn,
+    refetchInterval: 10_000,
   });
+
+  // Refetch balance on transfer modal open
+  useEffect(() => {
+    if (transferDialogOpen) {
+      refetchVaultBalance();
+    }
+  }, [transferDialogOpen, refetchVaultBalance]);
 
   const formattedRaisedAmountBackend =
     poolDetail?.depositedAmount != null && pool?.tokenInDecimals != null
