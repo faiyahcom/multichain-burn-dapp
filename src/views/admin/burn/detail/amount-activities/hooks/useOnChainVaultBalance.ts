@@ -84,6 +84,8 @@ export function useOnChainVaultBalance(params: {
     tokenInDecimals?: number;
     assetTypeReward?: number;
     assetTypeIn?: number;
+    /** Auto-refetch interval in ms. Omit or set 0 to disable polling. */
+    refetchInterval?: number;
 }) {
     const {
         poolAddress,
@@ -94,6 +96,7 @@ export function useOnChainVaultBalance(params: {
         tokenInDecimals,
         assetTypeReward,
         assetTypeIn,
+        refetchInterval,
     } = params;
 
     // Solana connection (AppKit or fallback)
@@ -195,6 +198,13 @@ export function useOnChainVaultBalance(params: {
         assetTypeIn,
         refetchKey,
     ]);
+
+    // Auto-polling
+    useEffect(() => {
+        if (!refetchInterval || !poolAddress || !chainId) return;
+        const id = setInterval(refetch, refetchInterval);
+        return () => clearInterval(id);
+    }, [refetchInterval, poolAddress, chainId, refetch]);
 
     return { rewardBalance, depositBalance, isSolana, refetch };
 }
