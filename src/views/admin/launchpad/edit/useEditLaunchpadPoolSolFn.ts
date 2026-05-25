@@ -18,7 +18,7 @@ import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 
 /** ratio_denominator base — must match create_pool */
-const RATIO_DENOMINATOR = 10_000;
+const RATIO_DENOMINATOR = 1_000_000_000_000;
 
 export interface EditLaunchpadPoolSolParams {
     poolAddress: string;
@@ -60,7 +60,7 @@ export const useEditLaunchpadPoolSolFn = () => {
 
                 const isFixed = params.mode === "fixed";
                 const ratioBps = isFixed
-                    ? new BN(Math.floor(Number(params.price ?? "0") * RATIO_DENOMINATOR))
+                    ? new BN(Math.floor(RATIO_DENOMINATOR / Number(params.price ?? "1")))
                     : new BN(0);
                 const ratioDenominator = isFixed ? new BN(RATIO_DENOMINATOR) : new BN(0);
 
