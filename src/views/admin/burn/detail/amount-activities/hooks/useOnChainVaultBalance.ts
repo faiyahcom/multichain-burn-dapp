@@ -4,6 +4,7 @@ import { ethers } from "ethers";
 import { useAppKitConnection } from "@reown/appkit-adapter-solana/react";
 import { BorshAccountsCoder, type Idl } from "@coral-xyz/anchor";
 import idl from "@/web3/contracts/multichain_burn_sc_sol.json";
+import launchpadIdl from "@/web3/contracts/launchpad.json";
 import {
     SOLANA_BACKEND_CHAIN_ID,
     NETWORK_CONFIGS,
@@ -22,8 +23,8 @@ const SOLANA_RPC_URL =
     (solanaConfig?.appKitNetwork as any)?.rpcUrls?.default?.http?.[0] ??
     (IS_MAINNET ? "https://api.mainnet-beta.solana.com" : "https://api.devnet.solana.com");
 
-// ── Anchor coder for PoolAccount deserialization ─────────────────────────────
-const accountsCoder = new BorshAccountsCoder(idl as Idl);
+const burnAccountsCoder = new BorshAccountsCoder(idl as Idl);
+const launchpadAccountsCoder = new BorshAccountsCoder(launchpadIdl as Idl);
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -84,6 +85,7 @@ export function useOnChainVaultBalance(params: {
     tokenInDecimals?: number;
     assetTypeReward?: number;
     assetTypeIn?: number;
+    poolKind?: string;
     /** Auto-refetch interval in ms. Omit or set 0 to disable polling. */
     refetchInterval?: number;
 }) {
@@ -96,8 +98,11 @@ export function useOnChainVaultBalance(params: {
         tokenInDecimals,
         assetTypeReward,
         assetTypeIn,
+        poolKind,
         refetchInterval,
     } = params;
+
+    const accountsCoder = poolKind === "launchpad" ? launchpadAccountsCoder : burnAccountsCoder;
 
     // Solana connection (AppKit or fallback)
     const { connection: appKitConnection } = useAppKitConnection();
@@ -196,6 +201,8 @@ export function useOnChainVaultBalance(params: {
         tokenInDecimals,
         assetTypeReward,
         assetTypeIn,
+        poolKind,
+        accountsCoder,
         refetchKey,
     ]);
 

@@ -87,6 +87,7 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     tokenInDecimals: pool?.tokenInDecimals,
     assetTypeReward: pool?.assetTypeReward,
     assetTypeIn: pool?.assetTypeIn,
+    poolKind: "launchpad",
     refetchInterval: 10_000,
   });
 
