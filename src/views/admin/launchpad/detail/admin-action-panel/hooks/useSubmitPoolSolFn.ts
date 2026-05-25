@@ -24,6 +24,11 @@ import {
     AssetTypeEnum,
 } from "@/web3/helpers";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import {
+    assertSufficientNativeSolBalance,
+    assertSufficientSplTokenBalance,
+} from "@/utils/helpers/solana-balance";
+import BN from "bn.js";
 import type { PoolDetailResponse } from "@/types/pool";
 
 export type SubmitPoolSolParams = {
@@ -60,6 +65,11 @@ export const useSubmitPoolSolFn = () => {
                 let accounts: Record<string, PublicKey | undefined>;
 
                 if (isNativeReward) {
+                    await assertSufficientNativeSolBalance({
+                        connection,
+                        walletPublicKey,
+                        requiredLamports: new BN(poolDetail.pool.rewardAmount ?? "0"),
+                    });
                     accounts = {
                         admin: walletPublicKey,
                         pool: poolPDA,
@@ -79,6 +89,14 @@ export const useSubmitPoolSolFn = () => {
                         rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
+
+                    await assertSufficientSplTokenBalance({
+                        connection,
+                        tokenAta: adminRewardAta,
+                        requiredAmount: new BN(poolDetail.pool.rewardAmount ?? "0"),
+                        symbol: poolDetail.pool.rewardTokenSymbol ?? "token",
+                        decimals: poolDetail.pool.rewardTokenDecimals ?? 0,
+                    });
 
                     accounts = {
                         admin: walletPublicKey,

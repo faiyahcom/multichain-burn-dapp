@@ -26,10 +26,15 @@ import {
     getLaunchpadDepositVaultPDA,
     detectAssetType,
     getTokenProgramFromAssetType,
+    AssetTypeEnum,
 } from "@/web3/helpers";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import {
+    assertSufficientNativeSolBalance,
+    assertSufficientSplTokenBalance,
+} from "@/utils/helpers/solana-balance";
 
 /** ratio_denominator base — 4 decimal places of price precision */
 const RATIO_DENOMINATOR = 1_000_000_000_000;
@@ -155,6 +160,25 @@ export const useCreateLaunchpadPoolSolFn = () => {
                 const isAuto = params.claimPolicy === "after_end_auto";
 
                 const rewardAmount = toBaseUnits(params.budget || "0", rewardDecimals);
+
+                // 5.5 Balance check — only when not a draft (draft does not transfer tokens)
+                if (!params.isDraft) {
+                    if (assetRewardType === AssetTypeEnum.NATIVE) {
+                        await assertSufficientNativeSolBalance({
+                            connection,
+                            walletPublicKey,
+                            requiredLamports: rewardAmount,
+                        });
+                    } else {
+                        await assertSufficientSplTokenBalance({
+                            connection,
+                            tokenAta: adminRewardAta,
+                            requiredAmount: rewardAmount,
+                            symbol: "sale token",
+                            decimals: rewardDecimals,
+                        });
+                    }
+                }
 
                 // 6. Create ATA instruction if needed
                 const prependIxs = [];
