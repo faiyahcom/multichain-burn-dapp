@@ -74,6 +74,7 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
     fmt(poolDetail?.pool?.currentRewardAmount, rewardDec);
   const formattedBurn = fmt(poolDetail?.depositedAmount, burnDec);
   const settlementFee = fmtFee(poolDetail?.pool?.settlementFee);
+  const collectedFee = fmt(poolDetail?.pool?.settlementFeeTotal, rewardDec);
   const creationFee =
     poolDetail?.pool?.poolCreationFee !== undefined ? (
       <span className="inline-flex items-center gap-1">
@@ -111,7 +112,7 @@ const RewardAmount = ({ poolDetail, vaultBalance }: Props) => {
           </span>
         ),
       },
-      null,
+      { label: "Collected Fee", value: `${collectedFee} ${rewardSymbol}` },
     ],
     [
       { label: "Creation Fee", value: creationFee },
