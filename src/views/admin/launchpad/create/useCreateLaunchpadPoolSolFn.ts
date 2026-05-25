@@ -147,7 +147,7 @@ export const useCreateLaunchpadPoolSolFn = () => {
 
                 const isFixed = params.mode === "fixed";
                 const ratioBps = isFixed
-                    ? new BN(Math.floor(Number(params.price ?? "0") * RATIO_DENOMINATOR))
+                    ? new BN(Math.floor(RATIO_DENOMINATOR / Number(params.price ?? "1")))
                     : new BN(0);
                 const ratioDenominator = isFixed ? new BN(RATIO_DENOMINATOR) : new BN(0);
 
