@@ -5,7 +5,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useCreateBurnPoolEvmFn } from "../useCreateBurnPoolEvmFn";
 import { useCreateBurnPoolSolFn } from "../useCreateBurnPoolSolFn";
 import { useSystemStore } from "@/stores/systemStore";
-import { NETWORK_CONFIGS, type NetworkId } from "@/config/networks";
+import { NETWORK_CONFIGS, type NetworkId, type nativeCurrency } from "@/config/networks";
 import NetworkIcon from "@/components/layout/header/network-icon";
 import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
 import { cn } from "@/lib/utils";
@@ -16,6 +16,9 @@ import {
 import { Button } from "@/components/common/glow/button";
 import { Input } from "@/components/common/glow/input";
 import { DatePicker } from "@/components/common/glow/date-picker";
+import { useFeeSettings } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
+import { formatAmount } from "@/utils/helpers/numbers";
+import TokenDisplay from "@/components/common/token-display";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
@@ -42,6 +45,13 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
   const { createPool: createPoolEvm } = useCreateBurnPoolEvmFn();
 
   const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
+  const { creationFee, isLoading: isFeeLoading } = useFeeSettings(selectedNetworkId);
+  const nativeCurrencyInfo = network?.appKitNetwork.nativeCurrency as nativeCurrency | undefined;
+  const nativeDecimals = nativeCurrencyInfo?.decimals ?? 18;
+  const nativeSymbol = nativeCurrencyInfo?.symbol ?? "";
+  const formattedCreationFee = creationFee != null
+    ? formatAmount(creationFee.toString(), nativeDecimals)
+    : isFeeLoading ? "Loading..." : "—";
 
   const {
     register,
@@ -354,6 +364,24 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
               )}
             >
               Burn
+            </span>
+          </div>
+
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+              Pool Creation Fee
+            </span>
+            <span
+              className={cn(
+                getVariantBorderClassName({ variant: "burn" }),
+                "relative flex w-full gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
+                "rounded-md border-2",
+              )}
+            >
+              {formattedCreationFee}
+              {creationFee != null && nativeSymbol && (
+                <TokenDisplay symbol={nativeSymbol} />
+              )}
             </span>
           </div>
         </div>
