@@ -119,6 +119,7 @@ export interface PoolDetailResponse {
     totalStaked: string;
     totalRewardAccrued?: string;
     totalUnstaked?: string;
+    totalRewardRefund?: string;
     user?: {
       address?: string;
       totalStaked: string;
