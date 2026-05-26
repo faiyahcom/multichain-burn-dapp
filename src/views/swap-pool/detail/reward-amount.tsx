@@ -1,10 +1,11 @@
 import { useMemo } from "react";
-import { formatAmount } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import Decimal from "decimal.js";
 import GlowContainer from "@/components/common/glow/container";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -23,6 +24,9 @@ const RewardAmount = ({ poolDetail }: Props) => {
             poolDetail?.pool?.tokenInDecimals,
         )
         : "-";
+    const settlementFee = poolDetail?.pool?.settlementFee
+        ? `${shortenNumber({ number: Number(poolDetail.pool.settlementFee) / DECIMAL_FEE_PERCENT, decimalPlaces: 2 })}%`
+        : "—";
     const network = poolDetail?.pool?.chainId
         ? chainIdToNetworkConfig(poolDetail?.pool?.chainId)
         : undefined;
@@ -92,14 +96,20 @@ const RewardAmount = ({ poolDetail }: Props) => {
                 </p>
             </div>
             <div className="space-y-3.75">
-                <p className="flex justify-between pr-2 text-sm md:pr-5 md:text-base lg:text-xl 2xl:text-2xl">
-                    <span className="text-mb-gray-b8">
-                        Total Swapped Amount:
-                    </span>{" "}
-                    <span className="">
-                        {formattedBurned} / {formattedMaxBurn} {burnTokenDisplay?.symbol}
-                    </span>
-                </p>
+                <div className="grid grid-cols-1 gap-y-1 md:grid-cols-2 md:space-x-8">
+                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                        <span className="text-mb-gray-b8">
+                            Total Swapped Amount:
+                        </span>{" "}
+                        <span className="">
+                            {formattedBurned} / {formattedMaxBurn} {burnTokenDisplay?.symbol}
+                        </span>
+                    </p>
+                    <p className="flex justify-between text-sm md:text-base lg:text-xl 2xl:text-2xl">
+                        <span className="text-mb-gray-b8">Settlement Fee:</span>
+                        <span>{settlementFee}</span>
+                    </p>
+                </div>
                 <div>
                     <div className="h-2.5 w-full overflow-hidden rounded-md border border-swap-border/85 bg-mb-dark-popover-item md:h-3.5 2xl:h-4.5">
                         <div

@@ -9,6 +9,7 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import GlowContainer from "@/components/common/glow/container";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -46,7 +47,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
     }, [pool?.rewardDenominator]);
 
     const settlementFee = pool?.settlementFee
-        ? `${shortenNumber({ number: Number(pool.settlementFee) / 100, decimalPlaces: 2 })}%`
+        ? `${shortenNumber({ number: Number(pool.settlementFee) / DECIMAL_FEE_PERCENT, decimalPlaces: 2 })}%`
         : "—";
 
     // total reward (the full cap in sale tokens)

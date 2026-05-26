@@ -6,7 +6,7 @@ import { useOnChainVaultBalance } from "@/views/admin/burn/detail/amount-activit
 import { useMemo, useState } from "react";
 import { ActionBtn, StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import TokenDisplay from "@/components/common/token-display";
 
 type Props = {
@@ -141,6 +141,26 @@ const EndStatus = ({ poolDetail }: Props) => {
               symbol={poolDetail?.tokenIn?.symbol}
               customSymbol={poolDetail?.tokenIn?.customSymbol}
               imageUri={burnTokenDisplay.imageUri ?? undefined}
+              classNames={{
+                img: "size-3.5 md:size-4 2xl:size-4.25",
+                container: "inline-flex items-center gap-1 md:gap-1.5",
+              }}
+            />
+          </div>
+        }
+      />
+      <StatRow
+        label="Fee"
+        value={
+          <div className="inline-flex items-center gap-1 md:gap-1.5">
+            {formatAmount(
+              poolDetail?.userAmount?.totalSettlementFee ?? "0",
+              poolDetail?.pool.rewardTokenDecimals ?? 0,
+            )}
+            <TokenDisplay
+              symbol={poolDetail?.tokenOut?.symbol}
+              customSymbol={poolDetail?.tokenOut?.customSymbol}
+              imageUri={rewardTokenDisplay.imageUri ?? undefined}
               classNames={{
                 img: "size-3.5 md:size-4 2xl:size-4.25",
                 container: "inline-flex items-center gap-1 md:gap-1.5",

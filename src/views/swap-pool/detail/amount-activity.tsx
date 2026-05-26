@@ -170,6 +170,34 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                     )}
                 </span>
             </div>
+            {poolDetail?.pool.status !== "canceled" && (
+                <div className="mb-3 flex items-center justify-between">
+                    <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">
+                        Fee
+                    </span>
+                    <span className="text-sm font-bold md:text-base lg:text-md 2xl:text-xl">
+                        {poolDetail ? (
+                            <div className="inline-flex items-center gap-1.5">
+                                {formatAmount(
+                                    poolDetail.userAmount?.totalSettlementFee ?? "0",
+                                    poolDetail.pool.rewardTokenDecimals,
+                                )}
+                                <TokenDisplay
+                                    symbol={poolDetail.tokenOut?.symbol}
+                                    customSymbol={poolDetail.tokenOut?.customSymbol}
+                                    imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                                    classNames={{
+                                        img: "size-3.5 md:size-4 2xl:size-4.25",
+                                        container: "inline-flex items-center gap-1.5",
+                                    }}
+                                />
+                            </div>
+                        ) : (
+                            <Skeleton className="h-4 w-24" />
+                        )}
+                    </span>
+                </div>
+            )}
             {poolDetail?.pool.status === "canceled" && isPoolOwner && (
                 <div className="mb-3 flex items-center justify-between">
                 <span className="text-sm text-mb-gray-b8 md:text-base lg:text-md 2xl:text-xl">

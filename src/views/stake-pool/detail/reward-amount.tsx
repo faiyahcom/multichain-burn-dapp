@@ -3,6 +3,7 @@ import type { PoolDetailResponse } from "@/types/pool";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import GlowContainer from "@/components/common/glow/container";
+import { DECIMAL_FEE_PERCENT } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 
 type Props = {
     poolDetail?: PoolDetailResponse;
@@ -20,7 +21,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
             : "-";
 
     const settlementFee = poolDetail?.pool?.settlementFee
-        ? `${shortenNumber({ number: Number(poolDetail.pool.settlementFee) / 100, decimalPlaces: 2 })}%`
+        ? `${shortenNumber({ number: Number(poolDetail.pool.settlementFee) / DECIMAL_FEE_PERCENT, decimalPlaces: 2 })}%`
         : "—";
 
     const network = poolDetail?.pool?.chainId

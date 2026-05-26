@@ -60,6 +60,7 @@ export interface PoolDetailResponse {
     deposited: string;
     claimed: string;
     canClaim: boolean;
+    totalSettlementFee?: string;
   };
   depositedAmount: string;
   claimedRewardAmount: string;
