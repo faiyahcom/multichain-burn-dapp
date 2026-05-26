@@ -19,45 +19,52 @@ export const useEmergencyCloseSolFn = () => {
 
     const emergencyCloseSol = useCallback(
         async ({ poolAddress }: { poolAddress: string }) => {
-            if (!isConnected || !address) throw new Error("Wallet not connected");
-            if (!connection || !provider) throw new Error("Connection not available");
+            try {
+                if (!isConnected || !address) throw new Error("Wallet not connected");
+                if (!connection || !provider) throw new Error("Connection not available");
 
-            const walletPublicKey = new PublicKey(address);
-            const anchorWallet: BrowserWallet = {
-                publicKey: walletPublicKey,
-                signTransaction: provider.signTransaction.bind(provider),
-                signAllTransactions: provider.signAllTransactions?.bind(provider),
-            };
+                const walletPublicKey = new PublicKey(address);
+                const anchorWallet: BrowserWallet = {
+                    publicKey: walletPublicKey,
+                    signTransaction: provider.signTransaction.bind(provider),
+                    signAllTransactions: provider.signAllTransactions?.bind(provider),
+                };
 
-            const program = getLaunchpadProgram(connection, anchorWallet);
-            const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);
-            const launchpadConfigPDA = getLaunchpadConfigPDA(program.programId);
-            const poolPDA = new PublicKey(poolAddress);
+                const program = getLaunchpadProgram(connection, anchorWallet);
+                const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);
+                const launchpadConfigPDA = getLaunchpadConfigPDA(program.programId);
+                const poolPDA = new PublicKey(poolAddress);
 
-            const tx = await program.methods
-                .emergencyClosePool()
-                .accounts({
-                    admin: walletPublicKey,
-                    burnFactory: burnFactoryPDA,
-                    launchpadConfig: launchpadConfigPDA,
-                    pool: poolPDA,
-                })
-                .transaction();
+                const tx = await program.methods
+                    .emergencyClosePool()
+                    .accounts({
+                        admin: walletPublicKey,
+                        burnFactory: burnFactoryPDA,
+                        launchpadConfig: launchpadConfigPDA,
+                        pool: poolPDA,
+                    })
+                    .transaction();
 
-            const { blockhash, lastValidBlockHeight } =
-                await connection.getLatestBlockhash();
-            tx.recentBlockhash = blockhash;
-            tx.feePayer = walletPublicKey;
+                const { blockhash, lastValidBlockHeight } =
+                    await connection.getLatestBlockhash();
+                tx.recentBlockhash = blockhash;
+                tx.feePayer = walletPublicKey;
 
-            const signedTx = await provider.signTransaction(tx);
-            const signature = await sendAndConfirmTransactionSafe(
-                connection,
-                signedTx.serialize(),
-                { blockhash, lastValidBlockHeight },
-            );
+                const signedTx = await provider.signTransaction(tx);
+                const signature = await sendAndConfirmTransactionSafe(
+                    connection,
+                    signedTx.serialize(),
+                    { blockhash, lastValidBlockHeight },
+                );
 
-            toast.success("Pool emergency closed!", { description: signature });
-            return signature;
+                toast.success("Pool emergency closed!", { description: signature });
+                return signature;
+            } catch (error: unknown) {
+                toast.error("Emergency close failed", {
+                    description: getErrorMessage({ error }),
+                });
+                throw error;
+            }
         },
         [isConnected, address, connection, provider],
     );

@@ -1,11 +1,10 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "@tanstack/react-router";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { useAppKitProvider } from "@reown/appkit/react";
+import { toast } from "@/components/common/custom-toast";
 import { poolQueryKeys } from "@/services/queries/queryKey";
 import { poolService } from "@/services/poolService";
 import type { PoolDetailResponse } from "@/types/pool";
-import { toast } from "@/components/common/custom-toast";
 import { useCancelPoolEvmFn } from "./hooks/useCancelPoolEvmFn";
 import { useSubmitPoolEvmFn } from "./hooks/useSubmitPoolEvmFn";
 import { useEmergencyCloseEvmFn } from "./hooks/useEmergencyCloseEvmFn";
@@ -14,10 +13,10 @@ import { useEmergencyCloseSolFn } from "./hooks/useEmergencyCloseSolFn";
 import { useSubmitPoolSolFn } from "./hooks/useSubmitPoolSolFn";
 import { useCancelPoolSolFn } from "./hooks/useCancelPoolSolFn";
 import { useWithdrawSolFn } from "./hooks/useWithdrawSolFn";
+import { ensureLatestSuperAdminAccess } from "@/utils/helpers/ensure-super-admin-access";
 
 export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
     const { caipAddress } = useAppKitAccount();
-    const { walletProvider } = useAppKitProvider("eip155");
     const namespace = caipAddress?.split(":")[0];
     const isSolana = namespace === "solana";
     const queryClient = useQueryClient();
@@ -87,6 +86,17 @@ export const useAdminAction = (poolDetail?: PoolDetailResponse) => {
 
     const handleEmergencyClose = async (reason?: string) => {
         if (!pool?.address) return;
+
+        const access = await ensureLatestSuperAdminAccess({
+            forbiddenMessage: "Unauthorized",
+        });
+        if (!access.ok) {
+            toast.error("Emergency close failed", {
+                description: access.message,
+            });
+            return;
+        }
+
         if (isSolana) {
             await emergencyCloseSol({ poolAddress: pool.address });
         } else {
