@@ -59,10 +59,10 @@ export const useEditLaunchpadPoolSolFn = () => {
                 const launchpadConfigPDA = getLaunchpadConfigPDA(program.programId);
 
                 const isFixed = params.mode === "fixed";
-                const ratioBps = isFixed
-                    ? new BN(Math.floor(RATIO_DENOMINATOR / Number(params.price ?? "1")))
+                const ratioBps = isFixed ? new BN(RATIO_DENOMINATOR) : new BN(0);
+                const ratioDenominator = isFixed
+                    ? new BN(Math.round(Number(params.price ?? "1") * RATIO_DENOMINATOR))
                     : new BN(0);
-                const ratioDenominator = isFixed ? new BN(RATIO_DENOMINATOR) : new BN(0);
 
                 const isInstant = params.claimPolicy === "instant";
                 const isAuto = params.claimPolicy === "after_end_auto";
