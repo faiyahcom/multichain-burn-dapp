@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { useSignMessage, useConnections } from 'wagmi'
-import { useAppKitAccount, useDisconnect } from '@reown/appkit/react'
+import { useAppKitAccount, useDisconnect, useAppKitProvider } from '@reown/appkit/react'
 import { createWalletClient, custom } from 'viem'
 import bs58 from 'bs58'
 import { authService, hasEnabledAdminRole } from '@/services/authService'
@@ -68,6 +68,9 @@ export function useWalletAuth() {
   const { mutateAsync: signEvmMessage } = useSignMessage()
   const connections = useConnections()
   const connector = connections[0]?.connector
+  // AppKit's live session-backed EVM provider — always connected, unlike
+  // connector.getProvider() which can return an uninitialised lazy instance.
+  const { walletProvider: appKitEvmProvider } = useAppKitProvider<any>('eip155')
 
   const { address: solanaAddress } = useAppKitAccount({
     namespace: 'solana',
@@ -118,11 +121,15 @@ export function useWalletAuth() {
             // viem's signMessage calls personal_sign without any chain ID checks.
             if (!connector) throw signError
             console.log('[Step 2] connector.id:', connector.id)
-            const liveChainId = Number(await connector.getChainId())
-            console.log('[Step 2] liveChainId:', liveChainId)
-            const provider = await connector.getProvider({ chainId: liveChainId }) as any
-            console.log('[Step 2] provider type:', provider?.constructor?.name ?? typeof provider)
-            const viemClient = createWalletClient({ transport: custom(provider) })
+            // Use the AppKit provider (has an active WalletConnect session) instead of
+            // connector.getProvider() which returns an uninitialised lazy instance and
+            // throws "Please call connect() before request()".
+            if (!appKitEvmProvider) {
+              console.error('[Step 2] appKitEvmProvider is undefined — cannot sign')
+              throw signError
+            }
+            console.log('[Step 2] appKitEvmProvider type:', appKitEvmProvider?.constructor?.name ?? typeof appKitEvmProvider)
+            const viemClient = createWalletClient({ transport: custom(appKitEvmProvider) })
             try {
               signature = await viemClient.signMessage({ account: address as `0x${string}`, message })
               console.log('[Step 2] ✓ viem signMessage OK, sig:', signature?.slice(0, 20), '…')
@@ -205,7 +212,7 @@ export function useWalletAuth() {
         setLoading(false)
       }
     },
-    [signEvmMessage, connector, connections.length, login, logout, setLoading, setError, disconnect, navigate],
+    [signEvmMessage, connector, connections.length, appKitEvmProvider, login, logout, setLoading, setError, disconnect, navigate],
   )
 
   const authenticateEvm = useCallback(
