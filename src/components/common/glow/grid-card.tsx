@@ -64,9 +64,10 @@ const GridCard: React.FC<Props> = ({
       <GlowContainer
         variant={variant}
         className={cn(
-          "relative h-full space-y-3 border-3 p-3 sm:space-y-6 sm:p-6",
+          "relative h-full border-3 p-3 sm:p-6",
           "text-center text-base font-semibold sm:text-2xl",
           "z-10 **:z-10",
+          "flex flex-col justify-between gap-3 sm:gap-6",
           CARD_VARIANT_BG_CLASS_NAME[variant],
           classNames?.glowContainer,
         )}
