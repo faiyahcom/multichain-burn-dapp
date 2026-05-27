@@ -7,15 +7,23 @@ import {
   type ContainerVariant,
 } from "./container";
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+  containerStyle,
+  containerClassName,
+  className,
+  ...props
+}: React.ComponentProps<"table"> & {
+  containerStyle?: React.CSSProperties;
+  containerClassName?: string;
+}) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto overflow-y-hidden"
-      style={{
-        scrollbarWidth: "thin",
-        scrollbarColor: "rgba(0, 0, 0, 0.3) transparent",
-      }}
+      className={cn(
+        "relative w-full overflow-x-auto overflow-y-hidden thin-transparent-scrollbar",
+        containerClassName,
+      )}
+      style={containerStyle}
     >
       <table
         data-slot="table"
