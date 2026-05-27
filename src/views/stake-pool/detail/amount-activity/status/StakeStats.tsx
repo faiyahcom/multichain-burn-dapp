@@ -189,6 +189,7 @@ const StakeStats = ({
                             {formatTimestampSecondsToDate({
                                 timestamp: poolDetail?.pool?.interestStopDate,
                             })}
+                            .
                         </span>
                         <br />
                         <span>You can then unstake and claim your rewards</span>
