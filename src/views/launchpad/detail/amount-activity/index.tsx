@@ -287,7 +287,7 @@ const AmountActivity = ({ poolDetail }: Props) => {
 
                 {/* Distribution mode message */}
                 {distributionMessage && (
-                    <p className="text-xs text-mb-gray-b8 md:text-sm lg:text-base">
+                    <p className="text-xs text-destructive md:text-sm lg:text-base">
                         {distributionMessage}
                     </p>
                 )}
