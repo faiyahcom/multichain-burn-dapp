@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from "clsx";
 import { extendTailwindMerge } from "tailwind-merge";
 
-const customMerge = extendTailwindMerge<"scrollbar">({
+const customMerge = extendTailwindMerge({
   extend: {
     classGroups: {
       "font-size": [
@@ -36,10 +36,6 @@ const customMerge = extendTailwindMerge<"scrollbar">({
         "rounded-18px",
         "rounded-24px",
         "rounded-13px",
-      ],
-      scrollbar: [
-        "thin-transparent-scrollbar",
-        "thin-white-transparent-scrollbar",
       ],
     },
   },

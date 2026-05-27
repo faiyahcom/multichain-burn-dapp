@@ -63,7 +63,7 @@ const LaunchpadRecentPoolsTable = () => {
   return (
     <>
       <div className="space-y-6">
-        <Table containerClassName="thin-white-transparent-scrollbar">
+        <Table>
           <TableHeader>
             <TableRow>
               {columns.map((column, index) => (

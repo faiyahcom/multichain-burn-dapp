@@ -50,7 +50,7 @@ const LaunchpadPoolListTable: React.FC<Props> = ({ data, isLoading }) => {
   const fixWidth: React.CSSProperties["minWidth"] = `200px`;
 
   return (
-    <Table containerClassName="thin-white-transparent-scrollbar">
+    <Table>
       <TableHeader>
         <TableRow>
           {columns.map((column, index) => (
