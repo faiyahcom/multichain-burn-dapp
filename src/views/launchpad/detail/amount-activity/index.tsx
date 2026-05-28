@@ -126,10 +126,22 @@ const AmountActivity = ({ poolDetail }: Props) => {
         }
         if (claimPolicy === "after_end") {
             if (distributionMode === "automatic") {
-                return "Your allocation will be automatically distributed when the pool ends.";
+                return (
+                    <>
+                        Your allocation will be automatically distributed{" "}
+                        <br />
+                        when the pool ends.
+                    </>
+                );
             }
             if (distributionMode === "claim") {
-                return "Your rewards will be available to claim when the pool ends.";
+                return (
+                    <>
+                        Your rewards will be available to claim{" "}
+                        <br />
+                        when the pool ends.
+                    </>
+                );
             }
         }
         return null;
@@ -287,21 +299,21 @@ const AmountActivity = ({ poolDetail }: Props) => {
 
                 {/* Distribution mode message */}
                 {distributionMessage && (
-                    <p className="text-xs text-destructive md:text-sm lg:text-base">
+                    <p className="text-center text-xs text-destructive md:text-sm lg:text-base">
                         {distributionMessage}
                     </p>
                 )}
 
                 {/* Completed success message */}
                 {isCompleted && (
-                    <p className="flex items-center gap-1.5 text-xs text-mb-gray-b8 md:text-sm lg:text-base">
+                    <p className="flex items-center justify-center gap-1.5 text-xs text-mb-gray-b8 md:text-sm lg:text-base">
                         <IconTick className="inline size-3 md:size-3.5" />
                         <span>All allocations have been distributed successfully.</span>
                     </p>
                 )}
 
                 {isEmergencyClosed && (
-                    <div className="gap-1.5 text-xs text-mb-gray-b8 md:text-sm lg:text-base">
+                    <div className="flex items-center justify-center gap-1.5 text-xs text-mb-gray-b8 md:text-sm lg:text-base">
                         <IconExclaimation className="inline size-4 md:size-6.5" />
                         <span className="">This pool was emergency closed by admin.</span>
                     </div>

@@ -224,7 +224,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                 </div>
             )}
             {Number(poolDetail?.userAmount?.claimed || "0") > 0 && (
-                <div className="inline-flex items-center gap-1.5 py-1.5 md:gap-2.5">
+                <div className="flex items-center justify-center gap-1.5 py-1.5 md:gap-2.5">
                     <IconTick className="inline size-3 md:size-3.5" />
                     <span className="text-xs text-mb-gray-b8 md:text-sm 2xl:text-base">
                         Reward has been sent to your wallet after swap
@@ -232,7 +232,7 @@ const AmountAndActivity = ({ poolDetail }: Props) => {
                 </div>
             )}
             {poolDetail?.pool.status === "closed" && (
-                <div className="inline-flex items-start gap-1.5 py-1.5 md:gap-2.5">
+                <div className="flex items-center justify-center gap-1.5 py-1.5 md:gap-2.5">
                     <IconExclaimation className="inline size-3 md:size-3.5" />
                     <span className="text-xs text-mb-gray-b8 md:text-sm 2xl:text-base">
                         This pool was emergency closed by admin.
