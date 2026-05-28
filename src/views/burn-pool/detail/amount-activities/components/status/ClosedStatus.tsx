@@ -111,7 +111,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                     </div>
                 }
             />
-            <div className="mx-6 inline-flex items-start gap-1">
+            <div className="flex items-start justify-center gap-1">
                 <IconExclaimation className="inline size-5 translate-y-0.5" />
                 <span className="text-sm text-greyed">
                     This pool was emergency closed by admin.
