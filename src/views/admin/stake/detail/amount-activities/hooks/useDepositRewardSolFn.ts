@@ -28,6 +28,10 @@ import {
 } from "@/web3/helpers";
 import type { PoolDetailResponse } from "@/types/pool";
 import { toBaseUnits } from "@/utils/helpers/numbers";
+import {
+    assertSufficientNativeSolBalance,
+    assertSufficientSplTokenBalance,
+} from "@/utils/helpers/solana-balance";
 
 export interface DepositRewardStakeSolParams {
     poolAddress: string;
@@ -58,13 +62,18 @@ export const useDepositRewardSolFn = () => {
                 const burnFactoryPDA = getFactoryPDA(MULTICHAIN_BURN_PROGRAM_ID);
                 const poolPDA = new PublicKey(poolAddress);
 
-                const { rewardTokenDecimals, assetTypeReward, rewardToken } = poolDetail.pool;
+                const { rewardTokenDecimals, assetTypeReward, rewardToken, rewardTokenSymbol } = poolDetail.pool;
                 const amountBN = new BN(toBaseUnits(amountStr, rewardTokenDecimals).toString());
                 const isNativeReward = assetTypeReward === AssetTypeEnum.NATIVE;
 
                 let signature: string;
 
                 if (isNativeReward) {
+                    await assertSufficientNativeSolBalance({
+                        connection,
+                        walletPublicKey,
+                        requiredLamports: amountBN,
+                    });
                     const tx = await program.methods
                         .depositRewardNative(amountBN)
                         .accounts({
@@ -102,6 +111,14 @@ export const useDepositRewardSolFn = () => {
                         rewardTokenProgram,
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
+
+                    await assertSufficientSplTokenBalance({
+                        connection,
+                        tokenAta: ownerRewardAta,
+                        requiredAmount: amountBN,
+                        symbol: rewardTokenSymbol ?? "token",
+                        decimals: rewardTokenDecimals,
+                    });
 
                     const tx = await program.methods
                         .depositReward(amountBN)

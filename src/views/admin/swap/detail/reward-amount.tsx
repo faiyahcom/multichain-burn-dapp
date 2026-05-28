@@ -3,6 +3,7 @@ import type { BurnPoolStatus, PoolDetailResponse } from "@/types/pool";
 import { Skeleton } from "@/components/ui/skeleton";
 import { chainIdToNetworkConfig, type nativeCurrency } from "@/config/networks";
 import NetworkImgIcon from "@/components/common/network-img-icon";
+import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
 import { useMediaQuery } from "usehooks-ts";
 
@@ -37,8 +38,27 @@ const RewardAmount = ({ poolDetail }: Props) => {
   const nativeDecimals = nativeCurrencyInfo?.decimals ?? 18;
   const nativeSymbol = nativeCurrencyInfo?.symbol ?? "";
 
-  const rewardSymbol = poolDetail?.pool?.rewardTokenSymbol ?? "";
-  const burnSymbol = poolDetail?.pool?.tokenInSymbol ?? "";
+  const burnTokenDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: poolDetail?.pool?.tokenIn,
+    tokenSymbol: poolDetail?.tokenIn?.symbol,
+    tokenName: poolDetail?.tokenIn?.name,
+    customName: poolDetail?.tokenIn?.customName,
+    customSymbol: poolDetail?.tokenIn?.customSymbol,
+    imageUri: poolDetail?.tokenIn?.imageUri,
+  });
+  const rewardTokenDisplay = resolvePoolTokenDisplay({
+    network,
+    tokenAddress: poolDetail?.pool?.rewardToken,
+    tokenSymbol: poolDetail?.tokenOut?.symbol,
+    tokenName: poolDetail?.tokenOut?.name,
+    customName: poolDetail?.tokenOut?.customName,
+    customSymbol: poolDetail?.tokenOut?.customSymbol,
+    imageUri: poolDetail?.tokenOut?.imageUri,
+  });
+
+  const rewardSymbol = rewardTokenDisplay.symbol;
+  const burnSymbol = burnTokenDisplay.symbol;
   const rewardDec = poolDetail?.pool?.rewardTokenDecimals ?? 0;
   const burnDec = poolDetail?.pool?.tokenInDecimals ?? 0;
 
@@ -50,6 +70,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
   );
   const formattedBurn = fmt(poolDetail?.depositedAmount, burnDec);
   const settlementFee = fmtFee(poolDetail?.pool?.settlementFee);
+  const collectedFee = fmt(poolDetail?.pool?.settlementFeeTotal, rewardDec);
   const creationFee =
     poolDetail?.pool?.poolCreationFee !== undefined ? (
       <span className="inline-flex items-center gap-1">
@@ -87,7 +108,7 @@ const RewardAmount = ({ poolDetail }: Props) => {
           </span>
         ),
       },
-      null,
+      { label: "Collected Fee", value: `${collectedFee} ${rewardSymbol}` },
     ],
     [
       { label: "Creation Fee", value: creationFee },

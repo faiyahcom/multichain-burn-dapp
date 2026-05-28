@@ -30,10 +30,15 @@ import {
     getDepositVaultPDA,
     detectAssetType,
     getTokenProgramFromAssetType,
+    AssetTypeEnum,
 } from "@/web3/helpers";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 import BN from "bn.js";
 import { DECIMAL_FEE_PERCENT } from "../../fee-settings-management/hooks/useFeeSettings";
+import {
+    assertSufficientNativeSolBalance,
+    assertSufficientSplTokenBalance,
+} from "@/utils/helpers/solana-balance";
 
 export type CreateStakePoolSolParams = {
     poolName: string;
@@ -171,6 +176,23 @@ export const useCreateStakePoolSolFn = () => {
                         : new BN(Math.round(params.interestAccrualDuration * 86400));
                 // APR stored as basis points: 12% → 1200 bps
                 const aprBps = new BN(Math.round(params.apr * DECIMAL_FEE_PERCENT));
+
+                // 6.5 Balance check
+                if (assetRewardType === AssetTypeEnum.NATIVE) {
+                    await assertSufficientNativeSolBalance({
+                        connection,
+                        walletPublicKey,
+                        requiredLamports: rewardAmountBN,
+                    });
+                } else {
+                    await assertSufficientSplTokenBalance({
+                        connection,
+                        tokenAta: ownerRewardAta,
+                        requiredAmount: rewardAmountBN,
+                        symbol: "reward token",
+                        decimals: rewardDecimals,
+                    });
+                }
 
                 // 7. Prepend ATA creation if wallet's reward ATA is missing
                 const prependIxs: TransactionInstruction[] = [];

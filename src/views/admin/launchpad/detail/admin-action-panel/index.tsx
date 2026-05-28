@@ -7,10 +7,11 @@ import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 import ClosePoolDialog from "@/components/shared/close-pool-dialog";
 import TransferTokensDialog from "@/views/admin/burn/detail/amount-activities/TransferTokensDialog";
 import { useBatchTransferEvmFn } from "./hooks/useBatchTransferEvmFn";
+import { useBatchTransferSolFn } from "./hooks/useBatchTransferSolFn";
 import type {
   BatchRecipient,
   TokenMode,
-} from "@/views/admin/stake/detail/amount-activities/hooks/useBatchTransferSolFn";
+} from "@/views/admin/burn/detail/amount-activities/hooks/useBatchTransferSolFn";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { chainIdToNetworkConfig, SOLANA_BACKEND_CHAIN_ID } from "@/config/networks";
 import { formatAmount } from "@/utils/helpers/numbers";
@@ -35,6 +36,7 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
   } = useAdminAction(poolDetail);
 
   const { batchTransferEvm } = useBatchTransferEvmFn();
+  const { batchTransferSol } = useBatchTransferSolFn();
 
   const [activeAction, setActiveAction] = useState<string | null>(null);
   const [closeDialogOpen, setCloseDialogOpen] = useState(false);
@@ -87,6 +89,7 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     tokenInDecimals: pool?.tokenInDecimals,
     assetTypeReward: pool?.assetTypeReward,
     assetTypeIn: pool?.assetTypeIn,
+    poolKind: "launchpad",
     refetchInterval: 10_000,
   });
 
@@ -121,17 +124,23 @@ const AdminActionPanel = ({ poolDetail }: Props) => {
     mode: TokenMode,
   ) => {
     if (!pool?.address || !poolDetail) return;
-    if (isSolanaPool)
-      throw new Error(
-        "Token transfer is not yet available for Solana launchpad pools.",
-      );
-    await batchTransferEvm({
-      poolAddress: pool.address,
-      poolDetail,
-      mode,
-      recipients,
-      onSuccess: () => refetchVaultBalance(),
-    });
+    if (isSolanaPool) {
+      await batchTransferSol({
+        poolAddress: pool.address,
+        poolDetail,
+        mode,
+        recipients,
+        onSuccess: () => refetchVaultBalance(),
+      });
+    } else {
+      await batchTransferEvm({
+        poolAddress: pool.address,
+        poolDetail,
+        mode,
+        recipients,
+        onSuccess: () => refetchVaultBalance(),
+      });
+    }
     invalidatePoolQueries(pool.address);
     refetchVaultBalance();
   };

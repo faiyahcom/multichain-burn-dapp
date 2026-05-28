@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
-import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from "@solana/web3.js";
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY, Transaction } from "@solana/web3.js";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import {
     useAppKitConnection,
@@ -26,13 +26,18 @@ import {
     getLaunchpadDepositVaultPDA,
     detectAssetType,
     getTokenProgramFromAssetType,
+    AssetTypeEnum,
 } from "@/web3/helpers";
 import { toBaseUnits } from "@/utils/helpers/numbers";
 import { getErrorMessage } from "@/utils/helpers/error-message";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
+import {
+    assertSufficientNativeSolBalance,
+    assertSufficientSplTokenBalance,
+} from "@/utils/helpers/solana-balance";
 
 /** ratio_denominator base — 4 decimal places of price precision */
-const RATIO_DENOMINATOR = 10_000;
+const RATIO_DENOMINATOR = 1_000_000_000_000;
 
 export type CreateLaunchpadPoolSolParams = {
     poolName: string;
@@ -146,15 +151,34 @@ export const useCreateLaunchpadPoolSolFn = () => {
                 const timeEnd = new BN(Math.floor(params.endTime.getTime() / 1000));
 
                 const isFixed = params.mode === "fixed";
-                const ratioBps = isFixed
-                    ? new BN(Math.floor(Number(params.price ?? "0") * RATIO_DENOMINATOR))
+                const ratioBps = isFixed ? new BN(RATIO_DENOMINATOR) : new BN(0);
+                const ratioDenominator = isFixed
+                    ? new BN(Math.round(Number(params.price ?? "1") * RATIO_DENOMINATOR))
                     : new BN(0);
-                const ratioDenominator = isFixed ? new BN(RATIO_DENOMINATOR) : new BN(0);
 
                 const isInstant = params.claimPolicy === "instant";
                 const isAuto = params.claimPolicy === "after_end_auto";
 
                 const rewardAmount = toBaseUnits(params.budget || "0", rewardDecimals);
+
+                // 5.5 Balance check — only when not a draft (draft does not transfer tokens)
+                if (!params.isDraft) {
+                    if (assetRewardType === AssetTypeEnum.NATIVE) {
+                        await assertSufficientNativeSolBalance({
+                            connection,
+                            walletPublicKey,
+                            requiredLamports: rewardAmount,
+                        });
+                    } else {
+                        await assertSufficientSplTokenBalance({
+                            connection,
+                            tokenAta: adminRewardAta,
+                            requiredAmount: rewardAmount,
+                            symbol: "sale token",
+                            decimals: rewardDecimals,
+                        });
+                    }
+                }
 
                 // 6. Create ATA instruction if needed
                 const prependIxs = [];
@@ -172,7 +196,7 @@ export const useCreateLaunchpadPoolSolFn = () => {
                 }
 
                 // 7. Build transaction
-                const tx = await program.methods
+                const createIx = await program.methods
                     .createPool({
                         timeStart,
                         timeEnd,
@@ -205,11 +229,30 @@ export const useCreateLaunchpadPoolSolFn = () => {
                         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
                         burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                     })
-                    .transaction();
+                    .instruction();
 
-                if (prependIxs.length > 0) {
-                    tx.instructions.unshift(...prependIxs);
+                const instructions = [...prependIxs, createIx];
+
+                if (!params.isDraft) {
+                    const submitIx = await program.methods
+                        .submitPool()
+                        .accounts({
+                            admin: walletPublicKey,
+                            pool: poolPDA,
+                            burnFactory: burnFactoryPDA,
+                            launchpadConfig: launchpadConfigPDA,
+                            rewardVault: rewardVaultPDA,
+                            rewardMint,
+                            adminRewardAta,
+                            rewardTokenProgram: rewardTokenProgramId!,
+                            systemProgram: SystemProgram.programId,
+                            burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
+                        })
+                        .instruction();
+                    instructions.push(submitIx);
                 }
+
+                const tx = new Transaction().add(...instructions);
 
                 const { blockhash, lastValidBlockHeight } =
                     await connection.getLatestBlockhash();
