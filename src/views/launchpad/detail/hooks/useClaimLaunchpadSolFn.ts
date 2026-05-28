@@ -21,6 +21,7 @@ import {
     getFactoryPDA,
     getLaunchpadConfigPDA,
     getLaunchpadRewardVaultPDA,
+    getLaunchpadUserDepositPDA,
     detectAssetType,
     getTokenProgramFromAssetType,
     AssetTypeEnum,
@@ -88,8 +89,20 @@ export const useClaimLaunchpadSolFn = () => {
                     tokenIn,
                     depositMint: depositMint?.toBase58() ?? null,
                 });
+                const userDepositPDA = getLaunchpadUserDepositPDA(
+                    poolPDA,
+                    walletPublicKey,
+                    program.programId,
+                );
+
                 if (isNativeReward) {
                     // ── claim_native ──────────────────────────────────────
+                    // remaining_accounts: [user (W:true), userDeposit (W:true)]
+                    const remainingAccounts = [
+                        { pubkey: walletPublicKey, isSigner: false, isWritable: true },
+                        { pubkey: userDepositPDA,  isSigner: false, isWritable: true },
+                    ];
+
                     console.log("[claimLaunchpadSol] claimNative accounts", {
                         signer: walletPublicKey.toBase58(),
                         treasury: treasuryPubkey.toBase58(),
@@ -97,6 +110,7 @@ export const useClaimLaunchpadSolFn = () => {
                         launchpadConfig: launchpadConfigPDA.toBase58(),
                         pool: poolPDA.toBase58(),
                         depositMint: depositMint?.toBase58() ?? null,
+                        userDepositPDA: userDepositPDA.toBase58(),
                     });
 
                     const tx = await program.methods
@@ -111,6 +125,7 @@ export const useClaimLaunchpadSolFn = () => {
                             systemProgram: SystemProgram.programId,
                             burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                         } as any)
+                        .remainingAccounts(remainingAccounts)
                         .transaction();
 
                     const { blockhash, lastValidBlockHeight } =
@@ -147,6 +162,20 @@ export const useClaimLaunchpadSolFn = () => {
                         ASSOCIATED_TOKEN_PROGRAM_ID,
                     );
 
+                    // remaining_accounts: [user (W:false), userDeposit (W:true), userRewardAta (W:true)]
+                    const userRewardAta = await getAssociatedTokenAddress(
+                        rewardMintPK,
+                        walletPublicKey,
+                        false,
+                        rewardTokenProgram,
+                        ASSOCIATED_TOKEN_PROGRAM_ID,
+                    );
+                    const remainingAccounts = [
+                        { pubkey: walletPublicKey, isSigner: false, isWritable: false },
+                        { pubkey: userDepositPDA,  isSigner: false, isWritable: true },
+                        { pubkey: userRewardAta,   isSigner: false, isWritable: true },
+                    ];
+
                     console.log("[claimLaunchpadSol] claimSpl accounts", {
                         signer: walletPublicKey.toBase58(),
                         treasury: treasuryPubkey.toBase58(),
@@ -158,6 +187,8 @@ export const useClaimLaunchpadSolFn = () => {
                         rewardMint: rewardMintPK.toBase58(),
                         depositMint: depositMint?.toBase58() ?? null,
                         rewardTokenProgram: rewardTokenProgram.toBase58(),
+                        userDepositPDA: userDepositPDA.toBase58(),
+                        userRewardAta: userRewardAta.toBase58(),
                     });
 
                     const tx = await program.methods
@@ -175,6 +206,7 @@ export const useClaimLaunchpadSolFn = () => {
                             rewardTokenProgram,
                             burnProgram: MULTICHAIN_BURN_PROGRAM_ID,
                         } as any)
+                        .remainingAccounts(remainingAccounts)
                         .transaction();
 
                     const { blockhash, lastValidBlockHeight } =

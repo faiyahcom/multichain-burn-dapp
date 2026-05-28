@@ -7,15 +7,23 @@ import {
   type ContainerVariant,
 } from "./container";
 
-function Table({ className, ...props }: React.ComponentProps<"table">) {
+function Table({
+  containerStyle,
+  containerClassName,
+  className,
+  ...props
+}: React.ComponentProps<"table"> & {
+  containerStyle?: React.CSSProperties;
+  containerClassName?: string;
+}) {
   return (
     <div
       data-slot="table-container"
-      className="relative w-full overflow-x-auto overflow-y-hidden"
-      style={{
-        scrollbarWidth: "thin",
-        scrollbarColor: "rgba(0, 0, 0, 0.3) transparent",
-      }}
+      className={cn(
+        "relative w-full overflow-x-auto overflow-y-hidden thin-transparent-scrollbar",
+        containerClassName,
+      )}
+      style={containerStyle}
     >
       <table
         data-slot="table"
@@ -37,7 +45,7 @@ function TableHeader({
   return (
     <thead
       data-slot="table-header"
-      className={cn("sm:text-3xl", className)}
+      className={cn("sm:text-2xl", className)}
       {...props}
     />
   );
@@ -97,7 +105,7 @@ function TableHead({
     <th
       data-slot="table-head"
       className={cn(
-        "px-2 pb-6 text-center align-middle font-semibold whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
+        "px-3 pb-6 text-center align-middle font-semibold whitespace-nowrap [&:has([role=checkbox])]:pr-0 *:[[role=checkbox]]:translate-y-0.5",
         variant &&
           getVariantBorderClassName({
             variant: variant,

@@ -3,7 +3,7 @@ import { StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import { IconExclaimation } from "@/assets/react";
 import { useMemo } from "react";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenDisplay from "@/components/common/token-display";
@@ -86,6 +86,26 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                             classNames={{
                                 img: "size-4 md:size-5 2xl:size-5.75",
                                 container: "inline-flex items-center gap-1.5 md:gap-2.5",
+                            }}
+                        />
+                    </div>
+                }
+            />
+            <StatRow
+                label="Fee"
+                value={
+                    <div className="inline-flex items-center gap-1 md:gap-1.5">
+                        {formatAmount(
+                            poolDetail?.userAmount?.totalSettlementFee ?? "0",
+                            poolDetail?.pool.rewardTokenDecimals ?? 0,
+                        )}
+                        <TokenDisplay
+                            symbol={poolDetail?.tokenOut?.symbol}
+                            customSymbol={poolDetail?.tokenOut?.customSymbol}
+                            imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                            classNames={{
+                                img: "size-3.5 md:size-4 2xl:size-4.25",
+                                container: "inline-flex items-center gap-1 md:gap-1.5",
                             }}
                         />
                     </div>
