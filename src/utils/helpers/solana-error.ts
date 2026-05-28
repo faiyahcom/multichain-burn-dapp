@@ -131,6 +131,10 @@ const getMappedMessage = (text: string) => {
     return SOLANA_ERROR_NAME_TO_MESSAGE.get(errorName) ?? null;
   }
 
+  if (/\binsufficient funds\b/i.test(text)) {
+    return "Insufficient reward balance";
+  }
+
   return null;
 };
 
