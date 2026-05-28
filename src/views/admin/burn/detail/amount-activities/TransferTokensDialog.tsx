@@ -119,6 +119,7 @@ export interface TransferTokensDialogProps {
     chainId: string;
     /** 0 = burn pool (dynamic), 1 = swap pool (fixed ratio), 2 = Stake pool, 3 = Launchpad pool */
     poolKind?: number;
+    isConfirmNeeded?: boolean;
     poolInfo: {
         tokenInSymbol?: string;
         tokenInName?: string;
@@ -137,6 +138,7 @@ const TransferTokensDialog = ({
   onOpenChange,
   chainId,
   poolKind,
+  isConfirmNeeded,
   poolInfo,
   onTransfer,
 }: TransferTokensDialogProps) => {
@@ -643,7 +645,7 @@ const TransferTokensDialog = ({
             isLoading={isTransferring}
             isLoadingText="Transferring…"
             btnProps={{
-              onClick: mode === "deposit" && poolKind === 2
+              onClick: mode === "deposit" && isConfirmNeeded
                 ? () => setConfirmDepositOpen(true)
                 : handleTransfer,
               disabled:
