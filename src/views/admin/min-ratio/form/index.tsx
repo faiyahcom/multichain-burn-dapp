@@ -217,6 +217,7 @@ const AdminMinRatioForm: React.FC<Props> = ({ chainId, tokenIn, tokenOut }) => {
                   btnProps={{
                     disabled: isEdit,
                   }}
+                  poolKind={1} // Only swap pool need min ratio
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />
@@ -239,6 +240,7 @@ const AdminMinRatioForm: React.FC<Props> = ({ chainId, tokenIn, tokenOut }) => {
                   btnProps={{
                     disabled: isEdit,
                   }}
+                  poolKind={1} // Only swap pool need min ratio
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[fieldState.error]} />

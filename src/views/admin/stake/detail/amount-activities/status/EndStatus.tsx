@@ -141,6 +141,7 @@ const EndStatus = ({ poolDetail, vaultBalance }: Props) => {
                 onOpenChange={setTransferDialogOpen}
                 chainId={pool?.chainId ?? ""}
                 poolKind={pool?.kind}
+                isConfirmNeeded
                 poolInfo={{
                     tokenInSymbol: tokenInSymbolDisplay,
                     tokenInName: stakingTokenDisplay.name,

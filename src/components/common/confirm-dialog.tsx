@@ -12,7 +12,7 @@ interface Props {
   open: boolean;
   onOpenChange: (value: boolean) => void;
   title?: string;
-  description?: string;
+  description?: React.ReactNode;
   onCancel?: () => void;
   onConfirm?: () => void;
   buttonCancelText?: string;
@@ -65,7 +65,7 @@ const ConfirmDialog: React.FC<Props> = ({
       >
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
-          <DialogDescription>{description}</DialogDescription>
+          <DialogDescription className="text-foreground mt-5">{description}</DialogDescription>
         </DialogHeader>
         <DialogFooter className="gap-4.75 sm:justify-center">
           <AnimateIconButton

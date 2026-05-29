@@ -19,12 +19,13 @@ import { Spinner } from "../ui/spinner";
 import { whitelistQueryKeys } from "@/services/queries/queryKey";
 import { cn } from "@/lib/utils";
 import TokenImage from "./token-image";
+import type { PoolType } from "@/types/admin/master-pool-management";
 
 type Props = {
   value?: string;
   onChange: (address: string) => void;
   disabledAddress?: string;
-  poolKind?: number;
+  poolKind?: PoolType;
   btnProps?: React.ComponentProps<typeof Button>;
 };
 
