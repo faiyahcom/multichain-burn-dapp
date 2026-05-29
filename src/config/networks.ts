@@ -41,11 +41,11 @@ const XPHERE_MAINNET_RPC =
 
 export const xphereMainnet = {
   ..._xphereMainnet,
-  rpcUrls: {
-    default: {
-      http: [XPHERE_MAINNET_RPC],
-    },
-  },
+  // rpcUrls: {
+  //   default: {
+  //     http: [XPHERE_MAINNET_RPC],
+  //   },
+  // },
 } as unknown as typeof _xphereMainnet;
 
 /**
@@ -209,7 +209,7 @@ export const evmAppkitNetworks = IS_MAINNET
  * that redirect on preflight and break browser-based dApps.
  */
 const RPC_OVERRIDES: Record<number, string> = IS_MAINNET
-  ? { [xphereMainnet.id]: XPHERE_MAINNET_RPC }
+  ? {}
   : { [xphereTestnet.id]: "https://rpc.ankr.com/xphere_testnet" };
 
 /**
