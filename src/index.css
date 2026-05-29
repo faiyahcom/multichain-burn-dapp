@@ -187,11 +187,13 @@
   --color-swap-border: var(--swap-border);
   --color-green-border: var(--green-border);
   --color-stake-border: var(--stake-border);
+  --color-launchpad-border: var(--launchpad-border);
   --shadow-pair-glow: 0 0 20px 5px var(--pair-shadow);
   --shadow-burn-glow: 0 0 10px 5px var(--burn-shadow);
   --shadow-swap-glow: 0 0 20px 5px var(--swap-shadow);
   --shadow-green-glow: 0 0 10px 5px var(--green-shadow);
   --shadow-stake-glow: 0 0 20px 5px var(--stake-shadow);
+  --shadow-launchpad-glow: 0 0 20px 5px var(--launchpad-shadow);
 
   --tracking-2-percent: -0.02em;
 
@@ -203,6 +205,8 @@
   --color-mb-btn-burn: var(--mb-btn-burn);
   --color-mb-btn-pair: var(--mb-btn-pair);
   --color-mb-btn-stake: var(--mb-btn-stake);
+  --color-mb-btn-launchpad: var(--mb-btn-launchpad);
+
   --color-banner-text: var(--banner-text);
   --color-mb-dark-popover-item: var(--mb-dark-popover-item);
   --color-mb-dark-popover-item-border: var(--mb-dark-popover-item-border);
@@ -226,6 +230,7 @@
 
   --breakpoint-1440px: 90rem;
   /* END */
+  --color-mb-white-ce: var(--mb-white-ce);
 }
 
 /* Light mode design tokens (default) */
@@ -250,6 +255,9 @@
 
   --stake-border: rgba(20, 184, 166, 0.85);
   --stake-shadow: rgba(20, 184, 166, 0.25);
+
+  --launchpad-border: rgb(107, 114, 128);
+  --launchpad-shadow: rgba(142, 142, 147, 0.15);
   /* END */
 
   --sub-bg: #ffffff;
@@ -343,6 +351,7 @@
   --mb-btn-burn: #f26100;
   --mb-btn-pair: #8970ff;
   --mb-btn-stake: #06b6d4;
+  --mb-btn-launchpad: #2f3c4e;
 
   --banner-text: #d41317;
   --mb-dark-popover-item: #10121f;
@@ -364,6 +373,8 @@
   --mb-glow-input-bg: rgba(59, 130, 246, 0.05);
   --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
   --mb-glow-green: #03db92;
+
+  --mb-white-ce: #cecece;
 }
 
 /* Dark mode design tokens (tweak these later as you like) */
@@ -388,6 +399,9 @@
 
   --stake-border: rgba(20, 184, 166, 0.85);
   --stake-shadow: rgba(20, 184, 166, 0.878431);
+
+  --launchpad-border: rgb(107, 114, 128);
+  --launchpad-shadow: rgba(142, 142, 147, 0.15);
   /* END */
 
   --sub-bg: #ffffff;
@@ -481,6 +495,7 @@
   --mb-btn-burn: #f26100;
   --mb-btn-pair: #7407e9;
   --mb-btn-stake: #06b6d4;
+  --mb-btn-launchpad: #2f3c4e;
 
   --banner-text: #d41317;
   --mb-dark-popover-item: #10121f;
@@ -502,6 +517,7 @@
   --mb-glow-input-secondary: rgba(184, 184, 184, 0.5);
   --mb-glow-green: #03db92;
   /* END */
+  --mb-white-ce: #cecece;
 }
 
 @layer base {
@@ -638,6 +654,16 @@
     rgba(0, 0, 0, 0.8);
 }
 
+@utility card-launchpad-bg {
+  background: linear-gradient(
+    180deg,
+    rgba(68, 69, 70, 0.33) 0%,
+    rgba(237, 244, 255, 0) 31.25%,
+    rgba(235, 244, 255, 0) 65.38%,
+    rgba(68, 69, 70, 0.33) 100%
+  );
+}
+
 @utility card-pair-bold-bottom-bg {
   background: linear-gradient(
     168.92deg,
@@ -675,6 +701,16 @@
     rgba(20, 184, 166, 0) 21.08%,
     rgba(20, 184, 166, 0.3) 61.5%,
     #14b8a6 91.81%
+  );
+}
+
+@utility card-launchpad-bold-bottom-bg {
+  background: linear-gradient(
+    180deg,
+    rgba(68, 69, 70, 0.33) 0%,
+    rgba(237, 244, 255, 0) 31.25%,
+    rgba(235, 244, 255, 0) 65.38%,
+    rgba(68, 69, 70, 0.33) 100%
   );
 }
 
@@ -739,6 +775,21 @@
   background-repeat: no-repeat;
 }
 
+@utility grid-launchpad-bg {
+  background:
+    linear-gradient(
+      180deg,
+      rgba(47, 60, 78, 0.33) 0%,
+      rgba(3, 51, 117, 0) 31.25%,
+      rgba(3, 51, 117, 0) 65.38%,
+      rgba(47, 60, 78, 0.33) 100%
+    ),
+    url("/images/grid/launchpad-card-bg.png");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
 @utility grid-pair-btn-bg {
   background: linear-gradient(
     0deg,
@@ -775,6 +826,10 @@
     #04889f 84.42%,
     #035e6e 97.73%
   );
+}
+
+@utility grid-launchpad-btn-bg {
+  @apply bg-mb-btn-launchpad;
 }
 
 @utility global-grid {
@@ -819,7 +874,7 @@
 
 @utility thin-transparent-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(0, 0, 0, 0.3) transparent;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
 }
 
 @utility zoom-70 {

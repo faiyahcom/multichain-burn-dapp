@@ -5,6 +5,7 @@ import TokenOutInNetworkDisplay from "@/components/common/glow/token-out-in-netw
 import MetricNumber from "@/components/common/metric-number";
 import NoData from "@/components/common/no-data";
 import { chainIdToNetworkConfig } from "@/config/networks";
+import { poolQueryKeys } from "@/services/queries/queryKey";
 import {
   getPoolStatusLabel,
   type PoolItemType,
@@ -12,8 +13,9 @@ import {
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import { renderPoolTime } from "@/views/pool/glow/shared/helpers";
-import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
+import { useCallback, useEffect, useReducer } from "react";
 
 interface Props {
   data?: PoolItemType[];
@@ -21,13 +23,20 @@ interface Props {
 }
 
 const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
-  const [tick, setTick] = useState(0);
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setTick((prev) => prev + 1);
-    }, 1000);
+    const interval = setInterval(forceUpdate, 1000);
     return () => clearInterval(interval);
+  }, []);
+
+  const handleOnTimeEnd = useCallback(() => {
+    queryClient.invalidateQueries({
+      queryKey: poolQueryKeys.list().filter(Boolean),
+      exact: false,
+    });
   }, []);
 
   return (
@@ -104,27 +113,25 @@ const BurnPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                       unit={tokenOutDisplay.symbol}
                       isShorten
                     />
-                    <p key={tick}>{renderPoolTime(pool)}</p>
+                    <p>{renderPoolTime(pool, handleOnTimeEnd)}</p>
                   </div>
                 }
                 btn={{
-                  asChild: true,
-                  children: (
-                    <Link
-                      to="/burn/detail/$address"
-                      params={{
-                        address: pool.address,
-                      }}
-                      search={{
-                        depositReward: undefined,
-                      }}
-                    >
-                      {statusLabel}
-                    </Link>
-                  ),
+                  children: statusLabel,
+                  hasGroupHover: true,
                 }}
                 classNames={{
                   content: "space-y-1.5 sm:space-y-3",
+                  container: "cursor-pointer group",
+                }}
+                onContainerClick={() => {
+                  navigate({
+                    to: "/burn/detail/$address",
+                    params: { address: pool.address },
+                    search: {
+                      depositReward: undefined,
+                    },
+                  });
                 }}
               />
             );

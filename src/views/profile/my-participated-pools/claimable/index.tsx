@@ -147,7 +147,7 @@ const ProfileMyParticipatedPoolsClaimable = () => {
                 href = `/staking/detail/${pool.address}`;
                 break;
               case PoolKindCodeEnum.Launchpad:
-                href = `#`;
+                href = `/launchpad/detail/${pool.address}`;
                 break;
               default:
                 void (poolType satisfies never); // exhaustive check

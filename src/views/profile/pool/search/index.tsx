@@ -13,6 +13,8 @@ import {
   getPoolStatusLabel,
   poolTypeLabels,
   swapPoolStatuses,
+  userJoinedLaunchpadPoolStatuses,
+  userJoinedStakePoolStatuses,
   type AllPoolStatus,
   type PoolType,
 } from "@/types/admin/master-pool-management";
@@ -51,10 +53,13 @@ const ProfilePoolSearch: React.FC<Props> = ({
       case PoolKindCodeEnum.Stake:
         if (profileType === "my-create-pools") statuses = []; // user cannot create stake pool
         if (profileType === "my-participated-pools")
-          statuses = [...swapPoolStatuses, "full"]; // For participated pools, user cannot join "holding" and "upcoming" status, so basically it is the same as swap pool
+          statuses = [...userJoinedStakePoolStatuses];
         break;
       case PoolKindCodeEnum.Launchpad:
-        statuses = []; // TODO: implement launchpad pool search
+        if (profileType === "my-create-pools") statuses = []; // user cannot create launchpad
+        if (profileType === "my-participated-pools") {
+          statuses = [...userJoinedLaunchpadPoolStatuses];
+        }
         break;
       case "claimable":
         statuses = [];
@@ -89,12 +94,22 @@ const ProfilePoolSearch: React.FC<Props> = ({
 
     if (poolType === PoolKindCodeEnum.Stake) return ["stakedAmount", "apr"];
 
+    if (poolType === PoolKindCodeEnum.Launchpad)
+      return [
+        {
+          value: "depositedAmount",
+          label: "My Amount",
+          shortLabel: "Amount",
+        },
+      ];
+
     return ["volume", "liquidity"];
   }, [poolType]);
 
   const poolTypeOptions: MultipleSelectOption[] = [
     PoolKindCodeEnum.Burn,
     PoolKindCodeEnum.Stake,
+    PoolKindCodeEnum.Launchpad,
   ].map((type) => ({
     label: poolTypeLabels[type],
     value: type.toString(),

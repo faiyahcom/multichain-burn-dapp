@@ -19,6 +19,7 @@ const CARD_VARIANT_BG_IMG: Record<ContainerVariant, string> = {
   swap: "/images/summary/swap-card-bg.png",
   green: "",
   stake: "/images/summary/stake-card-bg.png",
+  launchpad: "/images/summary/launchpad-card-bg.jpg",
 };
 
 const CARD_VARIANT_BG: Record<ContainerVariant, string> = {
@@ -27,6 +28,7 @@ const CARD_VARIANT_BG: Record<ContainerVariant, string> = {
   swap: "card-swap-bold-bottom-bg",
   green: "",
   stake: "card-stake-bold-bottom-bg",
+  launchpad: "card-launchpad-bold-bottom-bg",
 };
 
 const GlowSummaryCard: React.FC<Props> = ({
@@ -40,7 +42,12 @@ const GlowSummaryCard: React.FC<Props> = ({
     <div className={cn("relative rounded-24px", classNames?.container)}>
       {CARD_VARIANT_BG_IMG[variant] && (
         <div
-          className="pointer-events-none absolute inset-0 z-0 rounded-24px bg-cover bg-center bg-no-repeat opacity-30"
+          className={cn(
+            "pointer-events-none absolute inset-0 z-0 rounded-24px bg-cover bg-center bg-no-repeat opacity-30",
+            {
+              "opacity-80": variant === "launchpad",
+            },
+          )}
           style={{ backgroundImage: `url(${CARD_VARIANT_BG_IMG[variant]})` }}
         />
       )}

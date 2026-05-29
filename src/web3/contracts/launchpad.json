@@ -1,0 +1,3013 @@
+{
+  "address": "DTU8p2jeu2B84Eznz2krv3ZgPgHkmPGRULzfproYQNSj",
+  "metadata": {
+    "name": "launchpad",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "cancel_pool",
+      "discriminator": [
+        211,
+        11,
+        27,
+        100,
+        252,
+        115,
+        57,
+        77
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin validation."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_vault",
+          "docs": [
+            "Pool's reward vault. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "docs": [
+            "Sale token mint. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "admin_reward_ata",
+          "docs": [
+            "Admin's ATA to receive refunded tokens. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_token_program",
+          "optional": true
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_native",
+      "discriminator": [
+        169,
+        122,
+        132,
+        23,
+        2,
+        52,
+        2,
+        241
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "docs": [
+            "Can be the user (self-claim) or operator (batch claim)."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — used to validate the operator."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_mint",
+          "docs": [
+            "Optional: only required for deferred fixed pools (ratio_bps != 0)",
+            "to get deposit token decimals for ratio-based reward calculation."
+          ],
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "claim_spl",
+      "discriminator": [
+        178,
+        141,
+        219,
+        41,
+        138,
+        211,
+        162,
+        60
+      ],
+      "accounts": [
+        {
+          "name": "signer",
+          "docs": [
+            "Can be the user (self-claim) or operator (batch claim)."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "treasury_ata",
+          "writable": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — used to validate the operator."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "writable": true
+        },
+        {
+          "name": "deposit_mint",
+          "docs": [
+            "Optional: only required for deferred fixed pools (ratio_bps != 0)",
+            "to get deposit token decimals for ratio-based reward calculation."
+          ],
+          "optional": true
+        },
+        {
+          "name": "reward_token_program"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_pool",
+      "discriminator": [
+        233,
+        146,
+        209,
+        142,
+        207,
+        104,
+        64,
+        188
+      ],
+      "accounts": [
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "docs": [
+            "Launchpad-local config PDA holding the pool counter."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "launchpad_config.pool_count",
+                "account": "LaunchpadConfig"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint"
+        },
+        {
+          "name": "deposit_mint"
+        },
+        {
+          "name": "reward_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_token_program"
+        },
+        {
+          "name": "deposit_token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CreatePoolArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit_to_pool_native",
+      "discriminator": [
+        113,
+        114,
+        127,
+        0,
+        143,
+        10,
+        27,
+        120
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_deposit",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  117,
+                  115,
+                  101,
+                  114,
+                  45,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_account",
+          "docs": [
+            "DEPRECATED: This field is unused in the instruction handler but kept",
+            "for IDL backward-compatibility. Do not reference in new code."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_vault",
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "user_reward_ata",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "treasury_ata",
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_token_program",
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "deposit_to_pool_spl",
+      "discriminator": [
+        242,
+        51,
+        251,
+        94,
+        180,
+        59,
+        52,
+        57
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_vault",
+          "docs": [
+            "Optional: only required when reward is SPL (asset_reward_type != 2)."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "docs": [
+            "Optional: only required when reward is SPL (asset_reward_type != 2)."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "user_deposit",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  117,
+                  115,
+                  101,
+                  114,
+                  45,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_deposit_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "user_reward_ata",
+          "docs": [
+            "Optional: only required when reward is SPL (asset_reward_type != 2)."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "treasury_ata",
+          "docs": [
+            "Optional: only required when reward is SPL (asset_reward_type != 2)."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_token_program",
+          "docs": [
+            "Optional: only required when reward is SPL (asset_reward_type != 2)."
+          ],
+          "optional": true
+        },
+        {
+          "name": "deposit_token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "rent",
+          "address": "SysvarRent111111111111111111111111111111111"
+        },
+        {
+          "name": "owner_deposit_ata",
+          "docs": [
+            "Optional: only required for Fixed pools (ratio_bps != 0)."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "pool.target_address",
+                "account": "PoolAccount"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "emergency_close_pool",
+      "discriminator": [
+        84,
+        52,
+        17,
+        149,
+        117,
+        116,
+        34,
+        73
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initialize",
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "launchpad_config",
+          "docs": [
+            "Launchpad-local config PDA holding the pool counter."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "retreive_reward",
+      "discriminator": [
+        170,
+        14,
+        238,
+        105,
+        38,
+        44,
+        154,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "writable": true
+        },
+        {
+          "name": "deposit_mint",
+          "writable": true
+        },
+        {
+          "name": "reward_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "deposit_vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  100,
+                  101,
+                  112,
+                  111,
+                  115,
+                  105,
+                  116,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiver_address",
+          "writable": true
+        },
+        {
+          "name": "receiver_reward_token_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "receiver_address"
+              },
+              {
+                "kind": "account",
+                "path": "reward_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "reward_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "receiver_deposit_token_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "receiver_address"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_token_program"
+              },
+              {
+                "kind": "account",
+                "path": "deposit_mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "reward_token_program"
+        },
+        {
+          "name": "deposit_token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_mint",
+          "type": "pubkey"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "retreive_reward_native",
+      "discriminator": [
+        242,
+        100,
+        149,
+        234,
+        21,
+        107,
+        36,
+        154
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "receiver_address",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "submit_pool",
+      "discriminator": [
+        138,
+        6,
+        64,
+        197,
+        135,
+        17,
+        242,
+        41
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "burn_factory"
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_vault",
+          "docs": [
+            "Pool's reward vault — receives the deposited sale tokens."
+          ],
+          "writable": true,
+          "optional": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112,
+                  45,
+                  114,
+                  101,
+                  119,
+                  97,
+                  114,
+                  100,
+                  45,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "reward_mint",
+          "docs": [
+            "Sale token mint. Required when asset_reward_type != 2 (native SOL)."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "admin_reward_ata",
+          "docs": [
+            "Admin's ATA holding the sale tokens to deposit. Required when asset_reward_type != 2."
+          ],
+          "writable": true,
+          "optional": true
+        },
+        {
+          "name": "reward_token_program",
+          "optional": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "update_pool",
+      "discriminator": [
+        239,
+        214,
+        170,
+        78,
+        36,
+        35,
+        30,
+        34
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "burn_factory",
+          "docs": [
+            "The burn program's FactoryAccount — read-only for admin/treasury/fees."
+          ]
+        },
+        {
+          "name": "launchpad_config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  97,
+                  117,
+                  110,
+                  99,
+                  104,
+                  112,
+                  97,
+                  100,
+                  45,
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_id",
+                "account": "PoolAccount"
+              }
+            ]
+          }
+        },
+        {
+          "name": "burn_program",
+          "address": "754ELZcjRwPPUcYsPsARcmixGX6rs32fxmcoFFsuigHz"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "UpdatePoolArgs"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "LaunchpadConfig",
+      "discriminator": [
+        205,
+        61,
+        113,
+        174,
+        159,
+        51,
+        248,
+        24
+      ]
+    },
+    {
+      "name": "PoolAccount",
+      "discriminator": [
+        116,
+        210,
+        187,
+        119,
+        196,
+        196,
+        52,
+        137
+      ]
+    },
+    {
+      "name": "UserDeposit",
+      "discriminator": [
+        69,
+        238,
+        23,
+        217,
+        255,
+        137,
+        185,
+        35
+      ]
+    }
+  ],
+  "events": [
+    {
+      "name": "LaunchpadClaimed",
+      "discriminator": [
+        6,
+        15,
+        234,
+        29,
+        205,
+        147,
+        236,
+        164
+      ]
+    },
+    {
+      "name": "LaunchpadCollected",
+      "discriminator": [
+        19,
+        66,
+        45,
+        30,
+        245,
+        189,
+        95,
+        3
+      ]
+    },
+    {
+      "name": "LaunchpadDeposited",
+      "discriminator": [
+        196,
+        137,
+        38,
+        48,
+        164,
+        41,
+        38,
+        218
+      ]
+    },
+    {
+      "name": "LaunchpadPoolClosed",
+      "discriminator": [
+        140,
+        116,
+        37,
+        92,
+        232,
+        60,
+        208,
+        150
+      ]
+    },
+    {
+      "name": "LaunchpadPoolDeployed",
+      "discriminator": [
+        56,
+        122,
+        235,
+        245,
+        207,
+        49,
+        206,
+        192
+      ]
+    },
+    {
+      "name": "LaunchpadPoolUpdated",
+      "discriminator": [
+        113,
+        247,
+        244,
+        223,
+        93,
+        175,
+        205,
+        255
+      ]
+    },
+    {
+      "name": "LaunchpadRewardRefund",
+      "discriminator": [
+        99,
+        126,
+        162,
+        171,
+        43,
+        87,
+        217,
+        142
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidAssetType",
+      "msg": "Invalid asset type"
+    },
+    {
+      "code": 6001,
+      "name": "PoolNotCreated",
+      "msg": "Pool not in created state"
+    },
+    {
+      "code": 6002,
+      "name": "PoolNotDeposited",
+      "msg": "Pool not deposited"
+    },
+    {
+      "code": 6003,
+      "name": "PoolNotApproved",
+      "msg": "Pool not approved"
+    },
+    {
+      "code": 6004,
+      "name": "PoolApproved",
+      "msg": "Pool approved"
+    },
+    {
+      "code": 6005,
+      "name": "PoolNotActive",
+      "msg": "Pool not active"
+    },
+    {
+      "code": 6006,
+      "name": "PoolAlreadyActive",
+      "msg": "Pool already active"
+    },
+    {
+      "code": 6007,
+      "name": "ZeroAmount",
+      "msg": "Zero amount"
+    },
+    {
+      "code": 6008,
+      "name": "NativeAmountZero",
+      "msg": "Native amount zero"
+    },
+    {
+      "code": 6009,
+      "name": "InsufficientRewardBalance",
+      "msg": "Insufficient reward balance"
+    },
+    {
+      "code": 6010,
+      "name": "PoolNotEnded",
+      "msg": "Pool not ended"
+    },
+    {
+      "code": 6011,
+      "name": "Unauthorized",
+      "msg": "Unauthorized"
+    },
+    {
+      "code": 6012,
+      "name": "AlreadyClaimed",
+      "msg": "Already claimed"
+    },
+    {
+      "code": 6013,
+      "name": "RatioMustBeZero",
+      "msg": "Ratio must be zero"
+    },
+    {
+      "code": 6014,
+      "name": "PoolPaused",
+      "msg": "Pool is paused"
+    },
+    {
+      "code": 6015,
+      "name": "PoolClosed",
+      "msg": "Pool is closed"
+    },
+    {
+      "code": 6016,
+      "name": "PoolNotClosed",
+      "msg": "Pool not closed"
+    },
+    {
+      "code": 6017,
+      "name": "InvalidAddress",
+      "msg": "Invalid address"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidTimeRange",
+      "msg": "Invalid time range"
+    },
+    {
+      "code": 6019,
+      "name": "InvalidCreationFee",
+      "msg": "Invalid creation fee"
+    },
+    {
+      "code": 6020,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    },
+    {
+      "code": 6021,
+      "name": "TargetAddressNotMatch",
+      "msg": "Target address not match"
+    },
+    {
+      "code": 6022,
+      "name": "NotFixedPool",
+      "msg": "Not fixed pool"
+    },
+    {
+      "code": 6023,
+      "name": "EmptyReward",
+      "msg": "Empty reward token"
+    },
+    {
+      "code": 6024,
+      "name": "PoolAlreadyCollected",
+      "msg": "Pool already collected"
+    },
+    {
+      "code": 6025,
+      "name": "PoolNotDraft",
+      "msg": "Pool not in draft"
+    },
+    {
+      "code": 6026,
+      "name": "PoolNotPending",
+      "msg": "Pool not in pending"
+    },
+    {
+      "code": 6027,
+      "name": "PoolEnded",
+      "msg": "Pool ended"
+    },
+    {
+      "code": 6028,
+      "name": "PoolNotDynamic",
+      "msg": "Pool not dynamic"
+    },
+    {
+      "code": 6029,
+      "name": "InvalidRatio",
+      "msg": "Invalid ratio: denominator must be greater than zero"
+    },
+    {
+      "code": 6030,
+      "name": "InvalidInput",
+      "msg": "Invalid input"
+    },
+    {
+      "code": 6031,
+      "name": "RewardTooSmall",
+      "msg": "Reward amount too small (rounds to zero)"
+    },
+    {
+      "code": 6032,
+      "name": "ExceedBalance",
+      "msg": "Exceed balance"
+    },
+    {
+      "code": 6033,
+      "name": "BothAssetsNative",
+      "msg": "Deposit and reward asset cannot both be native SOL"
+    },
+    {
+      "code": 6034,
+      "name": "CannotRemoveLastAdmin",
+      "msg": "Cannot remove last admin"
+    },
+    {
+      "code": 6035,
+      "name": "CannotSelfRemove",
+      "msg": "Cannot self remove"
+    },
+    {
+      "code": 6036,
+      "name": "UserAlreadyWhitelisted",
+      "msg": "User already whitelisted"
+    },
+    {
+      "code": 6037,
+      "name": "InvalidPoolType",
+      "msg": "Invalid pool type"
+    },
+    {
+      "code": 6038,
+      "name": "ZeroSaleTokenAmount",
+      "msg": "Sale token amount must be greater than zero"
+    },
+    {
+      "code": 6039,
+      "name": "NoDeposit",
+      "msg": "No deposit to claim"
+    },
+    {
+      "code": 6040,
+      "name": "NotOperator",
+      "msg": "Not operator"
+    },
+    {
+      "code": 6041,
+      "name": "NotOwner",
+      "msg": "Not owner"
+    }
+  ],
+  "types": [
+    {
+      "name": "CreatePoolArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "asset_reward_type",
+            "type": "u8"
+          },
+          {
+            "name": "asset_type",
+            "type": "u8"
+          },
+          {
+            "name": "reward_amount",
+            "type": "u64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "ratio_bps",
+            "docs": [
+              "0 = Dynamic pool (burn-like), ≠ 0 = Fixed pool (swap-like) price numerator."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "ratio_denominator",
+            "docs": [
+              "For Fixed pools: price denominator. For Dynamic: ignored."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "target_address",
+            "docs": [
+              "Target address for Fixed pool (where deposits go)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "is_auto",
+            "type": "bool"
+          },
+          {
+            "name": "is_instant",
+            "type": "bool"
+          },
+          {
+            "name": "reward_visibility",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadClaimed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadCollected",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadConfig",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool_count",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadDeposited",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount_in",
+            "type": "u64"
+          },
+          {
+            "name": "fee",
+            "type": "u64"
+          },
+          {
+            "name": "reward",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "current_amount",
+            "type": "u64"
+          },
+          {
+            "name": "total_amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadPoolClosed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadPoolDeployed",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "reward_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "deposit_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "target",
+            "type": "pubkey"
+          },
+          {
+            "name": "asset_type",
+            "type": "u8"
+          },
+          {
+            "name": "asset_reward_type",
+            "type": "u8"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "reward_deposited",
+            "type": "u64"
+          },
+          {
+            "name": "ratio",
+            "type": "u64"
+          },
+          {
+            "name": "ratio_denominator",
+            "type": "u64"
+          },
+          {
+            "name": "settlement_fee",
+            "type": "u64"
+          },
+          {
+            "name": "creation_fee_paid",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadPoolUpdated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LaunchpadRewardRefund",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "type": "u64"
+          },
+          {
+            "name": "executor",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "token_mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "docs": [
+              "Admin who created the pool."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "target_address",
+            "docs": [
+              "Target address (e.g. where deposit goes for swap-like / Fixed pools)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "sale_token_mint",
+            "docs": [
+              "Sale token mint (reward to distribute).  Pubkey::default() for native SOL."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "payment_token_mint",
+            "docs": [
+              "Payment token mint (what users deposit). Pubkey::default() for native SOL."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "pool_id",
+            "docs": [
+              "Unique sequential pool id."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "pool_start_ts",
+            "docs": [
+              "Pool start timestamp (deposits accepted from)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "pool_end_ts",
+            "docs": [
+              "Pool end timestamp (deposits accepted until)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "ratio_bps",
+            "docs": [
+              "ratio_bps:  0 = Dynamic pool (burn-like), ≠ 0 = Fixed pool (swap-like).",
+              "For Fixed pools: token price numerator."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "ratio_denominator",
+            "docs": [
+              "For Fixed pools: token price denominator (must > 0)."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "settlement_fee_bps",
+            "docs": [
+              "Settlement fee in bps applied on payout at deposit/claim time."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "deposit_balance",
+            "docs": [
+              "Current payment token balance in the pool (deposits minus any collected)."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "reward_balance",
+            "docs": [
+              "Current sale token balance remaining in the pool."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "reward_cap",
+            "docs": [
+              "Total sale tokens locked at creation (immutable after creation)."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "asset_type",
+            "docs": [
+              "0: SPL, 1: SPL2022, 2: SOL — for payment token."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "asset_reward_type",
+            "docs": [
+              "0: SPL, 1: SPL2022, 2: SOL — for sale token."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "status",
+            "docs": [
+              "Pool status."
+            ],
+            "type": {
+              "defined": {
+                "name": "PoolStatus"
+              }
+            }
+          },
+          {
+            "name": "paused",
+            "docs": [
+              "Paused flag."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "docs": [
+              "PDA bump."
+            ],
+            "type": "u8"
+          },
+          {
+            "name": "is_close",
+            "docs": [
+              "Emergency close flag."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "is_collected",
+            "docs": [
+              "Whether deposited payment tokens have been collected by admin."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "name",
+            "docs": [
+              "Pool name."
+            ],
+            "type": "string"
+          },
+          {
+            "name": "total_deposited",
+            "docs": [
+              "Total payment tokens deposited by all users."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "is_auto",
+            "docs": [
+              "For operator automate claim"
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "is_instant",
+            "docs": [
+              "For fixed pool"
+            ],
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolStatus",
+      "repr": {
+        "kind": "rust"
+      },
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Draft"
+          },
+          {
+            "name": "Upcoming"
+          },
+          {
+            "name": "Ongoing"
+          },
+          {
+            "name": "Holding"
+          },
+          {
+            "name": "Ended"
+          },
+          {
+            "name": "Closed"
+          },
+          {
+            "name": "Canceled"
+          },
+          {
+            "name": "Completed"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UpdatePoolArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "time_start",
+            "type": "i64"
+          },
+          {
+            "name": "time_end",
+            "type": "i64"
+          },
+          {
+            "name": "target_address",
+            "type": "pubkey"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "is_auto",
+            "type": "bool"
+          },
+          {
+            "name": "is_instant",
+            "type": "bool"
+          },
+          {
+            "name": "reward_cap",
+            "type": "u64"
+          },
+          {
+            "name": "ratio_bps",
+            "type": "u64"
+          },
+          {
+            "name": "ratio_denominator",
+            "type": "u64"
+          },
+          {
+            "name": "reward_visibility",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserDeposit",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "docs": [
+              "Total payment tokens deposited by this user."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "claimed",
+            "docs": [
+              "Whether the user has claimed their sale tokens (Dynamic pools only)."
+            ],
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ]
+}

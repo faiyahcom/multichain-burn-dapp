@@ -21,12 +21,14 @@ import { Route as MyParticipatedPoolsIndexRouteImport } from './routes/my-partic
 import { Route as MyDashboardIndexRouteImport } from './routes/my-dashboard/index'
 import { Route as MyCreatePoolsIndexRouteImport } from './routes/my-create-pools/index'
 import { Route as MyActivityIndexRouteImport } from './routes/my-activity/index'
+import { Route as LaunchpadIndexRouteImport } from './routes/launchpad/index'
 import { Route as BurnIndexRouteImport } from './routes/burn/index'
 import { Route as ActivityHistoryIndexRouteImport } from './routes/activity-history/index'
 import { Route as SwapCreateIndexRouteImport } from './routes/swap/create/index'
 import { Route as BurnCreateIndexRouteImport } from './routes/burn/create/index'
 import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$address'
 import { Route as StakingDetailAddressRouteImport } from './routes/staking/detail/$address'
+import { Route as LaunchpadDetailAddressRouteImport } from './routes/launchpad/detail/$address'
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 
@@ -92,6 +94,11 @@ const MyActivityIndexRoute = MyActivityIndexRouteImport.update({
   path: '/my-activity/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LaunchpadIndexRoute = LaunchpadIndexRouteImport.update({
+  id: '/launchpad/',
+  path: '/launchpad/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BurnIndexRoute = BurnIndexRouteImport.update({
   id: '/burn/',
   path: '/burn/',
@@ -122,6 +129,11 @@ const StakingDetailAddressRoute = StakingDetailAddressRouteImport.update({
   path: '/staking/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LaunchpadDetailAddressRoute = LaunchpadDetailAddressRouteImport.update({
+  id: '/launchpad/detail/$address',
+  path: '/launchpad/detail/$address',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BurnDetailAddressRoute = BurnDetailAddressRouteImport.update({
   id: '/burn/detail/$address',
   path: '/burn/detail/$address',
@@ -138,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
   '/burn': typeof BurnIndexRoute
+  '/launchpad': typeof LaunchpadIndexRoute
   '/my-activity': typeof MyActivityIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
@@ -150,6 +163,7 @@ export interface FileRoutesByFullPath {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/launchpad/detail/$address': typeof LaunchpadDetailAddressRoute
   '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/burn/create': typeof BurnCreateIndexRoute
@@ -160,6 +174,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/activity-history': typeof ActivityHistoryIndexRoute
   '/burn': typeof BurnIndexRoute
+  '/launchpad': typeof LaunchpadIndexRoute
   '/my-activity': typeof MyActivityIndexRoute
   '/my-create-pools': typeof MyCreatePoolsIndexRoute
   '/my-dashboard': typeof MyDashboardIndexRoute
@@ -172,6 +187,7 @@ export interface FileRoutesByTo {
   '/swap-history': typeof SwapHistoryIndexRoute
   '/swap': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/launchpad/detail/$address': typeof LaunchpadDetailAddressRoute
   '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/burn/create': typeof BurnCreateIndexRoute
@@ -183,6 +199,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/activity-history/': typeof ActivityHistoryIndexRoute
   '/burn/': typeof BurnIndexRoute
+  '/launchpad/': typeof LaunchpadIndexRoute
   '/my-activity/': typeof MyActivityIndexRoute
   '/my-create-pools/': typeof MyCreatePoolsIndexRoute
   '/my-dashboard/': typeof MyDashboardIndexRoute
@@ -195,6 +212,7 @@ export interface FileRoutesById {
   '/swap-history/': typeof SwapHistoryIndexRoute
   '/swap/': typeof SwapIndexRoute
   '/burn/detail/$address': typeof BurnDetailAddressRoute
+  '/launchpad/detail/$address': typeof LaunchpadDetailAddressRoute
   '/staking/detail/$address': typeof StakingDetailAddressRoute
   '/swap/detail/$address': typeof SwapDetailAddressRoute
   '/burn/create/': typeof BurnCreateIndexRoute
@@ -207,6 +225,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history'
     | '/burn'
+    | '/launchpad'
     | '/my-activity'
     | '/my-create-pools'
     | '/my-dashboard'
@@ -219,6 +238,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/burn/detail/$address'
+    | '/launchpad/detail/$address'
     | '/staking/detail/$address'
     | '/swap/detail/$address'
     | '/burn/create'
@@ -229,6 +249,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history'
     | '/burn'
+    | '/launchpad'
     | '/my-activity'
     | '/my-create-pools'
     | '/my-dashboard'
@@ -241,6 +262,7 @@ export interface FileRouteTypes {
     | '/swap-history'
     | '/swap'
     | '/burn/detail/$address'
+    | '/launchpad/detail/$address'
     | '/staking/detail/$address'
     | '/swap/detail/$address'
     | '/burn/create'
@@ -251,6 +273,7 @@ export interface FileRouteTypes {
     | '/'
     | '/activity-history/'
     | '/burn/'
+    | '/launchpad/'
     | '/my-activity/'
     | '/my-create-pools/'
     | '/my-dashboard/'
@@ -263,6 +286,7 @@ export interface FileRouteTypes {
     | '/swap-history/'
     | '/swap/'
     | '/burn/detail/$address'
+    | '/launchpad/detail/$address'
     | '/staking/detail/$address'
     | '/swap/detail/$address'
     | '/burn/create/'
@@ -274,6 +298,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ActivityHistoryIndexRoute: typeof ActivityHistoryIndexRoute
   BurnIndexRoute: typeof BurnIndexRoute
+  LaunchpadIndexRoute: typeof LaunchpadIndexRoute
   MyActivityIndexRoute: typeof MyActivityIndexRoute
   MyCreatePoolsIndexRoute: typeof MyCreatePoolsIndexRoute
   MyDashboardIndexRoute: typeof MyDashboardIndexRoute
@@ -286,6 +311,7 @@ export interface RootRouteChildren {
   SwapHistoryIndexRoute: typeof SwapHistoryIndexRoute
   SwapIndexRoute: typeof SwapIndexRoute
   BurnDetailAddressRoute: typeof BurnDetailAddressRoute
+  LaunchpadDetailAddressRoute: typeof LaunchpadDetailAddressRoute
   StakingDetailAddressRoute: typeof StakingDetailAddressRoute
   SwapDetailAddressRoute: typeof SwapDetailAddressRoute
   BurnCreateIndexRoute: typeof BurnCreateIndexRoute
@@ -379,6 +405,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MyActivityIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/launchpad/': {
+      id: '/launchpad/'
+      path: '/launchpad'
+      fullPath: '/launchpad'
+      preLoaderRoute: typeof LaunchpadIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/burn/': {
       id: '/burn/'
       path: '/burn'
@@ -421,6 +454,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof StakingDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/launchpad/detail/$address': {
+      id: '/launchpad/detail/$address'
+      path: '/launchpad/detail/$address'
+      fullPath: '/launchpad/detail/$address'
+      preLoaderRoute: typeof LaunchpadDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/burn/detail/$address': {
       id: '/burn/detail/$address'
       path: '/burn/detail/$address'
@@ -442,6 +482,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ActivityHistoryIndexRoute: ActivityHistoryIndexRoute,
   BurnIndexRoute: BurnIndexRoute,
+  LaunchpadIndexRoute: LaunchpadIndexRoute,
   MyActivityIndexRoute: MyActivityIndexRoute,
   MyCreatePoolsIndexRoute: MyCreatePoolsIndexRoute,
   MyDashboardIndexRoute: MyDashboardIndexRoute,
@@ -454,6 +495,7 @@ const rootRouteChildren: RootRouteChildren = {
   SwapHistoryIndexRoute: SwapHistoryIndexRoute,
   SwapIndexRoute: SwapIndexRoute,
   BurnDetailAddressRoute: BurnDetailAddressRoute,
+  LaunchpadDetailAddressRoute: LaunchpadDetailAddressRoute,
   StakingDetailAddressRoute: StakingDetailAddressRoute,
   SwapDetailAddressRoute: SwapDetailAddressRoute,
   BurnCreateIndexRoute: BurnCreateIndexRoute,

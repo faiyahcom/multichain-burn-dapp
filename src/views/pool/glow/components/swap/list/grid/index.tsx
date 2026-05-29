@@ -21,6 +21,7 @@ import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import { truncateString } from "@/utils/helpers/string";
 import SwapDialog from "@/views/swap-pool/swap-action/swap-dialog";
 import { useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 
 interface Props {
@@ -32,6 +33,7 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
   const { user } = useAuthStore();
   const queryClient = useQueryClient();
   const [swapPoolAddress, setSwapPoolAddress] = useState<string | undefined>();
+  const navigate = useNavigate();
 
   return (
     <>
@@ -156,6 +158,13 @@ const SwapPoolListGrid: React.FC<Props> = ({ data, isLoading }) => {
                   content:
                     "space-y-0 sm:space-y-0 flex flex-col gap-y-1.5 sm:gap-y-3 flex-1",
                   glowContainer: "flex flex-col justify-between",
+                  container: "cursor-pointer",
+                }}
+                onContainerClick={() => {
+                  navigate({
+                    to: "/swap/detail/$address",
+                    params: { address: pool.address },
+                  });
                 }}
               />
             );

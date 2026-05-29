@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import { toast } from "@/components/common/custom-toast";
-import { getErrorMessage } from "@/utils/helpers/error-message";
 import { sendAndConfirmTransactionSafe } from "@/utils/helpers/solana-confirm";
 import {
     PublicKey,
@@ -33,6 +32,7 @@ import {
     type AssetType,
 } from "@/web3/helpers";
 import BN from "bn.js";
+import { getErrorMessage } from "@/utils/helpers/error-message";
 
 const UNSTAKE_ERROR_MESSAGE =
     "Failed to unstake your token. Please try again.";

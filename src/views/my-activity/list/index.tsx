@@ -16,7 +16,7 @@ import { userQueryKeys } from "@/services/queries/queryKey";
 import { userService, type UserActivityType } from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
 import { useMyActivitySearchFilterStore } from "@/stores/my-activity/search-filter-store";
-import { getActivityKindLabel } from "@/types/pool";
+import { getActivityKindLabel, myActivityExcludes } from "@/types/pool";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import {
   formatTimestampSecondsToDate,
@@ -50,6 +50,7 @@ const MyActivityList = () => {
           limit: limit,
           search: filter.text ? filter.text : undefined,
           kinds: convertArrayToStringParam({ array: filter.activityKind }),
+          excludeKinds: myActivityExcludes,
         }),
       enabled: !!user,
     },
@@ -183,8 +184,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Deposit reward token, Deposit burn token, Stake
-  if ([10, 30, 33].includes(kind)) {
+  // Deposit reward token, Deposit burn token, Stake, Join Launchpad
+  if ([10, 30, 33, 36].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountIn}
@@ -197,8 +198,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Claim reward (burn & stake), Unstake
-  if ([31, 35, 34].includes(kind)) {
+  // Claim reward (burn & stake), Unstake, Claim Allocation, Reward Received
+  if ([31, 35, 34, 37, 38].includes(kind)) {
     return (
       <MetricNumber
         number={uiAmountOut}
@@ -211,8 +212,8 @@ const renderDescription = (activity: UserActivityType) => {
     );
   }
 
-  // Swap
-  if (kind === 32) {
+  // Swap, Deposit & Instant Claim
+  if ([32, 39].includes(kind)) {
     return (
       <div className="flex min-w-0 flex-wrap items-center justify-start gap-1">
         <MetricNumber

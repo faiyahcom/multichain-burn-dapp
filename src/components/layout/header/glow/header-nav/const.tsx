@@ -3,6 +3,7 @@ import {
   IconMyParticipatedPools,
   IconPersonalInfoSettings,
 } from "@/assets/react";
+import { cn } from "@/lib/utils";
 import type { LinkProps } from "@tanstack/react-router";
 import { HistoryIcon } from "lucide-react";
 
@@ -45,6 +46,26 @@ export const NAV_ITEMS: NavItemType[] = [
     href: "/staking",
     // Exactly /staking or start with /staking/
     activeRegexMatch: /^\/staking(\/|$)/,
+  },
+  {
+    title: "Launchpad",
+    href: "/launchpad",
+    // Exactly /launchpad or start with /launchpad/
+    activeRegexMatch: /^\/launchpad(\/|$)/,
+    icon: ({ className }) => (
+      <div
+        className={cn(
+          "relative flex size-10.5 shrink-0 items-center justify-center",
+          className,
+        )}
+      >
+        <img
+          src="/images/categories/launchpad.png"
+          alt="Launchpad"
+          className="w-full object-contain"
+        />
+      </div>
+    ),
   },
 ];
 

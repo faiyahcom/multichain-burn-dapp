@@ -7,6 +7,7 @@ import { userService } from "@/services/userService";
 import { useAuthStore } from "@/stores/authStore";
 import { useMyParticipatedPoolsBurnSearchFilterStore } from "@/stores/my-participated-pools/burn";
 import { useMyParticipatedPoolsClaimableSearchFilterStore } from "@/stores/my-participated-pools/claimable";
+import { useMyParticipatedPoolsLaunchpadSearchFilterStore } from "@/stores/my-participated-pools/launchpad";
 import { useMyParticipatedPoolsStakeSearchFilterStore } from "@/stores/my-participated-pools/stake";
 import { useMyParticipatedPoolsSwapSearchFilterStore } from "@/stores/my-participated-pools/swap";
 import {
@@ -22,9 +23,15 @@ import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo } from "react";
 
-type Tab = "burn-pool" | "swap-pool" | "claimable" | "stake-pool";
+type Tab = "burn-pool" | "swap-pool" | "claimable" | "stake-pool" | "launchpad";
 
-const validTabs: Tab[] = ["burn-pool", "swap-pool", "claimable", "stake-pool"];
+const validTabs: Tab[] = [
+  "burn-pool",
+  "swap-pool",
+  "claimable",
+  "stake-pool",
+  "launchpad",
+];
 const isValidTab = (value: unknown): value is Tab =>
   typeof value === "string" && validTabs.includes(value as Tab);
 
@@ -33,6 +40,7 @@ const TabToPoolType: Record<Tab, PoolType | "claimable"> = {
   "swap-pool": PoolKindCodeEnum.Swap,
   claimable: "claimable",
   "stake-pool": PoolKindCodeEnum.Stake,
+  launchpad: PoolKindCodeEnum.Launchpad,
 };
 
 export const Route = createFileRoute("/my-participated-pools/")({
@@ -59,6 +67,9 @@ function RouteComponent() {
   const { filter: filterClaimable, setFilter: setFilterClaimable } =
     useMyParticipatedPoolsClaimableSearchFilterStore();
 
+  const { filter: filterLaunchpad, setFilter: setFilterLaunchpad } =
+    useMyParticipatedPoolsLaunchpadSearchFilterStore();
+
   const { data: claimableCount } = useQuery({
     queryKey: userQueryKeys.claimableCount({
       id: user?.id,
@@ -73,6 +84,7 @@ function RouteComponent() {
     { label: "Burn Pool", value: "burn-pool" },
     { label: "Swap Pool", value: "swap-pool" },
     { label: "Staking Pool", value: "stake-pool" },
+    { label: "Launchpad", value: "launchpad" },
     {
       label: "Claimable",
       value: "claimable",
@@ -100,11 +112,13 @@ function RouteComponent() {
         return filterClaimable;
       case "stake-pool":
         return filterStake;
+      case "launchpad":
+        return filterLaunchpad;
       default:
         void (tab satisfies never); // exhaustive check
         return undefined;
     }
-  }, [tab, filterBurn, filterSwap, filterClaimable, filterStake]);
+  }, [tab, filterBurn, filterSwap, filterClaimable, filterStake, filterLaunchpad]);
 
   const setFilter = useMemo(() => {
     switch (tab) {
@@ -116,11 +130,13 @@ function RouteComponent() {
         return setFilterClaimable;
       case "stake-pool":
         return setFilterStake;
+      case "launchpad":
+        return setFilterLaunchpad;
       default:
         void (tab satisfies never); // exhaustive check
         return undefined;
     }
-  }, [tab, setFilterBurn, setFilterSwap, setFilterClaimable, setFilterStake]);
+  }, [tab, setFilterBurn, setFilterSwap, setFilterClaimable, setFilterStake, setFilterLaunchpad]);
 
   return (
     <ProfileLayout>

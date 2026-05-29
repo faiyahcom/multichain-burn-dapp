@@ -15,7 +15,9 @@ interface Props {
     container?: string;
     glowContainer?: string;
     content?: string;
+    separator?: string;
   };
+  onContainerClick?: () => void;
 }
 
 const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
@@ -24,6 +26,7 @@ const CARD_VARIANT_BG_CLASS_NAME: Record<ContainerVariant, string> = {
   swap: "grid-swap-bg",
   green: "",
   stake: "grid-stake-bg",
+  launchpad: "grid-launchpad-bg",
 };
 
 export const gridCardButtonClassName = ({
@@ -49,17 +52,22 @@ const GridCard: React.FC<Props> = ({
   bottomSection,
   btn,
   classNames,
+  onContainerClick,
 }) => {
   const { className: btnClassName, ...btnProps } = btn;
 
   return (
-    <div className={cn("relative rounded-24px", classNames?.container)}>
+    <div
+      className={cn("relative rounded-24px", classNames?.container)}
+      onClick={onContainerClick}
+    >
       <GlowContainer
         variant={variant}
         className={cn(
-          "relative h-full space-y-3 border-3 p-3 sm:space-y-6 sm:p-6",
+          "relative h-full border-3 p-3 sm:p-6",
           "text-center text-base font-semibold sm:text-2xl",
           "z-10 **:z-10",
+          "flex flex-col justify-between gap-3 sm:gap-6",
           CARD_VARIANT_BG_CLASS_NAME[variant],
           classNames?.glowContainer,
         )}
@@ -75,6 +83,7 @@ const GridCard: React.FC<Props> = ({
             className={cn(
               "h-0.75 w-full",
               getVariantBtnBgClassName({ variant }),
+              classNames?.separator,
             )}
           />
           {bottomSection}

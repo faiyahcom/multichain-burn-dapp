@@ -3,7 +3,7 @@ import { StatRow } from "../../components";
 import { useAmountActivity } from "../../use-amount-activity";
 import { IconExclaimation } from "@/assets/react";
 import { useMemo } from "react";
-import { shortenNumber } from "@/utils/helpers/numbers";
+import { formatAmount, shortenNumber } from "@/utils/helpers/numbers";
 import { chainIdToNetworkConfig } from "@/config/networks";
 import { resolvePoolTokenDisplay } from "@/utils/helpers/pool-token-display";
 import TokenDisplay from "@/components/common/token-display";
@@ -91,7 +91,27 @@ const ClosedStatus = ({ poolDetail }: Props) => {
                     </div>
                 }
             />
-            <div className="mx-6 inline-flex items-start gap-1">
+            <StatRow
+                label="Fee"
+                value={
+                    <div className="inline-flex items-center gap-1 md:gap-1.5">
+                        {formatAmount(
+                            poolDetail?.userAmount?.totalSettlementFee ?? "0",
+                            poolDetail?.pool.rewardTokenDecimals ?? 0,
+                        )}
+                        <TokenDisplay
+                            symbol={poolDetail?.tokenOut?.symbol}
+                            customSymbol={poolDetail?.tokenOut?.customSymbol}
+                            imageUri={rewardTokenDisplay.imageUri ?? undefined}
+                            classNames={{
+                                img: "size-3.5 md:size-4 2xl:size-4.25",
+                                container: "inline-flex items-center gap-1 md:gap-1.5",
+                            }}
+                        />
+                    </div>
+                }
+            />
+            <div className="flex items-start justify-center gap-1">
                 <IconExclaimation className="inline size-5 translate-y-0.5" />
                 <span className="text-sm text-greyed">
                     This pool was emergency closed by admin.

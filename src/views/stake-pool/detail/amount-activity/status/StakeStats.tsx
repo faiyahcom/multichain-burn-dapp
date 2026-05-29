@@ -184,11 +184,15 @@ const StakeStats = ({
                 (poolDetail?.pool?.interestStopDate &&
                     poolDetail?.pool?.interestStopDate !== "0" ? (
                     <p className="text-center text-xs text-error md:text-sm lg:text-base 2xl:text-lg">
-                        Interest stops on{" "}
-                        {formatTimestampSecondsToDate({
-                            timestamp: poolDetail?.pool?.interestStopDate,
-                        })}
-                        . You can then unstake and claim your rewards
+                        <span>
+                            Interest stops on{" "}
+                            {formatTimestampSecondsToDate({
+                                timestamp: poolDetail?.pool?.interestStopDate,
+                            })}
+                            .
+                        </span>
+                        <br />
+                        <span>You can then unstake and claim your rewards</span>
                     </p>
                 ) : (
                     <p className="text-center text-sm text-error md:text-base lg:text-lg 2xl:text-xl">
@@ -196,7 +200,7 @@ const StakeStats = ({
                     </p>
                 ))}
             {hasReachedLimit && (
-                <div className="inline-flex items-start gap-1">
+                <div className="flex items-start justify-center gap-1">
                     <IconExclaimation className="inline size-5" />
                     <span className="text-sm text-mb-gray-b8">
                         This pool has reached its staking limit and is no longer accepting

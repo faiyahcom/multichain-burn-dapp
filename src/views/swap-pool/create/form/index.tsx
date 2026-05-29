@@ -13,7 +13,6 @@ import {
 } from "@/components/common/glow/radio-group";
 import WhitelistTokenSelect from "@/components/common/glow/whitelist-token-select";
 import NetworkIcon from "@/components/layout/header/network-icon";
-import { DEFAULT_INPUT_NUMBER_STEP } from "@/config/constant";
 import {
   NETWORK_CONFIGS,
   networkIdToChainId,
@@ -32,14 +31,19 @@ import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { useForm, Controller, type SubmitHandler } from "react-hook-form";
 import { useCreateSwapPoolEvmFn } from "../useCreateSwapPoolEvmFn";
+import { useFeeSettings } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
+import { formatAmount } from "@/utils/helpers/numbers";
+import { type nativeCurrency } from "@/config/networks";
+import TokenDisplay from "@/components/common/token-display";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
   tokenBurn: string;
-  ratio: string;
   budget: string;
   tokenReward: string;
   amountPay: string; // This is only for the UI, not for the API, this is what client requested (MB-1054)
+  numerator: string;
+  denominator: string;
 };
 
 type Props = {
@@ -67,6 +71,19 @@ const CreateSwapPoolForm = ({
   const { createPool: createPoolEvm } = useCreateSwapPoolEvmFn();
 
   const network = NETWORK_CONFIGS.find((n) => n.id === selectedNetworkId);
+  const { creationFee, isLoading: isFeeLoading } =
+    useFeeSettings(selectedNetworkId);
+  const nativeCurrencyInfo = network?.appKitNetwork.nativeCurrency as
+    | nativeCurrency
+    | undefined;
+  const nativeDecimals = nativeCurrencyInfo?.decimals ?? 18;
+  const nativeSymbol = nativeCurrencyInfo?.symbol ?? "";
+  const formattedCreationFee =
+    creationFee != null
+      ? formatAmount(creationFee.toString(), nativeDecimals)
+      : isFeeLoading
+        ? "Loading..."
+        : "—";
 
   const {
     register,
@@ -82,18 +99,21 @@ const CreateSwapPoolForm = ({
     defaultValues: {
       poolName: "",
       tokenBurn: undefined,
-      ratio: undefined,
       tokenReward: undefined,
-      budget: undefined,
-      amountPay: undefined,
+      budget: "",
+      amountPay: "",
+      numerator: "",
+      denominator: "",
     },
     mode: "onChange",
   });
 
   const selectedTokenBurn = watch("tokenBurn");
   const selectedTokenReward = watch("tokenReward");
+  const numerator = watch("numerator");
+  const denominator = watch("denominator");
   const budget = watch("budget");
-  const ratio = watch("ratio");
+  const amountPay = watch("amountPay");
 
   const chainId = networkIdToChainId(selectedNetworkId);
   const shouldCheckMinRatio =
@@ -119,13 +139,20 @@ const CreateSwapPoolForm = ({
     retry: false,
   });
 
+  // Trigger denominator field check when any of these dependent fields change
+  // Trigger on the Min ratio config (if any) and numerator field
   useEffect(() => {
-    const ratioFieldState = getFieldState("ratio");
-    const isRatioDirty = ratioFieldState?.isDirty;
-    if (isRatioDirty) {
-      trigger("ratio");
+    const denominatorFieldState = getFieldState("denominator");
+    const isDenominatorDirty = denominatorFieldState?.isDirty;
+    if (isDenominatorDirty) {
+      trigger("denominator");
     }
-  }, [pairConfigData, isDetailPairConfigEnabled, isDetailPairConfigPending]);
+  }, [
+    pairConfigData,
+    isDetailPairConfigEnabled,
+    isDetailPairConfigPending,
+    numerator,
+  ]);
 
   const isRatioBiggerOrEqualToMinRatio = ({
     ratioNumerator,
@@ -177,11 +204,8 @@ const CreateSwapPoolForm = ({
   }, []);
 
   const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
-    const [rawNumerator, rawDenominator] = values.ratio
-      .split(":")
-      .map((v) => v.trim());
-    const ratioNumerator = Number(rawNumerator || 0);
-    const ratioDenominator = Number(rawDenominator || 0);
+    const ratioNumerator = Number(values.numerator || 0);
+    const ratioDenominator = Number(values.denominator || 0);
 
     if (!ratioNumerator || !ratioDenominator) {
       toast.error("Invalid ratio format. Please use `X:Y`.");
@@ -267,16 +291,14 @@ const CreateSwapPoolForm = ({
   };
 
   const handleOnChangeBudget = (value: string) => {
-    if (!!value && ratio) {
+    if (!!value && numerator && denominator) {
       const budgetNumber = Number(value);
-      const [rawNumerator, rawDenominator] = ratio
-        .split(":")
-        .map((v) => v.trim());
-      const numerator = Number(rawNumerator || 0);
-      const denominator = Number(rawDenominator || 0);
+      const numeratorNumber = Number(numerator);
+      const denominatorNumber = Number(denominator);
 
-      if (numerator && denominator && budgetNumber) {
-        const numberAmountPay = (budgetNumber / denominator) * numerator;
+      if (numeratorNumber && denominatorNumber && budgetNumber) {
+        const numberAmountPay =
+          (budgetNumber / denominatorNumber) * numeratorNumber;
         setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
           shouldValidate: true,
         });
@@ -284,16 +306,58 @@ const CreateSwapPoolForm = ({
     }
   };
 
-  const handleOnChangeRatio = (value: string) => {
-    const [rawNumerator, rawDenominator] = value
-      .split(":")
-      .map((v) => v.trim());
-    const numerator = Number(rawNumerator || 0);
-    const denominator = Number(rawDenominator || 0);
-    const budgetNumber = Number(budget || 0);
+  const handleOnChangeNumerator = (value: string) => {
+    const numeratorNumber = Number(value);
+    const denominatorNumber = Number(denominator);
+    const amountPayNumber = Number(amountPay);
+    const budgetNumber = Number(budget);
 
-    if (numerator && denominator && budgetNumber) {
-      const numberAmountPay = (budgetNumber / denominator) * numerator;
+    if (numeratorNumber && denominatorNumber && amountPayNumber) {
+      const numberBudget =
+        (amountPayNumber / numeratorNumber) * denominatorNumber;
+      setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
+        shouldValidate: true,
+      });
+    }
+
+    // Only if the amountPayNumber is falsy and the budgetNumber is not falsy
+    if (
+      !amountPayNumber &&
+      numeratorNumber &&
+      denominatorNumber &&
+      budgetNumber
+    ) {
+      const numberAmountPay =
+        (budgetNumber / denominatorNumber) * numeratorNumber;
+      setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
+        shouldValidate: true,
+      });
+    }
+  };
+
+  const handleOnChangeDenominator = (value: string) => {
+    const numeratorNumber = Number(numerator);
+    const denominatorNumber = Number(value);
+    const amountPayNumber = Number(amountPay);
+    const budgetNumber = Number(budget);
+
+    if (numeratorNumber && denominatorNumber && amountPayNumber) {
+      const numberBudget =
+        (amountPayNumber / numeratorNumber) * denominatorNumber;
+      setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
+        shouldValidate: true,
+      });
+    }
+
+    // Only if the amountPayNumber is falsy and the budgetNumber is not falsy
+    if (
+      !amountPayNumber &&
+      numeratorNumber &&
+      denominatorNumber &&
+      budgetNumber
+    ) {
+      const numberAmountPay =
+        (budgetNumber / denominatorNumber) * numeratorNumber;
       setValue("amountPay", Number(numberAmountPay.toFixed(6)).toString(), {
         shouldValidate: true,
       });
@@ -301,16 +365,14 @@ const CreateSwapPoolForm = ({
   };
 
   const handleOnChangeAmountPay = (value: string) => {
-    if (!!value && ratio) {
+    if (!!value && numerator && denominator) {
       const amountPayNumber = Number(value);
-      const [rawNumerator, rawDenominator] = ratio
-        .split(":")
-        .map((v) => v.trim());
-      const numerator = Number(rawNumerator || 0);
-      const denominator = Number(rawDenominator || 0);
+      const numeratorNumber = Number(numerator);
+      const denominatorNumber = Number(denominator);
 
-      if (numerator && denominator && amountPayNumber) {
-        const numberBudget = (amountPayNumber / numerator) * denominator;
+      if (numeratorNumber && denominatorNumber && amountPayNumber) {
+        const numberBudget =
+          (amountPayNumber / numeratorNumber) * denominatorNumber;
         setValue("budget", Number(numberBudget.toFixed(6)).toString(), {
           shouldValidate: true,
         });
@@ -419,55 +481,132 @@ const CreateSwapPoolForm = ({
             />
           </span>
           <div className="flex items-center gap-3">
-            <Input
-              placeholder="1:1"
-              aria-invalid={!!errors.ratio}
-              variant="swap"
-              className={cn(
-                "border-2 py-1 text-xs font-medium sm:text-sm md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
-                "w-10 bg-transparent px-2 text-center placeholder:text-center sm:w-12 md:w-14 lg:w-16 2xl:w-20",
+            <Controller
+              control={control}
+              name="numerator"
+              rules={{
+                required: "Numerator is required",
+                validate: {
+                  validNumber: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal?.isFinite()
+                      ? true
+                      : "Numerator must be a valid number";
+                  },
+                  moreThanZero: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal?.isZero()
+                      ? "Numerator must be greater than zero"
+                      : true;
+                  },
+                  notNegative: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal?.isNegative()
+                      ? "Numerator must be positive"
+                      : true;
+                  },
+                  mustBeInteger: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal && decimal.decimalPlaces() > 0
+                      ? "Numerator must be an integer"
+                      : true;
+                  },
+                },
+              }}
+              render={({ field: { onChange, value, ref, name, onBlur } }) => (
+                <NumericInput
+                  inputComponent={Input}
+                  variant="swap"
+                  placeholder="1"
+                  aria-invalid={!!errors.numerator}
+                  className={cn(
+                    "w-20 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:w-30 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                  )}
+                  value={value ?? ""}
+                  ref={ref}
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={(val) => {
+                    onChange(val);
+                    handleOnChangeNumerator(val);
+                  }}
+                />
               )}
-              {...register("ratio", {
-                onChange: (e) => {
-                  handleOnChangeRatio(e.target.value);
-                },
-                required: "Ratio is required",
-                validate: (value) => {
-                  const trimmed = value.trim();
+            />
+            <div className="h-full align-middle">:</div>
+            <Controller
+              control={control}
+              name="denominator"
+              rules={{
+                required: "Denominator is required",
+                validate: {
+                  validNumber: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal?.isFinite()
+                      ? true
+                      : "Denominator must be a valid number";
+                  },
+                  moreThanZero: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal?.isZero()
+                      ? "Denominator must be greater than zero"
+                      : true;
+                  },
+                  notNegative: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal?.isNegative()
+                      ? "Denominator must be positive"
+                      : true;
+                  },
+                  mustBeInteger: (value) => {
+                    const decimal = safeDecimalParse({ value: value ?? "" });
+                    return decimal && decimal.decimalPlaces() > 0
+                      ? "Denominator must be an integer"
+                      : true;
+                  },
+                  minRatio: (value) => {
+                    if (
+                      isDetailPairConfigEnabled &&
+                      !isDetailPairConfigPending &&
+                      pairConfigData
+                    ) {
+                      const isValidMinRatio = isRatioBiggerOrEqualToMinRatio({
+                        ratioNumerator: numerator,
+                        ratioDenominator: value,
+                        minRatioNumerator:
+                          pairConfigData.pairConfig.ratioNumerator,
+                        minRatioDenominator:
+                          pairConfigData.pairConfig.ratioDenominator,
+                      });
 
-                  // allow negative/decimal numbers through format check
-                  const match = trimmed.match(/^(-?[\d.]+):(-?[\d.]+)$/);
-                  if (!match) return 'Ratio must be in format "X:Y" (e.g. 1:2)';
-
-                  const left = Number(match[1]);
-                  const right = Number(match[2]);
-
-                  if (!Number.isInteger(left) || !Number.isInteger(right))
-                    return "Both numbers must be integers";
-                  if (left <= 0 || right <= 0)
-                    return "Both numbers must be greater than zero";
-
-                  if (
-                    isDetailPairConfigEnabled &&
-                    !isDetailPairConfigPending &&
-                    pairConfigData
-                  ) {
-                    const isValidMinRatio = isRatioBiggerOrEqualToMinRatio({
-                      ratioNumerator: match[1],
-                      ratioDenominator: match[2],
-                      minRatioNumerator:
-                        pairConfigData.pairConfig.ratioNumerator,
-                      minRatioDenominator:
-                        pairConfigData.pairConfig.ratioDenominator,
-                    });
-                    if (!isValidMinRatio) {
-                      return `Ratio must be greater than or equal to min ratio (${pairConfigData.pairConfig.ratioNumerator}:${pairConfigData.pairConfig.ratioDenominator}, ${shortenNumber({ number: Number(pairConfigData.pairConfig.ratio) })})`;
+                      if (!isValidMinRatio) {
+                        return `Ratio must be greater than or equal to min ratio (${pairConfigData.pairConfig.ratioNumerator}:${pairConfigData.pairConfig.ratioDenominator}, ${shortenNumber({ number: Number(pairConfigData.pairConfig.ratio) })})`;
+                      }
                     }
-                  }
 
-                  return true;
+                    return true;
+                  },
                 },
-              })}
+              }}
+              render={({ field: { onChange, value, ref, name, onBlur } }) => (
+                <NumericInput
+                  inputComponent={Input}
+                  variant="swap"
+                  placeholder="1"
+                  aria-invalid={!!errors.denominator}
+                  className={cn(
+                    "w-20 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:w-30 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                  )}
+                  value={value ?? ""}
+                  ref={ref}
+                  name={name}
+                  onBlur={onBlur}
+                  onChange={(val) => {
+                    onChange(val);
+                    handleOnChangeDenominator(val);
+                  }}
+                />
+              )}
             />
             <RadioGroup variant="swap" value="fixed" asChild>
               <RadioGroupItem
@@ -485,9 +624,14 @@ const CreateSwapPoolForm = ({
               </RadioGroupItem>
             </RadioGroup>
           </div>
-          {errors.ratio && (
+          {errors.numerator && (
             <p className="font-inter text-xs text-destructive">
-              {errors.ratio.message}
+              {errors.numerator.message}
+            </p>
+          )}
+          {errors.denominator && (
+            <p className="font-inter text-xs text-destructive">
+              {errors.denominator.message}
             </p>
           )}
         </div>
@@ -619,7 +763,7 @@ const CreateSwapPoolForm = ({
             </div>
           </div>
 
-          <div className="flex flex-col justify-end gap-2">
+          <div className="flex w-full flex-col justify-end gap-2">
             <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
               You Receive
             </span>
@@ -680,6 +824,24 @@ const CreateSwapPoolForm = ({
                 {errors.budget.message}
               </p>
             )}
+          </div>
+
+          <div className="flex w-full flex-col gap-2">
+            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+              Pool Creation Fee
+            </span>
+            <span
+              className={cn(
+                getVariantBorderClassName({ variant: "swap" }),
+                "relative flex w-full gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
+                "rounded-md border-2",
+              )}
+            >
+              {formattedCreationFee}
+              {creationFee != null && nativeSymbol && (
+                <TokenDisplay symbol={nativeSymbol} />
+              )}
+            </span>
           </div>
         </div>
       </div>

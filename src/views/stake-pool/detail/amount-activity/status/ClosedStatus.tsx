@@ -12,7 +12,7 @@ const ClosedStatus = ({ poolDetail }: Props) => {
             poolDetail={poolDetail}
             stakeDisabled
             extraContent={
-                <div className="inline-flex items-start gap-1">
+                <div className="flex items-start justify-center gap-1">
                     <IconExclaimation className="inline size-5" />
                     <span className="text-sm text-mb-gray-b8">
                         This pool was emergency closed by admin.
