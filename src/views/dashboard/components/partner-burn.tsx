@@ -95,9 +95,12 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                     </div>
                 )}
                 {status !== "on_going" && status !== "upcoming" && (
-                    <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
-                    </span>
+                    <div className="flex flex-col items-center gap-px sm:gap-px 2xl:gap-0.5">
+                        <span aria-hidden className="text-xs sm:text-tiny 2xl:text-xs opacity-0 select-none">-</span>
+                        <span className="text-xs font-medium sm:text-tiny 2xl:text-xs">
+                            {status.charAt(0).toUpperCase() + status.slice(1)}
+                        </span>
+                    </div>
                 )}
             </div>
         </GlowContainer>
