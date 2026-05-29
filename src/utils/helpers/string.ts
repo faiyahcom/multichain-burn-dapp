@@ -42,7 +42,7 @@ export const formatTimestampSecondsToDate = ({
 
 /** Converts a unix-seconds timestamp string to a human-readable "time ago" string. */
 export const formatRelativeTime = (timestamp: string): string => {
-  const secondsAgo = Math.floor(Date.now() / 1000) - Number(timestamp);
+  const secondsAgo = Math.max(0, Math.floor(Date.now() / 1000 - Number(timestamp)));
   if (secondsAgo < 60) return `${secondsAgo}s ago`;
   const m = Math.floor(secondsAgo / 60);
   if (m < 60) return `${m}m ago`;
