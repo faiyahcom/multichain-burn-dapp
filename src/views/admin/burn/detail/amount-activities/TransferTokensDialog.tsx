@@ -1,4 +1,5 @@
 import AnimateIconButton from "@/components/common/animate-icon-button";
+import ConfirmDialog from "@/components/common/confirm-dialog";
 import NetworkImgIcon from "@/components/common/network-img-icon";
 import {
   Dialog,
@@ -97,7 +98,7 @@ const UserRow = ({
       >
         <NumericInput
           value={amount}
-          onChange={(val) => onAmountChange(val)}
+          onChange={onAmountChange}
           placeholder="0.00"
           className="h-8 w-36 text-center text-sm"
           min={0}
@@ -118,6 +119,7 @@ export interface TransferTokensDialogProps {
     chainId: string;
     /** 0 = burn pool (dynamic), 1 = swap pool (fixed ratio), 2 = Stake pool, 3 = Launchpad pool */
     poolKind?: number;
+    isConfirmNeeded?: boolean;
     poolInfo: {
         tokenInSymbol?: string;
         tokenInName?: string;
@@ -136,6 +138,7 @@ const TransferTokensDialog = ({
   onOpenChange,
   chainId,
   poolKind,
+  isConfirmNeeded,
   poolInfo,
   onTransfer,
 }: TransferTokensDialogProps) => {
@@ -161,6 +164,7 @@ const TransferTokensDialog = ({
     new Map(),
   );
   const [isTransferring, setIsTransferring] = useState(false);
+  const [confirmDepositOpen, setConfirmDepositOpen] = useState(false);
 
   // ── Optimistic local balances ─────────────────────────────────────────────
   // Seeded from props; immediately decremented after each successful transfer
@@ -270,6 +274,7 @@ const TransferTokensDialog = ({
     setSearch("");
     setSelectedMap(new Map());
     setMode("reward");
+    setConfirmDepositOpen(false);
     onOpenChange(false);
   };
 
@@ -317,6 +322,7 @@ const TransferTokensDialog = ({
     selectedEntries.every(([, amt]) => parseFloat(amt) > 0);
 
   return (
+    <>
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent
         className="flex max-h-[92vh] flex-col gap-0 overflow-x-hidden overflow-y-auto p-0 sm:max-w-lg"
@@ -639,7 +645,9 @@ const TransferTokensDialog = ({
             isLoading={isTransferring}
             isLoadingText="Transferring…"
             btnProps={{
-              onClick: handleTransfer,
+              onClick: mode === "deposit" && isConfirmNeeded
+                ? () => setConfirmDepositOpen(true)
+                : handleTransfer,
               disabled:
                 !canTransfer ||
                 isTransferring ||
@@ -649,6 +657,31 @@ const TransferTokensDialog = ({
         </div>
       </DialogContent>
     </Dialog>
+
+    <ConfirmDialog
+      open={confirmDepositOpen}
+      onOpenChange={setConfirmDepositOpen}
+      title="Confirm Transfer"
+      description={
+        <>
+          <span>
+            Withdrawing tokens from the pool may result in insufficient funds for users to unstake their tokens. Some users may be unable to unstake until additional funds are added back to the pool.
+          </span>
+          <br />
+          <br />
+          <span>Are you sure you want to continue?</span>
+        </>
+      }
+      buttonCancelText="No"
+      buttonConfirmText="Yes"
+      onConfirm={async () => {
+        await handleTransfer();
+        setConfirmDepositOpen(false);
+      }}
+      onCancel={() => setConfirmDepositOpen(false)}
+      isLoading={isTransferring}
+    />
+    </>
   );
 };
 
