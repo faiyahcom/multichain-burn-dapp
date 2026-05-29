@@ -106,6 +106,7 @@ const StatusSwitch: React.FC<Props> = ({
         result = await enableWhitelistTokenSolana({
           tokenAddress: address,
           poolTypes: targetPoolTypes,
+          isCreate: false,
         });
       }
     }

@@ -4,6 +4,7 @@ import { Button } from "../ui/button";
 export interface RadioGroupButtonOption {
   label: string;
   value: string;
+  disabled?: boolean;
 }
 
 interface Props {
@@ -28,10 +29,12 @@ const RadioGroupButton: React.FC<Props> = ({
         return (
           <Button
             key={index}
+            type="button"
             variant={selected === option.value ? "mb-active" : "mb-inactive"}
             size={"mb-btn"}
             onClick={() => onChange?.(option.value)}
             className={classNames?.btn}
+            disabled={option.disabled}
           >
             {option.label}
           </Button>

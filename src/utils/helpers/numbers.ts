@@ -63,7 +63,9 @@ export function safeDecimal(
 ): Decimal {
   if (value == null || value === "") return fallback;
   try {
-    return new Decimal(typeof value === "bigint" ? value.toString() : String(value));
+    return new Decimal(
+      typeof value === "bigint" ? value.toString() : String(value),
+    );
   } catch {
     return fallback;
   }
@@ -209,6 +211,7 @@ export const shortenNumber = ({
 
 function formatUsd(usd: number): string {
   if (usd === 0) return "$0.00";
+  if (usd < 0.000001) return "< $0.000001";
   if (usd < 0.01) return `$${usd.toPrecision(2)}`;
   return `$${usd.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
@@ -228,4 +231,3 @@ export function formatNativeWithUsd(
   if (price == null || isNaN(humanAmt)) return nativePart;
   return `${nativePart} ~ ${formatUsd(humanAmt * price)}`;
 }
-

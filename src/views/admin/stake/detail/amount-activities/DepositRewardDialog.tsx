@@ -29,28 +29,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import BN from "bn.js";
 import { formatUnits } from "viem";
-
-// ─── Duration helper ─────────────────────────────────────────────────────────
-
-function formatDuration(seconds: number | undefined | null): string {
-    if (
-        seconds === undefined ||
-        seconds === null ||
-        !isFinite(seconds) ||
-        seconds < 0
-    )
-        return "—";
-    if (seconds === 0) return "0";
-    if (seconds >= 9_007_199_254_740_991) return "Infinite";
-    const days = Math.floor(seconds / 86400);
-    const hours = Math.floor((seconds % 86400) / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const parts: string[] = [];
-    if (days) parts.push(`${days} ${days === 1 ? "day" : "days"}`);
-    if (hours) parts.push(`${hours} ${hours === 1 ? "hour" : "hours"}`);
-    if (minutes) parts.push(`${minutes} ${minutes === 1 ? "minute" : "minutes"}`);
-    return parts.length ? parts.join(" ") : `${seconds}s`;
-}
+import { formatDuration } from "@/utils/helpers/date";
 
 // ─── Summary row ─────────────────────────────────────────────────────────────
 

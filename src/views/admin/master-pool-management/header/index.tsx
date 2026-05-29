@@ -14,6 +14,7 @@ interface Props {
 
 const AdminMasterPoolManagementHeader: React.FC<Props> = ({ poolType }) => {
   const isStakePool = poolType === 2;
+  const isLaunchpad = poolType === 3;
   const { user } = useAuthStore();
   const navigate = useNavigate();
 
@@ -37,8 +38,8 @@ const AdminMasterPoolManagementHeader: React.FC<Props> = ({ poolType }) => {
     >
       <div>
         <h1 className="text-3xl font-semibold">Master Pool Management</h1>
-        <p className="text-mb-gray-69 text-base">
-          Manage all swap, burn, and staking pools.
+        <p className="text-base text-mb-gray-69">
+          Manage all swap, burn, staking pools and launchpads
         </p>
       </div>
       {/* Only super admin can create pool */}
@@ -53,6 +54,20 @@ const AdminMasterPoolManagementHeader: React.FC<Props> = ({ poolType }) => {
           }}
         >
           <span className="">Create Staking Pool</span>{" "}
+          <PlusIcon className="size-3.75" />
+        </Button>
+      )}
+      {user && isSuperAdmin && isLaunchpad && (
+        <Button
+          variant={"mb-primary"}
+          size={"mb-square-btn"}
+          onClick={() => {
+            navigate({
+              to: "/admin/launchpad/create",
+            });
+          }}
+        >
+          <span className="">Create Launchpad</span>{" "}
           <PlusIcon className="size-3.75" />
         </Button>
       )}

@@ -108,6 +108,7 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
         const claimed = safeDecimal(poolDetail?.claimedRewardAmount);
         const settlementFeeTotal = safeDecimal(pool?.settlementFeeTotal);
         const totalUnstaked = safeDecimal(staking?.totalUnstaked ?? "0");
+        const totalRewardRefund = safeDecimal(staking?.totalRewardRefund ?? "0");
         const totalRewardAmount = isSameToken
             ? totalReward.add(totalStaked)
             : totalReward;
@@ -120,7 +121,11 @@ const StakedRewardAmount = ({ poolDetail }: Props) => {
                 .sub(claimed)
                 .sub(settlementFeeTotal)
                 .sub(totalUnstaked)
-            : totalRewardAmount.sub(claimed).sub(settlementFeeTotal);
+                .sub(totalRewardRefund)
+            : totalRewardAmount
+                .sub(claimed)
+                .sub(settlementFeeTotal)
+                .sub(totalRewardRefund);
         formattedRewardDeficit = formatAmount(
             deficit.toFixed(0, Decimal.ROUND_DOWN),
             rewardDec,

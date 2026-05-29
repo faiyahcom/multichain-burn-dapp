@@ -173,6 +173,7 @@ const AdminWhitelistTokenDialogCreate = () => {
       const result = await createWhitelistTokenSolana({
         tokenAddress: data.address,
         poolTypes: data.poolTypes,
+        isCreate: true,
       });
       if (result) {
         createWhitelistTokenMutation(data);

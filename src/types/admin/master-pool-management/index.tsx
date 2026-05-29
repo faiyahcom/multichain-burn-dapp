@@ -51,6 +51,13 @@ export const adminPoolTypeShortenOptions = poolTypes.map((type) => {
   };
 });
 
+export const launchpadModes = ["fixed", "dynamic"] as const; // TODO: subject to change
+export type LaunchpadMode = (typeof launchpadModes)[number];
+export const launchpadModeLabels: Record<LaunchpadMode, string> = {
+  fixed: "Fixed",
+  dynamic: "Dynamic",
+};
+
 export const swapPoolStatuses = [
   "on_going",
   "canceled",
@@ -60,9 +67,9 @@ export const swapPoolStatuses = [
 export type SwapPoolStatus = (typeof swapPoolStatuses)[number];
 export const swapPoolStatusLabels: Record<SwapPoolStatus, string> = {
   on_going: "Ongoing",
-  ended: "End",
-  canceled: "Cancel",
-  closed: "Close",
+  ended: "Ended",
+  canceled: "Canceled",
+  closed: "Closed",
 };
 export const swapPoolStatusColors: Record<SwapPoolStatus, string> = {
   on_going: "#7AF4CB",
@@ -111,6 +118,23 @@ export const stakePoolStatusColors: Record<StakePoolStatus, string> = {
   full: "#FFB08E",
 };
 
+export const launchpadPoolStatuses = [
+  "upcoming",
+  "completed",
+  ...swapPoolStatuses,
+] as const;
+export type LaunchpadPoolStatus = (typeof launchpadPoolStatuses)[number];
+export const launchpadPoolStatusLabels: Record<LaunchpadPoolStatus, string> = {
+  ...swapPoolStatusLabels,
+  upcoming: "Upcoming",
+  completed: "Completed",
+};
+export const launchpadPoolStatusColors: Record<LaunchpadPoolStatus, string> = {
+  ...swapPoolStatusColors,
+  upcoming: "#FFE798",
+  completed: "#8EEAFF",
+};
+
 export const getPoolStatusColor = (status: AllPoolStatus) => {
   return allPoolStatusColors[status as AllPoolStatus] ?? "#7989ba";
 };
@@ -122,22 +146,25 @@ export type AllPoolStatus =
   | BurnPoolStatus
   | SwapPoolStatus
   | StakePoolStatus
+  | LaunchpadPoolStatus
   | "draft";
 
 // draft is not included in this list because when it is used is situational
 export const allPoolStatuses: AllPoolStatus[] = Array.from(
-  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses]),
+  new Set([...burnPoolStatuses, ...swapPoolStatuses, ...stakePoolStatuses, ...launchpadPoolStatuses]),
 );
 export const allPoolStatusLabels: Record<AllPoolStatus, string> = {
   ...burnPoolStatusLabels,
   ...swapPoolStatusLabels,
   ...stakePoolStatusLabels,
+  ...launchpadPoolStatusLabels,
   draft: "Draft",
 };
 export const allPoolStatusColors: Record<AllPoolStatus, string> = {
   ...burnPoolStatusColors,
   ...swapPoolStatusColors,
   ...stakePoolStatusColors,
+  ...launchpadPoolStatusColors,
   draft: "#7989ba",
 };
 

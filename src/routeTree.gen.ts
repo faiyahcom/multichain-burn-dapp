@@ -37,10 +37,13 @@ import { Route as SwapDetailAddressRouteImport } from './routes/swap/detail/$add
 import { Route as BurnDetailAddressRouteImport } from './routes/burn/detail/$address'
 import { Route as AdminStakeCreateIndexRouteImport } from './routes/admin/stake/create/index'
 import { Route as AdminMinRatioCreateIndexRouteImport } from './routes/admin/min-ratio/create/index'
+import { Route as AdminLaunchpadCreateIndexRouteImport } from './routes/admin/launchpad/create/index'
 import { Route as PairDetailChainIdTokenInTokenOutRouteImport } from './routes/pair-detail/$chainId/$tokenIn/$tokenOut'
 import { Route as AdminSwapDetailAddressRouteImport } from './routes/admin/swap/detail/$address'
 import { Route as AdminStakeEditAddressRouteImport } from './routes/admin/stake/edit/$address'
 import { Route as AdminStakeDetailAddressRouteImport } from './routes/admin/stake/detail/$address'
+import { Route as AdminLaunchpadEditAddressRouteImport } from './routes/admin/launchpad/edit/$address'
+import { Route as AdminLaunchpadDetailAddressRouteImport } from './routes/admin/launchpad/detail/$address'
 import { Route as AdminBurnEditAddressRouteImport } from './routes/admin/burn/edit/$address'
 import { Route as AdminBurnDetailAddressRouteImport } from './routes/admin/burn/detail/$address'
 import { Route as AdminMinRatioEditChainIdTokenInTokenOutRouteImport } from './routes/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
@@ -195,6 +198,12 @@ const AdminMinRatioCreateIndexRoute =
     path: '/admin/min-ratio/create/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminLaunchpadCreateIndexRoute =
+  AdminLaunchpadCreateIndexRouteImport.update({
+    id: '/admin/launchpad/create/',
+    path: '/admin/launchpad/create/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const PairDetailChainIdTokenInTokenOutRoute =
   PairDetailChainIdTokenInTokenOutRouteImport.update({
     id: '/pair-detail/$chainId/$tokenIn/$tokenOut',
@@ -216,6 +225,18 @@ const AdminStakeDetailAddressRoute = AdminStakeDetailAddressRouteImport.update({
   path: '/admin/stake/detail/$address',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminLaunchpadEditAddressRoute =
+  AdminLaunchpadEditAddressRouteImport.update({
+    id: '/admin/launchpad/edit/$address',
+    path: '/admin/launchpad/edit/$address',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const AdminLaunchpadDetailAddressRoute =
+  AdminLaunchpadDetailAddressRouteImport.update({
+    id: '/admin/launchpad/detail/$address',
+    path: '/admin/launchpad/detail/$address',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminBurnEditAddressRoute = AdminBurnEditAddressRouteImport.update({
   id: '/admin/burn/edit/$address',
   path: '/admin/burn/edit/$address',
@@ -262,10 +283,13 @@ export interface FileRoutesByFullPath {
   '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/launchpad/detail/$address': typeof AdminLaunchpadDetailAddressRoute
+  '/admin/launchpad/edit/$address': typeof AdminLaunchpadEditAddressRoute
   '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/launchpad/create': typeof AdminLaunchpadCreateIndexRoute
   '/admin/min-ratio/create': typeof AdminMinRatioCreateIndexRoute
   '/admin/stake/create': typeof AdminStakeCreateIndexRoute
   '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
@@ -299,10 +323,13 @@ export interface FileRoutesByTo {
   '/swap/create': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/launchpad/detail/$address': typeof AdminLaunchpadDetailAddressRoute
+  '/admin/launchpad/edit/$address': typeof AdminLaunchpadEditAddressRoute
   '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/launchpad/create': typeof AdminLaunchpadCreateIndexRoute
   '/admin/min-ratio/create': typeof AdminMinRatioCreateIndexRoute
   '/admin/stake/create': typeof AdminStakeCreateIndexRoute
   '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
@@ -337,10 +364,13 @@ export interface FileRoutesById {
   '/swap/create/': typeof SwapCreateIndexRoute
   '/admin/burn/detail/$address': typeof AdminBurnDetailAddressRoute
   '/admin/burn/edit/$address': typeof AdminBurnEditAddressRoute
+  '/admin/launchpad/detail/$address': typeof AdminLaunchpadDetailAddressRoute
+  '/admin/launchpad/edit/$address': typeof AdminLaunchpadEditAddressRoute
   '/admin/stake/detail/$address': typeof AdminStakeDetailAddressRoute
   '/admin/stake/edit/$address': typeof AdminStakeEditAddressRoute
   '/admin/swap/detail/$address': typeof AdminSwapDetailAddressRoute
   '/pair-detail/$chainId/$tokenIn/$tokenOut': typeof PairDetailChainIdTokenInTokenOutRoute
+  '/admin/launchpad/create/': typeof AdminLaunchpadCreateIndexRoute
   '/admin/min-ratio/create/': typeof AdminMinRatioCreateIndexRoute
   '/admin/stake/create/': typeof AdminStakeCreateIndexRoute
   '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut': typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
@@ -376,10 +406,13 @@ export interface FileRouteTypes {
     | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/launchpad/detail/$address'
+    | '/admin/launchpad/edit/$address'
     | '/admin/stake/detail/$address'
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/launchpad/create'
     | '/admin/min-ratio/create'
     | '/admin/stake/create'
     | '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
@@ -413,10 +446,13 @@ export interface FileRouteTypes {
     | '/swap/create'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/launchpad/detail/$address'
+    | '/admin/launchpad/edit/$address'
     | '/admin/stake/detail/$address'
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/launchpad/create'
     | '/admin/min-ratio/create'
     | '/admin/stake/create'
     | '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
@@ -450,10 +486,13 @@ export interface FileRouteTypes {
     | '/swap/create/'
     | '/admin/burn/detail/$address'
     | '/admin/burn/edit/$address'
+    | '/admin/launchpad/detail/$address'
+    | '/admin/launchpad/edit/$address'
     | '/admin/stake/detail/$address'
     | '/admin/stake/edit/$address'
     | '/admin/swap/detail/$address'
     | '/pair-detail/$chainId/$tokenIn/$tokenOut'
+    | '/admin/launchpad/create/'
     | '/admin/min-ratio/create/'
     | '/admin/stake/create/'
     | '/admin/min-ratio/edit/$chainId/$tokenIn/$tokenOut'
@@ -488,10 +527,13 @@ export interface RootRouteChildren {
   SwapCreateIndexRoute: typeof SwapCreateIndexRoute
   AdminBurnDetailAddressRoute: typeof AdminBurnDetailAddressRoute
   AdminBurnEditAddressRoute: typeof AdminBurnEditAddressRoute
+  AdminLaunchpadDetailAddressRoute: typeof AdminLaunchpadDetailAddressRoute
+  AdminLaunchpadEditAddressRoute: typeof AdminLaunchpadEditAddressRoute
   AdminStakeDetailAddressRoute: typeof AdminStakeDetailAddressRoute
   AdminStakeEditAddressRoute: typeof AdminStakeEditAddressRoute
   AdminSwapDetailAddressRoute: typeof AdminSwapDetailAddressRoute
   PairDetailChainIdTokenInTokenOutRoute: typeof PairDetailChainIdTokenInTokenOutRoute
+  AdminLaunchpadCreateIndexRoute: typeof AdminLaunchpadCreateIndexRoute
   AdminMinRatioCreateIndexRoute: typeof AdminMinRatioCreateIndexRoute
   AdminStakeCreateIndexRoute: typeof AdminStakeCreateIndexRoute
   AdminMinRatioEditChainIdTokenInTokenOutRoute: typeof AdminMinRatioEditChainIdTokenInTokenOutRoute
@@ -695,6 +737,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMinRatioCreateIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/launchpad/create/': {
+      id: '/admin/launchpad/create/'
+      path: '/admin/launchpad/create'
+      fullPath: '/admin/launchpad/create'
+      preLoaderRoute: typeof AdminLaunchpadCreateIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pair-detail/$chainId/$tokenIn/$tokenOut': {
       id: '/pair-detail/$chainId/$tokenIn/$tokenOut'
       path: '/pair-detail/$chainId/$tokenIn/$tokenOut'
@@ -721,6 +770,20 @@ declare module '@tanstack/react-router' {
       path: '/admin/stake/detail/$address'
       fullPath: '/admin/stake/detail/$address'
       preLoaderRoute: typeof AdminStakeDetailAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/launchpad/edit/$address': {
+      id: '/admin/launchpad/edit/$address'
+      path: '/admin/launchpad/edit/$address'
+      fullPath: '/admin/launchpad/edit/$address'
+      preLoaderRoute: typeof AdminLaunchpadEditAddressRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/launchpad/detail/$address': {
+      id: '/admin/launchpad/detail/$address'
+      path: '/admin/launchpad/detail/$address'
+      fullPath: '/admin/launchpad/detail/$address'
+      preLoaderRoute: typeof AdminLaunchpadDetailAddressRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/burn/edit/$address': {
@@ -776,10 +839,13 @@ const rootRouteChildren: RootRouteChildren = {
   SwapCreateIndexRoute: SwapCreateIndexRoute,
   AdminBurnDetailAddressRoute: AdminBurnDetailAddressRoute,
   AdminBurnEditAddressRoute: AdminBurnEditAddressRoute,
+  AdminLaunchpadDetailAddressRoute: AdminLaunchpadDetailAddressRoute,
+  AdminLaunchpadEditAddressRoute: AdminLaunchpadEditAddressRoute,
   AdminStakeDetailAddressRoute: AdminStakeDetailAddressRoute,
   AdminStakeEditAddressRoute: AdminStakeEditAddressRoute,
   AdminSwapDetailAddressRoute: AdminSwapDetailAddressRoute,
   PairDetailChainIdTokenInTokenOutRoute: PairDetailChainIdTokenInTokenOutRoute,
+  AdminLaunchpadCreateIndexRoute: AdminLaunchpadCreateIndexRoute,
   AdminMinRatioCreateIndexRoute: AdminMinRatioCreateIndexRoute,
   AdminStakeCreateIndexRoute: AdminStakeCreateIndexRoute,
   AdminMinRatioEditChainIdTokenInTokenOutRoute:

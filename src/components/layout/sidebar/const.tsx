@@ -12,6 +12,7 @@ import {
   IconPairList,
   IconPersonalInfoSettings,
   IconRevenueFeeStats,
+  IconRocketOutline,
   IconSettings,
   IconSupport,
   IconSwap,
@@ -220,13 +221,8 @@ export const adminNavItems: NavItem[] = [
       { label: "Swap Pool", tab: "swap-pool", icon: IconArrowLeftRightOutline },
       { label: "Burn Pool", tab: "burn-pool", icon: IconFlameOutline },
       { label: "Stake Pool", tab: "stake-pool", icon: IconLockOutline },
+      { label: "Launchpad", tab: "launchpad", icon: IconRocketOutline },
     ],
-  },
-  {
-    label: "Draft Pools",
-    section: navSection.admin,
-    to: "/admin/draft-pools",
-    allowedRoles: ["admin", "super_admin"],
   },
   {
     label: "Min Ratio",
