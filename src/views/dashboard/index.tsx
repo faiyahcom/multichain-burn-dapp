@@ -30,6 +30,7 @@ const HomeDashboard = () => {
   const { data } = useQuery({
     queryKey: dashboardQueryKeys.statsSticker(),
     queryFn: () => dashboardService.getStatsSticker(),
+    refetchInterval: 5_000,
   });
 
   const { data: latestActivityData } = useQuery({
@@ -72,17 +73,20 @@ const HomeDashboard = () => {
     queryKey: dashboardQueryKeys.topSwapper({ limit: DEFAULT_POOL_LIMIT }),
     queryFn: () =>
       dashboardService.getTopSwapper({ limit: DEFAULT_POOL_LIMIT }),
+    refetchInterval: 5_000,
   });
 
   const { data: topPairData } = useQuery({
     queryKey: dashboardQueryKeys.topPair({ limit: 6 }),
     queryFn: () => dashboardService.getTopPair({ limit: 6 }),
+    refetchInterval: 5_000,
   });
 
   const { data: topStakingData } = useQuery({
     queryKey: dashboardQueryKeys.topStakingPools({ limit: DEFAULT_POOL_LIMIT }),
     queryFn: () =>
       dashboardService.getTopStakingPools({ limit: DEFAULT_POOL_LIMIT }),
+    refetchInterval: 5_000,
   });
 
   const tickerItems = data
