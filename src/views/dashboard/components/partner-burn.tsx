@@ -3,7 +3,6 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import useEmblaCarousel from "embla-carousel-react";
 import AutoScroll from "embla-carousel-auto-scroll";
 import GlowContainer from "@/components/common/glow/container";
-import TokenImage from "@/components/common/token-image";
 import { IconBurnCategory } from "@/assets/react";
 import { dashboardService } from "@/services/dashboardService";
 import type { PartnerPool } from "@/services/dashboardService";
@@ -41,7 +40,6 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
         pool.tokenOutDecimals,
     );
     const poolName = truncateString({ str: pool.name, left: 10, right: 0 });
-    const symbol = pool.tokenOutSymbolCustom ?? pool.tokenOutSymbol;
     const daysUntil = Math.ceil(
         (Number(pool.timeStart) - Math.floor(Date.now() / 1000)) / 86400,
     );
@@ -71,7 +69,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                 <p className="max-w-full text-xs font-semibold sm:text-tiny 2xl:text-xs">
                     {poolName}
                 </p>
-                <p className="text-2xl font-semibold sm:text-sm 2xl:text-lg">
+                <p className="text-lg xs:text-2xl font-semibold sm:text-sm 2xl:text-lg">
                     {rewardFormatted}
                 </p>
                 <TokenDisplay
@@ -79,7 +77,7 @@ const PartnerPoolCard = ({ pool }: { pool: PartnerPool }) => {
                     customSymbol={pool.tokenInSymbolCustom ?? undefined}
                     imageUri={pool.tokenInImageUri ?? undefined}
                     classNames={{
-                        img: "size-8.5 lg:size-7 2xl:size-11",
+                        img: "size-6 xs:size-8.5 lg:size-7 2xl:size-11",
                     }}
                     hasSymbol={false}
                 />
@@ -220,8 +218,8 @@ export const PartnerBurnSection = () => {
     return (
         <GlowContainer className="px-5 py-6.25" variant="burn">
             <div className="mb-6 flex items-center gap-3">
-                <IconBurnCategory className="size-10.75" />
-                <p className="text-2xl font-medium text-nowrap">PARTNER BURN</p>
+                <IconBurnCategory className="size-10.75 shrink-0" />
+                <p className="text-2xl font-medium">PARTNER BURN</p>
             </div>
 
             {showCarousel ? (

@@ -89,7 +89,7 @@ const SummaryRow = ({
 }) => (
   <div className={cn("flex flex-col gap-1 px-3 py-2 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-2 2xl:px-6 2xl:py-4", className)}>
     <div className="text-sm font-medium text-mb-gray-b8 sm:text-base 2xl:text-xl">{label}</div>
-    <div className="text-sm sm:text-base 2xl:text-xl">
+    <div className="text-sm sm:text-base 2xl:text-xl sm:text-right">
       {typeof value === "string" ? (
         <span className="font-semibold">{value}</span>
       ) : (

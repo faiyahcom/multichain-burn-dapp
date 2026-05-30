@@ -229,6 +229,7 @@
   --color-mb-glow-green: var(--mb-glow-green);
 
   --breakpoint-1440px: 90rem;
+  --breakpoint-xs: 23.438rem; /* For very narrow screens */
   /* END */
   --color-mb-white-ce: var(--mb-white-ce);
 }

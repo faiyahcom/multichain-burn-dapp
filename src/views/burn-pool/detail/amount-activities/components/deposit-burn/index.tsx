@@ -90,10 +90,10 @@ const SummaryRow = ({
       className,
     )}
   >
-    <div className="text-sm font-medium text-nowrap text-mb-gray-b8 sm:text-base 2xl:text-xl">
+    <div className="text-sm font-medium text-mb-gray-b8 sm:text-base 2xl:text-xl">
       {label}
     </div>
-    <div className="text-sm sm:text-base 2xl:text-xl">
+    <div className="text-sm sm:text-base 2xl:text-xl sm:text-right">
       {typeof value === "string" ? (
         <span className="font-semibold">{value}</span>
       ) : (
