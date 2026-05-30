@@ -43,20 +43,20 @@ const PairCard = ({ pair }: PairCardProps) => {
 
   return (
     /* Only change: flex-col for mobile, flex-row for md: up */
-    <div className="flex flex-col items-stretch gap-5 rounded-2xl border border-mb-pair-card-border bg-mb-dark-profile-btn p-5 md:flex-row md:items-center md:gap-3 md:rounded-xl md:p-3">
-      <div className="flex min-w-0 flex-1 items-start gap-4 md:items-center md:gap-3">
+    <div className="flex flex-col items-stretch md:gap-5 rounded-2xl border border-mb-pair-card-border bg-mb-dark-profile-btn p-5 md:flex-row md:items-center gap-3 md:rounded-xl md:p-3">
+      <div className="flex flex-1 items-start gap-4 md:items-center md:gap-3 w-full md:w-auto">
         {/* Icons: size-12 on mobile, original size-8 on md: */}
         <div className="relative shrink-0 pr-1 pb-1 md:pr-2 md:pb-2">
           <div className="flex items-center">
             <TokenImage
               src={tokenOutDisplay.imageUri}
               alt={tokenOutDisplay.symbol}
-              classNames={{ common: "size-12 md:size-8 z-10" }}
+              classNames={{ common: "md:size-12 size-8 z-10" }}
             />
             <TokenImage
               src={tokenInDisplay.imageUri}
               alt={tokenInDisplay.symbol}
-              classNames={{ common: "size-12 md:size-8 -ml-3 md:-ml-2 z-0" }}
+              classNames={{ common: "md:size-12 size-8 -ml-3 md:-ml-2 z-0" }}
             />
           </div>
           {network?.iconSrc && (
@@ -64,13 +64,13 @@ const PairCard = ({ pair }: PairCardProps) => {
               src={network.iconSrc}
               alt=""
               /* Matches your original absolute positioning */
-              className="absolute right-0 bottom-0 size-5 rounded-full border border-mb-pair-card-border bg-[#0B1622] md:right-1 md:bottom-1 md:size-4"
+              className="absolute right-0 bottom-0 md:size-5 rounded-full border border-mb-pair-card-border bg-[#0B1622] md:right-1 md:bottom-1 size-4"
             />
           )}
         </div>
 
         {/* Info block: Original text styles preserved */}
-        <div className="min-w-0 flex-1 space-y-1.5 text-xs md:space-y-1">
+        <div className="flex-1 space-y-1.5 text-xs md:space-y-1 w-[calc(100%-var(--spacing)*17)] md:w-auto">
           <div className="flex items-center">
             <span
               className="truncate text-lg font-medium md:text-sm"
@@ -90,7 +90,7 @@ const PairCard = ({ pair }: PairCardProps) => {
               isShorten
               classNames={{
                 container:
-                  "text-mb-pair-metric font-bold justify-end md:justify-start",
+                  "text-mb-pair-metric font-bold justify-end md:justify-start min-w-0",
               }}
             />
           </div>
@@ -103,7 +103,7 @@ const PairCard = ({ pair }: PairCardProps) => {
               isShorten
               classNames={{
                 container:
-                  "text-mb-pair-metric font-bold justify-end md:justify-start",
+                  "text-mb-pair-metric font-bold justify-end md:justify-start min-w-0",
               }}
             />
           </div>
