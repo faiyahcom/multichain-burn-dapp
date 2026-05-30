@@ -76,7 +76,7 @@ const StakePoolCard = ({ pool, rank }: { pool: TopStakingPool; rank: number }) =
 
                 {/* Staked amount */}
                 {pool.stakingAmount > 0 && (
-                    <p className="text-2xl font-semibold sm:text-sm 2xl:text-lg">
+                    <p className="text-lg xs:text-2xl font-semibold sm:text-sm 2xl:text-lg">
                         {stakedDisplay}
                     </p>
                 )}
@@ -86,7 +86,7 @@ const StakePoolCard = ({ pool, rank }: { pool: TopStakingPool; rank: number }) =
                     symbol={pool.tokenInSymbol}
                     customSymbol={undefined}
                     imageUri={pool?.rewardTokenImageUri ?? undefined}
-                    classNames={{ img: "size-8.5 lg:size-7 2xl:size-11" }}
+                    classNames={{ img: "size-6 xs:size-8.5 lg:size-7 2xl:size-11" }}
                     hasSymbol={false}
                 />
 
@@ -140,8 +140,8 @@ const ComingSoonCard = () => (
 export const TopStakingPools = ({ pools }: { pools?: TopStakingPool[] }) => (
     <GlowContainer className="px-5 py-6.25" variant="stake">
         <div className="mb-8 flex items-center gap-3">
-            <StakeCategoryIcon className="size-10" />
-            <p className="text-2xl font-medium text-nowrap">TOP STAKING POOLS</p>
+            <StakeCategoryIcon className="size-10 shrink-0" />
+            <p className="text-2xl font-medium">TOP STAKING POOLS</p>
         </div>
 
         <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
