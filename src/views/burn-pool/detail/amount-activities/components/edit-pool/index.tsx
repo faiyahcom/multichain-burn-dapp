@@ -129,7 +129,7 @@ const EditPoolDialog = ({
             >
               {/* Pool Name */}
               <div className="flex flex-col gap-2">
-                <label className="font-inter text-sm font-medium">
+                <label className="font-inter text-base font-medium">
                   Pool Name
                 </label>
                 <Input
@@ -149,7 +149,7 @@ const EditPoolDialog = ({
               {/* Time pickers */}
               <div className="flex flex-col gap-4 sm:flex-row">
                 <div className="flex flex-1 flex-col gap-2">
-                  <label className="font-inter text-sm font-medium">
+                  <label className="font-inter text-base font-medium">
                     Start Time
                   </label>
                   <DatePicker
@@ -165,7 +165,7 @@ const EditPoolDialog = ({
                       today.setHours(0, 0, 0, 0);
                       return date < today;
                     }}
-                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px"
+                    className="rounded-md px-3 py-5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
                   />
                   <input
                     type="hidden"
@@ -187,7 +187,7 @@ const EditPoolDialog = ({
                   )}
                 </div>
                 <div className="flex flex-1 flex-col gap-2">
-                  <label className="font-inter text-sm font-medium">
+                  <label className="font-inter text-base font-medium">
                     End Time
                   </label>
                   <DatePicker
@@ -205,7 +205,7 @@ const EditPoolDialog = ({
                         date < today || (startTime ? date < startTime : false)
                       );
                     }}
-                    className="rounded-md px-2 py-0 text-xs sm:text-sm md:px-3 md:py-5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px"
+                    className="rounded-md px-3 py-5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
                   />
                   <input
                     type="hidden"
@@ -236,7 +236,7 @@ const EditPoolDialog = ({
                   onClick={handleCancel}
                   disabled={isSubmitting}
                   hasHover
-                  className="flex-1 font-orbitron text-sm font-semibold sm:text-base xl:text-2xl"
+                  className="flex-1 font-orbitron text-base font-semibold xl:text-2xl"
                 >
                   Cancel
                 </Button>
@@ -245,7 +245,7 @@ const EditPoolDialog = ({
                   type="submit"
                   isLoading={isSubmitting}
                   hasHover
-                  className="flex-1 font-orbitron text-sm font-semibold sm:text-base xl:text-2xl"
+                  className="flex-1 font-orbitron text-base font-semibold xl:text-2xl"
                 >
                   {isSubmitting ? "Editing..." : "Edit"}
                 </Button>
