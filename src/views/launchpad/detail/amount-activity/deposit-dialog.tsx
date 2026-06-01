@@ -595,7 +595,7 @@ const DepositDialog = ({
                                             />
                                             <div
                                                 className={cn(
-                                                    "flex items-center gap-2 rounded-xl border-2 border-foreground bg-mb-dark-popover px-2 sm:px-4",
+                                                    "flex shrink-0 items-center gap-2 rounded-xl border-2 border-foreground bg-mb-dark-popover px-2 sm:px-4",
                                                 )}
                                             >
                                                 {!pool ? (

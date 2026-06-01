@@ -630,7 +630,7 @@ const StakeDialog = ({ open, onOpenChange, poolDetail, onConfirm }: Props) => {
                                                 />
                                                 <div
                                                     className={cn(
-                                                        "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 text-mb-btn-stake sm:px-4",
+                                                        "flex shrink-0 items-center gap-2 rounded-md bg-mb-dark-popover px-2 text-mb-btn-stake sm:px-4",
                                                         getVariantBorderClassName({ variant: "stake" }),
                                                     )}
                                                 >
