@@ -477,8 +477,8 @@ const DepositDialog = ({
                                                         chainId={pool?.chainId ?? ""}
                                                         hasLabel
                                                         classNames={{
-                                                            container: "flex items-center justify-center",
-                                                            img: "sm:size-4",
+                                                            container: "flex items-center",
+                                                            img: "size-4 sm:size-4",
                                                         }}
                                                     />
                                                 }
