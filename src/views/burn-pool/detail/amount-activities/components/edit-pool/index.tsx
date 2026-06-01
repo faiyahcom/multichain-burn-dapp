@@ -4,8 +4,9 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Dialog,
-  DialogContent,
+  DialogBody,
   DialogHeader,
+  DialogOverlay,
   DialogPortal,
   DialogTitle,
 } from "@/components/ui/dialog";
@@ -100,159 +101,172 @@ const EditPoolDialog = ({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPortal>
-        <DialogContent
+        <DialogOverlay />
+        <DialogBody
           showCloseButton={false}
-          className={cn(
-            "h-fit w-full bg-background p-0 sm:max-w-2xl sm:p-0 sm:px-8 md:p-0 xl:max-w-3xl",
-            getVariantBorderClassName({
-              variant: "burn",
-              custom: "rounded-xl",
-            }),
-            getVariantShadowClassName({ variant: "burn" }),
-          )}
+          className="fixed inset-0 z-50 overflow-y-auto"
         >
           <div
-            className={cn(
-              "h-fit w-full px-6 py-8",
-              getVariantBgClassName({ variant: "burn" }),
-            )}
+            className="flex min-h-full flex-col items-center justify-center p-2 sm:p-4"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) onOpenChange(false);
+            }}
           >
-            <DialogHeader className="text-center">
-              <DialogTitle className="mb-4 font-orbitron text-2xl font-semibold uppercase sm:text-3xl xl:text-4xl 2xl:mb-8">
-                Edit Pool
-              </DialogTitle>
-            </DialogHeader>
-
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="flex flex-col gap-6"
+            <div
+              className={cn(
+                "h-fit w-full bg-background sm:max-w-2xl xl:max-w-3xl",
+                getVariantBorderClassName({
+                  variant: "burn",
+                  custom: "rounded-xl",
+                }),
+                getVariantShadowClassName({ variant: "burn" }),
+              )}
             >
-              {/* Pool Name */}
-              <div className="flex flex-col gap-2">
-                <label className="font-inter text-base font-medium">
-                  Pool Name
-                </label>
-                <Input
-                  variant="burn"
-                  placeholder="Enter Pool Name"
-                  aria-invalid={!!errors.poolName}
-                  className="w-full bg-transparent"
-                  {...register("poolName")}
-                />
-                {errors.poolName && (
-                  <p className="font-inter text-xs text-destructive">
-                    {errors.poolName.message}
-                  </p>
+              <div
+                className={cn(
+                  "h-fit w-full rounded-xl px-6 py-8",
+                  getVariantBgClassName({ variant: "burn" }),
                 )}
-              </div>
+              >
+                <DialogHeader className="text-center">
+                  <DialogTitle className="mb-4 font-orbitron text-2xl font-semibold uppercase sm:text-3xl xl:text-4xl 2xl:mb-8">
+                    Edit Pool
+                  </DialogTitle>
+                </DialogHeader>
 
-              {/* Time pickers */}
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <div className="flex flex-1 flex-col gap-2">
-                  <label className="font-inter text-base font-medium">
-                    Start Time
-                  </label>
-                  <DatePicker
-                    variant="burn"
-                    value={startTime}
-                    onChange={(date) =>
-                      setValue("startTime", date as Date, {
-                        shouldValidate: true,
-                      })
-                    }
-                    disabled={(date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return date < today;
-                    }}
-                    className="rounded-md px-3 py-5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
-                  />
-                  <input
-                    type="hidden"
-                    {...register("startTime", {
-                      required: "Start time is required",
-                      validate: (value) => {
-                        if (value <= new Date())
-                          return "Start time must be in the future";
-                        if (endTime && value >= endTime)
-                          return "Start time must be before end time";
-                        return true;
-                      },
-                    })}
-                  />
-                  {errors.startTime && (
-                    <p className="font-inter text-xs text-destructive">
-                      {errors.startTime.message}
-                    </p>
-                  )}
-                </div>
-                <div className="flex flex-1 flex-col gap-2">
-                  <label className="font-inter text-base font-medium">
-                    End Time
-                  </label>
-                  <DatePicker
-                    variant="burn"
-                    value={endTime}
-                    onChange={(date) =>
-                      setValue("endTime", date as Date, {
-                        shouldValidate: true,
-                      })
-                    }
-                    disabled={(date) => {
-                      const today = new Date();
-                      today.setHours(0, 0, 0, 0);
-                      return (
-                        date < today || (startTime ? date < startTime : false)
-                      );
-                    }}
-                    className="rounded-md px-3 py-5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
-                  />
-                  <input
-                    type="hidden"
-                    {...register("endTime", {
-                      required: "End time is required",
-                      validate: (value) => {
-                        if (value <= new Date())
-                          return "End time must be in the future";
-                        if (startTime && value <= startTime)
-                          return "End time must be after start time";
-                        return true;
-                      },
-                    })}
-                  />
-                  {errors.endTime && (
-                    <p className="font-inter text-xs text-destructive">
-                      {errors.endTime.message}
-                    </p>
-                  )}
-                </div>
-              </div>
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  className="flex flex-col gap-6"
+                >
+                  {/* Pool Name */}
+                  <div className="flex flex-col gap-2">
+                    <label className="font-inter text-base font-medium">
+                      Pool Name
+                    </label>
+                    <Input
+                      variant="burn"
+                      placeholder="Enter Pool Name"
+                      aria-invalid={!!errors.poolName}
+                      className="w-full bg-transparent"
+                      {...register("poolName")}
+                    />
+                    {errors.poolName && (
+                      <p className="font-inter text-xs text-destructive">
+                        {errors.poolName.message}
+                      </p>
+                    )}
+                  </div>
 
-              {/* Action Buttons */}
-              <div className="flex gap-4 pt-2">
-                <Button
-                  variant="burn-active"
-                  type="button"
-                  onClick={handleCancel}
-                  disabled={isSubmitting}
-                  hasHover
-                  className="flex-1 font-orbitron text-base font-semibold xl:text-2xl"
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="burn"
-                  type="submit"
-                  isLoading={isSubmitting}
-                  hasHover
-                  className="flex-1 font-orbitron text-base font-semibold xl:text-2xl"
-                >
-                  {isSubmitting ? "Editing..." : "Edit"}
-                </Button>
+                  {/* Time pickers */}
+                  <div className="flex flex-col gap-4 sm:flex-row">
+                    <div className="flex flex-1 flex-col gap-2">
+                      <label className="font-inter text-base font-medium">
+                        Start Time
+                      </label>
+                      <DatePicker
+                        variant="burn"
+                        value={startTime}
+                        onChange={(date) =>
+                          setValue("startTime", date as Date, {
+                            shouldValidate: true,
+                          })
+                        }
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return date < today;
+                        }}
+                        className="rounded-md px-3 py-5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
+                      />
+                      <input
+                        type="hidden"
+                        {...register("startTime", {
+                          required: "Start time is required",
+                          validate: (value) => {
+                            if (value <= new Date())
+                              return "Start time must be in the future";
+                            if (endTime && value >= endTime)
+                              return "Start time must be before end time";
+                            return true;
+                          },
+                        })}
+                      />
+                      {errors.startTime && (
+                        <p className="font-inter text-xs text-destructive">
+                          {errors.startTime.message}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-1 flex-col gap-2">
+                      <label className="font-inter text-base font-medium">
+                        End Time
+                      </label>
+                      <DatePicker
+                        variant="burn"
+                        value={endTime}
+                        onChange={(date) =>
+                          setValue("endTime", date as Date, {
+                            shouldValidate: true,
+                          })
+                        }
+                        disabled={(date) => {
+                          const today = new Date();
+                          today.setHours(0, 0, 0, 0);
+                          return (
+                            date < today ||
+                            (startTime ? date < startTime : false)
+                          );
+                        }}
+                        className="rounded-md px-3 py-5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
+                      />
+                      <input
+                        type="hidden"
+                        {...register("endTime", {
+                          required: "End time is required",
+                          validate: (value) => {
+                            if (value <= new Date())
+                              return "End time must be in the future";
+                            if (startTime && value <= startTime)
+                              return "End time must be after start time";
+                            return true;
+                          },
+                        })}
+                      />
+                      {errors.endTime && (
+                        <p className="font-inter text-xs text-destructive">
+                          {errors.endTime.message}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-4 pt-2">
+                    <Button
+                      variant="burn-active"
+                      type="button"
+                      onClick={handleCancel}
+                      disabled={isSubmitting}
+                      hasHover
+                      className="flex-1 font-orbitron text-base font-semibold xl:text-2xl"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="burn"
+                      type="submit"
+                      isLoading={isSubmitting}
+                      hasHover
+                      className="flex-1 font-orbitron text-base font-semibold xl:text-2xl"
+                    >
+                      {isSubmitting ? "Editing..." : "Edit"}
+                    </Button>
+                  </div>
+                </form>
               </div>
-            </form>
+            </div>
           </div>
-        </DialogContent>
+        </DialogBody>
       </DialogPortal>
     </Dialog>
   );
