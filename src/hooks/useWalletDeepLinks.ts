@@ -87,14 +87,15 @@ const CURATED_WALLETS: CuratedWallet[] = [
     id: "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa",
     name: "Coinbase Wallet",
     isSolana: false,
-    buildLink: (url) => `https://go.cb-wallet.com/dapp?url=${enc(url)}`,
+    // Official format: https://docs.cdp.coinbase.com/wallet-sdk/docs/deep-link-into-dapp-browser
+    buildLink: (url) => `https://go.cb-w.com/dapp?cb_url=${enc(url)}`,
   },
-  {
-    id: "1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369",
-    name: "Rainbow",
-    isSolana: false,
-    buildLink: (url) => `https://rnbwapp.com/dapp?url=${enc(url)}`,
-  },
+//   {
+//     id: "1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369",
+//     name: "Rainbow",
+//     isSolana: false,
+//     buildLink: (url) => `https://rnbwapp.com/dapp?url=${enc(url)}`,
+//   },
   {
     id: "971e689d0a5be527bac79629b4ee9b925e82208e5168b733496a09c0faed0709",
     name: "OKX Wallet",
@@ -102,29 +103,29 @@ const CURATED_WALLETS: CuratedWallet[] = [
     buildLink: (url) =>
       `https://www.okx.com/download?deeplink=${enc(`okx://wallet/dapp/url?dappUrl=${enc(url)}`)}`,
   },
-  {
-    // Bitget Wallet — HTTPS universal link (falls back to a web page if the app
-    // isn't installed). Docs: web3.bitget.com/en/docs/configuration/deeplink
-    id: "38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662",
-    name: "Bitget Wallet",
-    isSolana: false,
-    buildLink: (url) => `https://bkcode.vip?action=dapp&url=${enc(url)}`,
-  },
-  {
-    // TokenPocket — custom scheme. Docs: help.tokenpocket.pro/developer-en
-    id: "20459438007b75f4f4acb98bf29aa3b800550309646d375da5fd4aac6c2a2c66",
-    name: "TokenPocket",
-    isSolana: false,
-    buildLink: (url) =>
-      `tpdapp://open?params=${enc(JSON.stringify({ url, chain: "Ethereum" }))}`,
-  },
-  {
-    // imToken — custom scheme. Docs: token.im developer deeplink reference.
-    id: "ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef",
-    name: "imToken",
-    isSolana: false,
-    buildLink: (url) => `imtokenv2://navigate/DappView?url=${enc(url)}`,
-  },
+//   {
+//     // Bitget Wallet — HTTPS universal link (falls back to a web page if the app
+//     // isn't installed). Docs: web3.bitget.com/en/docs/configuration/deeplink
+//     id: "38f5d18bd8522c244bdd70cb4a68e0e718865155811c043f052fb9f1c51de662",
+//     name: "Bitget Wallet",
+//     isSolana: false,
+//     buildLink: (url) => `https://bkcode.vip?action=dapp&url=${enc(url)}`,
+//   },
+//   {
+//     // TokenPocket — custom scheme. Docs: help.tokenpocket.pro/developer-en
+//     id: "20459438007b75f4f4acb98bf29aa3b800550309646d375da5fd4aac6c2a2c66",
+//     name: "TokenPocket",
+//     isSolana: false,
+//     buildLink: (url) =>
+//       `tpdapp://open?params=${enc(JSON.stringify({ url, chain: "Ethereum" }))}`,
+//   },
+//   {
+//     // imToken — custom scheme. Docs: token.im developer deeplink reference.
+//     id: "ef333840daf915aafdc4a004525502d6d49d77bd9c65e0642dbaefb3c2893bef",
+//     name: "imToken",
+//     isSolana: false,
+//     buildLink: (url) => `imtokenv2://navigate/DappView?url=${enc(url)}`,
+//   },
   // ── Solana ─────────────────────────────────────────────────────────────────
   {
     id: "a797aa35c0fadbfc1a53e7f675162ed5226968b44a19ee3d24385c64d1d3c393",
@@ -134,18 +135,18 @@ const CURATED_WALLETS: CuratedWallet[] = [
     buildLink: (url) =>
       `https://phantom.app/ul/browse/${enc(url)}?ref=${enc(hostOf(url))}`,
   },
-  {
-    id: "1ca0bdd4747578705b1939af023d120677c64fe6ca76add81fda36e350605e79",
-    name: "Solflare",
-    isSolana: true,
-    buildLink: smsBrowse("https://solflare.com"),
-  },
-  {
-    id: "2bd8c14e035c2d48f184aaa168559e86b0e3433228d3c4075900a221785019b0",
-    name: "Backpack",
-    isSolana: true,
-    buildLink: smsBrowse("https://backpack.app"),
-  },
+//   {
+//     id: "1ca0bdd4747578705b1939af023d120677c64fe6ca76add81fda36e350605e79",
+//     name: "Solflare",
+//     isSolana: true,
+//     buildLink: smsBrowse("https://solflare.com"),
+//   },
+//   {
+//     id: "2bd8c14e035c2d48f184aaa168559e86b0e3433228d3c4075900a221785019b0",
+//     name: "Backpack",
+//     isSolana: true,
+//     buildLink: smsBrowse("https://backpack.app"),
+//   },
 ];
 
 /** Curated wallets active given the current SHOW_SOL_WALLETS toggle. */

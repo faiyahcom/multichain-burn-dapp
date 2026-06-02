@@ -37,15 +37,19 @@ export function isMobileBrowser(): boolean {
 /**
  * Detects the current wallet browser host via user-agent string.
  *
- * UA pattern priority follows PancakeSwap's hostDetection:
- *  1. MetaMaskMobile
- *  2. Trust Wallet
- *  3. CoinbaseWallet
- *  4. OKX (UA + window.okxwallet provider check)
+ * UA sniffing is a BEST-EFFORT supplement only. Most wallets either ship no
+ * stable UA token or change it across app versions, so the authoritative
+ * signal is the injected provider (detectInjectedWalletByProvider /
+ * hasSolanaWalletProvider), which isInAppWalletBrowser() also checks.
  *
- * Additional wallets (Rainbow, TokenPocket, imToken, BitKeep/Bitget) are
- * detected as `{ isWalletApp: true, host: WalletHost.Unknown }` so the
- * redirect prompt is still suppressed for users already in those browsers.
+ * Only two wallets set a reliable, distinctive UA token that we trust here:
+ *  - MetaMask Mobile  → "MetaMaskMobile"
+ *    (metamask-mobile sets applicationNameForUserAgent="WebView MetaMaskMobile")
+ *  - Coinbase Wallet  → "CoinbaseWallet"
+ *
+ * Intentionally NOT matched by UA (handled by provider detection instead):
+ *  - Trust: ships no stable UA token → window.ethereum.isTrust / window.trustwallet
+ *  - OKX:   app UA uses "OKApp", not "OKX" → window.okxwallet is authoritative
  */
 export function detectWalletBrowser(): WalletBrowserDetection {
   if (typeof navigator === "undefined") return DEFAULT_DETECTION;
@@ -53,32 +57,15 @@ export function detectWalletBrowser(): WalletBrowserDetection {
 
   if (/MetaMaskMobile/i.test(ua))
     return { isWalletApp: true, host: WalletHost.Metamask };
-  if (/Trust Wallet/i.test(ua))
-    return { isWalletApp: true, host: WalletHost.Trust };
   if (/CoinbaseWallet/i.test(ua))
     return { isWalletApp: true, host: WalletHost.Coinbase };
-  if (/OKX/i.test(ua) && detectOkxProvider())
-    return { isWalletApp: true, host: WalletHost.Okx };
 
-  // Other EVM wallet browsers — catch-all for wallets not covered above.
+  // Best-effort catch-all for wallets that embed a recognizable token in their
+  // WebView UA. Returns Unknown so the prompt is still suppressed for them.
   if (/Rainbow|TokenPocket|imToken|BitKeep|Bitget/i.test(ua))
     return { isWalletApp: true, host: WalletHost.Unknown };
 
-  // Solana wallets do NOT set a reliable UA string.
-  // Detection is handled generically via hasSolanaWalletProvider() in
-  // isInAppWalletBrowser(), which checks window.phantom / window.solflare /
-  // window.backpack etc. — no UA hardcoding needed.
-
   return DEFAULT_DETECTION;
-}
-
-/** Checks for the OKX wallet provider injection. SSR-safe. */
-function detectOkxProvider(): boolean {
-  try {
-    return typeof window !== "undefined" && "okxwallet" in window;
-  } catch {
-    return false;
-  }
 }
 
 /**
@@ -124,10 +111,12 @@ export function detectInjectedWalletByProvider(): WalletHost | null {
       // EVM
       okxwallet?: unknown;
       binancew3w?: unknown;
+      trustwallet?: unknown;
       ethereum?: {
         isMetaMask?: boolean;
         isBinance?: boolean;
         isCoinbaseWallet?: boolean;
+        isTrust?: boolean;
       };
       // Solana
       phantom?: { solana?: { isPhantom?: boolean } };
@@ -139,6 +128,9 @@ export function detectInjectedWalletByProvider(): WalletHost | null {
     // EVM providers
     if (w.okxwallet) return WalletHost.Okx;
     if (w.ethereum?.isBinance || w.binancew3w) return WalletHost.BinanceW3W;
+    // Trust sets isTrust (and historically isMetaMask too) — check it first so
+    // it isn't misclassified as MetaMask.
+    if (w.ethereum?.isTrust || w.trustwallet) return WalletHost.Trust;
     if (w.ethereum?.isMetaMask && !w.ethereum?.isBinance)
       return WalletHost.Metamask;
     if (w.ethereum?.isCoinbaseWallet) return WalletHost.Coinbase;
