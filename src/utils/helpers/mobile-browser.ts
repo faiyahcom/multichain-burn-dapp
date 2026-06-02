@@ -156,12 +156,20 @@ export function detectInjectedWalletByProvider(): WalletHost | null {
 /**
  * Returns true when the current browser is a wallet's built-in browser.
  *
- * Checks both UA patterns (EVM wallets) and injected window providers
- * (Solana wallets like Phantom, Solflare, Backpack which do not set a
- * distinctive UA on mobile).
+ * Combines three signals so the prompt is correctly suppressed whenever the
+ * user is already inside any wallet's browser:
+ *  1. UA patterns            — EVM wallets that set a distinctive UA string.
+ *  2. EVM injected provider  — covers wallets whose UA string drifts across
+ *                              app versions but still inject window.ethereum
+ *                              (e.g. MetaMask/Coinbase builds the UA regex misses).
+ *  3. Solana injected provider — Solana wallets set no distinctive UA at all.
  */
 export function isInAppWalletBrowser(): boolean {
-  return detectWalletBrowser().isWalletApp || hasSolanaWalletProvider();
+  return (
+    detectWalletBrowser().isWalletApp ||
+    detectInjectedWalletByProvider() !== null ||
+    hasSolanaWalletProvider()
+  );
 }
 
 /**
