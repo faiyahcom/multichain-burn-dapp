@@ -135,13 +135,13 @@ const CURATED_WALLETS: CuratedWallet[] = [
       `https://phantom.app/ul/browse/${enc(url)}?ref=${enc(hostOf(url))}`,
   },
   {
-    id: "df43f30e3e1a453b0d4c5b62b1bc3c71bbedf7b3e23b5ad9cf9d6de3bdd5cd74",
+    id: "1ca0bdd4747578705b1939af023d120677c64fe6ca76add81fda36e350605e79",
     name: "Solflare",
     isSolana: true,
     buildLink: smsBrowse("https://solflare.com"),
   },
   {
-    id: "dd43a63bf1e7e97b66bd3a9e58ff14d4977e21afbde6e1f1dee82f57a68b51f5",
+    id: "2bd8c14e035c2d48f184aaa168559e86b0e3433228d3c4075900a221785019b0",
     name: "Backpack",
     isSolana: true,
     buildLink: smsBrowse("https://backpack.app"),
@@ -224,13 +224,15 @@ export function useWalletDeepLinks(enabled = true) {
         const data = (await res.json()) as ExplorerResponse;
         if (cancelled) return;
 
-        // Preserve curated order; hydrate name + logo when the API returns the
-        // wallet, otherwise keep the offline fallback values.
+        // Preserve curated order. We keep the curated display name (the registry
+        // occasionally renames entries, e.g. "Base (formerly Coinbase Wallet)")
+        // and only pull the logo from the API, falling back to no logo when the
+        // wallet isn't returned.
         const hydrated = curated.map<WalletDeepLinkEntry>((w) => {
           const listing = data.listings[w.id];
           return {
             id: w.id,
-            name: listing?.name ?? w.name,
+            name: w.name,
             imageUrl: listing ? logoUrl(listing.image_id) : "",
             buildLink: w.buildLink,
             featured: true,
