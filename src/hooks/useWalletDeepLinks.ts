@@ -83,13 +83,13 @@ const CURATED_WALLETS: CuratedWallet[] = [
     buildLink: (url) =>
       `https://link.trustwallet.com/open_url?coin_id=60&url=${enc(url)}`,
   },
-  {
-    id: "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa",
-    name: "Coinbase Wallet",
-    isSolana: false,
-    // Official format: https://docs.cdp.coinbase.com/wallet-sdk/docs/deep-link-into-dapp-browser
-    buildLink: (url) => `https://go.cb-w.com/dapp?cb_url=${enc(url)}`,
-  },
+//   {
+//     id: "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa",
+//     name: "Coinbase Wallet",
+//     isSolana: false,
+//     // Official format: https://docs.cdp.coinbase.com/wallet-sdk/docs/deep-link-into-dapp-browser
+//     buildLink: (url) => `https://go.cb-w.com/dapp?cb_url=${enc(url)}`,
+//   },
 //   {
 //     id: "1ae92b26df02f0abca6304df07debccd18262fdf5fe82daa81593582dac9a369",
 //     name: "Rainbow",
