@@ -14,7 +14,10 @@ import {
 
 interface Props {
   open: boolean;
-  onDismiss: () => void;
+  /** Close the modal without connecting. */
+  onClose: () => void;
+  /** "Continue Anyway" — close the modal and proceed with the normal connect flow. */
+  onContinueAnyway: () => void;
 }
 
 function WalletCard({
@@ -54,8 +57,12 @@ function WalletCard({
  * Solana wallets (Phantom, Solflare) are shown in a separate section when
  * `SHOW_SOL_WALLETS` is enabled in `useWalletDeepLinks.ts`.
  */
-export function InAppBrowserPrompt({ open, onDismiss }: Props) {
-  const { entries, isLoading } = useWalletDeepLinks();
+export function InAppBrowserPrompt({
+  open,
+  onClose,
+  onContinueAnyway,
+}: Props) {
+  const { entries, isLoading } = useWalletDeepLinks(open);
   const [showMore, setShowMore] = useState(false);
   const currentUrl = window.location.href;
 
@@ -67,7 +74,7 @@ export function InAppBrowserPrompt({ open, onDismiss }: Props) {
   const hasMore = !showMore && evmEntries.some((e) => !e.featured);
 
   return (
-    <Dialog open={open} onOpenChange={(v) => !v && onDismiss()}>
+    <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
       <DialogContent
         className="sm:max-w-sm gap-4 border-white/10 bg-[#141520] px-5 pb-5 pt-6"
         showCloseButton={false}
@@ -140,11 +147,11 @@ export function InAppBrowserPrompt({ open, onDismiss }: Props) {
           </>
         )}
 
-        {/* Escape hatch */}
+        {/* Escape hatch — proceed with the normal WalletConnect/AppKit flow */}
         <Button
           variant="ghost"
           className="w-full font-inter text-sm text-white/35 hover:bg-white/5 hover:text-white/55"
-          onClick={onDismiss}
+          onClick={onContinueAnyway}
         >
           Continue Anyway
         </Button>
