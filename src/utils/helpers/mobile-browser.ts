@@ -6,11 +6,16 @@
 /** Identifies which wallet's in-app browser the user is currently in. */
 export enum WalletHost {
   Unknown = "Unknown",
+  // EVM
   Metamask = "Metamask",
   Trust = "Trust",
   Coinbase = "Coinbase",
   Okx = "Okx",
   BinanceW3W = "BinanceW3W",
+  // Solana
+  Phantom = "Phantom",
+  Solflare = "Solflare",
+  Backpack = "Backpack",
 }
 
 /** The result of wallet browser host detection. */
@@ -55,9 +60,14 @@ export function detectWalletBrowser(): WalletBrowserDetection {
   if (/OKX/i.test(ua) && detectOkxProvider())
     return { isWalletApp: true, host: WalletHost.Okx };
 
-  // Additional wallets not in PancakeSwap's detection but supported here.
+  // Other EVM wallet browsers — catch-all for wallets not covered above.
   if (/Rainbow|TokenPocket|imToken|BitKeep|Bitget/i.test(ua))
     return { isWalletApp: true, host: WalletHost.Unknown };
+
+  // Solana wallets do NOT set a reliable UA string.
+  // Detection is handled generically via hasSolanaWalletProvider() in
+  // isInAppWalletBrowser(), which checks window.phantom / window.solflare /
+  // window.backpack etc. — no UA hardcoding needed.
 
   return DEFAULT_DETECTION;
 }
@@ -72,6 +82,37 @@ function detectOkxProvider(): boolean {
 }
 
 /**
+ * Checks for Solana wallet provider injections.
+ *
+ * Solana wallets (Phantom, Solflare, Backpack) do not reliably set a
+ * distinctive UA string — they identify themselves via window providers.
+ * This check is the authoritative signal for those browsers.
+ */
+function hasSolanaWalletProvider(): boolean {
+  try {
+    if (typeof window === "undefined") return false;
+    const w = window as typeof window & {
+      phantom?: { solana?: { isPhantom?: boolean } };
+      solana?: { isPhantom?: boolean };
+      solflare?: { isSolflare?: boolean };
+      backpack?: unknown;
+      xnft?: unknown;
+      glow?: unknown;
+    };
+    return !!(
+      w.phantom?.solana?.isPhantom ||
+      w.solana?.isPhantom ||
+      w.solflare?.isSolflare ||
+      w.backpack ||
+      w.xnft ||
+      w.glow
+    );
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Detects a connected wallet by its injected window provider.
  * Follows PancakeSwap's detectInjectedWalletByProvider pattern.
  * Returns the WalletHost if a known provider is found, or null otherwise.
@@ -80,6 +121,7 @@ export function detectInjectedWalletByProvider(): WalletHost | null {
   try {
     if (typeof window === "undefined") return null;
     const w = window as typeof window & {
+      // EVM
       okxwallet?: unknown;
       binancew3w?: unknown;
       ethereum?: {
@@ -87,21 +129,39 @@ export function detectInjectedWalletByProvider(): WalletHost | null {
         isBinance?: boolean;
         isCoinbaseWallet?: boolean;
       };
+      // Solana
+      phantom?: { solana?: { isPhantom?: boolean } };
+      solana?: { isPhantom?: boolean };
+      solflare?: { isSolflare?: boolean };
+      backpack?: unknown;
+      xnft?: unknown;
     };
+    // EVM providers
     if (w.okxwallet) return WalletHost.Okx;
     if (w.ethereum?.isBinance || w.binancew3w) return WalletHost.BinanceW3W;
     if (w.ethereum?.isMetaMask && !w.ethereum?.isBinance)
       return WalletHost.Metamask;
     if (w.ethereum?.isCoinbaseWallet) return WalletHost.Coinbase;
+    // Solana providers
+    if (w.phantom?.solana?.isPhantom || w.solana?.isPhantom)
+      return WalletHost.Phantom;
+    if (w.solflare?.isSolflare) return WalletHost.Solflare;
+    if (w.backpack || w.xnft) return WalletHost.Backpack;
     return null;
   } catch {
     return null;
   }
 }
 
-/** Returns true when the current browser is a wallet's built-in browser. */
+/**
+ * Returns true when the current browser is a wallet's built-in browser.
+ *
+ * Checks both UA patterns (EVM wallets) and injected window providers
+ * (Solana wallets like Phantom, Solflare, Backpack which do not set a
+ * distinctive UA on mobile).
+ */
 export function isInAppWalletBrowser(): boolean {
-  return detectWalletBrowser().isWalletApp;
+  return detectWalletBrowser().isWalletApp || hasSolanaWalletProvider();
 }
 
 /**
