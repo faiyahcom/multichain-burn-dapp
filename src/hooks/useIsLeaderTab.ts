@@ -1,85 +1,111 @@
 import { useEffect, useState } from "react";
 
-const LEADER_LOCK_NAME = "wallet-connection-leader";
+const ACTIVE_TAB_KEY = "wallet-active-tab";
+// Same-tab notification: localStorage `storage` events fire in OTHER tabs only,
+// so we dispatch this window event to update the claiming tab itself.
+const CLAIM_EVENT = "wallet-active-tab:claim";
+
+// Stable id for THIS browser tab (one per JS context).
+let cachedTabId: string | null = null;
+function getTabId(): string {
+  if (cachedTabId) return cachedTabId;
+  cachedTabId =
+    typeof crypto !== "undefined" && "randomUUID" in crypto
+      ? crypto.randomUUID()
+      : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+  return cachedTabId;
+}
+
+function readOwner(): string | null {
+  try {
+    return localStorage.getItem(ACTIVE_TAB_KEY);
+  } catch {
+    return null;
+  }
+}
 
 /**
- * Returns true when THIS tab is the elected leader that owns the wallet
- * connection lifecycle (auth, disconnect, network sync).
+ * Mark THIS tab as the active one. Call when the user initiates a connection so
+ * the tab they're actually using owns the wallet lifecycle — this is the signal
+ * that survives MetaMask's duplicate-tab bug, because only the tab the user
+ * tapped Connect in claims ownership.
+ */
+export function claimActiveTab(): void {
+  try {
+    localStorage.setItem(ACTIVE_TAB_KEY, getTabId());
+  } catch {
+    /* storage unavailable */
+  }
+  if (typeof window !== "undefined") {
+    window.dispatchEvent(new Event(CLAIM_EVENT));
+  }
+}
+
+/**
+ * Returns true when THIS tab owns the wallet connection lifecycle (auth,
+ * disconnect, network sync).
  *
- * Why this exists: MetaMask on Android has a deeplink bug that spawns DUPLICATE
- * dapp tabs (MetaMask/metamask-mobile#5831, #3646). WalletConnect/wagmi share a
- * single session across all tabs of the origin, so if every tab ran the auth
- * lifecycle they'd race — duplicate signature prompts and requests landing in
- * the wrong tab ("signing gone wrong"). Electing a single leader prevents that.
+ * Why: MetaMask on Android spawns DUPLICATE dapp tabs (deeplink bug), and
+ * WalletConnect/wagmi share one session across all tabs of the origin. If every
+ * tab ran the lifecycle they'd race — duplicate signature prompts and responses
+ * landing in the wrong tab ("signing gone wrong").
  *
- * Mechanism: the Web Locks API. Exactly one tab can hold an exclusive lock at a
- * time. Leadership FOLLOWS VISIBILITY — a tab contends for the lock while it's
- * visible and releases it when hidden — so the foreground tab is always the
- * actor. That matters in MetaMask's in-app browser, where only one duplicate
- * tab is on-screen at a time; the visible one leads, the hidden one stays
- * passive. If two tabs are visible at once (e.g. desktop side-by-side), the
- * lock still guarantees exactly one leader.
- *
- * Fallback: if Web Locks is unavailable, the tab is always leader (single-tab
- * assumption) so behaviour is unchanged on legacy browsers.
+ * Mechanism: a shared localStorage key holds the id of the active tab. Unlike
+ * the Web Locks API it works in every WebView, and ownership FOLLOWS THE USER:
+ * a tab claims on connect (claimActiveTab) and on becoming visible/focused, and
+ * all tabs converge by reading the shared key on every `storage` event. The tab
+ * the user is driving wins; the duplicate stays passive.
  */
 export function useIsLeaderTab(): boolean {
-  const hasLocks =
-    typeof navigator !== "undefined" && "locks" in navigator;
-  const [isLeader, setIsLeader] = useState(!hasLocks);
+  const [isActive, setIsActive] = useState(false);
 
   useEffect(() => {
-    if (!hasLocks) return;
+    const tabId = getTabId();
 
-    // `abort` cancels a still-pending lock request; `resolveHold` releases a
-    // lock we currently hold (resolving the request callback's promise).
-    let abort: AbortController | null = null;
-    let resolveHold: (() => void) | null = null;
-
-    const acquire = () => {
-      if (document.visibilityState !== "visible") return;
-      if (abort) return; // already contending or holding
-      abort = new AbortController();
-      navigator.locks
-        .request(
-          LEADER_LOCK_NAME,
-          { mode: "exclusive", signal: abort.signal },
-          () =>
-            // Hold the lock (and leadership) until we explicitly release it.
-            new Promise<void>((resolve) => {
-              setIsLeader(true);
-              resolveHold = resolve;
-            }),
-        )
-        .catch(() => {
-          // Aborted (we gave up while still pending) or failed — not leader.
-        });
-    };
-
-    const release = () => {
-      setIsLeader(false);
-      if (resolveHold) {
-        resolveHold(); // release held lock → a waiting tab can become leader
-        resolveHold = null;
-      } else if (abort) {
-        abort.abort(); // cancel a request that hadn't acquired yet
+    const claim = () => {
+      try {
+        localStorage.setItem(ACTIVE_TAB_KEY, tabId);
+      } catch {
+        /* storage blocked → behave as sole tab */
       }
-      abort = null;
+      setIsActive(true);
     };
 
-    const onVisibilityChange = () => {
-      if (document.visibilityState === "visible") acquire();
-      else release();
+    // Reflect the shared owner. Reading the key (not the event's newValue) avoids
+    // stale-ordering races when two tabs claim near-simultaneously.
+    const resync = () => {
+      const owner = readOwner();
+      if (owner === null) {
+        if (document.visibilityState === "visible") claim();
+        return;
+      }
+      setIsActive(owner === tabId);
     };
 
-    document.addEventListener("visibilitychange", onVisibilityChange);
-    acquire();
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === ACTIVE_TAB_KEY) resync();
+    };
+    const onVisible = () => {
+      if (document.visibilityState === "visible") claim();
+    };
+    const onLocalClaim = () => setIsActive(readOwner() === tabId);
+
+    window.addEventListener("storage", onStorage);
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", claim);
+    window.addEventListener(CLAIM_EVENT, onLocalClaim);
+
+    // Initial: a visible tab claims; a hidden tab reflects the current owner.
+    if (document.visibilityState === "visible") claim();
+    else resync();
 
     return () => {
-      document.removeEventListener("visibilitychange", onVisibilityChange);
-      release();
+      window.removeEventListener("storage", onStorage);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", claim);
+      window.removeEventListener(CLAIM_EVENT, onLocalClaim);
     };
-  }, [hasLocks]);
+  }, []);
 
-  return isLeader;
+  return isActive;
 }

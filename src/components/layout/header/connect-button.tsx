@@ -12,6 +12,7 @@ import {
   isInAppWalletBrowser,
   isMobileBrowser,
 } from "@/utils/helpers/mobile-browser";
+import { claimActiveTab } from "@/hooks/useIsLeaderTab";
 
 const ConnectButton = () => {
   const { open } = useAppKit();
@@ -19,6 +20,11 @@ const ConnectButton = () => {
   const [promptOpen, setPromptOpen] = useState(false);
 
   const handleConnect = async () => {
+    // Claim the connection lifecycle for THIS tab. If MetaMask (Android) has
+    // spawned a duplicate tab, the tab the user actually taps Connect in becomes
+    // the sole owner of auth/signing — the duplicate stays passive.
+    claimActiveTab();
+
     // CASE 1: already inside a mobile wallet's in-app browser (MetaMask, etc.).
     // Connect the INJECTED provider directly. Do NOT call open() here — AppKit's
     // modal would re-deeplink to the same wallet (metamask://wc?...), spawning a
@@ -50,6 +56,7 @@ const ConnectButton = () => {
 
   // "Continue Anyway" — dismiss the prompt and run the normal connect flow.
   const handleContinueAnyway = async () => {
+    claimActiveTab();
     setPromptOpen(false);
     await open();
   };

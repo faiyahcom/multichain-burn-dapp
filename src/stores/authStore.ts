@@ -67,16 +67,4 @@ export const useAuthStore = create<AuthState>()(
   ),
 )
 
-// Cross-tab auth sync. When the leader tab logs in or out it writes
-// `auth-storage`; other tabs (e.g. MetaMask's duplicate Android tab) pick up the
-// change here and rehydrate, so a tab switched into doesn't re-prompt a fresh
-// signature for an already-authenticated session, and a logout propagates.
-if (typeof window !== 'undefined') {
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'auth-storage') {
-      void useAuthStore.persist.rehydrate();
-    }
-  });
-}
-
 
