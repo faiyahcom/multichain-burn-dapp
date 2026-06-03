@@ -3,7 +3,7 @@ import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { networkIdToChainId } from "@/config/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useWalletAuth } from "./useWalletAuth";
 import { useDisconnect } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
@@ -52,8 +52,36 @@ const useWalletConnectionHandler = () => {
 
     const queryClient = useQueryClient();
 
+    // Multi-tab guard. WalletConnect/wagmi share ONE session + connection state
+    // across every tab of the origin (localStorage / IndexedDB + cross-tab storage
+    // events). If this lifecycle handler runs in a background tab, it reacts to
+    // that synced state and either double-authenticates or hits the
+    // unsupported-chain disconnect() branch — tearing down the shared session for
+    // all tabs. So only the VISIBLE tab is allowed to drive side-effects; the bump
+    // below re-runs the main effect when a tab is brought back to the foreground.
+    const [visibilityTick, setVisibilityTick] = useState(0);
+    useEffect(() => {
+        const onVisibilityChange = () => {
+            if (document.visibilityState === "visible") {
+                setVisibilityTick((t) => t + 1);
+            }
+        };
+        document.addEventListener("visibilitychange", onVisibilityChange);
+        return () =>
+            document.removeEventListener("visibilitychange", onVisibilityChange);
+    }, []);
+
     useEffect(() => {
         if (!_hasHydrated) return;
+
+        // Only the foreground tab owns the connection lifecycle (see note above).
+        // A backgrounded tab no-ops here and re-syncs via visibilityTick when shown.
+        if (
+            typeof document !== "undefined" &&
+            document.visibilityState !== "visible"
+        ) {
+            return;
+        }
 
         if (!isConnected || !caipAddress) {
             prevChainKey.current = null;
@@ -180,6 +208,9 @@ const useWalletConnectionHandler = () => {
         user,
         logout,
         setSelectedNetworkId,
+        // Re-run the lifecycle when this tab returns to the foreground so it can
+        // sync up with any connection changes that happened while backgrounded.
+        visibilityTick,
         // authenticateEvm / authenticateSolana / disconnect / setError intentionally
         // omitted — accessed via stable refs above to prevent the effect re-running
         // (and triggering a second auth attempt) when hook callbacks are recreated.
