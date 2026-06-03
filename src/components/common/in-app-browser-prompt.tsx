@@ -28,11 +28,20 @@ function WalletCard({
   currentUrl: string;
 }) {
   const { name, imageUrl, buildLink } = entry;
+
+  // Navigate in the SAME tab. Using target="_blank" on Android opens a blank
+  // tab *and* fires the deeplink, so two navigations race and the wallet
+  // handoff breaks ("opens 2 links at once"). A same-tab assignment hands the
+  // current tab off to the wallet app cleanly.
+  const handleOpen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    window.location.href = buildLink(currentUrl);
+  };
+
   return (
     <a
       href={buildLink(currentUrl)}
-      target="_blank"
-      rel="noopener noreferrer"
+      onClick={handleOpen}
       className="flex flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-2 py-3.5 text-center transition-colors hover:bg-white/10 active:bg-white/15"
     >
       {imageUrl ? (
