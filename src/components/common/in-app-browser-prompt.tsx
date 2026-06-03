@@ -33,14 +33,14 @@ function WalletCard({
   // tab *and* fires the deeplink, so two navigations race and the wallet
   // handoff breaks ("opens 2 links at once"). A same-tab assignment hands the
   // current tab off to the wallet app cleanly.
-  const handleOpen = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleOpen = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     window.location.href = buildLink(currentUrl);
   };
 
   return (
-    <a
-      href={buildLink(currentUrl)}
+    <button
+      // href={buildLink(currentUrl)}
       onClick={handleOpen}
       className="flex flex-col items-center gap-2 rounded-xl border border-white/5 bg-white/5 px-2 py-3.5 text-center transition-colors hover:bg-white/10 active:bg-white/15"
     >
@@ -52,7 +52,7 @@ function WalletCard({
       <span className="font-inter line-clamp-2 text-[11px] font-medium leading-tight text-white/85">
         {name}
       </span>
-    </a>
+    </button>
   );
 }
 
