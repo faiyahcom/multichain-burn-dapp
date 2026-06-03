@@ -3,8 +3,9 @@ import { useSystemStore } from "@/stores/systemStore";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { networkIdToChainId } from "@/config/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
+import { useIsLeaderTab } from "./useIsLeaderTab";
 import { useDisconnect } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -52,36 +53,23 @@ const useWalletConnectionHandler = () => {
 
     const queryClient = useQueryClient();
 
-    // Multi-tab guard. WalletConnect/wagmi share ONE session + connection state
-    // across every tab of the origin (localStorage / IndexedDB + cross-tab storage
-    // events). If this lifecycle handler runs in a background tab, it reacts to
-    // that synced state and either double-authenticates or hits the
-    // unsupported-chain disconnect() branch — tearing down the shared session for
-    // all tabs. So only the VISIBLE tab is allowed to drive side-effects; the bump
-    // below re-runs the main effect when a tab is brought back to the foreground.
-    const [visibilityTick, setVisibilityTick] = useState(0);
-    useEffect(() => {
-        const onVisibilityChange = () => {
-            if (document.visibilityState === "visible") {
-                setVisibilityTick((t) => t + 1);
-            }
-        };
-        document.addEventListener("visibilitychange", onVisibilityChange);
-        return () =>
-            document.removeEventListener("visibilitychange", onVisibilityChange);
-    }, []);
+    // Multi-tab guard (leader election). WalletConnect/wagmi share ONE session +
+    // connection state across every tab of the origin. MetaMask on Android also
+    // spawns DUPLICATE dapp tabs via a deeplink bug. If this lifecycle handler
+    // ran in more than one tab, the tabs would race — double auth prompts and
+    // signature responses landing in the wrong tab ("signing gone wrong"), or the
+    // unsupported-chain disconnect() branch tearing down the shared session.
+    // useIsLeaderTab() elects exactly one leader (the visible/foreground tab), and
+    // only that tab drives side-effects. isLeader is in the dep array, so the
+    // effect re-runs and re-syncs when leadership is handed over.
+    const isLeader = useIsLeaderTab();
 
     useEffect(() => {
         if (!_hasHydrated) return;
 
-        // Only the foreground tab owns the connection lifecycle (see note above).
-        // A backgrounded tab no-ops here and re-syncs via visibilityTick when shown.
-        if (
-            typeof document !== "undefined" &&
-            document.visibilityState !== "visible"
-        ) {
-            return;
-        }
+        // Only the leader tab owns the connection lifecycle. Non-leaders no-op and
+        // re-sync when they later acquire leadership (e.g. brought to foreground).
+        if (!isLeader) return;
 
         if (!isConnected || !caipAddress) {
             prevChainKey.current = null;
@@ -208,9 +196,9 @@ const useWalletConnectionHandler = () => {
         user,
         logout,
         setSelectedNetworkId,
-        // Re-run the lifecycle when this tab returns to the foreground so it can
-        // sync up with any connection changes that happened while backgrounded.
-        visibilityTick,
+        // Re-run the lifecycle when this tab gains/loses leadership so the new
+        // leader syncs up with the current connection state.
+        isLeader,
         // authenticateEvm / authenticateSolana / disconnect / setError intentionally
         // omitted — accessed via stable refs above to prevent the effect re-running
         // (and triggering a second auth attempt) when hook callbacks are recreated.
