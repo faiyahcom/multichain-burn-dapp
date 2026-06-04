@@ -466,7 +466,7 @@ const DepositRewardDialog = ({
                           />
                         <div
                           className={cn(
-                            "flex items-center gap-2 rounded-md bg-mb-dark-popover px-2 sm:px-4 text-mb-burn-light",
+                            "flex shrink-0 items-center gap-2 rounded-md bg-mb-dark-popover px-2 sm:px-4 text-mb-burn-light",
                             getVariantBorderClassName({ variant: "burn" }),
                           )}
                         >

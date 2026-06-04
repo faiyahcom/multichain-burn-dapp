@@ -5,6 +5,7 @@ import { networkIdToChainId } from "@/config/networks";
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useEffect, useRef } from "react";
 import { useWalletAuth } from "./useWalletAuth";
+import { useIsLeaderTab } from "./useIsLeaderTab";
 import { useDisconnect } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -52,8 +53,23 @@ const useWalletConnectionHandler = () => {
 
     const queryClient = useQueryClient();
 
+    // Multi-tab guard (leader election). WalletConnect/wagmi share ONE session +
+    // connection state across every tab of the origin. MetaMask on Android also
+    // spawns DUPLICATE dapp tabs via a deeplink bug. If this lifecycle handler
+    // ran in more than one tab, the tabs would race — double auth prompts and
+    // signature responses landing in the wrong tab ("signing gone wrong"), or the
+    // unsupported-chain disconnect() branch tearing down the shared session.
+    // useIsLeaderTab() elects exactly one leader (the visible/foreground tab), and
+    // only that tab drives side-effects. isLeader is in the dep array, so the
+    // effect re-runs and re-syncs when leadership is handed over.
+    const isLeader = useIsLeaderTab();
+
     useEffect(() => {
         if (!_hasHydrated) return;
+
+        // Only the leader tab owns the connection lifecycle. Non-leaders no-op and
+        // re-sync when they later acquire leadership (e.g. brought to foreground).
+        if (!isLeader) return;
 
         if (!isConnected || !caipAddress) {
             prevChainKey.current = null;
@@ -180,6 +196,9 @@ const useWalletConnectionHandler = () => {
         user,
         logout,
         setSelectedNetworkId,
+        // Re-run the lifecycle when this tab gains/loses leadership so the new
+        // leader syncs up with the current connection state.
+        isLeader,
         // authenticateEvm / authenticateSolana / disconnect / setError intentionally
         // omitted — accessed via stable refs above to prevent the effect re-running
         // (and triggering a second auth attempt) when hook callbacks are recreated.

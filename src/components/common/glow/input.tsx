@@ -19,7 +19,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             variant,
             custom: "rounded-md border-3",
           }),
-          "bg-mb-glow-input-bg px-4 py-2 font-inter text-sm leading-none font-medium sm:text-xl",
+          "bg-mb-glow-input-bg px-4 py-2 font-inter text-base leading-none font-medium sm:text-xl",
           "placeholder:text-mb-glow-input-secondary read-only:text-mb-glow-input-secondary disabled:text-mb-glow-input-secondary",
           className,
         )}
