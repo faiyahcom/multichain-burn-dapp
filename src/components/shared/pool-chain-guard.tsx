@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
-import { chainIdToNetworkConfig } from "@/config/networks";
+import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
 import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
 import { useSystemStore } from "@/stores/systemStore";
 import { useAuthStore } from "@/stores/authStore";
 import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
+import { useChainId } from "wagmi";
 import { Button } from "@/components/common/glow/button";
 import { cn } from "@/lib/utils";
 
@@ -18,12 +19,19 @@ type Props = {
 };
 
 /**
- * Wraps on-chain action buttons for a specific pool.
+ * Wraps on-chain action buttons for a specific pool and guarantees the wallet is
+ * on the pool's chain before any on-chain interaction can be triggered.
  *
- * - Wallet not connected  → renders "Connect Wallet" button.
- * - Wrong network          → renders "Switch Network" button that opens the
- *                            global SwitchNetworkModal via openSwitchNetworkModal.
- * - Correct network        → renders children as-is.
+ * - Wallet not connected  → "Connect Wallet" button.
+ * - Wrong network          → "Switch Network" button (opens the global
+ *                            SwitchNetworkModal → switchNetwork).
+ * - Correct network        → renders children (the action) as-is.
+ *
+ * The connected-network check uses wagmi's `useChainId()` for EVM — the chain a
+ * transaction will actually be sent on — rather than a parsed `caipAddress`,
+ * which can lag the wallet. `useChainId()` updates on the wallet's `chainChanged`
+ * event, so the action button is gated on the wallet's *current* chain at all
+ * times: it is never rendered (and therefore never clickable) on the wrong chain.
  */
 export function PoolChainGuard({
   chainId,
@@ -33,8 +41,11 @@ export function PoolChainGuard({
 }: Props) {
   const { user } = useAuthStore();
   const { open } = useAppKit();
-  const { caipAddress } = useAppKitAccount();
   const { openSwitchNetworkModal } = useSystemStore();
+
+  const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
+  const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
+  const evmChainId = useChainId();
 
   const poolNetwork = chainId ? chainIdToNetworkConfig(chainId) : undefined;
   const poolNetworkId = poolNetwork?.id;
@@ -61,12 +72,21 @@ export function PoolChainGuard({
     );
   }
 
-  // Derive the wallet's currently connected network from caipAddress.
-  const [namespace, chainRef] = caipAddress?.split(":") ?? [];
-  const currentNetworkId =
-    namespace && chainRef ? mapChainToSystemNetwork(namespace, chainRef) : null;
+  // No specific chain requirement — render the action as-is.
+  if (!poolNetworkId) return <>{children}</>;
 
-  // Wrong network — show button that opens the global switch modal.
+  // Authoritative "what chain is the wallet actually on" for the pool's namespace.
+  // EVM: wagmi's live chainId (the chain a tx will use). Solana: connected account.
+  const currentNetworkId: NetworkId | null =
+    poolNetworkId === "solana"
+      ? solanaAddress
+        ? "solana"
+        : null
+      : evmAddress
+        ? mapChainToSystemNetwork("eip155", String(evmChainId))
+        : null;
+
+  // Wrong network — block the action and offer a switch instead.
   if (currentNetworkId !== poolNetworkId) {
     return (
       <Button
@@ -75,7 +95,7 @@ export function PoolChainGuard({
         className={btnClassName}
         onClick={(e) => {
           e.stopPropagation();
-          openSwitchNetworkModal(currentNetworkId, poolNetworkId!);
+          openSwitchNetworkModal(currentNetworkId, poolNetworkId);
         }}
       >
         Switch Network
