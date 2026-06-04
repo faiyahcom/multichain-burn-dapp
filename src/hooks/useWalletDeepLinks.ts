@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { APPKIT_PROJECT_ID } from "@/config/constant";
+import { IS_MAINNET } from "@/config/networks";
 
 // ─── Dev toggle ──────────────────────────────────────────────────────────────
 /**
@@ -7,7 +8,7 @@ import { APPKIT_PROJECT_ID } from "@/config/constant";
  * Phantom, Solflare, and Backpack will appear in a dedicated "Solana" section
  * below the EVM wallet grid.
  */
-export const SHOW_SOL_WALLETS = true;
+export const SHOW_SOL_WALLETS = !IS_MAINNET;
 // ─────────────────────────────────────────────────────────────────────────────
 
 const EXPLORER_BASE = "https://explorer-api.walletconnect.com";
