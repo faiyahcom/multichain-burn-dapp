@@ -42,11 +42,6 @@ export const solanaAdapter = new SolanaAdapter();
 export const appKitConfig = {
   adapters: [wagmiAdapter, solanaAdapter],
   networks,
-  // Propose the dApp's primary chain (Xphere) as the default instead of letting
-  // the connection inherit the wallet's active chain (a fresh MetaMask defaults
-  // to Ethereum). For injected wallets the wallet still reports its own chain, so
-  // useWalletConnectionHandler also auto-switches to the intended chain on connect.
-  defaultNetwork: activeXphereNetwork,
   metadata,
   projectId: APPKIT_PROJECT_ID ?? "",
   allowUnsupportedChain: true,
