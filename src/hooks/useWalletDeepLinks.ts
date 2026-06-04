@@ -76,17 +76,17 @@ const CURATED_WALLETS: CuratedWallet[] = [
       return `https://metamask.app.link/dapp/${hostname}${pathname}${search}`;
     },
   },
-  {
-    id: "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0",
-    name: "Trust Wallet",
-    isSolana: false,
-    // NOTE: do NOT pass coin_id. coin_id=60 (SLIP-44 = Ethereum) pins Trust's
-    // browser to Ethereum, which blocks switching to BSC/Xphere and breaks
-    // Solana. Omitting it opens chain-agnostic so the dApp drives the chain via
-    // Trust's injected provider (window.trustwallet.ethereum / .solana).
-    // (Trust's in-app browser is Android-only — removed on iOS since 2021.)
-    buildLink: (url) => `https://link.trustwallet.com/open_url?url=${enc(url)}`,
-  },
+  // {
+  //   id: "4622a2b2d6af1c9844944291e5e7351a6aa24cd7b23099efac1b2fd875da31a0",
+  //   name: "Trust Wallet",
+  //   isSolana: false,
+  //   // NOTE: do NOT pass coin_id. coin_id=60 (SLIP-44 = Ethereum) pins Trust's
+  //   // browser to Ethereum, which blocks switching to BSC/Xphere and breaks
+  //   // Solana. Omitting it opens chain-agnostic so the dApp drives the chain via
+  //   // Trust's injected provider (window.trustwallet.ethereum / .solana).
+  //   // (Trust's in-app browser is Android-only — removed on iOS since 2021.)
+  //   buildLink: (url) => `https://link.trustwallet.com/open_url?url=${enc(url)}`,
+  // },
 //   {
 //     id: "fd20dc426fb37566d803205b19bbc1d4096b248ac04548e3cfb6b3a38bd033aa",
 //     name: "Coinbase Wallet",
