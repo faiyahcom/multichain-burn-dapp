@@ -1,10 +1,16 @@
-import type { ReactNode } from "react";
-import { chainIdToNetworkConfig, type NetworkId } from "@/config/networks";
-import { mapChainToSystemNetwork } from "@/utils/helpers/networks";
+import { useState, type ReactNode } from "react";
+import { chainIdToNetworkConfig } from "@/config/networks";
 import { useSystemStore } from "@/stores/systemStore";
 import { useAuthStore } from "@/stores/authStore";
-import { useAppKitAccount, useAppKit } from "@reown/appkit/react";
-import { useChainId } from "wagmi";
+import {
+  useAppKitAccount,
+  useAppKit,
+  useAppKitProvider,
+} from "@reown/appkit/react";
+import { useInjectedEvmChainId } from "@/hooks/useInjectedEvmChainId";
+import { ensureEvmChain } from "@/utils/helpers/ensure-evm-chain";
+import { getErrorMessage } from "@/utils/helpers/error-message";
+import { toast } from "@/components/common/custom-toast";
 import { Button } from "@/components/common/glow/button";
 import { cn } from "@/lib/utils";
 
@@ -20,18 +26,15 @@ type Props = {
 
 /**
  * Wraps on-chain action buttons for a specific pool and guarantees the wallet is
- * on the pool's chain before any on-chain interaction can be triggered.
+ * actually on the pool's chain before any on-chain interaction.
  *
- * - Wallet not connected  → "Connect Wallet" button.
- * - Wrong network          → "Switch Network" button (opens the global
- *                            SwitchNetworkModal → switchNetwork).
- * - Correct network        → renders children (the action) as-is.
- *
- * The connected-network check uses wagmi's `useChainId()` for EVM — the chain a
- * transaction will actually be sent on — rather than a parsed `caipAddress`,
- * which can lag the wallet. `useChainId()` updates on the wallet's `chainChanged`
- * event, so the action button is gated on the wallet's *current* chain at all
- * times: it is never rendered (and therefore never clickable) on the wrong chain.
+ * The EVM "are we on the right chain" check reads the INJECTED provider's real
+ * chain (useInjectedEvmChainId) — the chain the transaction will use — not
+ * wagmi's cached chain, which can disagree. When connected to the right namespace
+ * but on the wrong EVM chain, the button calls ensureEvmChain() against that same
+ * provider: it switches, and adds the chain config to the wallet if missing.
+ * Cross-namespace (not connected to the pool's namespace at all) still routes
+ * through the connect+switch modal.
  */
 export function PoolChainGuard({
   chainId,
@@ -42,10 +45,11 @@ export function PoolChainGuard({
   const { user } = useAuthStore();
   const { open } = useAppKit();
   const { openSwitchNetworkModal } = useSystemStore();
-
   const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
   const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
-  const evmChainId = useChainId();
+  const { walletProvider } = useAppKitProvider("eip155");
+  const injectedChainId = useInjectedEvmChainId();
+  const [switching, setSwitching] = useState(false);
 
   const poolNetwork = chainId ? chainIdToNetworkConfig(chainId) : undefined;
   const poolNetworkId = poolNetwork?.id;
@@ -73,21 +77,20 @@ export function PoolChainGuard({
   }
 
   // No specific chain requirement — render the action as-is.
-  if (!poolNetworkId) return <>{children}</>;
+  if (!poolNetwork || !poolNetworkId) return <>{children}</>;
 
-  // Authoritative "what chain is the wallet actually on" for the pool's namespace.
-  // EVM: wagmi's live chainId (the chain a tx will use). Solana: connected account.
-  const currentNetworkId: NetworkId | null =
-    poolNetworkId === "solana"
-      ? solanaAddress
-        ? "solana"
-        : null
-      : evmAddress
-        ? mapChainToSystemNetwork("eip155", String(evmChainId))
-        : null;
+  const isSolanaPool = poolNetworkId === "solana";
+  const connectedToNamespace = isSolanaPool ? !!solanaAddress : !!evmAddress;
 
-  // Wrong network — block the action and offer a switch instead.
-  if (currentNetworkId !== poolNetworkId) {
+  // On the correct chain? EVM compares the injected provider's actual chain id.
+  const onRightChain = isSolanaPool
+    ? !!solanaAddress
+    : !!evmAddress && injectedChainId === Number(poolNetwork.appKitNetwork.id);
+
+  if (onRightChain) return <>{children}</>;
+
+  // Not connected to the pool's namespace → connect + switch via the modal flow.
+  if (!connectedToNamespace) {
     return (
       <Button
         variant={variant}
@@ -95,7 +98,7 @@ export function PoolChainGuard({
         className={btnClassName}
         onClick={(e) => {
           e.stopPropagation();
-          openSwitchNetworkModal(currentNetworkId, poolNetworkId);
+          openSwitchNetworkModal(null, poolNetworkId);
         }}
       >
         Switch Network
@@ -103,5 +106,35 @@ export function PoolChainGuard({
     );
   }
 
-  return <>{children}</>;
+  // Connected to the right namespace but on the wrong EVM chain → switch/add the
+  // chain on the SAME injected provider the transaction will use.
+  const handleSwitch = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (switching) return;
+    setSwitching(true);
+    try {
+      await ensureEvmChain(walletProvider, poolNetwork);
+    } catch (err) {
+      toast.error(
+        getErrorMessage({
+          error: err,
+          fallbackMsg: `Failed to switch to ${poolNetwork.label}.`,
+        }),
+      );
+    } finally {
+      setSwitching(false);
+    }
+  };
+
+  return (
+    <Button
+      variant={variant}
+      hasHover
+      disabled={switching}
+      className={btnClassName}
+      onClick={handleSwitch}
+    >
+      {switching ? "Switching…" : "Switch Network"}
+    </Button>
+  );
 }
