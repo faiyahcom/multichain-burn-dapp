@@ -6,40 +6,59 @@ import {
 } from "@/components/common/glow/container";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAppKit } from "@reown/appkit/react";
+import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
 import { InAppBrowserPrompt } from "@/components/common/in-app-browser-prompt";
 import {
   isInAppWalletBrowser,
   isMobileBrowser,
 } from "@/utils/helpers/mobile-browser";
 import { claimActiveTab } from "@/hooks/useIsLeaderTab";
+import { activeXphereNetwork } from "@/config/networks";
+import { useSystemStore } from "@/stores/systemStore";
 
 const ConnectButton = () => {
   const { open } = useAppKit();
-  const { connect, connectors } = useConnect();
+  const { connectAsync, connectors } = useConnect();
+  const { switchNetwork } = useAppKitNetwork();
+  const setPendingNetworkSwitch = useSystemStore(
+    (s) => s.setPendingNetworkSwitch,
+  );
   const [promptOpen, setPromptOpen] = useState(false);
 
+  // On first connect, steer the wallet to the dApp's primary chain (Xphere).
+  // For MODAL connects we reuse the existing pendingNetworkSwitch flow — the
+  // root-level useAppKitEventHandler performs switchNetwork() on MODAL_CLOSE once
+  // connected. switchNetwork() triggers wallet_addEthereumChain, so first-time
+  // users get the "Add Xphere network" prompt. (Wallets that ignore addChain —
+  // e.g. Trust's in-app browser — simply won't add it; nothing we can do there.)
+  const queueXphereDefault = () =>
+    setPendingNetworkSwitch({
+      network: activeXphereNetwork,
+      closeModalOnDone: false,
+    });
+
   const handleConnect = async () => {
-    // Claim the connection lifecycle for THIS tab. If MetaMask (Android) has
-    // spawned a duplicate tab, the tab the user actually taps Connect in becomes
-    // the sole owner of auth/signing — the duplicate stays passive.
+    // Claim the connection lifecycle for THIS tab so a MetaMask-Android duplicate
+    // tab stays passive (the tab the user taps Connect in owns auth/signing).
     claimActiveTab();
 
     // CASE 1: already inside a mobile wallet's in-app browser (MetaMask, etc.).
-    // Connect the INJECTED provider directly. Do NOT call open() here — AppKit's
-    // modal would re-deeplink to the same wallet (metamask://wc?...), spawning a
-    // SECOND dapp instance inside the wallet. The two instances then share one
-    // origin's WalletConnect storage → split session → "opens 2 links" and the
-    // signature request lands in the wrong instance ("signing gone wrong").
+    // Connect the INJECTED provider directly (calling open() here would re-deeplink
+    // and spawn a second dapp instance). The modal path's MODAL_CLOSE never fires
+    // here, so switch to Xphere ourselves right after connecting.
     if (isMobileBrowser() && isInAppWalletBrowser()) {
       const injected = connectors.find((c) => c.type === "injected");
       if (injected) {
-        connect({ connector: injected });
+        try {
+          await connectAsync({ connector: injected });
+          switchNetwork(activeXphereNetwork); // → add/switch Xphere prompt
+        } catch {
+          /* user rejected the connection / switch — nothing to do */
+        }
         return;
       }
-      // No injected EVM connector (e.g. a Solana-only in-app browser like
-      // Phantom) — use the AppKit modal, NOT the redirect prompt (we're already
-      // inside a wallet browser, so redirecting again makes no sense).
+      // Solana-only in-app browser (e.g. Phantom) — use the modal, NOT the
+      // redirect prompt (we're already inside a wallet browser).
       await open();
       return;
     }
@@ -50,14 +69,17 @@ const ConnectButton = () => {
       return;
     }
 
-    // CASE 3: desktop — normal AppKit modal (choose among wallets/extensions).
+    // CASE 3: desktop — queue Xphere, then open the AppKit modal.
+    queueXphereDefault();
     await open();
   };
 
-  // "Continue Anyway" — dismiss the prompt and run the normal connect flow.
+  // "Continue Anyway" — dismiss the prompt and run the normal WC/AppKit flow,
+  // queueing Xphere so it's switched-to once connected.
   const handleContinueAnyway = async () => {
     claimActiveTab();
     setPromptOpen(false);
+    queueXphereDefault();
     await open();
   };
 
