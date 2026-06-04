@@ -1,32 +1,13 @@
 import { useState, useCallback } from 'react'
 import { useSignMessage, useConnections } from 'wagmi'
-import { useAppKitAccount } from '@reown/appkit/react'
+import { useAppKitAccount, useAppKitProvider } from '@reown/appkit/react'
+import type { Provider as SolanaProvider } from '@reown/appkit-adapter-solana/react'
 import bs58 from 'bs58'
 import { authService } from '@/services/authService'
 import { useAuthStore } from '@/stores/authStore'
 import { getErrorMessage } from '@/utils/helpers/error-message'
 
 type WalletType = 'evm' | 'solana'
-
-async function signSolanaMessage(message: string): Promise<string> {
-  const solanaWallet = window.solana
-
-  if (!solanaWallet) {
-    throw new Error('Solana wallet not found. Please install Phantom wallet.')
-  }
-
-  if (!solanaWallet.isConnected) {
-    await solanaWallet.connect()
-  }
-
-  const messageBytes = new TextEncoder().encode(message)
-  const signedMessage = await solanaWallet.signMessage(messageBytes, 'utf8')
-
-  // Solana wallets return a Uint8Array signature; encode to base58 per the standard.
-  const signature = bs58.encode(signedMessage.signature)
-
-  return signature
-}
 
 export function useWalletAuth() {
   const [isAuthenticating, setIsAuthenticating] = useState(false)
@@ -42,6 +23,12 @@ export function useWalletAuth() {
   const { address: solanaAddress } = useAppKitAccount({
     namespace: 'solana',
   })
+  // Use the wallet that AppKit actually connected (Phantom, Solflare, Backpack,
+  // Trust, …) rather than the Phantom-only `window.solana` global. Non-Phantom
+  // wallets inject under their own namespace (e.g. window.trustwallet.solana) and
+  // are surfaced here via Wallet Standard, so window.solana would be undefined.
+  const { walletProvider: solanaProvider } =
+    useAppKitProvider<SolanaProvider>('solana')
 
   const authenticate = useCallback(
     async (walletType: WalletType, address: string, chainId?: string) => {
@@ -104,7 +91,15 @@ export function useWalletAuth() {
             }
           }
         } else {
-          signature = await signSolanaMessage(message)
+          if (!solanaProvider) {
+            throw new Error('Solana wallet not connected')
+          }
+          // AppKit's Solana provider returns the raw signature bytes; encode to
+          // base58 per the Solana signature standard.
+          const signatureBytes = await solanaProvider.signMessage(
+            new TextEncoder().encode(message),
+          )
+          signature = bs58.encode(signatureBytes)
         }
 
         const signInMethod =
@@ -149,7 +144,7 @@ export function useWalletAuth() {
         setLoading(false)
       }
     },
-    [signEvmMessage, connector, login, setLoading, setError],
+    [signEvmMessage, connector, solanaProvider, login, setLoading, setError],
   )
 
   const authenticateEvm = useCallback(

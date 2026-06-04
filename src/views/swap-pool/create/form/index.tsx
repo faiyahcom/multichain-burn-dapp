@@ -394,7 +394,7 @@ const CreateSwapPoolForm = ({
             getVariantBgClassName({
               variant: "swap",
             }),
-            "border-2 pl-3 text-xs font-medium sm:text-sm md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
+            "border-2 pl-3 text-base font-medium md:pl-4 lg:text-lg xl:text-xl 2xl:text-23px",
           )}
           {...register("poolName", {
             validate: {
@@ -427,12 +427,12 @@ const CreateSwapPoolForm = ({
       </div>
 
       <div className="flex flex-col gap-2.5">
-        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+        <span className="text-base font-medium md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
           Pool Info
         </span>
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+            <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Token Swap
             </span>
             <WhitelistTokenSelect
@@ -444,14 +444,14 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenReward}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
+                  "w-full px-3 py-1 text-base font-medium lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                   getVariantBorderClassName({
                     variant: "swap",
                     custom: "rounded-md",
                   }),
                 ),
                 triggerContent:
-                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
+                  "text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
                 // icon: "size-3.5 md:size-4 lg:size-5",
               }}
             />
@@ -467,7 +467,7 @@ const CreateSwapPoolForm = ({
           </div>
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+          <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
             Ratio{" "}
             <InfoTooltip
               variant="swap"
@@ -520,7 +520,7 @@ const CreateSwapPoolForm = ({
                   placeholder="1"
                   aria-invalid={!!errors.numerator}
                   className={cn(
-                    "w-20 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:w-30 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-20 border-2 bg-transparent py-1 pl-3 text-base font-medium md:w-30 md:py-1.5 md:pl-4 lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
@@ -595,7 +595,7 @@ const CreateSwapPoolForm = ({
                   placeholder="1"
                   aria-invalid={!!errors.denominator}
                   className={cn(
-                    "w-20 border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:w-30 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-20 border-2 bg-transparent py-1 pl-3 text-base font-medium md:w-30 md:py-1.5 md:pl-4 lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
@@ -617,7 +617,7 @@ const CreateSwapPoolForm = ({
                     custom: "rounded-md border-2",
                   }),
                   getVariantBgClassName({ variant: "swap" }),
-                  "px-2 py-1 text-xs sm:text-sm md:px-3 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
+                  "px-3 py-1 text-base lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                 )}
               >
                 Fixed
@@ -636,7 +636,7 @@ const CreateSwapPoolForm = ({
           )}
         </div>
         <div className="flex flex-col gap-2">
-          <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+          <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
             You Pay
           </span>
           <Controller
@@ -678,7 +678,7 @@ const CreateSwapPoolForm = ({
                 placeholder="0.0"
                 aria-invalid={!!errors.amountPay}
                 className={cn(
-                  "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:max-w-60 md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                  "w-full border-2 bg-transparent py-1 pl-3 text-base font-medium md:max-w-60 md:py-1.5 md:pl-4 lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                 )}
                 value={value ?? ""}
                 ref={ref}
@@ -700,12 +700,12 @@ const CreateSwapPoolForm = ({
       </div>
 
       <div className="flex flex-col gap-2">
-        <span className="text-sm font-medium sm:text-base md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
+        <span className="text-base font-medium md:text-lg lg:text-xl xl:text-2xl 2xl:text-3xl">
           Reward Config
         </span>
         <div className="flex">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+            <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Token Receive
             </span>
             <WhitelistTokenSelect
@@ -718,14 +718,14 @@ const CreateSwapPoolForm = ({
               disabledAddress={selectedTokenBurn}
               classNames={{
                 trigger: cn(
-                  "w-full px-2 py-1 text-xs font-medium sm:text-sm md:px-3 md:py-1.5 md:text-base lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
+                  "w-full px-3 py-1 text-base font-medium lg:max-w-2/3 lg:text-lg xl:text-xl 2xl:px-4 2xl:text-23px",
                   getVariantBorderClassName({
                     variant: "swap",
                     custom: "rounded-md",
                   }),
                 ),
                 triggerContent:
-                  "text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
+                  "text-base lg:text-lg xl:text-xl 2xl:text-23px font-medium",
                 // icon: "size-3.5 md:size-4 lg:size-5",
               }}
             />
@@ -745,26 +745,27 @@ const CreateSwapPoolForm = ({
 
         <div className="flex flex-wrap gap-4 md:grid md:grid-cols-2 md:gap-6">
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+            <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Network
             </span>
             <div
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex items-center gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
+                "relative flex items-center gap-2 px-3 py-1 text-base text-nowrap lg:text-lg xl:text-xl 2xl:text-23px",
                 "rounded-md border-2",
               )}
             >
               <NetworkIcon
                 networkId={network?.id || ("" as NetworkId)}
-                className="size-3.5 md:size-4 2xl:size-5.75"
+                // className="size-3.5 md:size-4 2xl:size-5.75"
+                className="size-5"
               />
               <span>{network?.label}</span>
             </div>
           </div>
 
           <div className="flex w-full flex-col justify-end gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+            <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
               You Receive
             </span>
             <Controller
@@ -806,7 +807,7 @@ const CreateSwapPoolForm = ({
                   placeholder="0.0"
                   aria-invalid={!!errors.budget}
                   className={cn(
-                    "w-full border-2 bg-transparent py-1 pl-3 text-xs font-medium sm:text-sm md:py-1.5 md:pl-4 md:text-base lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
+                    "w-full border-2 bg-transparent py-1 pl-3 text-base font-medium md:py-1.5 md:pl-4 lg:text-lg xl:text-xl 2xl:max-w-76 2xl:text-23px",
                   )}
                   value={value ?? ""}
                   ref={ref}
@@ -827,13 +828,13 @@ const CreateSwapPoolForm = ({
           </div>
 
           <div className="flex w-full flex-col gap-2">
-            <span className="text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 2xl:text-23px">
+            <span className="text-base lg:text-lg xl:text-xl 2xl:text-23px">
               Pool Creation Fee
             </span>
             <span
               className={cn(
                 getVariantBorderClassName({ variant: "swap" }),
-                "relative flex w-full gap-2 px-3 py-1 text-xs text-nowrap sm:text-sm md:px-4 md:py-1.5 md:text-base lg:text-lg xl:text-xl 2xl:text-23px",
+                "relative flex w-full gap-2 px-3 py-1 text-base text-nowrap lg:text-lg xl:text-xl 2xl:text-23px",
                 "rounded-md border-2",
               )}
             >
@@ -852,7 +853,7 @@ const CreateSwapPoolForm = ({
           type="submit"
           hasHover
           isLoading={isSubmitting}
-          className="w-full text-center font-orbitron text-sm font-semibold md:w-64 md:text-base lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
+          className="w-full text-center font-orbitron text-base font-semibold md:w-64 lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
         >
           {isSubmitting ? "Submitting..." : "Submit"}
         </Button>
