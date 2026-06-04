@@ -6,36 +6,18 @@ import {
 } from "@/components/common/glow/container";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useAppKit, useAppKitNetwork } from "@reown/appkit/react";
+import { useAppKit } from "@reown/appkit/react";
 import { InAppBrowserPrompt } from "@/components/common/in-app-browser-prompt";
 import {
   isInAppWalletBrowser,
   isMobileBrowser,
 } from "@/utils/helpers/mobile-browser";
 import { claimActiveTab } from "@/hooks/useIsLeaderTab";
-import { activeXphereNetwork } from "@/config/networks";
-import { useSystemStore } from "@/stores/systemStore";
 
 const ConnectButton = () => {
   const { open } = useAppKit();
-  const { connectAsync, connectors } = useConnect();
-  const { switchNetwork } = useAppKitNetwork();
-  const setPendingNetworkSwitch = useSystemStore(
-    (s) => s.setPendingNetworkSwitch,
-  );
+  const { connect, connectors } = useConnect();
   const [promptOpen, setPromptOpen] = useState(false);
-
-  // On first connect, steer the wallet to the dApp's primary chain (Xphere).
-  // For MODAL connects we reuse the existing pendingNetworkSwitch flow — the
-  // root-level useAppKitEventHandler performs switchNetwork() on MODAL_CLOSE once
-  // connected. switchNetwork() triggers wallet_addEthereumChain, so first-time
-  // users get the "Add Xphere network" prompt. (Wallets that ignore addChain —
-  // e.g. Trust's in-app browser — simply won't add it; nothing we can do there.)
-  const queueXphereDefault = () =>
-    setPendingNetworkSwitch({
-      network: activeXphereNetwork,
-      closeModalOnDone: false,
-    });
 
   const handleConnect = async () => {
     // Claim the connection lifecycle for THIS tab so a MetaMask-Android duplicate
@@ -44,17 +26,15 @@ const ConnectButton = () => {
 
     // CASE 1: already inside a mobile wallet's in-app browser (MetaMask, etc.).
     // Connect the INJECTED provider directly (calling open() here would re-deeplink
-    // and spawn a second dapp instance). The modal path's MODAL_CLOSE never fires
-    // here, so switch to Xphere ourselves right after connecting.
+    // and spawn a second dapp instance). We do NOT force any network switch here:
+    // forcing wallet_addEthereumChain for the custom Xphere chain crashes MetaMask
+    // mobile ("View: Root, TypeError: undefined is not a function") — in the in-app
+    // browser too, not just over WalletConnect. Xphere is switched ON DEMAND via
+    // NetworkSelect / SwitchNetworkModal when the user actually needs it.
     if (isMobileBrowser() && isInAppWalletBrowser()) {
       const injected = connectors.find((c) => c.type === "injected");
       if (injected) {
-        try {
-          await connectAsync({ connector: injected });
-          switchNetwork(activeXphereNetwork); // → add/switch Xphere prompt
-        } catch {
-          /* user rejected the connection / switch — nothing to do */
-        }
+        connect({ connector: injected });
         return;
       }
       // Solana-only in-app browser (e.g. Phantom) — use the modal, NOT the
@@ -69,17 +49,16 @@ const ConnectButton = () => {
       return;
     }
 
-    // CASE 3: desktop — queue Xphere, then open the AppKit modal.
-    queueXphereDefault();
+    // CASE 3: desktop — normal AppKit modal (no forced switch; the modal may end
+    // up as a WalletConnect session to a mobile wallet, where a forced add crashes).
     await open();
   };
 
-  // "Continue Anyway" — dismiss the prompt and run the normal WC/AppKit flow,
-  // queueing Xphere so it's switched-to once connected.
+  // "Continue Anyway" — dismiss the prompt and run the normal WC/AppKit flow.
+  // No forced switch (this path is WalletConnect on mobile — see CASE 1 note).
   const handleContinueAnyway = async () => {
     claimActiveTab();
     setPromptOpen(false);
-    queueXphereDefault();
     await open();
   };
 
