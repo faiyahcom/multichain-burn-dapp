@@ -44,7 +44,7 @@ export function PoolChainGuard({
 }: Props) {
   const { user } = useAuthStore();
   const { open } = useAppKit();
-  const { openSwitchNetworkModal } = useSystemStore();
+  const { openSwitchNetworkModal, selectedNetworkId } = useSystemStore();
   const { address: evmAddress } = useAppKitAccount({ namespace: "eip155" });
   const { address: solanaAddress } = useAppKitAccount({ namespace: "solana" });
   const { walletProvider } = useAppKitProvider("eip155");
@@ -89,6 +89,12 @@ export function PoolChainGuard({
 
   if (onRightChain) return <>{children}</>;
 
+  // When the header already shows the pool's network (selectedNetworkId matches)
+  // but the wallet isn't actually on it, the chain just needs to be ADDED to the
+  // wallet — so label it "Add Network" to avoid the confusing "Switch Network"
+  // (the user thinks they're already on it, per the header).
+  const needsAddLabel = selectedNetworkId === poolNetworkId;
+
   // Not connected to the pool's namespace → connect + switch via the modal flow.
   if (!connectedToNamespace) {
     return (
@@ -101,7 +107,7 @@ export function PoolChainGuard({
           openSwitchNetworkModal(null, poolNetworkId);
         }}
       >
-        Switch Network
+        {needsAddLabel ? "Add Network" : "Switch Network"}
       </Button>
     );
   }
@@ -134,7 +140,13 @@ export function PoolChainGuard({
       className={btnClassName}
       onClick={handleSwitch}
     >
-      {switching ? "Switching…" : "Switch Network"}
+      {switching
+        ? needsAddLabel
+          ? "Adding…"
+          : "Switching…"
+        : needsAddLabel
+          ? "Add Network"
+          : "Switch Network"}
     </Button>
   );
 }
