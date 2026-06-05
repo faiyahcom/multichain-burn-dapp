@@ -83,8 +83,6 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
     reset();
   }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  console.log("starttime, endtime", typeof startTime, typeof endTime, startTime, endTime, selectedTokenBurn, selectedTokenReward);
-
   const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
     if (isSolana && !onSubmitForm) {
       const poolAddress = await createPoolSol({
@@ -150,18 +148,21 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
           {...register("poolName", {
             validate: {
               required: (poolName) => {
+                if (!poolName) return "Pool name is required";
                 const trimmedPoolName = poolName.trim();
                 return trimmedPoolName.length === 0
                   ? "Pool name is required"
                   : true;
               },
               minLength: (poolName) => {
+                if (!poolName) return true; // handled by required
                 const trimmedPoolName = poolName.trim();
                 return trimmedPoolName.length >= 3
                   ? true
                   : "Pool name must be at least 3 characters";
               },
               maxLength: (poolName) => {
+                if (!poolName) return true; // handled by required
                 const trimmedPoolName = poolName.trim();
                 return trimmedPoolName.length <= 30
                   ? true
@@ -239,12 +240,12 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <input
               type="hidden"
               {...register("startTime", {
-                required: "Start time is required",
                 validate: (value) => {
+                  if (!(value instanceof Date)) return "Start time is required";
                   if (value <= new Date())
                     return "Start time must be in the future";
                   const end = getValues("endTime");
-                  if (end && value >= end)
+                  if (end instanceof Date && value >= end)
                     return "Start time must be before end time";
                   return true;
                 },
@@ -277,12 +278,12 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <input
               type="hidden"
               {...register("endTime", {
-                required: "End time is required",
                 validate: (value) => {
+                  if (!(value instanceof Date)) return "End time is required";
                   if (value <= new Date())
                     return "End time must be in the future";
                   const start = getValues("startTime");
-                  if (start && value <= start)
+                  if (start instanceof Date && value <= start)
                     return "End time must be after start time";
                   return true;
                 },
