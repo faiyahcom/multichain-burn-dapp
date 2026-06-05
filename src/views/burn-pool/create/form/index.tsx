@@ -19,6 +19,7 @@ import { DatePicker } from "@/components/common/glow/date-picker";
 import { useFeeSettings } from "@/views/admin/fee-settings-management/hooks/useFeeSettings";
 import { formatAmount } from "@/utils/helpers/numbers";
 import TokenDisplay from "@/components/common/token-display";
+import { PoolChainGuard } from "@/components/shared/pool-chain-guard";
 
 type CreateSwapPoolFormValues = {
   poolName: string;
@@ -389,15 +390,21 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
       </div>
 
       <div className="flex justify-center">
-        <Button
+        <PoolChainGuard
+          chainId={network?.backendChainId}
           variant="burn"
-          type="submit"
-          hasHover
-          isLoading={isSubmitting}
-          className="w-full text-center font-orbitron text-base font-semibold md:w-64 lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
+          className="md:w-64 lg:w-72 2xl:w-76.25"
         >
-          {isSubmitting ? "Submitting..." : "Submit"}
-        </Button>
+          <Button
+            variant="burn"
+            type="submit"
+            hasHover
+            isLoading={isSubmitting}
+            className="w-full text-center font-orbitron text-base font-semibold md:w-64 lg:w-72 lg:text-xl 2xl:w-76.25 2xl:text-2xl"
+          >
+            {isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </PoolChainGuard>
       </div>
     </form>
   );
