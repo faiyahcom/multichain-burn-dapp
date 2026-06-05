@@ -59,15 +59,17 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
     handleSubmit,
     reset,
     setValue,
+    trigger,
+    getValues,
     watch,
     formState: { errors, isSubmitting },
   } = useForm<CreateSwapPoolFormValues>({
     defaultValues: {
-      poolName: undefined,
-      tokenBurn: undefined,
-      tokenReward: undefined,
-      startTime: undefined,
-      endTime: undefined,
+      poolName: null,
+      tokenBurn: null,
+      tokenReward: null,
+      startTime: null,
+      endTime: null,
     },
   });
 
@@ -81,10 +83,12 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
     reset();
   }, [selectedNetworkId]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  console.log("starttime, endtime", typeof startTime, typeof endTime, startTime, endTime, selectedTokenBurn, selectedTokenReward);
+
   const onSubmit: SubmitHandler<CreateSwapPoolFormValues> = async (values) => {
     if (isSolana && !onSubmitForm) {
       const poolAddress = await createPoolSol({
-        poolName: values.poolName,
+        poolName: values?.poolName,
         tokenBurn: values.tokenBurn,
         tokenReward: values.tokenReward,
         startTime: values.startTime,
@@ -221,10 +225,11 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <DatePicker
               variant="burn"
               value={startTime}
-              onChange={(date: Date | undefined) =>
-                setValue("startTime", date as Date, { shouldValidate: true })
-              }
-              className="rounded-md px-3 py-4 text-base lg:text-lg xl:text-xl 2xl:text-23px"
+              onChange={(date: Date | undefined) => {
+                setValue("startTime", date as Date, { shouldValidate: true });
+                void trigger("endTime");
+              }}
+              className="rounded-md px-3 py-4 md:py-4.5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
               disabled={(date: Date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -238,7 +243,8 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                 validate: (value) => {
                   if (value <= new Date())
                     return "Start time must be in the future";
-                  if (endTime && value >= endTime)
+                  const end = getValues("endTime");
+                  if (end && value >= end)
                     return "Start time must be before end time";
                   return true;
                 },
@@ -257,10 +263,11 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
             <DatePicker
               variant="burn"
               value={endTime}
-              onChange={(date: Date | undefined) =>
-                setValue("endTime", date as Date, { shouldValidate: true })
-              }
-              className="rounded-md px-3 py-4 text-base lg:text-lg xl:text-xl 2xl:text-23px"
+              onChange={(date: Date | undefined) => {
+                setValue("endTime", date as Date, { shouldValidate: true });
+                void trigger("startTime");
+              }}
+              className="rounded-md px-3 py-4 md:py-4.5 text-base lg:text-lg xl:text-xl 2xl:text-23px"
               disabled={(date: Date) => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
@@ -274,7 +281,8 @@ const CreateBurnPoolForm = ({ onSubmitForm }: Props) => {
                 validate: (value) => {
                   if (value <= new Date())
                     return "End time must be in the future";
-                  if (startTime && value <= startTime)
+                  const start = getValues("startTime");
+                  if (start && value <= start)
                     return "End time must be after start time";
                   return true;
                 },
