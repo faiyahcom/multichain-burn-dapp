@@ -63,6 +63,7 @@ export function PoolChainGuard({
   if (!user) {
     return (
       <Button
+        type="button"
         variant={variant}
         hasHover
         className={btnClassName}
@@ -99,6 +100,7 @@ export function PoolChainGuard({
   if (!connectedToNamespace) {
     return (
       <Button
+        type="button"
         variant={variant}
         hasHover
         className={btnClassName}
@@ -134,6 +136,7 @@ export function PoolChainGuard({
 
   return (
     <Button
+      type="button"
       variant={variant}
       hasHover
       disabled={switching}
