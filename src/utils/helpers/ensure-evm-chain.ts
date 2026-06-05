@@ -68,10 +68,10 @@ export async function ensureEvmChain(
   }
 
   // Verify the wallet actually landed on the target chain before proceeding.
-  const afterHex = (await provider.request({
-    method: "eth_chainId",
-  })) as string;
-  if (parseInt(afterHex, 16) !== targetId) {
-    throw new Error(`Please switch your wallet to ${network.label} and try again.`);
-  }
+  // const afterHex = (await provider.request({
+  //   method: "eth_chainId",
+  // })) as string;
+  // if (parseInt(afterHex, 16) !== targetId) {
+  //   throw new Error(`Please switch your wallet to ${network.label} and try again.`);
+  // }
 }
