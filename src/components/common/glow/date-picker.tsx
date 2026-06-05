@@ -57,7 +57,12 @@ export function DatePicker({
 
   // Only sync from value if value is different from internal state
   React.useEffect(() => {
-    if (!value) return;
+    if (!value || value instanceof Date === false) {
+      setInternalDate(undefined);
+      setHour("00");
+      setMinute("00");
+      return;
+    };
     if (
       !internalDate ||
       value.getTime() !== internalDate.getTime() ||

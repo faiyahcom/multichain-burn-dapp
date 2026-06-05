@@ -32,6 +32,10 @@ const editFormSchema = z
     startTime: z.date({ message: "Start time is required" }),
     endTime: z.date({ message: "End time is required" }),
   })
+  .refine((data) => data.startTime < data.endTime, {
+    message: "Start time must be before end time",
+    path: ["startTime"],
+  })
   .refine((data) => data.endTime > data.startTime, {
     message: "End time must be after start time",
     path: ["endTime"],
@@ -62,6 +66,7 @@ const EditPoolDialog = ({
     register,
     handleSubmit,
     setValue,
+    trigger,
     watch,
     reset,
     setFocus,
@@ -166,11 +171,12 @@ const EditPoolDialog = ({
                       <DatePicker
                         variant="burn"
                         value={startTime}
-                        onChange={(date) =>
+                        onChange={(date) => {
                           setValue("startTime", date as Date, {
                             shouldValidate: true,
-                          })
-                        }
+                          });
+                          void trigger("endTime");
+                        }}
                         disabled={(date) => {
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
@@ -204,11 +210,12 @@ const EditPoolDialog = ({
                       <DatePicker
                         variant="burn"
                         value={endTime}
-                        onChange={(date) =>
+                        onChange={(date) => {
                           setValue("endTime", date as Date, {
                             shouldValidate: true,
-                          })
-                        }
+                          });
+                          void trigger("startTime");
+                        }}
                         disabled={(date) => {
                           const today = new Date();
                           today.setHours(0, 0, 0, 0);
