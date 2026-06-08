@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { DEFAULT_PAGE_SIZE } from "@/config/constant";
 import CustomPagination from "@/components/common/pagination";
 import CopyableText from "@/components/common/copyable-text";
 import {
@@ -27,7 +28,6 @@ type Props = {
   poolDetail?: PoolDetailResponse;
 };
 
-const DEFAULT_PAGE_SIZE = 5;
 
 const launchpadActionLabel = (kind: number): string => {
   switch (kind) {

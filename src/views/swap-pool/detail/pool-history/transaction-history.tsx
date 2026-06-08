@@ -1,4 +1,5 @@
 import CustomPagination from "@/components/common/pagination";
+import { DEFAULT_PAGE_SIZE } from "@/config/constant";
 import {
     Table,
     TableBody,
@@ -35,7 +36,6 @@ type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
-const DEFAULT_PAGE_SIZE = 5;
 
 const TransactionHistoryTable = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);
