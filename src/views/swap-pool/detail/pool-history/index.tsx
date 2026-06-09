@@ -15,8 +15,11 @@ type TabType = "transactions" | "activity";
 const PoolHistory = ({ poolDetail }: Props) => {
     const [activeTab, setActiveTab] = useState<TabType>("transactions");
     const [isExporting, setIsExporting] = useState(false);
+    const [isExportingActivities, setIsExportingActivities] = useState(false);
     // Keep in sync with excludeKinds in transaction-history.tsx
     const excludeKinds = [2].join(",");
+    // Keep in sync with excludeKinds in activities-history.tsx
+    const activitiesExcludeKinds = [20].join(",");
 
     const handleExport = async () => {
         if (!poolDetail?.pool?.address || isExporting) return;
@@ -27,6 +30,18 @@ const PoolHistory = ({ poolDetail }: Props) => {
             // silent
         } finally {
             setIsExporting(false);
+        }
+    };
+
+    const handleExportActivities = async () => {
+        if (!poolDetail?.pool?.address || isExportingActivities) return;
+        setIsExportingActivities(true);
+        try {
+            await poolService.exportPoolActivities(poolDetail.pool.address, activitiesExcludeKinds);
+        } catch {
+            // silent
+        } finally {
+            setIsExportingActivities(false);
         }
     };
 
@@ -92,6 +107,17 @@ const PoolHistory = ({ poolDetail }: Props) => {
                     >
                         <DownloadIcon className="size-3.5" />
                         {isExporting ? "Exporting..." : "Export"}
+                    </button>
+                )}
+                {activeTab === "activity" && (
+                    <button
+                        type="button"
+                        onClick={handleExportActivities}
+                        disabled={isExportingActivities}
+                        className="mb-1 flex items-center gap-1.5 text-sm text-greyed disabled:opacity-50"
+                    >
+                        <DownloadIcon className="size-3.5" />
+                        {isExportingActivities ? "Exporting..." : "Export"}
                     </button>
                 )}
             </div>

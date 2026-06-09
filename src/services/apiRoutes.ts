@@ -15,6 +15,7 @@ export const API_ROUTES = {
     GET_POOL_DETAIL: (address: string) => `/pools/${address}`,
     GET_POOL_TXNS: (address: string) => `/pools/${address}/txns`,
     GET_POOL_ACTIVITIES: (address: string) => `/pools/${address}/actitvites`,
+    ACTIVITIES_EXPORT: (address: string) => `/pools/${address}/actitvites/export`,
     REASON_CLOSE_POOL: (address: string) => `/pools/${address}/close-reason`,
     TOGGLE_PARTNER_POOL: (address: string) => `/pools/${address}/partner`,
   },
@@ -35,6 +36,7 @@ export const API_ROUTES = {
       `/whitelist-users/${chainId}/${address}/info`,
     ANALYSIS: "/whitelist-users/analysis",
     HISTORY: "/whitelist-users/history",
+    HISTORY_EXPORT: "/whitelist-users/history/export",
   },
   ADMINS: {
     LIST: "/admins",
@@ -65,6 +67,7 @@ export const API_ROUTES = {
   FEE: {
     LIST: "/fee",
     STATS: "/fee/stats",
+    EXPORT: "/fee/export",
   },
   GENERAL: {
     NATIVE_PRICES: "/general/native-prices",

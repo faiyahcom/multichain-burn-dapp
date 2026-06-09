@@ -15,6 +15,7 @@ type Props = {
 const PoolHistory = ({ poolDetail }: Props) => {
     const [activeTab, setActiveTab] = useState<Tab>("transactions");
     const [isExporting, setIsExporting] = useState(false);
+    const [isExportingActivities, setIsExportingActivities] = useState(false);
     const excludeKinds = [2, 3, 5, 6, 10].join(",");
 
     const handleExport = async () => {
@@ -26,6 +27,18 @@ const PoolHistory = ({ poolDetail }: Props) => {
             // silent
         } finally {
             setIsExporting(false);
+        }
+    };
+
+    const handleExportActivities = async () => {
+        if (!poolDetail?.pool?.address || isExportingActivities) return;
+        setIsExportingActivities(true);
+        try {
+            await poolService.exportPoolActivities(poolDetail.pool.address);
+        } catch {
+            // silent
+        } finally {
+            setIsExportingActivities(false);
         }
     };
 
@@ -87,6 +100,17 @@ const PoolHistory = ({ poolDetail }: Props) => {
                     >
                         <DownloadIcon className="size-3.5" />
                         {isExporting ? "Exporting..." : "Export"}
+                    </button>
+                )}
+                {activeTab === "activity" && (
+                    <button
+                        type="button"
+                        onClick={handleExportActivities}
+                        disabled={isExportingActivities}
+                        className="flex items-center gap-1.5 text-sm disabled:opacity-50 border border-greyed/50 rounded px-2 py-1"
+                    >
+                        <DownloadIcon className="size-3.5" />
+                        {isExportingActivities ? "Exporting..." : "Export"}
                     </button>
                 )}
             </div>
