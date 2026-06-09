@@ -94,7 +94,8 @@ export const poolService = {
   ): Promise<void> => {
     const params = new URLSearchParams();
     if (excludeKinds) params.set("excludeKinds", excludeKinds);
-    const query = params.toString() ? `?${params.toString()}` : "";
+    params.set("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+    const query = `?${params.toString()}`;
     const url = `${API_BASE_URL}${ADMINS_API_ROUTES.TXNS_EXPORT(address)}${query}`;
 
     const accessToken = useAuthStore.getState().accessToken;
