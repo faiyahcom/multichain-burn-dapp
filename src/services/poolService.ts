@@ -1,5 +1,7 @@
 import { apiClient } from "@/config/axios";
+import { API_BASE_URL } from "@/config/constant";
 import { API_ROUTES } from "@/services/apiRoutes";
+import { useAuthStore } from "@/stores/authStore";
 import type {
   PoolListRequest,
   PoolListResponse,
@@ -10,6 +12,7 @@ import type {
   PoolTxnsResponse,
 } from "@/types/pool";
 const POOLS_API_ROUTES = API_ROUTES.POOLS;
+const ADMINS_API_ROUTES = API_ROUTES.ADMINS;
 
 export const poolService = {
   getPoolDetail: async (address: string) => {
@@ -80,5 +83,74 @@ export const poolService = {
       },
     );
     return response;
+  },
+  /**
+   * Downloads the transaction history for a pool as an Excel file.
+   * Uses a direct fetch (not apiClient) so we can handle a binary blob response.
+   */
+  exportPoolTxns: async (
+    address: string,
+    excludeKinds?: string,
+  ): Promise<void> => {
+    const params = new URLSearchParams();
+    if (excludeKinds) params.set("excludeKinds", excludeKinds);
+    params.set("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+    const query = `?${params.toString()}`;
+    const url = `${API_BASE_URL}${ADMINS_API_ROUTES.TXNS_EXPORT(address)}${query}`;
+
+    const accessToken = useAuthStore.getState().accessToken;
+    const res = await fetch(url, {
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        Accept: "*/*",
+      },
+    });
+
+    if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const filenameMatch = disposition.match(/filename="?([^";\n]+)"?/);
+    const filename = filenameMatch?.[1] ?? `txn-history-${address}.xlsx`;
+
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
+  },
+
+  /** Downloads the activities history for a pool as an Excel file. */
+  exportPoolActivities: async (
+    address: string,
+    excludeKinds?: string,
+  ): Promise<void> => {
+    const params = new URLSearchParams();
+    if (excludeKinds) params.set("excludeKinds", excludeKinds);
+    params.set("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+    const url = `${API_BASE_URL}${POOLS_API_ROUTES.ACTIVITIES_EXPORT(address)}?${params.toString()}`;
+
+    const accessToken = useAuthStore.getState().accessToken;
+    const res = await fetch(url, {
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        Accept: "*/*",
+      },
+    });
+
+    if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const filenameMatch = disposition.match(/filename="?([^";\n]+)"?/);
+    const filename = filenameMatch?.[1] ?? `activities-${address}.xlsx`;
+
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
   },
 };

@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from "@/config/constant";
 import {
     Table,
     TableHeader,
@@ -19,7 +20,6 @@ type Props = {
     poolDetail?: PoolDetailResponse;
 };
 
-const DEFAULT_PAGE_SIZE = 5;
 
 const ActivitiesHistory = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);

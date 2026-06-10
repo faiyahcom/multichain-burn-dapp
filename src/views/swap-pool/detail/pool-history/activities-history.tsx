@@ -1,3 +1,4 @@
+import { DEFAULT_PAGE_SIZE } from '@/config/constant';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from '@/components/ui/table';
 import { poolService } from '@/services/poolService';
 import { poolQueryKeys } from '@/services/queries/queryKey';
@@ -12,7 +13,6 @@ type Props = {
     poolDetail?: PoolDetailResponse;
 }
 
-const DEFAULT_PAGE_SIZE = 5;
 
 const ActivitiesHistory = ({ poolDetail }: Props) => {
     const [page, setPage] = useState(1);

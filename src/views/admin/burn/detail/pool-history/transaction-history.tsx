@@ -1,4 +1,5 @@
 import CustomPagination from "@/components/common/pagination";
+import { DEFAULT_PAGE_SIZE } from "@/config/constant";
 import CopyableText from "@/components/common/copyable-text";
 import {
   Table,
@@ -27,7 +28,6 @@ type Props = {
   poolDetail?: PoolDetailResponse;
 };
 
-const DEFAULT_PAGE_SIZE = 5;
 
 const burnActionLabel = (kind: keyof typeof txnKind): string => {
   if (kind === 1) return "Burn";

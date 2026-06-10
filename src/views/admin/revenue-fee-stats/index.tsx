@@ -9,6 +9,7 @@ import {
 } from "@/config/networks";
 import { useNativePrices } from "@/hooks/useNativePrices";
 import { feeService, feeTxnKind } from "@/services/feeService";
+import { DownloadIcon } from "lucide-react";
 import { feeQueryKeys } from "@/services/queries/queryKey";
 import { formatNativeWithUsd, shortenNumber } from "@/utils/helpers/numbers";
 import { formatTimestampSecondsToDate } from "@/utils/helpers/string";
@@ -33,6 +34,24 @@ const AdminRevenueFeeStats = () => {
   const [creationPage, setCreationPage] = useState(1);
   const [settlementPage, setSettlementPage] = useState(1);
   const [dialogType, setDialogType] = useState<TabType | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (isExporting) return;
+    setIsExporting(true);
+    try {
+      await feeService.exportFee({
+        table: activeTab === "creation" ? "creation_fee" : "settlement_fee",
+        chainId,
+        from: fromParam,
+        to: toParam,
+      });
+    } catch {
+      // silent
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const currentPage = activeTab === "creation" ? creationPage : settlementPage;
   const chainId = networkIdToChainId(networkId) ?? "";
@@ -54,12 +73,12 @@ const AdminRevenueFeeStats = () => {
     activeTab === "creation"
       ? [feeTxnKind.createBurnPool, feeTxnKind.createSwapPool].join(",")
       : [
-          feeTxnKind.claimBurnReward,
-          feeTxnKind.swap,
-          feeTxnKind.claimStakeReward,
-          feeTxnKind.joinLaunchpad,
-          feeTxnKind.claimLaunchpadReward,
-        ].join(",");
+        feeTxnKind.claimBurnReward,
+        feeTxnKind.swap,
+        feeTxnKind.claimStakeReward,
+        feeTxnKind.joinLaunchpad,
+        feeTxnKind.claimLaunchpadReward,
+      ].join(",");
 
   const statsParams = { chainId, from: fromParam, to: toParam };
   const listParams = {
@@ -93,35 +112,35 @@ const AdminRevenueFeeStats = () => {
         time: formatTimestampSecondsToDate({
           timestamp: record.timestamp,
         }),
-        poolName: record.pool.name,
-        poolAddress: record.poolAddress,
+        poolName: record?.pool?.name,
+        poolAddress: record?.poolAddress,
         userName: record?.executor?.name ?? "--",
-        userAddress: record.executorAddress,
-        chainId: record.chainId,
-        txHash: record.hash,
+        userAddress: record?.executorAddress,
+        chainId: record?.chainId,
+        txHash: record?.hash,
         feeAmount:
           activeTab === "creation"
             ? formatNativeWithUsd(
-                record.amount,
-                record.tokenDecimals,
-                nativeSymbol,
-                nativePriceForChain(record.chainId),
-              )
+              record?.amount,
+              record?.tokenDecimals,
+              nativeSymbol,
+              nativePriceForChain(record?.chainId),
+            )
             : shortenNumber({
-                number:
-                  Number(record.amount) / Math.pow(10, record.tokenDecimals),
-              }) + ` ${record.tokenSymbol}`,
+              number:
+                Number(record?.amount) / Math.pow(10, record?.tokenDecimals),
+            }) + ` ${record?.tokenSymbol}`,
       })),
     [listData],
   );
 
   const creationFeeDisplay = statsData?.create_fee
     ? formatNativeWithUsd(
-        statsData.create_fee,
-        nativeDecimals,
-        nativeSymbol,
-        nativePriceForChain(chainId),
-      )
+      statsData.create_fee,
+      nativeDecimals,
+      nativeSymbol,
+      nativePriceForChain(chainId),
+    )
     : "—";
   const settlementFeesCount = statsData?.settlement_fees.length ?? 0;
 
@@ -213,46 +232,55 @@ const AdminRevenueFeeStats = () => {
       </div>
 
       {/* Tabs */}
-      <div className="mb-6 flex items-end gap-10">
-        <button
-          onClick={() => setActiveTab("creation")}
-          className="relative pb-1 text-lg font-medium transition-colors"
-        >
-          <span
-            className={clsx(
-              "transition-colors",
-              activeTab === "creation"
-                ? "text-foreground"
-                : "text-greyed/50 hover:text-greyed",
-            )}
+      <div className="mb-6 flex items-end justify-between gap-10">
+        <div className="flex items-end gap-10">
+          <button
+            onClick={() => setActiveTab("creation")}
+            className="relative pb-1 text-lg font-medium transition-colors"
           >
-            Creation Fee
-          </span>
-          {activeTab === "creation" && (
-            <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-active" />
-          )}
-        </button>
-        <button
-          onClick={() => setActiveTab("settlement")}
-          className="relative pb-1 text-lg font-medium transition-colors"
-        >
-          <span
-            className={clsx(
-              "transition-colors",
-              activeTab === "settlement"
-                ? "text-foreground"
-                : "text-greyed/50 hover:text-greyed",
+            <span
+              className={clsx(
+                "transition-colors",
+                activeTab === "creation"
+                  ? "text-foreground"
+                  : "text-greyed/50 hover:text-greyed",
+              )}
+            >
+              Creation Fee
+            </span>
+            {activeTab === "creation" && (
+              <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-active" />
             )}
+          </button>
+          <button
+            onClick={() => setActiveTab("settlement")}
+            className="relative pb-1 text-lg font-medium transition-colors"
           >
-            Settlement fee
-          </span>
-          {activeTab === "settlement" && (
-            <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-active" />
-          )}
+            <span
+              className={clsx(
+                "transition-colors",
+                activeTab === "settlement"
+                  ? "text-foreground"
+                  : "text-greyed/50 hover:text-greyed",
+              )}
+            >
+              Settlement fee
+            </span>
+            {activeTab === "settlement" && (
+              <div className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-active" />
+            )}
+          </button>
+        </div>
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={isExporting}
+          className="flex items-center gap-1.5 text-sm disabled:opacity-50 border border-greyed/50 rounded px-2 py-1"
+        >
+          <DownloadIcon className="size-3.5" />
+          {isExporting ? "Exporting..." : "Export"}
         </button>
       </div>
-
-      {/* Table */}
       {activeTab === "creation" && (
         <FeeTable
           rows={feeRows}
