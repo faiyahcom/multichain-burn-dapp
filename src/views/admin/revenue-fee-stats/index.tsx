@@ -112,24 +112,24 @@ const AdminRevenueFeeStats = () => {
         time: formatTimestampSecondsToDate({
           timestamp: record.timestamp,
         }),
-        poolName: record.pool.name,
-        poolAddress: record.poolAddress,
+        poolName: record?.pool?.name,
+        poolAddress: record?.poolAddress,
         userName: record?.executor?.name ?? "--",
-        userAddress: record.executorAddress,
-        chainId: record.chainId,
-        txHash: record.hash,
+        userAddress: record?.executorAddress,
+        chainId: record?.chainId,
+        txHash: record?.hash,
         feeAmount:
           activeTab === "creation"
             ? formatNativeWithUsd(
-              record.amount,
-              record.tokenDecimals,
+              record?.amount,
+              record?.tokenDecimals,
               nativeSymbol,
-              nativePriceForChain(record.chainId),
+              nativePriceForChain(record?.chainId),
             )
             : shortenNumber({
               number:
-                Number(record.amount) / Math.pow(10, record.tokenDecimals),
-            }) + ` ${record.tokenSymbol}`,
+                Number(record?.amount) / Math.pow(10, record?.tokenDecimals),
+            }) + ` ${record?.tokenSymbol}`,
       })),
     [listData],
   );
