@@ -1,5 +1,7 @@
 import { apiClient } from "@/config/axios";
+import { API_BASE_URL } from "@/config/constant";
 import { API_ROUTES } from "@/services/apiRoutes";
+import { useAuthStore } from "@/stores/authStore";
 import type { PaginationResponse } from "@/types/common";
 
 const WHITELIST_USERS_API_ROUTES = API_ROUTES.WHITELIST_USERS;
@@ -162,5 +164,37 @@ export const whitelistUserService = {
       },
     );
     return response;
+  },
+
+  /** Downloads the transfer history as an Excel file using current active filters. */
+  exportTransferHistory: async (params: TransferHistoryRequest): Promise<void> => {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== null && v !== "") searchParams.set(k, String(v));
+    });
+    searchParams.set("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+    const url = `${API_BASE_URL}${WHITELIST_USERS_API_ROUTES.HISTORY_EXPORT}?${searchParams.toString()}`;
+
+    const accessToken = useAuthStore.getState().accessToken;
+    const res = await fetch(url, {
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        Accept: "*/*",
+      },
+    });
+
+    if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const filenameMatch = disposition.match(/filename="?([^";\n]+)"?/);
+    const filename = filenameMatch?.[1] ?? "transfer-history.xlsx";
+
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
   },
 };

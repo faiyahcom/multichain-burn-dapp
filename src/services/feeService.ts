@@ -1,5 +1,7 @@
 import { apiClient } from "@/config/axios";
+import { API_BASE_URL } from "@/config/constant";
 import { API_ROUTES } from "@/services/apiRoutes";
+import { useAuthStore } from "@/stores/authStore";
 import type { PaginationResponse } from "@/types/common";
 
 // ─── Fee list types ───────────────────────────────────────────────────────────
@@ -86,5 +88,42 @@ export const feeService = {
       { params },
     );
     return response;
+  },
+
+  /** Downloads the fee list as an Excel file with currently active filters. */
+  exportFee: async (params: {
+    table: "settlement_fee" | "creation_fee";
+    chainId: string;
+    from?: string;
+    to?: string;
+  }): Promise<void> => {
+    const searchParams = new URLSearchParams();
+    Object.entries(params).forEach(([k, v]) => {
+      if (v !== undefined && v !== "") searchParams.set(k, v);
+    });
+    searchParams.set("timezone", Intl.DateTimeFormat().resolvedOptions().timeZone);
+    const url = `${API_BASE_URL}${API_ROUTES.FEE.EXPORT}?${searchParams.toString()}`;
+
+    const accessToken = useAuthStore.getState().accessToken;
+    const res = await fetch(url, {
+      headers: {
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        Accept: "*/*",
+      },
+    });
+
+    if (!res.ok) throw new Error(`Export failed: ${res.status}`);
+
+    const blob = await res.blob();
+    const disposition = res.headers.get("content-disposition") ?? "";
+    const filenameMatch = disposition.match(/filename="?([^";\n]+)"?/);
+    const filename = filenameMatch?.[1] ?? "fee-export.xlsx";
+
+    const objectUrl = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = objectUrl;
+    anchor.download = filename;
+    anchor.click();
+    URL.revokeObjectURL(objectUrl);
   },
 };

@@ -12,8 +12,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { networkIdToChainId } from "@/config/networks";
-import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { whitelistUserService } from "@/services/whitelistUserService";
+import { whitelistUserQueryKeys } from "@/services/queries/queryKey";
 import { useAdminTransferHistoryFilterStore } from "@/stores/admin/transfer-history/search-filter-store";
 import { convertArrayToStringParam } from "@/utils/helpers/array";
 import { sciToFormatted, shortenNumber } from "@/utils/helpers/numbers";
